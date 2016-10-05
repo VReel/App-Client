@@ -33,3 +33,9 @@
 /Users/FoxBookAir/Documents/Unity/VRealPrototype/Temp/bin/Debug/UnityEditor.iOS.Extensions.Common.dll.mdb
 /Users/FoxBookAir/Documents/Unity/VRealPrototype/Temp/bin/Debug/UnityEditor.iOS.Extensions.Xcode.dll
 /Users/FoxBookAir/Documents/Unity/VRealPrototype/Temp/bin/Debug/UnityEditor.iOS.Extensions.Xcode.dll.mdb
+/Users/FoxBookAir/Documents/Unity/VRealPrototype/Temp/bin/Debug/UnityEditor.AppleTV.Extensions.dll
+/Users/FoxBookAir/Documents/Unity/VRealPrototype/Temp/bin/Debug/UnityEditor.Tizen.Extensions.dll
+/Users/FoxBookAir/Documents/Unity/VRealPrototype/Temp/bin/Debug/UnityEditor.SamsungTV.Extensions.dll
+/Users/FoxBookAir/Documents/Unity/VRealPrototype/Temp/bin/Debug/UnityEditor.WebGL.Extensions.dll
+/Users/FoxBookAir/Documents/Unity/VRealPrototype/Temp/bin/Debug/UnityEditor.LinuxStandalone.Extensions.dll
+/Users/FoxBookAir/Documents/Unity/VRealPrototype/Temp/bin/Debug/UnityEditor.WindowsStandalone.Extensions.dll
