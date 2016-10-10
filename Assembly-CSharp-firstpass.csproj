@@ -79,6 +79,14 @@
      <Compile Include="Assets\Standard Assets\Utility\TimedObjectDestructor.cs" />
      <Compile Include="Assets\Standard Assets\Utility\WaypointCircuit.cs" />
      <Compile Include="Assets\Standard Assets\Utility\WaypointProgressTracker.cs" />
+     <Compile Include="Assets\Standard Assets\VR\MenuButton.cs" />
+     <Compile Include="Assets\Standard Assets\VR\Reticle.cs" />
+     <Compile Include="Assets\Standard Assets\VR\VRDeviceManager.cs" />
+     <Compile Include="Assets\Standard Assets\VR\VREyeRaycaster.cs" />
+     <Compile Include="Assets\Standard Assets\VR\VRFPSCounter.cs" />
+     <Compile Include="Assets\Standard Assets\VR\VRInput.cs" />
+     <Compile Include="Assets\Standard Assets\VR\VRInteractiveItem.cs" />
+     <Compile Include="Assets\Standard Assets\VR\VRTrackingReset.cs" />
      <None Include="Assets\Standard Assets\Prototyping\Shaders\ProceduralSkyBox.shader" />
      <None Include="Assets\Standard Assets\Prototyping\Shaders\WorldCoordDiffuse.shader" />
      <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
