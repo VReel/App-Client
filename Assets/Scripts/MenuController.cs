@@ -4,9 +4,9 @@ using VRStandardAssets.Utils;
 
 public class MenuController : MonoBehaviour 
 {
-    public GameObject m_quadMenu = null;
-    public GameObject m_sphereMenu = null;
-
+    [SerializeField] private GameObject m_quadMenu;
+    [SerializeField] private GameObject m_sphereMenu;
+    [SerializeField] private GameObject m_GUICanvas;
     [SerializeField] private VRStandardAssets.Utils.VRInput m_input;
 
     private void OnEnable ()
@@ -54,6 +54,11 @@ public class MenuController : MonoBehaviour
             {
                 m_sphereMenu.SetActive(false);
             }
+
+            if (m_GUICanvas != null)
+            {
+                m_GUICanvas.SetActive(false);
+            }
         }
 
         if (swipe == VRStandardAssets.Utils.VRInput.SwipeDirection.DOWN)
@@ -66,6 +71,11 @@ public class MenuController : MonoBehaviour
             if (m_sphereMenu != null)
             {
                 m_sphereMenu.SetActive(true);
+            }
+
+            if (m_GUICanvas != null)
+            {
+                m_GUICanvas.SetActive(true);
             }
         }
     }

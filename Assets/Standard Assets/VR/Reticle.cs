@@ -8,8 +8,9 @@ namespace VRStandardAssets.Utils
     // reticle is either at a default position in space or on the
     // surface of a VRInteractiveItem as determined by the VREyeRaycaster.
     public class Reticle : MonoBehaviour
-    {
+    {        
         [SerializeField] private float m_DefaultDistance = 5f;      // The default distance away from the camera the reticle is placed.
+        [SerializeField] private float m_RaycastAdustment = 0.1f;   // The distance in front of any object we raycast onto, that the reticle is placed.
         [SerializeField] private bool m_UseNormal;                  // Whether the reticle should be placed parallel to a surface.
         [SerializeField] private Image m_Image;                     // Reference to the image component that represents the reticle.
         [SerializeField] private Transform m_ReticleTransform;      // We need to affect the reticle's transform.
@@ -67,7 +68,7 @@ namespace VRStandardAssets.Utils
         // This overload of SetPosition is used when the VREyeRaycaster has hit something.
         public void SetPosition (RaycastHit hit)
         {
-            m_ReticleTransform.position = hit.point;
+            m_ReticleTransform.position = hit.point - (m_RaycastAdustment * m_Camera.forward);
             m_ReticleTransform.localScale = m_OriginalScale * hit.distance;
 
             // If the reticle should use the normal of what has been hit...
