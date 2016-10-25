@@ -11,12 +11,12 @@ public class MenuController : MonoBehaviour
 
     private void OnEnable ()
     {
-        m_input.OnSwipe += OnSwipe;
+        //m_input.OnSwipe += OnSwipe;
     }
 
     private void OnDisable ()
     {
-        m_input.OnSwipe -= OnSwipe;
+        //m_input.OnSwipe -= OnSwipe;
     }     
 
 	void Update () 
@@ -59,6 +59,8 @@ public class MenuController : MonoBehaviour
             {
                 m_GUICanvas.SetActive(false);
             }
+
+            Debug.Log("------- VREEL: Hide Menu");
         }
 
         if (swipe == VRStandardAssets.Utils.VRInput.SwipeDirection.DOWN)
@@ -77,6 +79,8 @@ public class MenuController : MonoBehaviour
             {
                 m_GUICanvas.SetActive(true);
             }
+
+            Debug.Log("------- VREEL: Show Menu");
         }
     }
 }

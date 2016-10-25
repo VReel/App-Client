@@ -31,5 +31,7 @@ public class SelectVR : MonoBehaviour
     {       
         //UnityEngine.VR.VRSettings.enabled = false;
         VRSettings.enabled = !VRSettings.enabled;
+
+        Debug.Log("------- VREEL: Flipped VRSettings.enabled = " + VRSettings.enabled);
     }
 }

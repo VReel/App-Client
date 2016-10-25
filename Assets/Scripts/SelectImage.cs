@@ -34,5 +34,7 @@ public class SelectImage : MonoBehaviour
         {
             RenderSettings.skybox = skybox;
         }
+
+        Debug.Log("------- VREEL: Changed skybox to material = " + skybox.ToString());
     }
 }

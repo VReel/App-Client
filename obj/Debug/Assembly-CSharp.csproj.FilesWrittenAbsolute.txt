@@ -17,3 +17,9 @@
 /Users/FoxBookAir/Documents/Unity/VRealPrototype/Temp/bin/Debug/Assembly-CSharp.dll
 /Users/FoxBookAir/Documents/Unity/VRealPrototype/obj/Debug/Assembly-CSharp.dll
 /Users/FoxBookAir/Documents/Unity/VRealPrototype/obj/Debug/Assembly-CSharp.dll.mdb
+/Users/FoxBookAir/Documents/Unity/VRealPrototype/Temp/bin/Debug/AWSSDK.CognitoIdentity.dll
+/Users/FoxBookAir/Documents/Unity/VRealPrototype/Temp/bin/Debug/AWSSDK.Core.dll
+/Users/FoxBookAir/Documents/Unity/VRealPrototype/Temp/bin/Debug/AWSSDK.S3.dll
+/Users/FoxBookAir/Documents/Unity/VRealPrototype/Temp/bin/Debug/AWSSDK.SecurityToken.dll
+/Users/FoxBookAir/Documents/Unity/VRealPrototype/Temp/bin/Debug/AWSSDK.CognitoSync.dll
+/Users/FoxBookAir/Documents/Unity/VRealPrototype/Temp/bin/Debug/AWSSDK.IdentityManagement.dll
