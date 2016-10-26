@@ -45,7 +45,7 @@ namespace VRStandardAssets.Menu
         }
 
         private void HandleClick()
-        {    
+        {                
             OnButtonSelected(this);
         }
     }

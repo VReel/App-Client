@@ -1,25 +1,30 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;   // List
 using System.IO;
-using Amazon;                   // UnityInitializer
-using Amazon.CognitoIdentity;   // CognitoAWSCredentials
-using Amazon.S3;                // AmazonS3Client
-using Amazon.S3.Model;          // ListBucketsRequest
+using Amazon;                       // UnityInitializer
+using Amazon.CognitoIdentity;       // CognitoAWSCredentials
+using Amazon.S3;                    // AmazonS3Client
+using Amazon.S3.Model;              // ListBucketsRequest
 using Amazon.S3.Util;
 /*
 using Amazon.Runtime;
 */
 
 public class AWSS3Client : MonoBehaviour 
-{
+{    
     public string m_s3BucketName = null;
     public string m_sampleFileName = null;
-    public Text m_resultText;
-    public GameObject m_resultSphere;
+    public GameObject[] m_imageSpheres;
+
+    [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
 
     private AmazonS3Client m_s3Client = null;
     private CognitoAWSCredentials m_credentials = null;
+    private static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
+
+    private bool alreadyRan = false; 
 
 	void Start () 
 	{
@@ -34,43 +39,71 @@ public class AWSS3Client : MonoBehaviour
 
     public void OnMouseDown()
     {
-        GetObject();
+        GetAllImages();
     }
-	
-    public void GetObjects()
+
+    private void OnEnable ()
     {
-        m_resultText.text = "Fetching all the Objects from " + m_s3BucketName;
+        m_menuButton.OnButtonSelected += OnButtonSelected;
+    }
+
+    private void OnDisable ()
+    {
+        m_menuButton.OnButtonSelected -= OnButtonSelected;
+    }        
+
+    private void OnButtonSelected(VRStandardAssets.Menu.MenuButton button)
+    {
+        GetAllImages();
+    }
+
+    public void GetAllImages()
+    {
+        // TEMP - making sure this function only gets called once, as in my Test it doesn't need to run multiple times!
+        if (alreadyRan)
+        {
+            return;
+        }
+        alreadyRan = true;
+        // -------
+
+        Debug.Log("------- VREEL: Fetching all the Objects from" + m_s3BucketName);
 
         var request = new ListObjectsRequest()
         {
             BucketName = m_s3BucketName
         };
 
+        int currImageSphere = 0;
         m_s3Client.ListObjectsAsync(request, (responseObject) =>
         {
-            m_resultText.text += "\n";
             if (responseObject.Exception == null)
             {
-                m_resultText.text += "Got Response \nPrinting now \n";
-                responseObject.Response.S3Objects.ForEach((o) =>
+                Debug.Log("------- VREEL: Got Response \nPrinting now \n");
+                responseObject.Response.S3Objects.ForEach((s3object) =>
                 {
-                    m_resultText.text += string.Format("{0}\n", o.Key);
+                    if (ImageExtensions.Contains(Path.GetExtension(s3object.Key).ToUpperInvariant())) // Check that the file is indeed an image
+                    {                        
+                        GetImage(s3object.Key, m_imageSpheres[currImageSphere]); // Set this image onto one of the imageSpheres
+                        currImageSphere++;
+                        Debug.Log("------- VREEL:" + s3object.Key);
+                    }                        
                 });
             }
             else
             {
-                m_resultText.text += "Got Exception \n";
+                Debug.Log("------- VREEL: Got Exception");
             }
         });
     }
 
-    public void GetObject()
+    public void GetImage(string fileName, GameObject resultSphere)
     {
-        m_resultText.text = string.Format("fetching {0} from bucket {1}", m_s3BucketName, m_sampleFileName);
-        m_s3Client.GetObjectAsync(m_s3BucketName, m_sampleFileName, (responseObj) =>
-        {   
-            m_resultText.text += "\n";
-            var response = responseObj.Response;
+        string logString = string.Format("------- VREEL: Fetching {0} from bucket {1}", fileName, m_s3BucketName);
+        Debug.Log(logString);
+        m_s3Client.GetObjectAsync(m_s3BucketName, fileName, (s3ResponseObj) =>
+        {               
+            var response = s3ResponseObj.Response;
             if (response.ResponseStream != null)
             {   
                 using (var stream = response.ResponseStream)
@@ -81,14 +114,14 @@ public class AWSS3Client : MonoBehaviour
 
                     texture2d.LoadImage(myBinary);
 
-                    m_resultSphere.GetComponent<MeshRenderer>().material.mainTexture = texture2d;
+                    resultSphere.GetComponent<MeshRenderer>().material.mainTexture = texture2d;
                 }
 
-                m_resultText.text += "Success";
+                Debug.Log("------- VREEL: Success");
             }
             else
             {
-                m_resultText.text += "Got Exception";
+                Debug.Log("------- VREEL: Got Exception");
             }
         });
     }
