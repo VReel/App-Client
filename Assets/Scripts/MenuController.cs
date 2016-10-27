@@ -4,6 +4,8 @@ using VRStandardAssets.Utils;
 
 public class MenuController : MonoBehaviour 
 {
+    public bool m_swipeEnabled = true;      // Should swipe switch menu on/off
+
     [SerializeField] private GameObject m_quadMenu;
     [SerializeField] private GameObject m_sphereMenu;
     [SerializeField] private GameObject m_GUICanvas;
@@ -11,12 +13,12 @@ public class MenuController : MonoBehaviour
 
     private void OnEnable ()
     {
-        //m_input.OnSwipe += OnSwipe;
+        m_input.OnSwipe += OnSwipe;
     }
 
     private void OnDisable ()
     {
-        //m_input.OnSwipe -= OnSwipe;
+        m_input.OnSwipe -= OnSwipe;
     }     
 
 	void Update () 
@@ -43,6 +45,11 @@ public class MenuController : MonoBehaviour
 
     private void OnSwipe(VRStandardAssets.Utils.VRInput.SwipeDirection swipe)
     {
+        if (!m_swipeEnabled)
+        {
+            return;
+        }
+
         if (swipe == VRStandardAssets.Utils.VRInput.SwipeDirection.UP)
         {
             if (m_quadMenu != null)

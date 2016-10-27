@@ -1,15 +1,67 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.IO;
+using System.IO;                     //DirectoryInfo
+using System.Collections.Generic;    //List
 
 public class OpenGallery : MonoBehaviour 
 {
-    [SerializeField] private GameObject m_imageSphere;
+    public GameObject[] m_imageSpheres;
+
+    private int m_currPictureIndex = 0;         // Using the word "Picture" to represent images that are stored on the device
+    private List<string> m_pictureFilePaths;
+
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
+
+    public void Start()
+    {
+        m_pictureFilePaths = new List<string>();
+    }
 
     public void OnMouseDown()
     {
         OpenAndroidGallery();
+    }
+
+    public void OpenAndroidGallery()
+    {       
+        // This is only Gear 360 images! I need to figure out how to find all 360 images regardless of where they live in the device
+        m_currPictureIndex = 0;
+        m_pictureFilePaths.Clear();
+        string path = "/storage/emulated/0/DCIM/Gear 360/";
+
+        Debug.Log("------- VREEL: Storing all FilePaths from directory: " + path);
+        int index = 0;
+        foreach (string filePath in System.IO.Directory.GetFiles(path))
+        { 
+            m_pictureFilePaths.Add(filePath);
+            index++;
+        }
+
+        int numImageSpheres = m_imageSpheres.GetLength(0);
+        LoadPictures(m_currPictureIndex, numImageSpheres);
+
+        Debug.Log("------- VREEL: OpenAndroidGallery() called");
+    }
+
+    public void NextPictures()
+    {
+        int numImageSpheres = m_imageSpheres.GetLength(0);
+        int numFilePaths = m_pictureFilePaths.Count;
+
+        m_currPictureIndex = Mathf.Clamp(m_currPictureIndex + numImageSpheres, 0, numFilePaths);
+        LoadPictures(m_currPictureIndex, numImageSpheres);
+
+        Debug.Log("------- VREEL: NextPictures() called");
+    }
+
+    public void PreviousPictures()
+    {
+        int numImageSpheres = m_imageSpheres.GetLength(0);
+        int numFilePaths = m_pictureFilePaths.Count;
+
+        m_currPictureIndex = Mathf.Clamp(m_currPictureIndex - numImageSpheres, 0, numFilePaths);
+        LoadPictures(m_currPictureIndex, numImageSpheres);
+
+        Debug.Log("------- VREEL: PreviousPictures() called");
     }
 
     private void OnEnable ()
@@ -27,41 +79,32 @@ public class OpenGallery : MonoBehaviour
         OpenAndroidGallery();
     }        
 
-    /*
-     * EXAMPLE OF USING INTENTS!
-     
-    // Taken from http://answers.unity3d.com/questions/537476/open-gallery-android.html
-
-    // Intent intent = new Intent();
-    AndroidJavaClass intentClass = new AndroidJavaClass("android.content.Intent");
-    AndroidJavaObject intentObject = new AndroidJavaObject("android.content.Intent");
-
-    // intent.setAction(Intent.ACTION_VIEW);
-    intentObject.Call<AndroidJavaObject>("setAction", intentClass.GetStatic<string>("ACTION_VIEW"));
-
-    // intent.setData(Uri.parse("content://media/internal/images/media"));
-    AndroidJavaClass uriClass = new AndroidJavaClass("android.net.Uri");
-    AndroidJavaObject uriObject = uriClass.CallStatic<AndroidJavaObject>("parse", "content://media/internal/images/media"); //parse of the url's file
-    intentObject.Call<AndroidJavaObject>("putExtra", intentClass.GetStatic<string>("EXTRA_STREAM"), uriObject); //call putExtra with the uri object of the file
-    intentObject.Call<AndroidJavaObject>("setType", "image/jpeg"); //set the type of file
-
-    // startActivity(intent);
-    AndroidJavaClass unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-    AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
-    currentActivity.Call("startActivity", intentObject);
-    */
-
-    public void OpenAndroidGallery()
+    private void LoadPictures(int startingPictureIndex, int numImages)
     {
-        GameObject imageSphere = (GameObject) Instantiate(m_imageSphere, new Vector3(-0.5f, 0.0f, 3.0f), Quaternion.identity);       
-        Texture2D texture = new Texture2D(2, 2, TextureFormat.ARGB32, false);
+        Debug.Log(string.Format("------- VREEL: Loading {0} pictures beginning at index {1}. There are {2} pictures in the gallery!", 
+            numImages, startingPictureIndex, m_pictureFilePaths.Count));
 
-        string path = "/storage/emulated/0/DCIM/Gear 360/SAM_100_0091.jpg"; // Hardcoded path
-        byte[] fileByteData = File.ReadAllBytes(path); // make sure to have Write Access: External (SDCard)
-        texture.LoadImage(fileByteData);
+        int currPictureIndex = startingPictureIndex;
+        for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, currPictureIndex++)
+        {
+            if (currPictureIndex < m_pictureFilePaths.Count)
+            {   
+                Debug.Log("------- VREEL: Loop iteration: " + sphereIndex);
 
-        imageSphere.GetComponent<MeshRenderer>().material.mainTexture = texture;
+                string filePath = m_pictureFilePaths[currPictureIndex];
+                byte[] fileByteData = File.ReadAllBytes(filePath); // make sure to have Write Access: External (SDCard)
 
-        Debug.Log("------- VREEL: Open Gallery called");
+                Debug.Log("------- VREEL: Loaded from filePath: " + filePath);
+
+                Texture2D texture = new Texture2D(2, 2, TextureFormat.ARGB32, false);
+                texture.LoadImage(fileByteData);
+
+                Debug.Log("------- VREEL: Loaded data into texture");
+
+                m_imageSpheres[sphereIndex].GetComponent<MeshRenderer>().material.mainTexture = texture;
+
+                Debug.Log("------- VREEL: Set texture on ImageSphere");
+            }
+        }
     }
 }
