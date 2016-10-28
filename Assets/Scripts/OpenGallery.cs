@@ -1,15 +1,20 @@
 ﻿using UnityEngine;
 using System.IO;                     //DirectoryInfo
+using System.Collections;            //IEnumerator
 using System.Collections.Generic;    //List
+using System.Threading;              //Threading
+
+//TODO: Get Asynchronous loading of Images to work somehow!
 
 public class OpenGallery : MonoBehaviour 
 {
     public GameObject[] m_imageSpheres;
 
+    [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
+
     private int m_currPictureIndex = 0;         // Using the word "Picture" to represent images that are stored on the device
     private List<string> m_pictureFilePaths;
-
-    [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
+    //private System.Threading.Thread m_thread;
 
     public void Start()
     {
@@ -22,46 +27,47 @@ public class OpenGallery : MonoBehaviour
     }
 
     public void OpenAndroidGallery()
-    {       
+    {
+        Debug.Log("------- VREEL: OpenAndroidGallery() called");
+
         // This is only Gear 360 images! I need to figure out how to find all 360 images regardless of where they live in the device
         m_currPictureIndex = 0;
         m_pictureFilePaths.Clear();
         string path = "/storage/emulated/0/DCIM/Gear 360/";
 
         Debug.Log("------- VREEL: Storing all FilePaths from directory: " + path);
-        int index = 0;
-        foreach (string filePath in System.IO.Directory.GetFiles(path))
-        { 
-            m_pictureFilePaths.Add(filePath);
-            index++;
-        }
+
+        StoreAllFilePaths(path);
 
         int numImageSpheres = m_imageSpheres.GetLength(0);
-        LoadPictures(m_currPictureIndex, numImageSpheres);
 
-        Debug.Log("------- VREEL: OpenAndroidGallery() called");
+        StartCoroutine(LoadPictures(m_currPictureIndex, numImageSpheres));
+        //m_thread = new Thread(() => LoadPictures(m_currPictureIndex, numImageSpheres));
+        //m_thread.Start();
     }
 
     public void NextPictures()
     {
+        Debug.Log("------- VREEL: NextPictures() called");
+
         int numImageSpheres = m_imageSpheres.GetLength(0);
         int numFilePaths = m_pictureFilePaths.Count;
 
         m_currPictureIndex = Mathf.Clamp(m_currPictureIndex + numImageSpheres, 0, numFilePaths);
-        LoadPictures(m_currPictureIndex, numImageSpheres);
 
-        Debug.Log("------- VREEL: NextPictures() called");
+        StartCoroutine(LoadPictures(m_currPictureIndex, numImageSpheres));       
     }
 
     public void PreviousPictures()
     {
+        Debug.Log("------- VREEL: PreviousPictures() called");
+
         int numImageSpheres = m_imageSpheres.GetLength(0);
         int numFilePaths = m_pictureFilePaths.Count;
 
         m_currPictureIndex = Mathf.Clamp(m_currPictureIndex - numImageSpheres, 0, numFilePaths);
-        LoadPictures(m_currPictureIndex, numImageSpheres);
 
-        Debug.Log("------- VREEL: PreviousPictures() called");
+        StartCoroutine(LoadPictures(m_currPictureIndex, numImageSpheres));
     }
 
     private void OnEnable ()
@@ -79,7 +85,15 @@ public class OpenGallery : MonoBehaviour
         OpenAndroidGallery();
     }        
 
-    private void LoadPictures(int startingPictureIndex, int numImages)
+    private void StoreAllFilePaths(string path)
+    {
+        foreach (string filePath in System.IO.Directory.GetFiles(path))
+        { 
+            m_pictureFilePaths.Add(filePath);
+        }
+    }
+
+    private IEnumerator LoadPictures(int startingPictureIndex, int numImages)
     {
         Debug.Log(string.Format("------- VREEL: Loading {0} pictures beginning at index {1}. There are {2} pictures in the gallery!", 
             numImages, startingPictureIndex, m_pictureFilePaths.Count));
@@ -89,22 +103,30 @@ public class OpenGallery : MonoBehaviour
         {
             if (currPictureIndex < m_pictureFilePaths.Count)
             {   
-                Debug.Log("------- VREEL: Loop iteration: " + sphereIndex);
-
-                string filePath = m_pictureFilePaths[currPictureIndex];
-                byte[] fileByteData = File.ReadAllBytes(filePath); // make sure to have Write Access: External (SDCard)
-
-                Debug.Log("------- VREEL: Loaded from filePath: " + filePath);
-
-                Texture2D texture = new Texture2D(2, 2, TextureFormat.ARGB32, false);
-                texture.LoadImage(fileByteData);
-
-                Debug.Log("------- VREEL: Loaded data into texture");
-
-                m_imageSpheres[sphereIndex].GetComponent<MeshRenderer>().material.mainTexture = texture;
-
-                Debug.Log("------- VREEL: Set texture on ImageSphere");
+                StartCoroutine(LoadPicturesInternal(sphereIndex, currPictureIndex));
+                yield return new WaitForSeconds(3.0f); // HACK to deal with the lack of asynchronous image loading...
             }
-        }
+        }            
+    }
+
+    private IEnumerator LoadPicturesInternal(int sphereIndex, int currPictureIndex)
+    {
+        Debug.Log("------- VREEL: Loop iteration: " + sphereIndex);
+
+        string filePath = m_pictureFilePaths[currPictureIndex];
+        //byte[] fileByteData = File.ReadAllBytes(filePath); // make sure to have Write Access: External (SDCard)
+
+        Debug.Log("------- VREEL: Loaded from filePath: " + filePath);
+
+        WWW www = new WWW("file://" + filePath);
+        yield return www;
+        //Texture2D texture = new Texture2D(2, 2);
+        //texture.LoadImage(fileByteData);
+
+        Debug.Log("------- VREEL: Loaded data into texture");
+
+        m_imageSpheres[sphereIndex].GetComponent<MeshRenderer>().material.mainTexture = www.texture;
+
+        Debug.Log("------- VREEL: Set texture on ImageSphere");
     }
 }

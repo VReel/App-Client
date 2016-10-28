@@ -50,6 +50,7 @@
      <Compile Include="Assets\Scripts\AWSS3Client.cs" />
      <Compile Include="Assets\Scripts\MenuController.cs" />
      <Compile Include="Assets\Scripts\OpenGallery.cs" />
+     <Compile Include="Assets\Scripts\SelectArrow.cs" />
      <Compile Include="Assets\Scripts\SelectImage.cs" />
      <Compile Include="Assets\Scripts\SelectScene.cs" />
      <Compile Include="Assets\Scripts\SelectVR.cs" />
