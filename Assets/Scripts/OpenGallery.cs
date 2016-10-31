@@ -108,9 +108,10 @@ public class OpenGallery : MonoBehaviour
             if (currPictureIndex < m_pictureFilePaths.Count)
             {   
                 StartCoroutine(LoadPicturesInternal(sphereIndex, currPictureIndex));
+                Resources.UnloadUnusedAssets();
                 yield return new WaitForSeconds(2.0f); // HACK to deal with the lack of asynchronous image loading...
             }
-        }            
+        }    
     }
 
     private IEnumerator LoadPicturesInternal(int sphereIndex, int currPictureIndex)
