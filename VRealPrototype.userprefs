@@ -1,25 +1,25 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.AttachToProcess" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AWSS3Client.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/VRCameraController.cs">
     <Files>
-      <File FileName="Assets/Scripts/AWSS3Client.cs" Line="73" Column="6" />
-      <File FileName="Assets/Scripts/OpenGallery.cs" Line="65" Column="9" />
-      <File FileName="Assets/Scripts/SelectImage.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/MenuController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/SelectVR.cs" Line="16" Column="6" />
+      <File FileName="Assets/Scripts/AWSS3Client.cs" Line="29" Column="16" />
+      <File FileName="Assets/Scripts/SelectArrow.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/SelectImage.cs" Line="14" Column="18" />
+      <File FileName="Assets/Scripts/VRCameraController.cs" Line="26" Column="11" />
+      <File FileName="Assets/Scripts/MenuController.cs" Line="7" Column="5" />
+      <File FileName="Assets/Scripts/SelectVR.cs" Line="10" Column="1" />
       <File FileName="Assets/Standard Assets/VR/VREyeRaycaster.cs" Line="1" Column="1" />
       <File FileName="Assets/Standard Assets/VR/Reticle.cs" Line="1" Column="1" />
-      <File FileName="Assets/Standard Assets/VR/VRInput.cs" Line="1" Column="1" />
-      <File FileName="Assets/Standard Assets/VR/MenuButton.cs" Line="48" Column="14" />
+      <File FileName="Assets/Standard Assets/VR/VRInput.cs" Line="25" Column="35" />
+      <File FileName="Assets/Standard Assets/VR/MenuButton.cs" Line="1" Column="1" />
       <File FileName="Assets/Standard Assets/VR/VRInteractiveItem.cs" Line="1" Column="1" />
       <File FileName="Assets/Examples/License.txt" Line="1" Column="1" />
-      <File FileName="Assets/Standard Assets/VR/VRDeviceManager.cs" Line="10" Column="40" />
+      <File FileName="Assets/Standard Assets/VR/VRDeviceManager.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/OpenGallery.cs" Line="117" Column="114" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/Users/FoxBookAir/Documents/Unity/VRealPrototype/Assets/Scripts/AWSS3Client.cs" line="62" column="1" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches>
     <Watch file="../ClimberUnity/Assets/LevelManager.cs" line="83" offsetX="417" offsetY="1394" expression="m_currSpeed" liveUpdate="False" />

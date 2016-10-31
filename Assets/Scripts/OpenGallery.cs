@@ -14,6 +14,7 @@ public class OpenGallery : MonoBehaviour
 
     private int m_currPictureIndex = 0;         // Using the word "Picture" to represent images that are stored on the device
     private List<string> m_pictureFilePaths;
+    private static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
     //private System.Threading.Thread m_thread;
 
     public void Start()
@@ -89,7 +90,10 @@ public class OpenGallery : MonoBehaviour
     {
         foreach (string filePath in System.IO.Directory.GetFiles(path))
         { 
-            m_pictureFilePaths.Add(filePath);
+            if (ImageExtensions.Contains(Path.GetExtension(filePath).ToUpperInvariant())) // Check that the file is indeed an image
+            {                
+                m_pictureFilePaths.Add(filePath);
+            }
         }
     }
 
@@ -104,7 +108,7 @@ public class OpenGallery : MonoBehaviour
             if (currPictureIndex < m_pictureFilePaths.Count)
             {   
                 StartCoroutine(LoadPicturesInternal(sphereIndex, currPictureIndex));
-                yield return new WaitForSeconds(3.0f); // HACK to deal with the lack of asynchronous image loading...
+                yield return new WaitForSeconds(2.0f); // HACK to deal with the lack of asynchronous image loading...
             }
         }            
     }
