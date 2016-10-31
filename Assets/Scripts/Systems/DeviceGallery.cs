@@ -6,11 +6,9 @@ using System.Threading;              //Threading
 
 //TODO: Get Asynchronous loading of Images to work somehow!
 
-public class OpenGallery : MonoBehaviour 
+public class DeviceGallery : MonoBehaviour 
 {
     public GameObject[] m_imageSpheres;
-
-    [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
 
     private int m_currPictureIndex = 0;         // Using the word "Picture" to represent images that are stored on the device
     private List<string> m_pictureFilePaths;
@@ -20,11 +18,6 @@ public class OpenGallery : MonoBehaviour
     public void Start()
     {
         m_pictureFilePaths = new List<string>();
-    }
-
-    public void OnMouseDown()
-    {
-        OpenAndroidGallery();
     }
 
     public void OpenAndroidGallery()
@@ -71,21 +64,6 @@ public class OpenGallery : MonoBehaviour
         StartCoroutine(LoadPictures(m_currPictureIndex, numImageSpheres));
     }
 
-    private void OnEnable ()
-    {
-        m_menuButton.OnButtonSelected += OnButtonSelected;
-    }
-
-    private void OnDisable ()
-    {
-        m_menuButton.OnButtonSelected -= OnButtonSelected;
-    }        
-
-    private void OnButtonSelected(VRStandardAssets.Menu.MenuButton button)
-    {
-        OpenAndroidGallery();
-    }        
-
     private void StoreAllFilePaths(string path)
     {
         foreach (string filePath in System.IO.Directory.GetFiles(path))
@@ -130,7 +108,8 @@ public class OpenGallery : MonoBehaviour
 
         Debug.Log("------- VREEL: Loaded data into texture");
 
-        m_imageSpheres[sphereIndex].GetComponent<MeshRenderer>().material.mainTexture = www.texture;
+
+        m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndPath(www.texture, filePath);
 
         Debug.Log("------- VREEL: Set texture on ImageSphere");
     }

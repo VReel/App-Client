@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
-using VRStandardAssets.Utils;
 
 public class MenuController : MonoBehaviour 
 {

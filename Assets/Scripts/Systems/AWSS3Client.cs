@@ -1,24 +1,21 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
 using System.Collections.Generic;   // List
-using System.IO;
+using System.IO;                    // Stream
 using Amazon;                       // UnityInitializer
 using Amazon.CognitoIdentity;       // CognitoAWSCredentials
 using Amazon.S3;                    // AmazonS3Client
 using Amazon.S3.Model;              // ListBucketsRequest
-using Amazon.S3.Util;
 /*
+using Amazon.S3.Util;
 using Amazon.Runtime;
 */
 
 public class AWSS3Client : MonoBehaviour 
 {    
     public string m_s3BucketName = null;
-    public string m_sampleFileName = null;
     public GameObject[] m_imageSpheres;
 
-    [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
+    [SerializeField] private ImageSkybox m_imageSkybox;
 
     private AmazonS3Client m_s3Client = null;
     private CognitoAWSCredentials m_credentials = null;
@@ -37,27 +34,7 @@ public class AWSS3Client : MonoBehaviour
         m_s3Client = new AmazonS3Client (m_credentials, RegionEndpoint.EUWest1);
 	}
 
-    public void OnMouseDown()
-    {
-        GetAllImages();
-    }
-
-    private void OnEnable ()
-    {
-        m_menuButton.OnButtonSelected += OnButtonSelected;
-    }
-
-    private void OnDisable ()
-    {
-        m_menuButton.OnButtonSelected -= OnButtonSelected;
-    }        
-
-    private void OnButtonSelected(VRStandardAssets.Menu.MenuButton button)
-    {
-        GetAllImages();
-    }
-
-    public void GetAllImages()
+    public void DownloadAllImages()
     {
         // TEMP - making sure this function only gets called once, as in my Test it doesn't need to run multiple times!
         if (alreadyRan)
@@ -84,7 +61,7 @@ public class AWSS3Client : MonoBehaviour
                 {
                     if (ImageExtensions.Contains(Path.GetExtension(s3object.Key).ToUpperInvariant())) // Check that the file is indeed an image
                     {                        
-                        GetImage(s3object.Key, m_imageSpheres[currImageSphere]); // Set this image onto one of the imageSpheres
+                        DownloadImage(s3object.Key, m_imageSpheres[currImageSphere]); // Set this image onto one of the imageSpheres
                         currImageSphere++;
                         Debug.Log("------- VREEL:" + s3object.Key);
                     }                        
@@ -97,10 +74,12 @@ public class AWSS3Client : MonoBehaviour
         });
     }
 
-    public void GetImage(string fileName, GameObject resultSphere)
+    public void DownloadImage(string fileName, GameObject resultSphere)
     {
-        string logString = string.Format("------- VREEL: Fetching {0} from bucket {1}", fileName, m_s3BucketName);
+        string fullFileName = m_s3BucketName + fileName;
+        string logString = string.Format("------- VREEL: Fetching {0} from bucket {1}", fileName, m_s3BucketName);       
         Debug.Log(logString);
+
         m_s3Client.GetObjectAsync(m_s3BucketName, fileName, (s3ResponseObj) =>
         {               
             var response = s3ResponseObj.Response;
@@ -110,11 +89,10 @@ public class AWSS3Client : MonoBehaviour
                 {
                     byte[] myBinary = ToByteArray(stream);
 
-                    Texture2D texture2d = new Texture2D(2,2);
+                    Texture2D downloadedTexture = new Texture2D(2,2);
+                    downloadedTexture.LoadImage(myBinary);
 
-                    texture2d.LoadImage(myBinary);
-
-                    resultSphere.GetComponent<MeshRenderer>().material.mainTexture = texture2d;
+                    resultSphere.GetComponent<SelectImage>().SetImageAndPath(downloadedTexture, fullFileName);
                 }
 
                 Debug.Log("------- VREEL: Success");
@@ -125,20 +103,44 @@ public class AWSS3Client : MonoBehaviour
             }
         });
     }
-
-    /*
-    private byte[] ToByteArray2(Stream stream)
+        
+    public void UploadImage()
     {
-        stream.Position = 0;
-        byte[] buffer = new byte[stream.Length];
-        for (int totalBytesCopied = 0; totalBytesCopied < stream.Length; )
-        {
-            totalBytesCopied += stream.Read(buffer, totalBytesCopied, Convert.ToInt32(stream.Length) - totalBytesCopied);
-        }
-        return buffer;
-    }
-    */
+        string fileName = m_imageSkybox.GetImageFilePath();
 
+        Debug.Log("------- VREEL: UploadImage with FileName: " + fileName);
+
+        //Application.persistentDataPath + Path.DirectorySeparatorChar +
+        var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+        string key = "Images/" + Path.GetFileName(fileName);
+
+        Debug.Log("------- VREEL: Creating request object");
+        var request = new PostObjectRequest()
+        {
+            Bucket = m_s3BucketName,
+            Key = key,
+            InputStream = stream,
+            CannedACL = S3CannedACL.Private
+        };
+
+        Debug.Log("------- VREEL: Making HTTP post call");
+
+        m_s3Client.PostObjectAsync(request, (responseObj) =>
+        {
+            if (responseObj.Exception == null)
+            {
+                string logString = string.Format("------- VREEL: object {0} posted to bucket {1}", responseObj.Request.Key, responseObj.Request.Bucket);
+                Debug.Log(logString);
+            }
+            else
+            {
+                Debug.Log("------- VREEL: Exception while posting the result object");
+                Debug.Log("------- VREEL: Receieved error: " + responseObj.Response.HttpStatusCode.ToString());
+            }
+        });
+    }
+
+    // TODO Understand this function properly...
     private byte[] ToByteArray(Stream stream)
     {
         byte[] b = null;
@@ -156,5 +158,5 @@ public class AWSS3Client : MonoBehaviour
             b = ms.ToArray();
         }
         return b;
-    }
+    }        
 }

@@ -1,15 +1,13 @@
 ﻿using UnityEngine;
-using UnityEngine.VR;
-using System.Collections;
-using VRStandardAssets.Utils;
 
-public class SelectVR : MonoBehaviour 
+public class OpenGallery : MonoBehaviour 
 {
+    [SerializeField] private DeviceGallery m_deviceGallery;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
 
     public void OnMouseDown()
     {
-        InvertVREnabled();
+        OpenAndroidGallery();
     }
 
     private void OnEnable ()
@@ -24,14 +22,13 @@ public class SelectVR : MonoBehaviour
 
     private void OnButtonSelected(VRStandardAssets.Menu.MenuButton button)
     {
-        InvertVREnabled();
+        OpenAndroidGallery();
     }
 
-    private void InvertVREnabled()
-    {       
-        //UnityEngine.VR.VRSettings.enabled = false;
-        VRSettings.enabled = !VRSettings.enabled;
+    private void OpenAndroidGallery()
+    {
+        Debug.Log("------- VREEL: Called OpenAndroidGallery()");
 
-        Debug.Log("------- VREEL: Flipped VRSettings.enabled = " + VRSettings.enabled);
+        m_deviceGallery.OpenAndroidGallery();
     }
 }

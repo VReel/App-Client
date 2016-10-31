@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
-using VRStandardAssets.Utils;
 
 public class SelectArrow : MonoBehaviour 
 {
@@ -11,7 +9,7 @@ public class SelectArrow : MonoBehaviour
     };
 
     [SerializeField] private ArrowType m_arrowType = ArrowType.kNext;
-    [SerializeField] private OpenGallery m_openGallery;
+    [SerializeField] private DeviceGallery m_deviceGallery;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
 
     public void OnMouseDown()
@@ -40,11 +38,11 @@ public class SelectArrow : MonoBehaviour
 
         if (m_arrowType == ArrowType.kNext)
         {
-            m_openGallery.NextPictures();
+            m_deviceGallery.NextPictures();
         }
         else if (m_arrowType == ArrowType.kPrev)
         {
-            m_openGallery.PreviousPictures();
+            m_deviceGallery.PreviousPictures();
         }           
     }
 }
