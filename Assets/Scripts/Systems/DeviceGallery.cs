@@ -85,29 +85,27 @@ public class DeviceGallery : MonoBehaviour
         {
             if (currPictureIndex < m_pictureFilePaths.Count)
             {   
-                StartCoroutine(LoadPicturesInternal(sphereIndex, currPictureIndex));
+                Debug.Log("------- VREEL: Loop iteration: " + sphereIndex);
+                string filePath = m_pictureFilePaths[currPictureIndex];
+                StartCoroutine(LoadPicturesInternal(filePath, sphereIndex));
                 Resources.UnloadUnusedAssets();
                 yield return new WaitForSeconds(2.0f); // HACK to deal with the lack of asynchronous image loading...
             }
         }    
     }
 
-    private IEnumerator LoadPicturesInternal(int sphereIndex, int currPictureIndex)
-    {
-        Debug.Log("------- VREEL: Loop iteration: " + sphereIndex);
-
-        string filePath = m_pictureFilePaths[currPictureIndex];
-        //byte[] fileByteData = File.ReadAllBytes(filePath); // make sure to have Write Access: External (SDCard)
-
-        Debug.Log("------- VREEL: Loaded from filePath: " + filePath);
+    private IEnumerator LoadPicturesInternal(string filePath, int sphereIndex)
+    {        
+        Debug.Log("------- VREEL: Loading from filePath: " + filePath);
 
         WWW www = new WWW("file://" + filePath);
         yield return www;
+
+        //byte[] fileByteData = File.ReadAllBytes(filePath); // make sure to have Write Access: External (SDCard)
         //Texture2D texture = new Texture2D(2, 2);
         //texture.LoadImage(fileByteData);
 
         Debug.Log("------- VREEL: Loaded data into texture");
-
 
         m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndPath(www.texture, filePath);
 

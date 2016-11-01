@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;            //IEnumerator
 using System.Collections.Generic;   // List
 using System.IO;                    // Stream
 using Amazon;                       // UnityInitializer
@@ -19,11 +20,12 @@ public class AWSS3Client : MonoBehaviour
 
     private AmazonS3Client m_s3Client = null;
     private CognitoAWSCredentials m_credentials = null;
+
+    private int m_currS3ImageIndex = 0;
+    private List<string> m_s3ImageFilePaths;
     private static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
 
-    private bool alreadyRan = false; 
-
-	void Start () 
+    void Start () 
 	{
 		UnityInitializer.AttachToGameObject(this.gameObject);
 
@@ -32,78 +34,10 @@ public class AWSS3Client : MonoBehaviour
             RegionEndpoint.EUWest1 // Region
         );
         m_s3Client = new AmazonS3Client (m_credentials, RegionEndpoint.EUWest1);
+
+        m_s3ImageFilePaths = new List<string>();
 	}
 
-    public void DownloadAllImages()
-    {
-        // TEMP - making sure this function only gets called once, as in my Test it doesn't need to run multiple times!
-        if (alreadyRan)
-        {
-            return;
-        }
-        alreadyRan = true;
-        // -------
-
-        Debug.Log("------- VREEL: Fetching all the Objects from" + m_s3BucketName);
-
-        var request = new ListObjectsRequest()
-        {
-            BucketName = m_s3BucketName
-        };
-
-        int currImageSphere = 0;
-        m_s3Client.ListObjectsAsync(request, (responseObject) =>
-        {
-            if (responseObject.Exception == null)
-            {
-                Debug.Log("------- VREEL: Got Response \nPrinting now \n");
-                responseObject.Response.S3Objects.ForEach((s3object) =>
-                {
-                    if (ImageExtensions.Contains(Path.GetExtension(s3object.Key).ToUpperInvariant())) // Check that the file is indeed an image
-                    {                        
-                        DownloadImage(s3object.Key, m_imageSpheres[currImageSphere]); // Set this image onto one of the imageSpheres
-                        currImageSphere++;
-                        Debug.Log("------- VREEL:" + s3object.Key);
-                    }                        
-                });
-            }
-            else
-            {
-                Debug.Log("------- VREEL: Got Exception");
-            }
-        });
-    }
-
-    public void DownloadImage(string fileName, GameObject resultSphere)
-    {
-        string fullFileName = m_s3BucketName + fileName;
-        string logString = string.Format("------- VREEL: Fetching {0} from bucket {1}", fileName, m_s3BucketName);       
-        Debug.Log(logString);
-
-        m_s3Client.GetObjectAsync(m_s3BucketName, fileName, (s3ResponseObj) =>
-        {               
-            var response = s3ResponseObj.Response;
-            if (response.ResponseStream != null)
-            {   
-                using (var stream = response.ResponseStream)
-                {
-                    byte[] myBinary = ToByteArray(stream);
-
-                    Texture2D downloadedTexture = new Texture2D(2,2);
-                    downloadedTexture.LoadImage(myBinary);
-
-                    resultSphere.GetComponent<SelectImage>().SetImageAndPath(downloadedTexture, fullFileName);
-                }
-
-                Debug.Log("------- VREEL: Success");
-            }
-            else
-            {
-                Debug.Log("------- VREEL: Got Exception");
-            }
-        });
-    }
-        
     public void UploadImage()
     {
         string fileName = m_imageSkybox.GetImageFilePath();
@@ -136,6 +70,142 @@ public class AWSS3Client : MonoBehaviour
             {
                 Debug.Log("------- VREEL: Exception while posting the result object");
                 Debug.Log("------- VREEL: Receieved error: " + responseObj.Response.HttpStatusCode.ToString());
+            }
+        });
+    }
+
+    private bool alreadyRan = false; // TEMP
+    public void DownloadAllImages()
+    {
+        // TEMP - making sure this function only gets called once, as in my Test it doesn't need to run multiple times!
+        if (alreadyRan)
+        {
+            return;
+        }
+        alreadyRan = true;
+        // -------
+
+        Debug.Log("------- VREEL: Fetching all the Objects from" + m_s3BucketName);
+
+        var request = new ListObjectsRequest()
+        {
+            BucketName = m_s3BucketName
+        };
+
+        m_s3Client.ListObjectsAsync(request, (responseObject) =>
+        {
+            if (responseObject.Exception == null)
+            {
+                Debug.Log("------- VREEL: Got Response, printing now!");
+
+                //TODO: Make this foreach loop into a seperate function!
+                responseObject.Response.S3Objects.ForEach((s3object) =>
+                {
+                    if (ImageExtensions.Contains(Path.GetExtension(s3object.Key).ToUpperInvariant())) // Check that the file is indeed an image
+                    {   
+                        m_s3ImageFilePaths.Add(s3object.Key);
+                        Debug.Log("------- VREEL:" + s3object.Key);
+                    }
+                });
+
+                DownloadAllImagesInternal();
+            }
+            else
+            {
+                Debug.Log("------- VREEL: Got Exception");
+            }
+        });
+    }
+
+    public void NextImages()
+    {
+        Debug.Log("------- VREEL: NextPictures() called");
+
+        int numImageSpheres = m_imageSpheres.GetLength(0);
+        int numFilePaths = m_s3ImageFilePaths.Count;
+
+        m_currS3ImageIndex = Mathf.Clamp(m_currS3ImageIndex + numImageSpheres, 0, numFilePaths);
+
+        StartCoroutine(DownloadImagesAndSetSpheres(m_currS3ImageIndex, numImageSpheres));       
+    }
+
+    public void PreviousImages()
+    {
+        Debug.Log("------- VREEL: PreviousPictures() called");
+
+        int numImageSpheres = m_imageSpheres.GetLength(0);
+        int numFilePaths = m_s3ImageFilePaths.Count;
+
+        m_currS3ImageIndex = Mathf.Clamp(m_currS3ImageIndex - numImageSpheres, 0, numFilePaths);
+
+        StartCoroutine(DownloadImagesAndSetSpheres(m_currS3ImageIndex, numImageSpheres));
+    }
+
+    /*
+    private void StoreAllFilePaths(ResponseObject responseObject)   // WHATS THE TYPE HERE...!?
+    {
+        foreach (string filePath in System.IO.Directory.GetFiles(path))
+        { 
+            if (ImageExtensions.Contains(Path.GetExtension(filePath).ToUpperInvariant())) // Check that the file is indeed an image
+            {                
+                m_pictureFilePaths.Add(filePath);
+            }
+        }
+    }
+    */
+
+    private void DownloadAllImagesInternal()
+    {
+        int numImageSpheres = m_imageSpheres.GetLength(0);
+        StartCoroutine(DownloadImagesAndSetSpheres(m_currS3ImageIndex, numImageSpheres));
+    }
+
+    private IEnumerator DownloadImagesAndSetSpheres(int startingPictureIndex, int numImages)
+    {
+        Debug.Log(string.Format("------- VREEL: Downloading {0} pictures beginning at index {1}. There are {2} pictures in the S3 bucket!", 
+            numImages, startingPictureIndex, m_s3ImageFilePaths.Count));
+
+        int currPictureIndex = startingPictureIndex;
+        for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, currPictureIndex++)
+        {
+            if (currPictureIndex < m_s3ImageFilePaths.Count)
+            {   
+                Debug.Log("------- VREEL: Loop iteration: " + sphereIndex);
+                string filePath = m_s3ImageFilePaths[currPictureIndex];
+                DownloadImage(filePath, sphereIndex);
+                Resources.UnloadUnusedAssets();
+                yield return new WaitForSeconds(2.0f); // HACK to deal with the lack of asynchronous image loading...
+            }
+        }   
+    }
+
+    private void DownloadImage(string filePath, int sphereIndex)
+    {
+        string fullFilePath = m_s3BucketName + filePath;
+        string logString = string.Format("------- VREEL: Fetching {0} from bucket {1}", filePath, m_s3BucketName);       
+        Debug.Log(logString);
+
+        m_s3Client.GetObjectAsync(m_s3BucketName, filePath, (s3ResponseObj) =>
+        {               
+            var response = s3ResponseObj.Response;
+            if (response.ResponseStream != null)
+            {   
+                using (var stream = response.ResponseStream)
+                {
+                    byte[] myBinary = ToByteArray(stream);
+
+                    Texture2D downloadedTexture = new Texture2D(2,2);
+                    downloadedTexture.LoadImage(myBinary);
+
+                    m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndPath(downloadedTexture, fullFilePath);
+                    downloadedTexture = null;
+                }
+
+                Debug.Log("------- VREEL: Success");
+            }
+            else
+            {
+                Debug.Log("------- VREEL: Got Exception");
             }
         });
     }

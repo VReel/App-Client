@@ -10,6 +10,7 @@ public class SelectArrow : MonoBehaviour
 
     [SerializeField] private ArrowType m_arrowType = ArrowType.kNext;
     [SerializeField] private DeviceGallery m_deviceGallery;
+    [SerializeField] private AWSS3Client m_awsS3Client;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
 
     public void OnMouseDown()
@@ -36,13 +37,27 @@ public class SelectArrow : MonoBehaviour
     {    
         Debug.Log("------- VREEL: Called Scroll() on a " + m_arrowType);
 
-        if (m_arrowType == ArrowType.kNext)
+        if (m_deviceGallery != null)
         {
-            m_deviceGallery.NextPictures();
+            if (m_arrowType == ArrowType.kNext)
+            {
+                m_deviceGallery.NextPictures();
+            }
+            else if (m_arrowType == ArrowType.kPrev)
+            {
+                m_deviceGallery.PreviousPictures();
+            }      
         }
-        else if (m_arrowType == ArrowType.kPrev)
+        else if (m_awsS3Client != null)
         {
-            m_deviceGallery.PreviousPictures();
-        }           
+            if (m_arrowType == ArrowType.kNext)
+            {
+                m_awsS3Client.NextImages();
+            }
+            else if (m_arrowType == ArrowType.kPrev)
+            {
+                m_awsS3Client.PreviousImages();
+            }      
+        }
     }
 }
