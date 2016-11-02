@@ -74,7 +74,7 @@ public class DeviceGallery : MonoBehaviour
             }
         }
 
-        m_pictureFilePaths.Reverse();
+        m_pictureFilePaths.Reverse(); // Reversing to have the pictures appear in the order of newest first
     }
 
     private IEnumerator LoadPictures(int startingPictureIndex, int numImages)

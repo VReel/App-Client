@@ -19,7 +19,6 @@ namespace VRStandardAssets.Utils
             RIGHT
         };
 
-
         public event Action<SwipeDirection> OnSwipe;                // Called every frame passing in the swipe, including if there is no swipe.
         public event Action OnClick;                                // Called when Fire1 is released and it's not a double click.
         public event Action OnDown;                                 // Called when Fire1 is pressed.
@@ -27,10 +26,8 @@ namespace VRStandardAssets.Utils
         public event Action OnDoubleClick;                          // Called when a double click is detected.
         public event Action OnCancel;                               // Called when Cancel is pressed.
 
-
         [SerializeField] private float m_DoubleClickTime = 0.3f;    //The max time allowed between double clicks
         [SerializeField] private float m_SwipeWidth = 0.3f;         //The width of a swipe
-
 
         private Vector2 m_MouseDownPosition;                        // The screen position of the mouse when Fire1 is pressed.
         private Vector2 m_MouseUpPosition;                          // The screen position of the mouse when Fire1 is released.
@@ -38,15 +35,12 @@ namespace VRStandardAssets.Utils
         private float m_LastHorizontalValue;                        // The previous value of the horizontal axis used to detect keyboard swipes.
         private float m_LastVerticalValue;                          // The previous value of the vertical axis used to detect keyboard swipes.
 
-
         public float DoubleClickTime{ get { return m_DoubleClickTime; } }
-
 
         private void Update()
         {
             CheckInput();
         }
-
 
         private void CheckInput()
         {
@@ -59,8 +53,10 @@ namespace VRStandardAssets.Utils
                 m_MouseDownPosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
 
                 // If anything has subscribed to OnDown call it.
-                if (OnDown != null)
+                if (OnDown != null && UnityEngine.VR.VRSettings.enabled)
+                {
                     OnDown();
+                }
             }
 
             // This if statement is to gather information about the mouse when the button is up.
@@ -75,33 +71,43 @@ namespace VRStandardAssets.Utils
 
             // If there was no swipe this frame from the mouse, check for a keyboard swipe.
             if (swipe == SwipeDirection.NONE)
+            {
                 swipe = DetectKeyboardEmulatedSwipe();
+            }
 
             // If there are any subscribers to OnSwipe call it passing in the detected swipe.
             if (OnSwipe != null)
+            {
                 OnSwipe(swipe);
+            }
 
             // This if statement is to trigger events based on the information gathered before.
             if(Input.GetButtonUp ("Fire1"))
             {
                 // If anything has subscribed to OnUp call it.
-                if (OnUp != null)
+                if (OnUp != null && UnityEngine.VR.VRSettings.enabled)
+                {
                     OnUp();
+                }
 
                 // If the time between the last release of Fire1 and now is less
                 // than the allowed double click time then it's a double click.
                 if (Time.time - m_LastMouseUpTime < m_DoubleClickTime)
                 {
                     // If anything has subscribed to OnDoubleClick call it.
-                    if (OnDoubleClick != null)
+                    if (OnDoubleClick != null && UnityEngine.VR.VRSettings.enabled)
+                    {
                         OnDoubleClick();
+                    }
                 }
                 else
                 {
                     // If it's not a double click, it's a single click.
                     // If anything has subscribed to OnClick call it.
-                    if (OnClick != null)
+                    if (OnClick != null && UnityEngine.VR.VRSettings.enabled)
+                    {
                         OnClick();
+                    }
                 }
 
                 // Record the time when Fire1 is released.
@@ -112,7 +118,9 @@ namespace VRStandardAssets.Utils
             if (Input.GetButtonDown("Cancel"))
             {
                 if (OnCancel != null)
+                {
                     OnCancel();
+                }
             }
         }
 
@@ -179,19 +187,27 @@ namespace VRStandardAssets.Utils
 
             // If there is positive vertical input now and previously there wasn't the swipe is up.
             if (vertical > 0f && noVerticalInputPreviously)
+            {
                 return SwipeDirection.UP;
+            }
 
             // If there is negative vertical input now and previously there wasn't the swipe is down.
             if (vertical < 0f && noVerticalInputPreviously)
+            {
                 return SwipeDirection.DOWN;
+            }
 
             // If there is positive horizontal input now and previously there wasn't the swipe is right.
             if (horizontal > 0f && noHorizontalInputPreviously)
+            {
                 return SwipeDirection.RIGHT;
+            }
 
             // If there is negative horizontal input now and previously there wasn't the swipe is left.
             if (horizontal < 0f && noHorizontalInputPreviously)
+            {
                 return SwipeDirection.LEFT;
+            }
 
             // If the swipe meets none of these requirements there is no swipe.
             return SwipeDirection.NONE;
