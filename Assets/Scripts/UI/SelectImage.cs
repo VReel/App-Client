@@ -18,11 +18,6 @@ public class SelectImage : MonoBehaviour
         gameObject.GetComponent<MeshRenderer>().material.mainTexture = texture;
     }
 
-    public void OnMouseDown()
-    {
-        SetSkybox();
-    }
-
     private void OnEnable ()
     {
         m_menuButton.OnButtonSelected += OnButtonSelected;

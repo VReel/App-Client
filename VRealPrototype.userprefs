@@ -1,21 +1,25 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.AttachToProcess" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/VRCameraController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Standard Assets/VR/MenuButton.cs">
     <Files>
-      <File FileName="Assets/Scripts/AWSS3Client.cs" Line="29" Column="16" />
-      <File FileName="Assets/Scripts/SelectArrow.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/SelectImage.cs" Line="14" Column="18" />
-      <File FileName="Assets/Scripts/VRCameraController.cs" Line="26" Column="11" />
-      <File FileName="Assets/Scripts/MenuController.cs" Line="7" Column="5" />
-      <File FileName="Assets/Scripts/SelectVR.cs" Line="10" Column="1" />
+      <File FileName="Assets/Standard Assets/VR/VRInteractiveItem.cs" Line="63" Column="10" />
+      <File FileName="Assets/Standard Assets/VR/MenuButton.cs" Line="10" Column="1" />
+      <File FileName="Assets/Scripts/Systems/AWSS3Client.cs" Line="200" Column="126" />
+      <File FileName="Assets/Scripts/Systems/DeviceGallery.cs" Line="12" Column="5" />
+      <File FileName="Assets/Scripts/UI/DownloadImages.cs" Line="5" Column="5" />
       <File FileName="Assets/Standard Assets/VR/VREyeRaycaster.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/SelectArrow.cs" Line="38" Column="39" />
       <File FileName="Assets/Standard Assets/VR/Reticle.cs" Line="1" Column="1" />
-      <File FileName="Assets/Standard Assets/VR/VRInput.cs" Line="25" Column="35" />
-      <File FileName="Assets/Standard Assets/VR/MenuButton.cs" Line="1" Column="1" />
-      <File FileName="Assets/Standard Assets/VR/VRInteractiveItem.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/UploadImage.cs" Line="28" Column="32" />
+      <File FileName="Assets/Standard Assets/VR/VRInput.cs" Line="1" Column="1" />
       <File FileName="Assets/Examples/License.txt" Line="1" Column="1" />
       <File FileName="Assets/Standard Assets/VR/VRDeviceManager.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/OpenGallery.cs" Line="117" Column="114" />
+      <File FileName="Assets/Scripts/UI/SelectVR.cs" Line="2" Column="22" />
+      <File FileName="Assets/Scripts/UI/OpenGallery.cs" Line="30" Column="60" />
+      <File FileName="Assets/Scripts/UI/SelectImage.cs" Line="1" Column="19" />
+      <File FileName="Assets/Scripts/UI/MenuController.cs" Line="25" Column="3" />
+      <File FileName="Assets/Scripts/Systems/VRCameraController.cs" Line="1" Column="19" />
+      <File FileName="Assets/Scripts/Systems/ImageSkybox.cs" Line="7" Column="19" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

@@ -5,11 +5,6 @@ public class SelectVR : MonoBehaviour
 {
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
 
-    public void OnMouseDown()
-    {
-        InvertVREnabled();
-    }
-
     private void OnEnable ()
     {
         m_menuButton.OnButtonSelected += OnButtonSelected;

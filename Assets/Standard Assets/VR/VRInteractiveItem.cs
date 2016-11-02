@@ -36,7 +36,6 @@ namespace VRStandardAssets.Utils
                 OnOver();
         }
 
-
         public void Out()
         {
             m_IsOver = false;
@@ -45,27 +44,23 @@ namespace VRStandardAssets.Utils
                 OnOut();
         }
 
-
         public void Click()
         {
             if (OnClick != null)
                 OnClick();
         }
 
-
         public void DoubleClick()
         {
             if (OnDoubleClick != null)
                 OnDoubleClick();
         }
-
-
+            
         public void Up()
         {
             if (OnUp != null)
                 OnUp();
         }
-
 
         public void Down()
         {

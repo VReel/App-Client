@@ -13,11 +13,6 @@ public class SelectArrow : MonoBehaviour
     [SerializeField] private AWSS3Client m_awsS3Client;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
 
-    public void OnMouseDown()
-    {
-        Scroll();
-    }
-
     private void OnEnable ()
     {
         m_menuButton.OnButtonSelected += OnButtonSelected;

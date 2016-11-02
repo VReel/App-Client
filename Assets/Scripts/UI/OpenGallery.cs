@@ -5,11 +5,6 @@ public class OpenGallery : MonoBehaviour
     [SerializeField] private DeviceGallery m_deviceGallery;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
 
-    public void OnMouseDown()
-    {
-        OpenAndroidGallery();
-    }
-
     private void OnEnable ()
     {
         m_menuButton.OnButtonSelected += OnButtonSelected;
