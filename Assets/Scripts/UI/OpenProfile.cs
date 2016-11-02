@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class DownloadImages : MonoBehaviour 
+public class OpenProfile : MonoBehaviour 
 {
     [SerializeField] private AWSS3Client m_awsS3Client;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;   

@@ -44,7 +44,6 @@ public class AWSS3Client : MonoBehaviour
 
         Debug.Log("------- VREEL: UploadImage with FileName: " + fileName);
 
-        //Application.persistentDataPath + Path.DirectorySeparatorChar +
         var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
         string key = "Images/" + Path.GetFileName(fileName);
 
@@ -74,17 +73,8 @@ public class AWSS3Client : MonoBehaviour
         });
     }
 
-    private bool alreadyRan = false; // TEMP
     public void DownloadAllImages()
     {
-        // TEMP - making sure this function only gets called once, as in my Test it doesn't need to run multiple times!
-        if (alreadyRan)
-        {
-            return;
-        }
-        alreadyRan = true;
-        // -------
-
         Debug.Log("------- VREEL: Fetching all the Objects from" + m_s3BucketName);
 
         var request = new ListObjectsRequest()
@@ -107,6 +97,8 @@ public class AWSS3Client : MonoBehaviour
                         Debug.Log("------- VREEL: Fetched " + s3object.Key);
                     }
                 });
+
+                m_s3ImageFilePaths.Reverse(); // Reversing to have the images appear in the order of newest first
 
                 DownloadAllImagesInternal();
             }

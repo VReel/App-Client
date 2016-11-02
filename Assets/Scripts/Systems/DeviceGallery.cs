@@ -73,6 +73,8 @@ public class DeviceGallery : MonoBehaviour
                 m_pictureFilePaths.Add(filePath);
             }
         }
+
+        m_pictureFilePaths.Reverse();
     }
 
     private IEnumerator LoadPictures(int startingPictureIndex, int numImages)

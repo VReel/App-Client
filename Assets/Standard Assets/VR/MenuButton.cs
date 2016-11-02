@@ -13,8 +13,8 @@ namespace VRStandardAssets.Menu
         [SerializeField] private Sprite m_spriteButtonUp;
         [SerializeField] private VRStandardAssets.Utils.VRInteractiveItem m_InteractiveItem;       // The interactive item used to know how the user is interacting with the button
 
-        private bool m_gazeOver;                                            // Whether the user is looking at the VRInteractiveItem currently.
-        private bool m_buttonDown;                                          // Whether the user is pushing the VRInteractiveItem down.
+        private bool m_gazeOver = false;                                    // Whether the user is looking at the VRInteractiveItem currently.
+        private bool m_buttonDown = false;                                  // Whether the user is pushing the VRInteractiveItem down.
 
         public bool GetGazeOver()
         {
@@ -24,6 +24,24 @@ namespace VRStandardAssets.Menu
         public bool GetButtonDown()
         {
             return m_buttonDown;
+        }
+
+        public Sprite GetSpriteButtonUp()
+        {
+            return m_spriteButtonUp;
+        }
+
+        public void SetSpriteButtonUp(Sprite spriteButtonUp)
+        {
+            m_spriteButtonUp = spriteButtonUp;
+            if (m_buttonDown)
+            {
+                HandleDown();
+            }
+            else
+            {
+                HandleUp();
+            }
         }
 
         private void OnEnable ()
