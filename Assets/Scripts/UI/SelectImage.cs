@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
+using System.Collections;            //IEnumerator
 
 public class SelectImage : MonoBehaviour 
 {
+    public float m_scalingFactor = 0.88f;
+    
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
 
@@ -15,7 +18,30 @@ public class SelectImage : MonoBehaviour
     public void SetImageAndPath(Texture texture, string filePath)
     {
         m_imageFilePath = filePath;
+
+        StartCoroutine(AnimateTexture(texture));
+    }
+
+    private IEnumerator AnimateTexture(Texture texture)
+    {
+        Vector3 originalScale = transform.localScale;
+
+        const float kMinShrink = 0.05f; // Minimum value you the sphere can shrink to...
+        while (transform.localScale.magnitude > kMinShrink)
+        {
+            transform.localScale = transform.localScale * m_scalingFactor;
+            yield return new WaitForEndOfFrame();
+        }
+
         gameObject.GetComponent<MeshRenderer>().material.mainTexture = texture;
+
+        while (transform.localScale.magnitude < originalScale.magnitude)
+        {
+            transform.localScale = transform.localScale / m_scalingFactor;
+            yield return new WaitForEndOfFrame();
+        }
+
+        transform.localScale = originalScale;
     }
 
     private void OnEnable ()

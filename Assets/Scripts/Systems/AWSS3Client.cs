@@ -104,7 +104,7 @@ public class AWSS3Client : MonoBehaviour
                     if (ImageExtensions.Contains(Path.GetExtension(s3object.Key).ToUpperInvariant())) // Check that the file is indeed an image
                     {   
                         m_s3ImageFilePaths.Add(s3object.Key);
-                        Debug.Log("------- VREEL:" + s3object.Key);
+                        Debug.Log("------- VREEL: Fetched " + s3object.Key);
                     }
                 });
 
@@ -112,7 +112,7 @@ public class AWSS3Client : MonoBehaviour
             }
             else
             {
-                Debug.Log("------- VREEL: Got Exception");
+                Debug.Log("------- VREEL: Got an Exception calling 'ListObjectsAsync()'");
             }
         });
     }
@@ -201,11 +201,11 @@ public class AWSS3Client : MonoBehaviour
                     downloadedTexture = null;
                 }
 
-                Debug.Log("------- VREEL: Success");
+                Debug.Log("------- VREEL: Successfully downloaded and set " + fullFilePath);
             }
             else
             {
-                Debug.Log("------- VREEL: Got Exception");
+                Debug.Log("------- VREEL: Got an Exception downloading " + fullFilePath);
             }
         });
     }
