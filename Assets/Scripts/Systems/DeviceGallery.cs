@@ -4,8 +4,6 @@ using System.Collections;            //IEnumerator
 using System.Collections.Generic;    //List
 using System.Threading;              //Threading
 
-//TODO: Get Asynchronous loading of Images to work somehow!
-
 public class DeviceGallery : MonoBehaviour 
 {
     public GameObject[] m_imageSpheres;
@@ -107,7 +105,6 @@ public class DeviceGallery : MonoBehaviour
                 string filePath = m_pictureFilePaths[currPictureIndex];
                 coroutineQueue.EnqueueAction(LoadPicturesInternal(filePath, sphereIndex));
                 coroutineQueue.EnqueueWait(2.0f);
-                Resources.UnloadUnusedAssets();
             }
             else
             {
@@ -135,6 +132,8 @@ public class DeviceGallery : MonoBehaviour
 
         Debug.Log("------- VREEL: Loaded data into texture");
 
+        // TODO: Make the copying of www.texture into this function call not block! - below is coming to 77.6MB of TextureData! (Don't think this is correct)... 
+        Debug.Log("------- VREEL: Calling SetImageAndFilePath which will block on copying texture of size " + www.texture.GetRawTextureData().Length);
         m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndFilePath(www.texture, filePath);
 
         /*
@@ -148,5 +147,7 @@ public class DeviceGallery : MonoBehaviour
         */
 
         Debug.Log("------- VREEL: Set texture on ImageSphere");
+
+        Resources.UnloadUnusedAssets();
     }
 }

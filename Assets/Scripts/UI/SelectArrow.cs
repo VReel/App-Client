@@ -12,6 +12,7 @@ public class SelectArrow : MonoBehaviour
     [SerializeField] private MeshCollider m_meshCollider;
     [SerializeField] private Image m_arrowImage;
     [SerializeField] private ArrowType m_arrowType = ArrowType.kNext;
+    [SerializeField] private MenuController m_menuController;
     [SerializeField] private DeviceGallery m_deviceGallery;
     [SerializeField] private AWSS3Client m_awsS3Client;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
@@ -30,6 +31,14 @@ public class SelectArrow : MonoBehaviour
 
     private bool ShouldBeActive()
     {
+        if (m_menuController != null)
+        {
+            if (!m_menuController.GetMenuActive())
+            {
+                return false;
+            }
+        }
+
         if (m_deviceGallery != null)
         {
             if (m_arrowType == ArrowType.kNext)

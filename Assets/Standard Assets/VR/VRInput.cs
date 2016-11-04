@@ -130,17 +130,15 @@ namespace VRStandardAssets.Utils
             // Get the direction from the mouse position when Fire1 is pressed to when it is released.
             Vector2 swipeData = (m_MouseUpPosition - m_MouseDownPosition);           
 
-            // If the direction of the swipe has a small width it is vertical.
-            bool swipeIsVertical = Mathf.Abs (swipeData.x) > m_SwipeWidth;
+            // If the X swipe is greater than the required width we register it as horizontal
+            bool swipeIsHorizontal = Mathf.Abs(swipeData.x) > m_SwipeWidth;
 
-            // If the direction of the swipe has a small height it is horizontal.
-            bool swipeIsHorizontal = Mathf.Abs(swipeData.y) > m_SwipeWidth;
+            // If the Y swipe is greater than the required width we register it as vertical
+            bool swipeIsVertical = Mathf.Abs(swipeData.y) > m_SwipeWidth;
 
-            /*
             Debug.Log("------- VREEL: Swipe Width: " + m_SwipeWidth);
-            Debug.Log("------- VREEL: Swipe Length X: " + Mathf.Abs (swipeData.x));
+            Debug.Log("------- VREEL: Swipe Length X: " + Mathf.Abs(swipeData.x));
             Debug.Log("------- VREEL: Swipe Length Y: " + Mathf.Abs(swipeData.y));
-            */
 
             // If the swipe has a positive y component and is vertical the swipe is up.
             if (swipeData.y > 0f && swipeIsVertical)

@@ -4,10 +4,17 @@ public class MenuController : MonoBehaviour
 {
     public bool m_swipeEnabled = true;      // When on, swiping switches the menu on/off
 
-    [SerializeField] private GameObject m_sphereMenu;
+    [SerializeField] private GameObject m_menuContainerObject;
     [SerializeField] private GameObject m_GUICanvas;
     [SerializeField] private VRStandardAssets.Utils.VRInput m_input;
     [SerializeField] private GameObject[] m_menuBarButtons;
+
+    private bool m_isMenuActive = true;
+
+    public bool GetMenuActive()
+    {
+        return m_isMenuActive;
+    }
 
     private void OnEnable ()
     {
@@ -78,15 +85,31 @@ public class MenuController : MonoBehaviour
     }
 
     private void SetMenuActive(bool active)
-    {
-        if (m_sphereMenu != null)
+    {        
+        if (m_menuContainerObject != null)
         {
-            m_sphereMenu.SetActive(active);
+            //We Trawl through all the subobjects, hiding all meshes, images and colliders!
+            foreach(var mesh in m_menuContainerObject.GetComponentsInChildren<MeshRenderer>())
+            {                
+                mesh.enabled = active;
+            }
+
+            foreach(var image in m_menuContainerObject.GetComponentsInChildren<UnityEngine.UI.Image>())
+            {                
+                image.enabled = active;
+            }
+
+            foreach(var collider in m_menuContainerObject.GetComponentsInChildren<Collider>())
+            {                
+                collider.enabled = active;
+            }
         }
 
         if (m_GUICanvas != null)
         {
             m_GUICanvas.SetActive(active);
         }
+
+        m_isMenuActive = active;
     }
 }

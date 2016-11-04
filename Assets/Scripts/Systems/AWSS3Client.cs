@@ -133,7 +133,7 @@ public class AWSS3Client : MonoBehaviour
 
         m_currS3ImageIndex = Mathf.Clamp(m_currS3ImageIndex + numImageSpheres, 0, numFilePaths);
 
-        coroutineQueue.Clear(); // Ensure we stop loading somethign that we may be loading
+        coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
         DownloadAllImagesInternal();
     }
 
@@ -146,7 +146,7 @@ public class AWSS3Client : MonoBehaviour
 
         m_currS3ImageIndex = Mathf.Clamp(m_currS3ImageIndex - numImageSpheres, 0, numFilePaths);
 
-        coroutineQueue.Clear(); // Ensure we stop loading somethign that we may be loading
+        coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
         DownloadAllImagesInternal();
     }
 
@@ -246,16 +246,17 @@ public class AWSS3Client : MonoBehaviour
             }
         }
 
+        // The following is generally coming out to around 6-7MB in size...
         Debug.Log("------- VREEL: Finished iterating, length of byte[] is " + myBinary.Length);
 
-        //byte[] myBinary = ToByteArray(stream);
-
+        // TODO: Make LoadImage() not block!
         Texture2D downloadedTexture = new Texture2D(2,2);
         downloadedTexture.LoadImage(myBinary);
         yield return new WaitForEndOfFrame();
 
-        Debug.Log("------- VREEL: Finished Loading Image, texture width  " + downloadedTexture.width + " + height " + downloadedTexture.height);
+        Debug.Log("------- VREEL: Finished Loading Image, texture width x height:  " + downloadedTexture.width + " x " + downloadedTexture.height);
 
+        // TODO: Make copying texture not block!
         m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndFilePath(downloadedTexture, fullFilePath);
         downloadedTexture = null;
         yield return new WaitForEndOfFrame();
