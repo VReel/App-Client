@@ -12,7 +12,7 @@ using Amazon.Runtime;
 */
 
 public class AWSS3Client : MonoBehaviour 
-{    
+{   
     public string m_s3BucketName = null;
     public GameObject[] m_imageSpheres;
 
@@ -24,6 +24,7 @@ public class AWSS3Client : MonoBehaviour
     private int m_currS3ImageIndex = 0;
     private List<string> m_s3ImageFilePaths;
     private static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
+    private CoroutineQueue coroutineQueue;
 
     void Start () 
 	{
@@ -36,7 +37,22 @@ public class AWSS3Client : MonoBehaviour
         m_s3Client = new AmazonS3Client (m_credentials, RegionEndpoint.EUWest1);
 
         m_s3ImageFilePaths = new List<string>();
+
+        coroutineQueue = new CoroutineQueue( this );
+        coroutineQueue.StartLoop();
 	}
+
+    public bool IsIndexAtStart()
+    {
+        return m_currS3ImageIndex == 0;
+    }
+
+    public bool IsIndexAtEnd()
+    {
+        int numImageSpheres = m_imageSpheres.GetLength(0);
+        int numFiles = m_s3ImageFilePaths.Count;
+        return m_currS3ImageIndex >= (numFiles - numImageSpheres);       
+    }
 
     public void UploadImage()
     {
@@ -88,8 +104,7 @@ public class AWSS3Client : MonoBehaviour
             {
                 Debug.Log("------- VREEL: Got Response, printing now!");
 
-                //TODO: Make this foreach loop into a seperate function!
-                responseObject.Response.S3Objects.ForEach((s3object) =>
+                responseObject.Response.S3Objects.ForEach((s3object) => //NOTE: Making this into a seperate function seemed more work than worth
                 {
                     if (ImageExtensions.Contains(Path.GetExtension(s3object.Key).ToUpperInvariant())) // Check that the file is indeed an image
                     {   
@@ -118,7 +133,8 @@ public class AWSS3Client : MonoBehaviour
 
         m_currS3ImageIndex = Mathf.Clamp(m_currS3ImageIndex + numImageSpheres, 0, numFilePaths);
 
-        StartCoroutine(DownloadImagesAndSetSpheres(m_currS3ImageIndex, numImageSpheres));       
+        coroutineQueue.Clear(); // Ensure we stop loading somethign that we may be loading
+        DownloadAllImagesInternal();
     }
 
     public void PreviousImages()
@@ -130,32 +146,22 @@ public class AWSS3Client : MonoBehaviour
 
         m_currS3ImageIndex = Mathf.Clamp(m_currS3ImageIndex - numImageSpheres, 0, numFilePaths);
 
-        StartCoroutine(DownloadImagesAndSetSpheres(m_currS3ImageIndex, numImageSpheres));
+        coroutineQueue.Clear(); // Ensure we stop loading somethign that we may be loading
+        DownloadAllImagesInternal();
     }
-
-    /*
-    private void StoreAllFilePaths(ResponseObject responseObject)   // WHATS THE TYPE HERE...!?
-    {
-        foreach (string filePath in System.IO.Directory.GetFiles(path))
-        { 
-            if (ImageExtensions.Contains(Path.GetExtension(filePath).ToUpperInvariant())) // Check that the file is indeed an image
-            {                
-                m_pictureFilePaths.Add(filePath);
-            }
-        }
-    }
-    */
 
     private void DownloadAllImagesInternal()
     {
         int numImageSpheres = m_imageSpheres.GetLength(0);
-        StartCoroutine(DownloadImagesAndSetSpheres(m_currS3ImageIndex, numImageSpheres));
+        DownloadImagesAndSetSpheres(m_currS3ImageIndex, numImageSpheres);
     }
 
-    private IEnumerator DownloadImagesAndSetSpheres(int startingPictureIndex, int numImages)
+    private void DownloadImagesAndSetSpheres(int startingPictureIndex, int numImages)
     {
         Debug.Log(string.Format("------- VREEL: Downloading {0} pictures beginning at index {1}. There are {2} pictures in the S3 bucket!", 
             numImages, startingPictureIndex, m_s3ImageFilePaths.Count));
+
+        Resources.UnloadUnusedAssets();
 
         int currPictureIndex = startingPictureIndex;
         for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, currPictureIndex++)
@@ -164,42 +170,99 @@ public class AWSS3Client : MonoBehaviour
             {   
                 Debug.Log("------- VREEL: Loop iteration: " + sphereIndex);
                 string filePath = m_s3ImageFilePaths[currPictureIndex];
-                DownloadImage(filePath, sphereIndex);
-                Resources.UnloadUnusedAssets();
-                yield return new WaitForSeconds(2.0f); // HACK to deal with the lack of asynchronous image loading...
+                DownloadImage(filePath, sphereIndex, currPictureIndex, numImages);
             }
-        }   
+            else
+            {
+                m_imageSpheres[sphereIndex].GetComponent<SelectImage>().Hide();
+            }
+        }
+
+        Resources.UnloadUnusedAssets();
     }
 
-    private void DownloadImage(string filePath, int sphereIndex)
+    private void DownloadImage(string filePath, int sphereIndex, int pictureIndex, int numImages)
     {
         string fullFilePath = m_s3BucketName + filePath;
-        string logString = string.Format("------- VREEL: Fetching {0} from bucket {1}", filePath, m_s3BucketName);       
-        Debug.Log(logString);
+        string logString01 = string.Format("------- VREEL: Fetching {0} from bucket {1}", filePath, m_s3BucketName);       
+        Debug.Log(logString01);
 
         m_s3Client.GetObjectAsync(m_s3BucketName, filePath, (s3ResponseObj) =>
         {               
             var response = s3ResponseObj.Response;
             if (response.ResponseStream != null)
             {   
-                using (var stream = response.ResponseStream)
+                bool requestStillValid = (m_currS3ImageIndex <= pictureIndex) &&  (pictureIndex < m_currS3ImageIndex + numImages); // Request no longer valid as user pressed Next or Previous arrows
+                string logString02 = string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", requestStillValid, m_currS3ImageIndex, pictureIndex, numImages); 
+                Debug.Log(logString02);
+                if (requestStillValid)
                 {
-                    byte[] myBinary = ToByteArray(stream);
+                    coroutineQueue.EnqueueAction(ConvertStreamAndSetImage(response, sphereIndex, fullFilePath));
+                    coroutineQueue.EnqueueWait(2.0f);
 
-                    Texture2D downloadedTexture = new Texture2D(2,2);
-                    downloadedTexture.LoadImage(myBinary);
-
-                    m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndPath(downloadedTexture, fullFilePath);
-                    downloadedTexture = null;
+                    Debug.Log("------- VREEL: Successfully downloaded and set " + fullFilePath);
+                }
+                else
+                {
+                    Debug.Log("------- VREEL: Downloaded item successfully but was thrown away because user has moved to previous or next: " + fullFilePath);
                 }
 
-                Debug.Log("------- VREEL: Successfully downloaded and set " + fullFilePath);
+                Resources.UnloadUnusedAssets();
             }
             else
             {
                 Debug.Log("------- VREEL: Got an Exception downloading " + fullFilePath);
             }
         });
+    }
+
+
+    private IEnumerator ConvertStreamAndSetImage(Amazon.S3.Model.GetObjectResponse response, int sphereIndex, string fullFilePath)
+    {
+        Debug.Log("------- VREEL: ConvertStreamAndSetImage for " + fullFilePath);
+
+        const int kNumIterationsPerFrame = 200;
+        byte[] myBinary = null;
+        using (var stream = response.ResponseStream)
+        {            
+            using( MemoryStream ms = new MemoryStream() )
+            {
+                int iterations = 0;
+                int byteCount = 0;
+                do
+                {
+                    byte[] buf = new byte[1024];
+                    byteCount = stream.Read(buf, 0, 1024);
+                    ms.Write(buf, 0, byteCount);
+                    iterations++;
+                    if (iterations % kNumIterationsPerFrame == 0)
+                    {                        
+                        yield return new WaitForEndOfFrame();
+                    }
+                } 
+                while(stream.CanRead && byteCount > 0);
+
+                myBinary = ms.ToArray();
+            }
+        }
+
+        Debug.Log("------- VREEL: Finished iterating, length of byte[] is " + myBinary.Length);
+
+        //byte[] myBinary = ToByteArray(stream);
+
+        Texture2D downloadedTexture = new Texture2D(2,2);
+        downloadedTexture.LoadImage(myBinary);
+        yield return new WaitForEndOfFrame();
+
+        Debug.Log("------- VREEL: Finished Loading Image, texture width  " + downloadedTexture.width + " + height " + downloadedTexture.height);
+
+        m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndFilePath(downloadedTexture, fullFilePath);
+        downloadedTexture = null;
+        yield return new WaitForEndOfFrame();
+
+        Debug.Log("------- VREEL: Finished Setting Image!");
+
+        Resources.UnloadUnusedAssets();
     }
 
     // TODO Understand this function properly...

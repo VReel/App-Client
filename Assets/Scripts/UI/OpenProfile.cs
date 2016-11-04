@@ -17,10 +17,10 @@ public class OpenProfile : MonoBehaviour
 
     private void OnButtonSelected(VRStandardAssets.Menu.MenuButton button)
     {        
-        DownloadAllImages();
+        OpenUserProfile();
     }
 
-    private void DownloadAllImages()
+    private void OpenUserProfile()
     {
         Debug.Log("------- VREEL: Called DownloadImage()");
         

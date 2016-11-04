@@ -48,6 +48,7 @@
      <Compile Include="Assets\Examples\CognitoSyncManagerSample.cs" />
      <Compile Include="Assets\Examples\S3Example.cs" />
      <Compile Include="Assets\Scripts\Systems\AWSS3Client.cs" />
+     <Compile Include="Assets\Scripts\Systems\CoroutineQueue.cs" />
      <Compile Include="Assets\Scripts\Systems\DeviceGallery.cs" />
      <Compile Include="Assets\Scripts\Systems\ImageSkybox.cs" />
      <Compile Include="Assets\Scripts\Systems\MenuController.cs" />
