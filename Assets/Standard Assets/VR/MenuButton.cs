@@ -93,8 +93,8 @@ namespace VRStandardAssets.Menu
         }
 
         private void HandleClick()
-        {                
-            OnButtonSelected(this);
+        {               
+            //OnButtonSelected(this);
         }
 
         // NOTE: The following functions is for making debugging without a headset easier...
