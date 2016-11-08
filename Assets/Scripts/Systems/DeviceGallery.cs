@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;        //UnityWebRequest
 using System.IO;                     //DirectoryInfo
 using System.Collections;            //IEnumerator
 using System.Collections.Generic;    //List
@@ -100,8 +101,7 @@ public class DeviceGallery : MonoBehaviour
         for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, currPictureIndex++)
         {
             if (currPictureIndex < m_pictureFilePaths.Count)
-            {   
-                Debug.Log("------- VREEL: Loop iteration: " + sphereIndex);
+            {                   
                 string filePath = m_pictureFilePaths[currPictureIndex];
                 coroutineQueue.EnqueueAction(LoadPicturesInternal(filePath, sphereIndex));
                 coroutineQueue.EnqueueWait(2.0f);
@@ -119,8 +119,31 @@ public class DeviceGallery : MonoBehaviour
     {        
         Debug.Log("------- VREEL: Loading from filePath: " + filePath);
 
+        // NOTE: When I keep calling www.texture it will crash due to multiple allocations!
+
         WWW www = new WWW("file://" + filePath);
+        //string path = "/storage/emulated/0/DCIM/Gear 360/SAM_100_0093.jpg";
+        //WWW www = new WWW("file://" + path);
+        //string url = "http://lookingglass.services/wp-content/uploads/2016/06/360panorama.jpg"; // 950KB
+        //string url = "https://upload.wikimedia.org/wikipedia/commons/6/6f/Helvellyn_Striding_Edge_360_Panorama,_Lake_District_-_June_09.jpg"; // 9.3MB
+        //WWW www = new WWW(url);
         yield return www;
+
+        //UnityWebRequest uwr = new UnityWebRequest(url);
+        /*
+        UnityWebRequest uwr = new UnityWebRequest("file://" + filePath);
+        DownloadHandlerTexture textureDownloadHandler = new DownloadHandlerTexture(true);
+        uwr.downloadHandler = textureDownloadHandler;
+        yield return uwr.Send();
+        if(uwr.isError) 
+        {
+            Debug.Log("------- VREEL: Error on loading texture");
+            yield break;
+        }
+
+        Texture2D t = textureDownloadHandler.texture;
+        Debug.Log("------- VREEL: Downloaded texture of size height x width: " + t.height + " x " + t.width);
+        */
 
         //ResourceRequest request = Resources.LoadAsync(filePath);
         //yield return request;
@@ -130,10 +153,14 @@ public class DeviceGallery : MonoBehaviour
         //Texture2D texture = new Texture2D(2, 2);
         //texture.LoadImage(fileByteData);
 
-        Debug.Log("------- VREEL: Loaded data into texture");
+        //coroutineQueue.EnqueueAction(LoadPicturesInternal2(www.texture, filePath, sphereIndex));
+        //coroutineQueue.EnqueueWait(2.0f);
 
-        // TODO: Make the copying of www.texture into this function call not block! - below is coming to 77.6MB of TextureData! (Don't think this is correct)... 
-        Debug.Log("------- VREEL: Calling SetImageAndFilePath which will block on copying texture of size " + www.texture.GetRawTextureData().Length);
+        //Debug.Log("------- VREEL: Loaded data into texture");
+
+        // TODO: Make the copying of www.texture into this function call not block! 
+        //Debug.Log("------- VREEL: Calling SetImageAndFilePath which will block on copying texture of size height x width: " + www.texture.height + " x " + www.texture.width);
+        //m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndFilePath(ref www, filePath);
         m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndFilePath(www.texture, filePath);
 
         /*
@@ -146,7 +173,53 @@ public class DeviceGallery : MonoBehaviour
         yield return tempThread.Join();
         */
 
-        Debug.Log("------- VREEL: Set texture on ImageSphere");
+        //Debug.Log("------- VREEL: Set texture on ImageSphere");
+
+        Resources.UnloadUnusedAssets();
+    }
+
+    private IEnumerator LoadPicturesInternal2(Texture2D source, string filePath, int sphereIndex)
+    {
+        int textureWidth = source.width;
+        int textureHeight = source.height;
+
+        Debug.Log("------- VREEL: Downloaded texture is being copied, Width x Height= " 
+            + textureWidth + " x " + textureHeight + " ; Size in pixels = " 
+            + textureWidth * textureHeight );
+
+        Texture2D myTexture = new Texture2D(textureWidth, textureHeight, source.format, false);
+        yield return myTexture;
+
+        const int kNumIterationsPerFrame = 400000;
+        int iterationCounter = 0;
+        Color tempSourceColor = Color.black;
+
+        Debug.Log("------- VREEL: Entering LoadPicturesInternal2 loop");
+        for (int y = 0; y < textureHeight; y++)
+        {
+            for (int x = 0; x < textureWidth; x++)
+            {                
+                //Debug.Log("------- VREEL: GetPixel(" + x + "," + y + ")");
+                tempSourceColor = source.GetPixel(x, y);
+
+                //Debug.Log("------- VREEL: SetPixel(" + x + "," + y + ")");
+                myTexture.SetPixel(x, y, tempSourceColor);
+
+                iterationCounter++;
+
+                if (iterationCounter % kNumIterationsPerFrame == 0)
+                {
+                    Debug.Log("------- VREEL: Yielding LoadPicturesInternal2 at Iteration number: " 
+                        + iterationCounter + " Pixel: (" + x + "," + y + ")");
+                    yield return new WaitForEndOfFrame(); 
+                }
+            }
+        }
+
+        //Apply changes to the Texture
+        myTexture.Apply();
+
+        m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndFilePath(myTexture, filePath);
 
         Resources.UnloadUnusedAssets();
     }

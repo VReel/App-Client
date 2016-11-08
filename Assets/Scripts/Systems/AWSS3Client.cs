@@ -221,7 +221,7 @@ public class AWSS3Client : MonoBehaviour
     {
         Debug.Log("------- VREEL: ConvertStreamAndSetImage for " + fullFilePath);
 
-        const int kNumIterationsPerFrame = 200;
+        const int kNumIterationsPerFrame = 150;
         byte[] myBinary = null;
         using (var stream = response.ResponseStream)
         {            
@@ -249,16 +249,8 @@ public class AWSS3Client : MonoBehaviour
         // The following is generally coming out to around 6-7MB in size...
         Debug.Log("------- VREEL: Finished iterating, length of byte[] is " + myBinary.Length);
 
-        // TODO: Make LoadImage() not block!
-        Texture2D downloadedTexture = new Texture2D(2,2);
-        downloadedTexture.LoadImage(myBinary);
-        yield return new WaitForEndOfFrame();
-
-        Debug.Log("------- VREEL: Finished Loading Image, texture width x height:  " + downloadedTexture.width + " x " + downloadedTexture.height);
-
         // TODO: Make copying texture not block!
-        m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndFilePath(downloadedTexture, fullFilePath);
-        downloadedTexture = null;
+        m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndFilePath(myBinary, fullFilePath);
         yield return new WaitForEndOfFrame();
 
         Debug.Log("------- VREEL: Finished Setting Image!");

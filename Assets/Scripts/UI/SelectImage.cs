@@ -9,19 +9,44 @@ public class SelectImage : MonoBehaviour
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
 
+    private Texture2D m_imageSphereTexture;
     private string m_imageFilePath; // All ImageSphere's have a path (either through the internet, or local to the device) associated with them!
     private string kEmptyString = "emptyString";
+
+    public void Awake()
+    {
+        m_imageSphereTexture = new Texture2D(2,2);
+    }
 
     public string GetImageFilePath()
     {
         return m_imageFilePath;
     }
 
-    public void SetImageAndFilePath(Texture texture, string filePath)
+    public void SetImageAndFilePath(byte[] textureStream, string filePath)
     {
         m_imageFilePath = filePath;
+        m_imageSphereTexture.LoadImage(textureStream);
 
-        StartCoroutine(AnimateSetTexture(texture));
+        Debug.Log("------- VREEL: Finished Loading Image, texture width x height:  " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
+
+        StartCoroutine(AnimateSetTexture());
+    }
+
+    public void SetImageAndFilePath(Texture2D texture, string filePath)
+    {
+        m_imageFilePath = filePath;
+        m_imageSphereTexture = texture;
+
+        StartCoroutine(AnimateSetTexture());
+    }
+
+    public void SetImageAndFilePath(ref WWW www, string filePath)
+    {
+        m_imageFilePath = filePath;
+        www.LoadImageIntoTexture(m_imageSphereTexture);
+
+        StartCoroutine(AnimateSetTexture());
     }
 
     public void Hide()
@@ -31,7 +56,7 @@ public class SelectImage : MonoBehaviour
         StartCoroutine(AnimateHide());
     }
 
-    private IEnumerator AnimateSetTexture(Texture texture)
+    private IEnumerator AnimateSetTexture()
     {        
         const float kMinShrink = 0.05f; // Minimum value you the sphere can shrink to...
         while (transform.localScale.magnitude > kMinShrink)
@@ -40,7 +65,7 @@ public class SelectImage : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
-        gameObject.GetComponent<MeshRenderer>().material.mainTexture = texture;
+        gameObject.GetComponent<MeshRenderer>().material.mainTexture = m_imageSphereTexture;
 
         while (transform.localScale.magnitude < m_defaultScale)
         {
@@ -79,9 +104,8 @@ public class SelectImage : MonoBehaviour
     private void SetSkybox()
     {    
         if (m_imageSphereSkybox != null)
-        {
-            Texture myTexture = gameObject.GetComponent<MeshRenderer>().material.mainTexture;
-            m_imageSphereSkybox.SetImageAndPath(myTexture, m_imageFilePath);
+        {            
+            m_imageSphereSkybox.SetImageAndPath(m_imageSphereTexture, m_imageFilePath);
         }
     }
 }
