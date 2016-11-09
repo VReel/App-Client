@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.VR; //VRSettings
 
 public class MenuController : MonoBehaviour 
 {
@@ -14,6 +15,11 @@ public class MenuController : MonoBehaviour
     public bool GetMenuActive()
     {
         return m_isMenuActive;
+    }
+
+    public void InvertVREnabled() // Unsuable until Oculus update their SDK...
+    {        
+        VRSettings.enabled = !VRSettings.enabled;
     }
 
     private void OnEnable ()

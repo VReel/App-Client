@@ -51,15 +51,12 @@
      <Compile Include="Assets\Scripts\Systems\CoroutineQueue.cs" />
      <Compile Include="Assets\Scripts\Systems\DeviceGallery.cs" />
      <Compile Include="Assets\Scripts\Systems\ImageSkybox.cs" />
+     <Compile Include="Assets\Scripts\Systems\KeyBoard.cs" />
      <Compile Include="Assets\Scripts\Systems\MenuController.cs" />
      <Compile Include="Assets\Scripts\Systems\VRCameraController.cs" />
-     <Compile Include="Assets\Scripts\UI\OpenGallery.cs" />
-     <Compile Include="Assets\Scripts\UI\OpenProfile.cs" />
      <Compile Include="Assets\Scripts\UI\SelectArrow.cs" />
      <Compile Include="Assets\Scripts\UI\SelectImage.cs" />
-     <Compile Include="Assets\Scripts\UI\SelectVR.cs" />
      <Compile Include="Assets\Scripts\UI\SelectedButton.cs" />
-     <Compile Include="Assets\Scripts\UI\UploadImage.cs" />
      <None Include="Assets\Standard Assets\Prototyping\Shaders\ProceduralSkyBox.shader" />
      <None Include="Assets\Standard Assets\Prototyping\Shaders\WorldCoordDiffuse.shader" />
      <None Include="Assets\Shader\UIOverlay.shader" />
