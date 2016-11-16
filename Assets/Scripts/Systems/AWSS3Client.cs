@@ -26,7 +26,7 @@ public class AWSS3Client : MonoBehaviour
     private static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
     private CoroutineQueue coroutineQueue;
 
-    void Start () 
+    void Start() 
 	{
 		UnityInitializer.AttachToGameObject(this.gameObject);
 
@@ -52,6 +52,20 @@ public class AWSS3Client : MonoBehaviour
         int numImageSpheres = m_imageSpheres.GetLength(0);
         int numFiles = m_s3ImageFilePaths.Count;
         return m_currS3ImageIndex >= (numFiles - numImageSpheres);       
+    }
+
+    public void Login()
+    {
+        Debug.Log("------- VREEL: Login called");
+
+        //TODO - write Login functionality
+    }
+
+    public void SignUp()
+    {
+        Debug.Log("------- VREEL: SignUp called");
+
+        //TODO - write SignUp functionality
     }
 
     public void UploadImage()

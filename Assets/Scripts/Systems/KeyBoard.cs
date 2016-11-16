@@ -5,20 +5,22 @@ using UnityEngine.UI;
 public class KeyBoard : MonoBehaviour 
 {
 	// Use this for initialization
-	public float blinkingTime = 1.5f;
-	public Text objectiveText;
-	public float distPos = 0.1f;
-	public Canvas mainCanvas;
-	public bool conserveText = false;
+	public float m_blinkingTime = 1.5f;
+    public Text m_objectiveTextObject;
+    public float m_distPos = 0.1f;
+    public GameObject m_mainCanvas;
+    public bool m_conserveText = false;
 
-	private string previousText;
-    private float elapsedTime;
-    private bool capitalLeters, symbolMode, blink;
-    private int nb_leters;
+    private string m_previousText;      // Text before selecting inputform
+    private string m_defaultText;       // Default value for inputform text
+    private bool m_isPassword;          // Should the resulting inputform text be set to asterixes?
+    private float m_elapsedTime;
+    private bool m_capitalLeters, m_symbolMode, m_blink;
+    private int m_numLetters;
 
-	public Text[] charText;
-	public Text[] charSymbol;
-    private string blinkText, actualText;
+    private Text[] m_allTextChars;
+    private Text[] m_allSymbolChars;
+    private string m_blinkText, m_actualText;
 
 	void Start () 
 	{
@@ -52,152 +54,194 @@ public class KeyBoard : MonoBehaviour
 		*/
 
 		GameObject[] go = GameObject.FindGameObjectsWithTag("KeyboardButton");
-		nb_leters = go.Length;
-		charText = new Text[nb_leters];
-		charSymbol = new Text[nb_leters];
+		m_numLetters = go.Length;
+        m_allTextChars = new Text[m_numLetters];
+        m_allSymbolChars = new Text[m_numLetters];
 
-		for(int ii=0; ii < nb_leters; ii++)
+        for(int i = 0; i < m_numLetters; i++)
 		{
-			charText[ii] = go[ii].transform.GetChild(0).GetComponent<Text>();
-			charSymbol[ii] = go[ii].transform.GetChild(1).GetComponent<Text>();
+            m_allTextChars[i] = go[i].transform.GetChild(0).GetComponent<Text>();
+            m_allSymbolChars[i] = go[i].transform.GetChild(1).GetComponent<Text>();
 		}
 
-        elapsedTime = 0;
-		objectiveText = null;
+        m_elapsedTime = 0;
+        m_objectiveTextObject = null;
 
-		mainCanvas.enabled = false;
-		symbolMode = false;
-		capitalLeters = false;
+        m_mainCanvas.SetActive(false);
+        m_symbolMode = false;
+        m_capitalLeters = false;
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () 
 	{
 		// only blink when a text is selected
-        elapsedTime += Time.fixedDeltaTime;
-		if(objectiveText != null)
+        m_elapsedTime += Time.fixedDeltaTime;
+        if(m_objectiveTextObject != null)
 		{
-            if(elapsedTime > blinkingTime)
+            if(m_elapsedTime > m_blinkingTime)
 			{
-                elapsedTime = 0;
+                m_elapsedTime = 0;
 
 				//Debug.Log("blink");
 
-				if(!blink)
+                if(!m_blink)
 				{
-					objectiveText.text = actualText;
+                    m_objectiveTextObject.text = m_actualText;
 				}
 				else
 				{
-					objectiveText.text = blinkText;
+                    m_objectiveTextObject.text = m_blinkText;
 				}
 
-				blink = !blink;
+                m_blink = !m_blink;
 			}
 		}
 	}
 
 	public void WriteChar(Text txt)
 	{
-        objectiveText.text = actualText + txt.text;
-        actualText = objectiveText.text;
-        blinkText = objectiveText.text + " |";	
+        m_objectiveTextObject.text = m_actualText + txt.text;
+        m_actualText = m_objectiveTextObject.text;
+        m_blinkText = m_objectiveTextObject.text + " |";	
 	}
 
 	public void Erase()
 	{
-        if(actualText.Length > 0)
+        if(m_actualText.Length > 0)
 		{
-            objectiveText.text = actualText.Remove(actualText.Length-1);
+            m_objectiveTextObject.text = m_actualText.Remove(m_actualText.Length-1);
 		}
 
-        actualText = objectiveText.text;
-        blinkText = objectiveText.text + " |";
+        m_actualText = m_objectiveTextObject.text;
+        m_blinkText = m_objectiveTextObject.text + " |";
 	}
 
 	// this function gets new input forms and stores temp string values
-	public void SelectTextInput(Text clickedText)
+    public void SelectTextInput(Text clickedTextObject)
 	{
-		// prevent line to stay at the end of the text:
-		if(objectiveText != null)
-		{
-			objectiveText.text = actualText;
-		}
+        // If keyboard active because of a previous SelectTextInput() call, then AcceptText() on currently active InputForm
+        if (m_mainCanvas.activeInHierarchy)
+        {
+            AcceptText();
+        }
             
-		objectiveText = clickedText;
-		previousText = clickedText.text;
+        m_objectiveTextObject = clickedTextObject;
+        m_previousText = clickedTextObject.text;
 
-		if(conserveText == false)
+        if(m_conserveText == false)
 		{
-			objectiveText.text="";
+            m_objectiveTextObject.text = "";
 		}
 
-        actualText = objectiveText.text;
-        blinkText = objectiveText.text + " |";
+        m_actualText = m_objectiveTextObject.text;
+        m_blinkText = m_objectiveTextObject.text + " |";
 
-		mainCanvas.enabled = true;
+        m_mainCanvas.SetActive(true);
 	}
+
+    public void SelectTextInputDefaultText(string defaultText)
+    {
+        m_defaultText = defaultText;
+
+        if (m_defaultText.CompareTo(m_objectiveTextObject.text) == 0)
+        {
+            m_objectiveTextObject.text = "";
+            m_actualText = m_objectiveTextObject.text;
+            m_blinkText = m_objectiveTextObject.text + " |";
+        }
+    }
+
+    public void SelectTextInputIsPassword()
+    {
+        m_isPassword = true;
+    }
 
 	public void AcceptText()
 	{
-        objectiveText.text = actualText;
-		mainCanvas.enabled=false;
-		objectiveText=null;	
+        if (m_isPassword)
+        {
+            m_actualText = ReplaceStringWithAsterixes(m_actualText);
+            m_isPassword = false;
+        }
+
+        if (m_actualText.Length > 0)
+        {
+            m_objectiveTextObject.text = m_actualText;
+        }
+        else
+        {
+            m_objectiveTextObject.text = m_defaultText;
+        }
+
+        m_mainCanvas.SetActive(false);
+        m_objectiveTextObject = null;	
 	}
 
 	public void CancelText()
 	{		
-		objectiveText.text = previousText;
-		mainCanvas.enabled = false;
-
-		objectiveText = null;
+        m_objectiveTextObject.text = m_previousText;
+        m_mainCanvas.SetActive(false);
+        m_objectiveTextObject = null;
 	}
         
 	public void UperLowerCase()
 	{
-		if(capitalLeters == false)
+        if(m_capitalLeters == false)
 		{
-			for(int ii=0; ii < nb_leters;ii++)
+            for(int i = 0; i < m_numLetters; i++)
 			{
-				charText[ii].text = charText[ii].text.ToUpper();
-				capitalLeters = true;
+                m_allTextChars[i].text = m_allTextChars[i].text.ToUpper();
 			}
+
+            m_capitalLeters = true;
 		}
 		else
 		{
-			for(int ii=0; ii < nb_leters;ii++)
+            for(int i = 0; i < m_numLetters; i++)
 			{
-				charText[ii].text = charText[ii].text.ToLower();
-				capitalLeters = false;
+                m_allTextChars[i].text = m_allTextChars[i].text.ToLower();
 			}
+
+            m_capitalLeters = false;
 		}
 	}
 	
 	public void SymbolChangeMode()
 	{
-		if(symbolMode == false)
+        if(m_symbolMode == false)
 		{			
 			string temp1;
-			for(int ii=0; ii<nb_leters; ii++)
+            for(int i = 0; i < m_numLetters; i++)
 			{
-				temp1=charText[ii].text;
-				charText[ii].text = charSymbol[ii].text;
-				charSymbol[ii].text = temp1;
+                temp1 = m_allTextChars[i].text;
+                m_allTextChars[i].text = m_allSymbolChars[i].text;
+                m_allSymbolChars[i].text = temp1;
 			}
 
-			symbolMode = true;
+			m_symbolMode = true;
 		}
 		else
 		{
 			string temp2;
-			for(int ii=0; ii<nb_leters; ii++)
+            for(int i = 0; i < m_numLetters; i++)
 			{
-				temp2=charSymbol[ii].text;
-				charSymbol[ii].text = charText[ii].text;
-				charText[ii].text = temp2;
+                temp2 = m_allSymbolChars[i].text;
+                m_allSymbolChars[i].text = m_allTextChars[i].text;
+                m_allTextChars[i].text = temp2;
 			}
 
-			symbolMode = false;
+            m_symbolMode = false;
 		}		
 	}
+
+    private string ReplaceStringWithAsterixes(string actualString)
+    {
+        string returnString = "";
+        for (int i = 0; i < actualString.Length; i++)
+        {
+            returnString += "*";
+        }
+        return returnString;
+    }
 }
