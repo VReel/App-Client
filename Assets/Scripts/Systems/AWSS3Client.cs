@@ -53,19 +53,29 @@ public class AWSS3Client : MonoBehaviour
         int numFiles = m_s3ImageFilePaths.Count;
         return m_currS3ImageIndex >= (numFiles - numImageSpheres);       
     }
-
-    public void Login()
+           
+    public bool Login()
     {
         Debug.Log("------- VREEL: Login called");
 
         //TODO - write Login functionality
+        return true;
     }
 
-    public void SignUp()
+    public bool ConfirmEmailAvailability()
+    {
+        Debug.Log("------- VREEL: ConfirmEmailAvailability called");
+
+        //TODO - write ConfirmEmailAvailability functionality
+        return true;
+    }
+
+    public bool SignUp()
     {
         Debug.Log("------- VREEL: SignUp called");
 
         //TODO - write SignUp functionality
+        return true;
     }
 
     public void UploadImage()
@@ -136,7 +146,7 @@ public class AWSS3Client : MonoBehaviour
                 Debug.Log("------- VREEL: Got an Exception calling 'ListObjectsAsync()'");
             }
         });
-    }
+    }       
 
     public void NextImages()
     {
@@ -229,7 +239,6 @@ public class AWSS3Client : MonoBehaviour
             }
         });
     }
-
 
     private IEnumerator ConvertStreamAndSetImage(Amazon.S3.Model.GetObjectResponse response, int sphereIndex, string fullFilePath)
     {

@@ -52,6 +52,7 @@
      <Compile Include="Assets\Scripts\Systems\DeviceGallery.cs" />
      <Compile Include="Assets\Scripts\Systems\ImageSkybox.cs" />
      <Compile Include="Assets\Scripts\Systems\KeyBoard.cs" />
+     <Compile Include="Assets\Scripts\Systems\LoginFlow.cs" />
      <Compile Include="Assets\Scripts\Systems\MenuController.cs" />
      <Compile Include="Assets\Scripts\Systems\VRCameraController.cs" />
      <Compile Include="Assets\Scripts\UI\SelectArrow.cs" />
