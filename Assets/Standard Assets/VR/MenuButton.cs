@@ -48,13 +48,26 @@ namespace VRStandardAssets.Menu
         public void SetSpriteButtonUp(Sprite spriteButtonUp)
         {
             m_spriteButtonUp = spriteButtonUp;
-            if (m_buttonDown)
+        }
+
+        public void RefreshButtonSprite()
+        {
+            if (m_buttonImage == null)
             {
-                HandleDown();
+                return;
             }
-            else
+
+            if (m_buttonDown && m_spriteButtonDown != null)
             {
-                HandleUp();
+                m_buttonImage.sprite = m_spriteButtonDown;
+            }
+            else if (m_gazeOver && m_spriteButtonOver != null)
+            {
+                m_buttonImage.sprite = m_spriteButtonOver;
+            }
+            else if (m_spriteButtonUp != null)
+            {
+                m_buttonImage.sprite = m_spriteButtonUp;
             }
         }
 
@@ -78,63 +91,31 @@ namespace VRStandardAssets.Menu
         {
             m_gazeOver = true;
 
-            if (!m_buttonDown)
-            {
-                if (m_buttonImage != null && m_spriteButtonOver != null)
-                {
-                    m_buttonImage.sprite = m_spriteButtonOver;
-                }
-            }
+            RefreshButtonSprite();
         }
             
         private void HandleOut()
         {
             m_gazeOver = false;
 
-            if (!m_buttonDown)
-            {
-                if (m_buttonImage != null && m_spriteButtonUp != null)
-                {
-                    m_buttonImage.sprite = m_spriteButtonUp;
-                }
-            }
+            RefreshButtonSprite();
         }
 
         private void HandleDown()
         {
             m_buttonDown = true;
 
-            if (m_buttonImage != null && m_spriteButtonDown != null)
-            {
-                m_buttonImage.sprite = m_spriteButtonDown;
-            }
+            RefreshButtonSprite();
         }
 
         private void HandleUp()
         {
             m_buttonDown = false;
 
-            if (!m_gazeOver)
-            {
-                if (m_buttonImage != null && m_spriteButtonUp != null)
-                {
-                    m_buttonImage.sprite = m_spriteButtonUp;
-                }
-            }
-            else
-            {
-                if (m_buttonImage != null) 
-                {
-                    if (m_spriteButtonOver != null)
-                    {
-                        m_buttonImage.sprite = m_spriteButtonOver;
-                    }
-                    else if (m_spriteButtonUp != null)
-                    {
-                        m_buttonImage.sprite = m_spriteButtonUp;
-                    }
-                }
+            RefreshButtonSprite();
 
+            if (m_gazeOver)
+            {
                 if (OnButtonSelected != null)
                 {
                     OnButtonSelected(this);
@@ -144,7 +125,7 @@ namespace VRStandardAssets.Menu
                 {
                     OnButtonSelectedFunc.Invoke();
                 }
-            }
+            }           
         }
 
         // NOTE: The following functions is for making debugging without a headset easier...

@@ -16,19 +16,23 @@ public class SelectedButton : MonoBehaviour
         return m_isSelected;
     }
 
+    // This is called by the MenuController!
     public void OnButtonSelected()
     {
         m_isSelected = true;
         m_spriteButtonUp = m_menuButton.GetSpriteButtonUp();
         m_menuButton.SetSpriteButtonUp(m_spriteButtonSelected);
+        m_menuButton.RefreshButtonSprite();
     }
 
+    // This is called by the MenuController!
     public void OnButtonDeselected()
     {
         m_isSelected = false;
         if (m_spriteButtonUp != null)
         {
             m_menuButton.SetSpriteButtonUp(m_spriteButtonUp);
+            m_menuButton.RefreshButtonSprite();
         }
     }
 

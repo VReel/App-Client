@@ -77,10 +77,10 @@ public class SelectArrow : MonoBehaviour
 
     private void OnButtonSelected(VRStandardAssets.Menu.MenuButton button)
     {
-        Scroll();
+        ArrowPressed();
     }
 
-    private void Scroll()   
+    private void ArrowPressed()   
     {    
         Debug.Log("------- VREEL: Called Scroll() on a " + m_arrowType);
 
