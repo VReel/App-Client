@@ -31,7 +31,7 @@ public class AWSS3Client : MonoBehaviour
 		UnityInitializer.AttachToGameObject(this.gameObject);
 
         m_credentials = new CognitoAWSCredentials (
-            "eu-west-1:1f9f6bd1-3cfe-43c2-afbc-3e06d8d1fe27", // Identity Pool ID
+            "eu-west-1:bb57e466-72ed-408d-8c84-301d0bae1a9f", // Identity Pool ID
             RegionEndpoint.EUWest1 // Region
         );
         m_s3Client = new AmazonS3Client (m_credentials, RegionEndpoint.EUWest1);
@@ -214,7 +214,7 @@ public class AWSS3Client : MonoBehaviour
         m_s3Client.GetObjectAsync(m_s3BucketName, filePath, (s3ResponseObj) =>
         {               
             var response = s3ResponseObj.Response;
-            if (response.ResponseStream != null)
+            if (response != null && response.ResponseStream != null)
             {   
                 bool requestStillValid = (m_currS3ImageIndex <= pictureIndex) &&  (pictureIndex < m_currS3ImageIndex + numImages); // Request no longer valid as user pressed Next or Previous arrows
                 string logString02 = string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", requestStillValid, m_currS3ImageIndex, pictureIndex, numImages); 
@@ -235,7 +235,8 @@ public class AWSS3Client : MonoBehaviour
             }
             else
             {
-                Debug.Log("------- VREEL: Got an Exception downloading " + fullFilePath);
+                Debug.Log("------- VREEL: Got an Exception calling GetObjectAsync() for: " + fullFilePath);
+                Debug.Log("------- VREEL: Exception was: " + s3ResponseObj.Exception);
             }
         });
     }
