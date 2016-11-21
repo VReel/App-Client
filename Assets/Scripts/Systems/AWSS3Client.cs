@@ -42,6 +42,25 @@ public class AWSS3Client : MonoBehaviour
         coroutineQueue.StartLoop();
 	}
 
+    /*
+     * 
+    CognitoSyncManager syncManager = new CognitoSyncManager (
+      credentials,
+      new AmazonCognitoSyncConfig {
+          RegionEndpoint = RegionEndpoint.USEast1 // Region
+      }
+    );
+
+    Dataset dataset = syncManager.OpenOrCreateDataset("myDataset");
+    dataset.OnSyncSuccess += SyncSuccessCallback;
+    dataset.Put("myKey", "myValue");
+    dataset.Synchronize();
+
+    void SyncSuccessCallback(object sender, SyncSuccessEvent e) {
+      // Your handler code here
+    }
+    */
+
     public bool IsIndexAtStart()
     {
         return m_currS3ImageIndex == 0;
@@ -59,7 +78,7 @@ public class AWSS3Client : MonoBehaviour
         Debug.Log("------- VREEL: Login called");
 
         //TODO - write Login functionality
-        return true;
+        return false;
     }
 
     public bool ConfirmEmailAvailability()

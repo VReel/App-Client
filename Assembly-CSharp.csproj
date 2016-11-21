@@ -46,7 +46,13 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Examples\CognitoSyncManagerSample.cs" />
+     <Compile Include="Assets\Examples\DynamoDBBaseExample.cs" />
+     <Compile Include="Assets\Examples\DynamoDBExample.cs" />
+     <Compile Include="Assets\Examples\HighLevelTableExample.cs" />
+     <Compile Include="Assets\Examples\LowLevelTableExample.cs" />
      <Compile Include="Assets\Examples\S3Example.cs" />
+     <Compile Include="Assets\Examples\SQSExample.cs" />
+     <Compile Include="Assets\Examples\TableQueryAndScanExample.cs" />
      <Compile Include="Assets\Scripts\Systems\AWSS3Client.cs" />
      <Compile Include="Assets\Scripts\Systems\CoroutineQueue.cs" />
      <Compile Include="Assets\Scripts\Systems\DeviceGallery.cs" />
@@ -58,11 +64,11 @@
      <Compile Include="Assets\Scripts\UI\SelectArrow.cs" />
      <Compile Include="Assets\Scripts\UI\SelectImage.cs" />
      <Compile Include="Assets\Scripts\UI\SelectedButton.cs" />
+     <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
      <None Include="Assets\Standard Assets\Prototyping\Shaders\ProceduralSkyBox.shader" />
      <None Include="Assets\Standard Assets\Prototyping\Shaders\WorldCoordDiffuse.shader" />
      <None Include="Assets\Shader\UIOverlay.shader" />
      <None Include="Assets\Examples\License.txt" />
-     <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
      <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
      <None Include="Assets\AWSSDK\src\Core\Resources\awsconfig.xml" />
  <Reference Include="UnityEngine.UI">
@@ -88,6 +94,12 @@
  </Reference>
  <Reference Include="AWSSDK.SecurityToken">
  <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.SecurityToken.dll</HintPath>
+ </Reference>
+ <Reference Include="AWSSDK.SQS">
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.SQS.dll</HintPath>
+ </Reference>
+ <Reference Include="AWSSDK.DynamoDBv2">
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.DynamoDBv2.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>

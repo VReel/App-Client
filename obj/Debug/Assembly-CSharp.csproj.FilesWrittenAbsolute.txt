@@ -48,3 +48,5 @@
 /Users/FoxBookAir/Documents/Unity/VReelApp/Temp/bin/Debug/Unity.CecilTools.dll
 /Users/FoxBookAir/Documents/Unity/VReelApp/Temp/bin/Debug/Mono.Cecil.Pdb.dll
 /Users/FoxBookAir/Documents/Unity/VReelApp/Temp/bin/Debug/Mono.Cecil.Mdb.dll
+/Users/FoxBookAir/Documents/Unity/VReelApp/Temp/bin/Debug/AWSSDK.SQS.dll
+/Users/FoxBookAir/Documents/Unity/VReelApp/Temp/bin/Debug/AWSSDK.DynamoDBv2.dll

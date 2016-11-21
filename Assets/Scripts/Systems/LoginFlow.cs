@@ -6,6 +6,10 @@ public class LoginFlow : MonoBehaviour
     [SerializeField] private GameObject m_loginPage;
     [SerializeField] private GameObject m_signUpPage1;
     [SerializeField] private GameObject m_signUpPage2;
+    [SerializeField] private GameObject m_invalidLoginError;
+    [SerializeField] private GameObject m_invalidEmailError;
+    [SerializeField] private GameObject m_invalidUsernameError;
+    [SerializeField] private GameObject m_invalidPasswordError;
 
     // --------- Login Screen Page
 
@@ -13,9 +17,11 @@ public class LoginFlow : MonoBehaviour
     {
         if (m_AWSS3Client.Login())
         {
-            m_loginPage.SetActive(true); // TODO: Switch on ImageSpheres
-            m_signUpPage1.SetActive(false);
-            m_signUpPage2.SetActive(false);
+            // TODO: Switch on ImageSpheres and enter user Profile
+        }
+        else 
+        {
+            m_invalidLoginError.SetActive(true);
         }
     }
 
@@ -38,6 +44,10 @@ public class LoginFlow : MonoBehaviour
             m_signUpPage1.SetActive(false);
             m_signUpPage2.SetActive(true);
         }
+        else
+        {
+            m_invalidEmailError.SetActive(true);
+        }
     }
 
     public void BackToLogin()
@@ -58,6 +68,12 @@ public class LoginFlow : MonoBehaviour
             m_loginPage.SetActive(false);
             m_signUpPage1.SetActive(false);
             m_signUpPage2.SetActive(true);
+        }
+        else
+        {
+            //TODO: Do this properly...
+            m_invalidUsernameError.SetActive(true);
+            m_invalidPasswordError.SetActive(true);
         }
     }
 

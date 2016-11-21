@@ -87,11 +87,11 @@
      <Compile Include="Assets\Standard Assets\VR\VRInput.cs" />
      <Compile Include="Assets\Standard Assets\VR\VRInteractiveItem.cs" />
      <Compile Include="Assets\Standard Assets\VR\VRTrackingReset.cs" />
+     <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
      <None Include="Assets\Standard Assets\Prototyping\Shaders\ProceduralSkyBox.shader" />
      <None Include="Assets\Standard Assets\Prototyping\Shaders\WorldCoordDiffuse.shader" />
      <None Include="Assets\Shader\UIOverlay.shader" />
      <None Include="Assets\Examples\License.txt" />
-     <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
      <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
      <None Include="Assets\AWSSDK\src\Core\Resources\awsconfig.xml" />
  <Reference Include="UnityEngine.UI">
@@ -117,6 +117,12 @@
  </Reference>
  <Reference Include="AWSSDK.SecurityToken">
  <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.SecurityToken.dll</HintPath>
+ </Reference>
+ <Reference Include="AWSSDK.SQS">
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.SQS.dll</HintPath>
+ </Reference>
+ <Reference Include="AWSSDK.DynamoDBv2">
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.DynamoDBv2.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

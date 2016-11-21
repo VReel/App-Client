@@ -46,11 +46,11 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Editor\CrossPlatformInput\CrossPlatformInputInitialize.cs" />
+     <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
      <None Include="Assets\Standard Assets\Prototyping\Shaders\ProceduralSkyBox.shader" />
      <None Include="Assets\Standard Assets\Prototyping\Shaders\WorldCoordDiffuse.shader" />
      <None Include="Assets\Shader\UIOverlay.shader" />
      <None Include="Assets\Examples\License.txt" />
-     <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
      <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
      <None Include="Assets\AWSSDK\src\Core\Resources\awsconfig.xml" />
  <Reference Include="UnityEditor.Advertisements">
@@ -103,6 +103,12 @@
  </Reference>
  <Reference Include="UnityEditor.OSXStandalone.Extensions">
  <HintPath>/Applications/Unity/Unity.app/Contents/PlaybackEngines/MacStandaloneSupport/UnityEditor.OSXStandalone.Extensions.dll</HintPath>
+ </Reference>
+ <Reference Include="AWSSDK.SQS">
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.SQS.dll</HintPath>
+ </Reference>
+ <Reference Include="AWSSDK.DynamoDBv2">
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.DynamoDBv2.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>
