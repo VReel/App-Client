@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
-using UnityEngine.VR; //VRSettings
+using UnityEngine.VR;       // VRSettings
+using UnityEngine.UI;       // Text
+using System.Collections;   // IEnumerator
 
 public class MenuController : MonoBehaviour 
 {
@@ -9,6 +11,8 @@ public class MenuController : MonoBehaviour
     [SerializeField] private GameObject m_loginSubMenu;
     [SerializeField] private GameObject m_profileSubMenu;
     [SerializeField] private GameObject m_gallerySubMenu;
+    [SerializeField] private GameObject m_welcomeText;
+    [SerializeField] private UserLogin m_userLogin;
     [SerializeField] private VRStandardAssets.Utils.Reticle m_reticle;
     [SerializeField] private VRStandardAssets.Utils.VRInput m_input;
     [SerializeField] private GameObject[] m_menuBarButtons;
@@ -42,6 +46,28 @@ public class MenuController : MonoBehaviour
         m_loginSubMenu.SetActive(active);
         m_profileSubMenu.SetActive(active);
         m_gallerySubMenu.SetActive(active);
+    }
+
+    public void ShowWelcomeText()
+    {
+        StartCoroutine(InternalShowWelcomeText());
+    }
+
+    private IEnumerator InternalShowWelcomeText()
+    {
+        while (!m_userLogin.HasCachedUsername())
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
+        Debug.Log("------- VREEL: Setting Welcome Text!");
+        Text textComponent = m_welcomeText.GetComponentInChildren<Text>();
+        if (textComponent != null)
+        {
+            textComponent.text = "Welcome " + m_userLogin.GetUsername() + "!";
+            Debug.Log("------- VREEL: Setting Welcome Text!");
+        }
+        m_welcomeText.SetActive(true);
     }
 
     private void OnEnable ()

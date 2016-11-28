@@ -116,7 +116,7 @@ public class AWSS3Client : MonoBehaviour
                     if (ImageExtensions.Contains(Path.GetExtension(s3object.Key).ToUpperInvariant())) // Check that the file is indeed an image
                     {   
                         m_s3ImageFilePaths.Add(s3object.Key);
-                        Debug.Log("------- VREEL: Saved FileName: " + s3object.Key);
+                        Debug.Log("------- VREEL: Stored FileName: " + s3object.Key);
                     }
                 });
 

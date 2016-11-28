@@ -51,6 +51,11 @@ public class AppDirector : MonoBehaviour
         SetImageSpheres(true);
         SetMenuBar(true);
 
+        if (m_appState == AppState.kLogin) // If we are coming from the login screen, set the welcome message
+        {
+            m_menuController.ShowWelcomeText();
+        }
+
         m_menuController.SetProfileSubMenuActive(true);
         m_AWSS3Client.DownloadAllImages();
         m_appState = AppState.kProfile;
