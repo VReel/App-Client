@@ -52,6 +52,7 @@
      <None Include="Assets\Shader\UIOverlay.shader" />
      <None Include="Assets\Examples\License.txt" />
      <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
+     <None Include="Assets\FacebookSDK\link.xml" />
      <None Include="Assets\AWSSDK\src\Core\Resources\awsconfig.xml" />
  <Reference Include="UnityEditor.Advertisements">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/Advertisements/Editor/UnityEditor.Advertisements.dll</HintPath>
@@ -86,6 +87,9 @@
  <Reference Include="AWSSDK.Core">
  <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.Core.dll</HintPath>
  </Reference>
+ <Reference Include="AWSSDK.DynamoDBv2">
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.DynamoDBv2.dll</HintPath>
+ </Reference>
  <Reference Include="AWSSDK.IdentityManagement">
  <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.IdentityManagement.dll</HintPath>
  </Reference>
@@ -95,6 +99,21 @@
  <Reference Include="AWSSDK.SecurityToken">
  <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.SecurityToken.dll</HintPath>
  </Reference>
+ <Reference Include="AWSSDK.SQS">
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.SQS.dll</HintPath>
+ </Reference>
+ <Reference Include="Facebook.Unity">
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/FacebookSDK/Plugins/Facebook.Unity.dll</HintPath>
+ </Reference>
+ <Reference Include="Facebook.Unity.Editor">
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/FacebookSDK/Plugins/Editor/Facebook.Unity.Editor.dll</HintPath>
+ </Reference>
+ <Reference Include="Facebook.Unity.PlatformEditor">
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/FacebookSDK/Plugins/Editor/Facebook.Unity.PlatformEditor.dll</HintPath>
+ </Reference>
+ <Reference Include="Facebook.Unity.Settings">
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/FacebookSDK/Plugins/Settings/Facebook.Unity.Settings.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEditor.Graphs">
  <HintPath>/Applications/Unity/Unity.app/Contents/Managed/UnityEditor.Graphs.dll</HintPath>
  </Reference>
@@ -103,12 +122,6 @@
  </Reference>
  <Reference Include="UnityEditor.OSXStandalone.Extensions">
  <HintPath>/Applications/Unity/Unity.app/Contents/PlaybackEngines/MacStandaloneSupport/UnityEditor.OSXStandalone.Extensions.dll</HintPath>
- </Reference>
- <Reference Include="AWSSDK.SQS">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.SQS.dll</HintPath>
- </Reference>
- <Reference Include="AWSSDK.DynamoDBv2">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.DynamoDBv2.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>

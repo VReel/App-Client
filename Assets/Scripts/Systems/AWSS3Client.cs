@@ -42,6 +42,22 @@ public class AWSS3Client : MonoBehaviour
         coroutineQueue.StartLoop();
 	}
 
+    public CognitoAWSCredentials GetCredentials()
+    {
+        return m_credentials; //TODO: Some sort of validity check!
+    }
+
+    /*
+     * 
+     * 
+    m_credentials.GetIdentityIdAsync(delegate(AmazonCognitoIdentityResult<string> result) {
+    if (result.Exception != null) {
+        //Exception!
+    }
+    string identityId = result.Response;
+    });
+     * /
+
     /*
      * 
     CognitoSyncManager syncManager = new CognitoSyncManager (

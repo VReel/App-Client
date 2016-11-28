@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Facebook.Unity;
 
 public class LoginFlow : MonoBehaviour 
 {   
@@ -6,10 +7,66 @@ public class LoginFlow : MonoBehaviour
     [SerializeField] private GameObject m_loginPage;
     [SerializeField] private GameObject m_signUpPage1;
     [SerializeField] private GameObject m_signUpPage2;
+    [SerializeField] private GameObject m_fbInvalidLoginError;
     [SerializeField] private GameObject m_invalidLoginError;
     [SerializeField] private GameObject m_invalidEmailError;
     [SerializeField] private GameObject m_invalidUsernameError;
     [SerializeField] private GameObject m_invalidPasswordError;
+
+    // --------- FB Login Screen Page
+
+    void Start()
+    {
+        Facebook.Unity.FB.Init();
+    }
+
+    public void FBLogin()
+    {
+        if (FB.IsInitialized)
+        {
+            FB.ActivateApp();
+
+            if (FB.IsLoggedIn) 
+            {   //User already logged in from a previous session                
+                Debug.Log("------- VREEL: User already logged in from a previous session");
+                AddFacebookTokenToCognito();
+            } 
+            else 
+            {
+                Debug.Log("------- VREEL: FB.LogInWithReadPermissions");
+                FB.LogInWithReadPermissions (null, FacebookLoginCallback);
+            }
+        }
+        else
+        {
+            Debug.Log("------- VREEL: Serious error: FB failed to Init");
+        }
+    }
+
+    private void FacebookLoginCallback(ILoginResult result)
+    {
+        Debug.Log("------- VREEL: FacebookLoginCallback");
+        Debug.Log("------- VREEL: FB.IsInitialized: " + FB.IsInitialized + ", FB.IsLoggedIn: " + FB.IsLoggedIn);
+        if (FB.IsLoggedIn)
+        {
+            AddFacebookTokenToCognito();
+        }
+        else
+        {
+            m_fbInvalidLoginError.SetActive(true);
+        }
+    }
+
+    private void AddFacebookTokenToCognito()
+    {
+        Debug.Log("------- VREEL: AddFacebookTokenToCognito");
+        Debug.Log("------- VREEL: FB.IsInitialized: " + FB.IsInitialized + ", FB.IsLoggedIn: " + FB.IsLoggedIn);
+        Debug.Log("------- VREEL: AccessToken.UserId: " + AccessToken.CurrentAccessToken.UserId.ToString());
+        Debug.Log("------- VREEL: AccessToken.CurrentAccessToken: " + AccessToken.CurrentAccessToken.TokenString);
+        Debug.Log("------- VREEL: LoginsCount Before AddLogin(): " + m_AWSS3Client.GetCredentials().LoginsCount);
+        m_AWSS3Client.GetCredentials().AddLogin ("graph.facebook.com", AccessToken.CurrentAccessToken.TokenString);
+        Debug.Log("------- VREEL: LoginsCount After AddLogin(): " + m_AWSS3Client.GetCredentials().LoginsCount);
+    }
 
     // --------- Login Screen Page
 

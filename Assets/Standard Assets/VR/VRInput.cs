@@ -136,9 +136,9 @@ namespace VRStandardAssets.Utils
             // If the Y swipe is greater than the required width we register it as vertical
             bool swipeIsVertical = Mathf.Abs(swipeData.y) > m_SwipeWidth;
 
-            Debug.Log("------- VREEL: Swipe Width: " + m_SwipeWidth);
-            Debug.Log("------- VREEL: Swipe Length X: " + Mathf.Abs(swipeData.x));
-            Debug.Log("------- VREEL: Swipe Length Y: " + Mathf.Abs(swipeData.y));
+            //Debug.Log("------- VREEL: Swipe Width: " + m_SwipeWidth);
+            //Debug.Log("------- VREEL: Swipe Length X: " + Mathf.Abs(swipeData.x));
+            //Debug.Log("------- VREEL: Swipe Length Y: " + Mathf.Abs(swipeData.y));
 
             // If the swipe has a positive y component and is vertical the swipe is up.
             if (swipeData.y > 0f && swipeIsVertical)
