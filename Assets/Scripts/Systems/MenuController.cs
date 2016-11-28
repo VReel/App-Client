@@ -5,8 +5,11 @@ public class MenuController : MonoBehaviour
 {
     public bool m_swipeEnabled = true;      // When on, swiping switches the menu on/off
 
-    [SerializeField] private GameObject m_menuContainerObject;
-    [SerializeField] private GameObject m_GUICanvas;
+    [SerializeField] private GameObject m_menuSubTree;
+    [SerializeField] private GameObject m_loginSubMenu;
+    [SerializeField] private GameObject m_profileSubMenu;
+    [SerializeField] private GameObject m_gallerySubMenu;
+    [SerializeField] private VRStandardAssets.Utils.Reticle m_reticle;
     [SerializeField] private VRStandardAssets.Utils.VRInput m_input;
     [SerializeField] private GameObject[] m_menuBarButtons;
 
@@ -17,53 +20,54 @@ public class MenuController : MonoBehaviour
         return m_isMenuActive;
     }
 
-    public void InvertVREnabled() // Unsuable until Oculus update their SDK...
-    {        
-        VRSettings.enabled = !VRSettings.enabled;
+    public void SetLoginSubMenuActive(bool active)
+    {
+        m_loginSubMenu.SetActive(active);
+    }
+
+    public void SetProfileSubMenuActive(bool active)
+    {
+        m_profileSubMenu.SetActive(active);
+        OnButtonSelected(m_menuBarButtons[0]);  // button 0 = Profile button
+    }
+
+    public void SetGallerySubMenuActive(bool active)
+    {
+        m_gallerySubMenu.SetActive(active);
+        OnButtonSelected(m_menuBarButtons[1]);  // button 1 = Gallery button
+    }
+
+    public void SetAllSubMenusActive(bool active)
+    {
+        m_loginSubMenu.SetActive(active);
+        m_profileSubMenu.SetActive(active);
+        m_gallerySubMenu.SetActive(active);
     }
 
     private void OnEnable ()
     {
         m_input.OnSwipe += OnSwipe;
-
-        foreach(GameObject menuButtonObject in m_menuBarButtons)
-        {
-            var menuButton = menuButtonObject.GetComponent<VRStandardAssets.Menu.MenuButton>();
-            if (menuButton != null)
-            {
-                menuButton.OnButtonSelected += OnButtonSelected;
-            }
-        }
     }
 
     private void OnDisable ()
     {
         m_input.OnSwipe -= OnSwipe;
-
-        foreach(GameObject menuButtonObject in m_menuBarButtons)
-        {
-            var menuButton = menuButtonObject.GetComponent<VRStandardAssets.Menu.MenuButton>();
-            if (menuButton != null)
-            {
-                menuButton.OnButtonSelected -= OnButtonSelected;
-            }
-        }
     }     
 
-    private void OnButtonSelected(VRStandardAssets.Menu.MenuButton button)
+    private void OnButtonSelected(GameObject button)
     {
-        foreach(GameObject menuButtonObject in m_menuBarButtons)
+        foreach(GameObject currButton in m_menuBarButtons)
         {       
-            var selectedButton = menuButtonObject.GetComponent<SelectedButton>();
-            if (menuButtonObject.GetComponent<VRStandardAssets.Menu.MenuButton>() == button)
+            var menuBarButton = currButton.GetComponent<MenuBarButton>();
+            if (button == currButton)
             {
-                selectedButton.OnButtonSelected();
-                selectedButton.SetMenuSectionActive(true);
+                menuBarButton.OnButtonSelected();
+                menuBarButton.SetMenuSectionActive(true);
             }
             else 
             {
-                selectedButton.OnButtonDeselected();
-                selectedButton.SetMenuSectionActive(false);
+                menuBarButton.OnButtonDeselected();
+                menuBarButton.SetMenuSectionActive(false);
             }
         }
     }
@@ -77,45 +81,52 @@ public class MenuController : MonoBehaviour
 
         if (swipe == VRStandardAssets.Utils.VRInput.SwipeDirection.UP)
         {
-            SetMenuActive(false);
+            SetMenuVisible(false);
 
             Debug.Log("------- VREEL: Hide Menu");
         }
 
         if (swipe == VRStandardAssets.Utils.VRInput.SwipeDirection.DOWN)
         {
-            SetMenuActive(true);
+            SetMenuVisible(true);
 
             Debug.Log("------- VREEL: Show Menu");
         }
     }
 
-    private void SetMenuActive(bool active)
+    private void SetMenuVisible(bool visible)
     {        
-        if (m_menuContainerObject != null)
+        if (m_menuSubTree != null)
         {
             //We Trawl through all the subobjects, hiding all meshes, images and colliders!
-            foreach(var mesh in m_menuContainerObject.GetComponentsInChildren<MeshRenderer>())
+            foreach(var mesh in m_menuSubTree.GetComponentsInChildren<MeshRenderer>())
             {                
-                mesh.enabled = active;
+                mesh.enabled = visible;
             }
 
-            foreach(var image in m_menuContainerObject.GetComponentsInChildren<UnityEngine.UI.Image>())
+            foreach(var image in m_menuSubTree.GetComponentsInChildren<UnityEngine.UI.Image>())
             {                
-                image.enabled = active;
+                image.enabled = visible;
             }
 
-            foreach(var collider in m_menuContainerObject.GetComponentsInChildren<Collider>())
+            foreach(var collider in m_menuSubTree.GetComponentsInChildren<Collider>())
             {                
-                collider.enabled = active;
+                collider.enabled = visible;
             }
         }
 
-        if (m_GUICanvas != null)
+        if (m_reticle != null)
         {
-            m_GUICanvas.SetActive(active);
+            if (visible)
+            {
+                m_reticle.Show();
+            }
+            else
+            {
+                m_reticle.Hide();
+            }
         }
 
-        m_isMenuActive = active;
+        m_isMenuActive = visible;
     }
 }

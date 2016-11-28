@@ -17,6 +17,7 @@ public class AWSS3Client : MonoBehaviour
     public GameObject[] m_imageSpheres;
 
     [SerializeField] private ImageSkybox m_imageSkybox;
+    [SerializeField] private UserLogin m_userLogin;
 
     private AmazonS3Client m_s3Client = null;
     private CognitoAWSCredentials m_credentials = null;
@@ -47,36 +48,6 @@ public class AWSS3Client : MonoBehaviour
         return m_credentials; //TODO: Some sort of validity check!
     }
 
-    /*
-     * 
-     * 
-    m_credentials.GetIdentityIdAsync(delegate(AmazonCognitoIdentityResult<string> result) {
-    if (result.Exception != null) {
-        //Exception!
-    }
-    string identityId = result.Response;
-    });
-     * /
-
-    /*
-     * 
-    CognitoSyncManager syncManager = new CognitoSyncManager (
-      credentials,
-      new AmazonCognitoSyncConfig {
-          RegionEndpoint = RegionEndpoint.USEast1 // Region
-      }
-    );
-
-    Dataset dataset = syncManager.OpenOrCreateDataset("myDataset");
-    dataset.OnSyncSuccess += SyncSuccessCallback;
-    dataset.Put("myKey", "myValue");
-    dataset.Synchronize();
-
-    void SyncSuccessCallback(object sender, SyncSuccessEvent e) {
-      // Your handler code here
-    }
-    */
-
     public bool IsIndexAtStart()
     {
         return m_currS3ImageIndex == 0;
@@ -88,34 +59,10 @@ public class AWSS3Client : MonoBehaviour
         int numFiles = m_s3ImageFilePaths.Count;
         return m_currS3ImageIndex >= (numFiles - numImageSpheres);       
     }
-           
-    public bool Login()
-    {
-        Debug.Log("------- VREEL: Login called");
-
-        //TODO - write Login functionality
-        return false;
-    }
-
-    public bool ConfirmEmailAvailability()
-    {
-        Debug.Log("------- VREEL: ConfirmEmailAvailability called");
-
-        //TODO - write ConfirmEmailAvailability functionality
-        return true;
-    }
-
-    public bool SignUp()
-    {
-        Debug.Log("------- VREEL: SignUp called");
-
-        //TODO - write SignUp functionality
-        return true;
-    }
 
     public void UploadImage()
     {
-        string fileName = m_imageSkybox.GetImageFilePath();
+        string fileName = m_userLogin.GetUserID() + "/" + m_imageSkybox.GetImageFilePath();
 
         Debug.Log("------- VREEL: UploadImage with FileName: " + fileName);
 
@@ -150,11 +97,12 @@ public class AWSS3Client : MonoBehaviour
 
     public void DownloadAllImages()
     {
-        Debug.Log("------- VREEL: Fetching all the Objects from" + m_s3BucketName);
+        Debug.Log("------- VREEL: Fetching all the Objects from" + m_s3BucketName + m_userLogin.GetUserID() + "/");
 
         var request = new ListObjectsRequest()
         {
-            BucketName = m_s3BucketName
+            BucketName = m_s3BucketName,
+            Prefix =  m_userLogin.GetUserID()
         };
 
         m_s3Client.ListObjectsAsync(request, (responseObject) =>
@@ -168,7 +116,7 @@ public class AWSS3Client : MonoBehaviour
                     if (ImageExtensions.Contains(Path.GetExtension(s3object.Key).ToUpperInvariant())) // Check that the file is indeed an image
                     {   
                         m_s3ImageFilePaths.Add(s3object.Key);
-                        Debug.Log("------- VREEL: Fetched " + s3object.Key);
+                        Debug.Log("------- VREEL: Saved FileName: " + s3object.Key);
                     }
                 });
 
@@ -217,7 +165,7 @@ public class AWSS3Client : MonoBehaviour
 
     private void DownloadImagesAndSetSpheres(int startingPictureIndex, int numImages)
     {
-        Debug.Log(string.Format("------- VREEL: Downloading {0} pictures beginning at index {1}. There are {2} pictures in the S3 bucket!", 
+        Debug.Log(string.Format("------- VREEL: Downloading {0} pictures beginning at index {1}. There are {2} pictures in this S3 folder!", 
             numImages, startingPictureIndex, m_s3ImageFilePaths.Count));
 
         Resources.UnloadUnusedAssets();
@@ -243,7 +191,7 @@ public class AWSS3Client : MonoBehaviour
     private void DownloadImage(string filePath, int sphereIndex, int pictureIndex, int numImages)
     {
         string fullFilePath = m_s3BucketName + filePath;
-        string logString01 = string.Format("------- VREEL: Fetching {0} from bucket {1}", filePath, m_s3BucketName);       
+        string logString01 = string.Format("------- VREEL: Downloading {0} from bucket {1}", filePath, m_s3BucketName);       
         Debug.Log(logString01);
 
         m_s3Client.GetObjectAsync(m_s3BucketName, filePath, (s3ResponseObj) =>

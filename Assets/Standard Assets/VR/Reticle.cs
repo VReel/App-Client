@@ -12,24 +12,20 @@ namespace VRStandardAssets.Utils
         [SerializeField] private float m_DefaultDistance = 5f;      // The default distance away from the camera the reticle is placed.
         [SerializeField] private float m_RaycastAdustment = 0.1f;   // The distance in front of any object we raycast onto, that the reticle is placed.
         [SerializeField] private bool m_UseNormal;                  // Whether the reticle should be placed parallel to a surface.
-        [SerializeField] private Image m_Image;                     // Reference to the image component that represents the reticle.
+        [SerializeField] private SpriteRenderer m_sprite;           // Reference to the image component that represents the reticle.
         [SerializeField] private Transform m_ReticleTransform;      // We need to affect the reticle's transform.
         [SerializeField] private Transform m_Camera;                // The reticle is always placed relative to the camera.
 
-
         private Vector3 m_OriginalScale;                            // Since the scale of the reticle changes, the original scale needs to be stored.
         private Quaternion m_OriginalRotation;                      // Used to store the original rotation of the reticle.
-
 
         public bool UseNormal
         {
             get { return m_UseNormal; }
             set { m_UseNormal = value; }
         }
-
-
+            
         public Transform ReticleTransform { get { return m_ReticleTransform; } }
-
 
         private void Awake()
         {
@@ -38,18 +34,15 @@ namespace VRStandardAssets.Utils
             m_OriginalRotation = m_ReticleTransform.localRotation;
         }
 
-
         public void Hide()
         {
-            m_Image.enabled = false;
+            m_sprite.enabled = false;
         }
-
 
         public void Show()
         {
-            m_Image.enabled = true;
+            m_sprite.enabled = true;
         }
-
 
         // This overload of SetPosition is used when the the VREyeRaycaster hasn't hit anything.
         public void SetPosition ()
@@ -63,7 +56,6 @@ namespace VRStandardAssets.Utils
             // The rotation should just be the default.
             m_ReticleTransform.localRotation = m_OriginalRotation;
         }
-
 
         // This overload of SetPosition is used when the VREyeRaycaster has hit something.
         public void SetPosition (RaycastHit hit)
