@@ -60,7 +60,6 @@ public class MenuController : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
-        Debug.Log("------- VREEL: Setting Welcome Text!");
         Text textComponent = m_welcomeText.GetComponentInChildren<Text>();
         if (textComponent != null)
         {

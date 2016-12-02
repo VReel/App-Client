@@ -98,3 +98,4 @@
 /Users/FoxBookAir/Documents/Unity/VReelApp/Temp/bin/Debug/Facebook.Unity.Settings.dll
 /Users/FoxBookAir/Documents/Unity/VReelApp/Temp/bin/Debug/Facebook.Unity.Editor.dll
 /Users/FoxBookAir/Documents/Unity/VReelApp/Temp/bin/Debug/Facebook.Unity.PlatformEditor.dll
+/Users/FoxBookAir/Documents/Unity/VReelApp/Temp/bin/Debug/AWSSDK.MobileAnalytics.dll

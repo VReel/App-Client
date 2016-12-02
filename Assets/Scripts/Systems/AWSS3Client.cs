@@ -6,9 +6,11 @@ using Amazon;                       // UnityInitializer
 using Amazon.CognitoIdentity;       // CognitoAWSCredentials
 using Amazon.S3;                    // AmazonS3Client
 using Amazon.S3.Model;              // ListBucketsRequest
+
+using Amazon.SecurityToken;         // AmazonSecurityTokenServiceClient
+using Amazon.Runtime;               // SessionAWSCredentials
 /*
 using Amazon.S3.Util;
-using Amazon.Runtime;
 */
 
 public class AWSS3Client : MonoBehaviour 
@@ -20,7 +22,8 @@ public class AWSS3Client : MonoBehaviour
     [SerializeField] private UserLogin m_userLogin;
 
     private AmazonS3Client m_s3Client = null;
-    private CognitoAWSCredentials m_credentials = null;
+    private CognitoAWSCredentials m_cognitoCredentials = null;
+    private AmazonSecurityTokenServiceClient m_stsClient = null;
 
     private int m_currS3ImageIndex = 0;
     private List<string> m_s3ImageFilePaths;
@@ -31,11 +34,21 @@ public class AWSS3Client : MonoBehaviour
 	{
 		UnityInitializer.AttachToGameObject(this.gameObject);
 
-        m_credentials = new CognitoAWSCredentials (
+        m_cognitoCredentials = new CognitoAWSCredentials(
+            "366575334313", // AWS Account ID
             "eu-west-1:bb57e466-72ed-408d-8c84-301d0bae1a9f", // Identity Pool ID
+            "arn:aws:iam::366575334313:role/Cognito_VReelMainUnauth_Role", // unAuthRoleArn
+            "arn:aws:iam::366575334313:role/Cognito_VReelMainAuth_Role", // authRoleArn
             RegionEndpoint.EUWest1 // Region
-        );
-        m_s3Client = new AmazonS3Client (m_credentials, RegionEndpoint.EUWest1);
+        );            
+
+        /*
+        var cic = new AmazonCognitoIdentityClient();
+        cic.GetIdAsync();
+        cic.GetCredentialsForIdentityAsync();
+        */
+
+        m_s3Client = new AmazonS3Client (m_cognitoCredentials, RegionEndpoint.EUWest1);
 
         m_s3ImageFilePaths = new List<string>();
 
@@ -45,7 +58,62 @@ public class AWSS3Client : MonoBehaviour
 
     public CognitoAWSCredentials GetCredentials()
     {
-        return m_credentials; //TODO: Some sort of validity check!
+        return m_cognitoCredentials; //TODO: Some sort of validity check!
+    }
+
+    public void InitS3ClientFB()
+    {           
+        m_cognitoCredentials.GetIdentityIdAsync((responseObj) =>
+        {
+            if (responseObj.Exception == null) 
+            {
+                string identityId = responseObj.Response;
+                InitS3ClientFBInternal(identityId);
+            }
+            else
+            {
+                Debug.Log("------- VREEL: Exception while assuming IAM role for S3 bucket");
+                Debug.Log("------- VREEL: Receieved error: " + responseObj.Exception.ToString());
+            }
+        });
+    }
+
+    public void InitS3ClientFBInternal(string accessToken)
+    {
+        m_stsClient = new AmazonSecurityTokenServiceClient(new AnonymousAWSCredentials());//m_cognitoCredentials);
+
+        var roleRequest = new Amazon.SecurityToken.Model.AssumeRoleWithWebIdentityRequest()
+        {         
+            WebIdentityToken = accessToken,
+            ProviderId = "graph.facebook.com",
+            RoleArn = "arn:aws:iam::366575334313:role/Cognito_VReelMainAuth_Role",
+            RoleSessionName = "vreelAppSession",
+            DurationSeconds = 3600
+        };
+
+        m_stsClient.AssumeRoleWithWebIdentityAsync( roleRequest, (responseObj) =>
+        {
+            if (responseObj.Exception == null)
+            {                
+                var credentials = responseObj.Response.Credentials;
+
+                SessionAWSCredentials sessionCredentials = new SessionAWSCredentials(
+                    credentials.AccessKeyId, 
+                    credentials.SecretAccessKey, 
+                    credentials.SessionToken
+                );
+
+                AmazonS3Config s3Config = new AmazonS3Config();
+                s3Config.RegionEndpoint = RegionEndpoint.EUWest1;
+
+                m_s3Client = new AmazonS3Client(sessionCredentials, s3Config);
+            }
+            else
+            {
+                Debug.Log("------- VREEL: Exception while assuming IAM role for S3 bucket");
+                Debug.Log("------- VREEL: Receieved error: " + responseObj.Response.HttpStatusCode.ToString());
+            }
+        });
     }
 
     public bool IsIndexAtStart()
@@ -62,12 +130,48 @@ public class AWSS3Client : MonoBehaviour
 
     public void UploadImage()
     {
-        string fileName = m_userLogin.GetUserID() + "/" + m_imageSkybox.GetImageFilePath();
+        coroutineQueue.EnqueueAction(UploadImageInternal());
+    }
+
+    public void DownloadAllImages()
+    {
+        coroutineQueue.EnqueueAction(DownloadAllImagesInternal());
+    }       
+
+    public void NextImages()
+    {
+        Debug.Log("------- VREEL: NextPictures() called");
+
+        int numImageSpheres = m_imageSpheres.GetLength(0);
+        int numFilePaths = m_s3ImageFilePaths.Count;
+
+        m_currS3ImageIndex = Mathf.Clamp(m_currS3ImageIndex + numImageSpheres, 0, numFilePaths);
+
+        coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
+        DownloadImagesAndSetSpheres();
+    }
+
+    public void PreviousImages()
+    {
+        Debug.Log("------- VREEL: PreviousPictures() called");
+
+        int numImageSpheres = m_imageSpheres.GetLength(0);
+        int numFilePaths = m_s3ImageFilePaths.Count;
+
+        m_currS3ImageIndex = Mathf.Clamp(m_currS3ImageIndex - numImageSpheres, 0, numFilePaths);
+
+        coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
+        DownloadImagesAndSetSpheres();
+    }
+
+    private IEnumerator UploadImageInternal()
+    {
+        string fileName =  m_imageSkybox.GetImageFilePath();
 
         Debug.Log("------- VREEL: UploadImage with FileName: " + fileName);
 
         var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-        string key = "Images/" + Path.GetFileName(fileName);
+        string key = m_userLogin.GetUserID() + "/" + Path.GetFileName(fileName);
 
         Debug.Log("------- VREEL: Creating request object");
         var request = new PostObjectRequest()
@@ -80,11 +184,16 @@ public class AWSS3Client : MonoBehaviour
 
         Debug.Log("------- VREEL: Making HTTP post call");
 
+        while (m_s3Client == null)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
         m_s3Client.PostObjectAsync(request, (responseObj) =>
         {
             if (responseObj.Exception == null)
             {
-                string logString = string.Format("------- VREEL: object {0} posted to bucket {1}", responseObj.Request.Key, responseObj.Request.Bucket);
+                string logString = string.Format("------- VREEL: Uploaded {0} posted to bucket {1}", responseObj.Request.Key, responseObj.Request.Bucket);
                 Debug.Log(logString);
             }
             else
@@ -95,15 +204,20 @@ public class AWSS3Client : MonoBehaviour
         });
     }
 
-    public void DownloadAllImages()
+    private IEnumerator DownloadAllImagesInternal()
     {
-        Debug.Log("------- VREEL: Fetching all the Objects from" + m_s3BucketName + m_userLogin.GetUserID() + "/");
+        Debug.Log("------- VREEL: Fetching all the Objects from: " + m_s3BucketName + "/" + m_userLogin.GetUserID() + "/");
 
         var request = new ListObjectsRequest()
         {
             BucketName = m_s3BucketName,
             Prefix =  m_userLogin.GetUserID()
         };
+
+        while (m_s3Client == null)
+        {
+            yield return new WaitForEndOfFrame();
+        }
 
         m_s3Client.ListObjectsAsync(request, (responseObject) =>
         {
@@ -122,48 +236,22 @@ public class AWSS3Client : MonoBehaviour
 
                 m_s3ImageFilePaths.Reverse(); // Reversing to have the images appear in the order of newest first
 
-                DownloadAllImagesInternal();
+                DownloadImagesAndSetSpheres();
             }
             else
             {
                 Debug.Log("------- VREEL: Got an Exception calling 'ListObjectsAsync()'");
             }
         });
-    }       
-
-    public void NextImages()
-    {
-        Debug.Log("------- VREEL: NextPictures() called");
-
-        int numImageSpheres = m_imageSpheres.GetLength(0);
-        int numFilePaths = m_s3ImageFilePaths.Count;
-
-        m_currS3ImageIndex = Mathf.Clamp(m_currS3ImageIndex + numImageSpheres, 0, numFilePaths);
-
-        coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
-        DownloadAllImagesInternal();
     }
 
-    public void PreviousImages()
-    {
-        Debug.Log("------- VREEL: PreviousPictures() called");
-
-        int numImageSpheres = m_imageSpheres.GetLength(0);
-        int numFilePaths = m_s3ImageFilePaths.Count;
-
-        m_currS3ImageIndex = Mathf.Clamp(m_currS3ImageIndex - numImageSpheres, 0, numFilePaths);
-
-        coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
-        DownloadAllImagesInternal();
-    }
-
-    private void DownloadAllImagesInternal()
+    private void DownloadImagesAndSetSpheres()
     {
         int numImageSpheres = m_imageSpheres.GetLength(0);
-        DownloadImagesAndSetSpheres(m_currS3ImageIndex, numImageSpheres);
+        DownloadImagesAndSetSpheresInternal(m_currS3ImageIndex, numImageSpheres);
     }
 
-    private void DownloadImagesAndSetSpheres(int startingPictureIndex, int numImages)
+    private void DownloadImagesAndSetSpheresInternal(int startingPictureIndex, int numImages)
     {
         Debug.Log(string.Format("------- VREEL: Downloading {0} pictures beginning at index {1}. There are {2} pictures in this S3 folder!", 
             numImages, startingPictureIndex, m_s3ImageFilePaths.Count));
@@ -174,8 +262,7 @@ public class AWSS3Client : MonoBehaviour
         for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, currPictureIndex++)
         {
             if (currPictureIndex < m_s3ImageFilePaths.Count)
-            {   
-                Debug.Log("------- VREEL: Loop iteration: " + sphereIndex);
+            {                   
                 string filePath = m_s3ImageFilePaths[currPictureIndex];
                 DownloadImage(filePath, sphereIndex, currPictureIndex, numImages);
             }
@@ -219,7 +306,7 @@ public class AWSS3Client : MonoBehaviour
             else
             {
                 Debug.Log("------- VREEL: Got an Exception calling GetObjectAsync() for: " + fullFilePath);
-                Debug.Log("------- VREEL: Exception was: " + s3ResponseObj.Exception);
+                Debug.Log("------- VREEL: Exception was: " + s3ResponseObj.Exception.ToString());
             }
         });
     }

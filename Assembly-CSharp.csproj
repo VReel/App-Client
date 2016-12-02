@@ -45,6 +45,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Examples\AmazonMobileAnalyticsSample.cs" />
      <Compile Include="Assets\Examples\CognitoSyncManagerSample.cs" />
      <Compile Include="Assets\Examples\DynamoDBBaseExample.cs" />
      <Compile Include="Assets\Examples\DynamoDBExample.cs" />
@@ -67,6 +68,7 @@
      <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\MainMenu.cs" />
      <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\Pay.cs" />
      <Compile Include="Assets\Scripts\Systems\AWSS3Client.cs" />
+     <Compile Include="Assets\Scripts\Systems\Analytics.cs" />
      <Compile Include="Assets\Scripts\Systems\AppDirector.cs" />
      <Compile Include="Assets\Scripts\Systems\CoroutineQueue.cs" />
      <Compile Include="Assets\Scripts\Systems\DeviceGallery.cs" />
@@ -78,14 +80,14 @@
      <Compile Include="Assets\Scripts\UI\MenuBarButton.cs" />
      <Compile Include="Assets\Scripts\UI\SelectArrow.cs" />
      <Compile Include="Assets\Scripts\UI\SelectImage.cs" />
-     <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
+     <None Include="Assets\Examples\License.txt" />
      <None Include="Assets\Standard Assets\Prototyping\Shaders\ProceduralSkyBox.shader" />
      <None Include="Assets\Standard Assets\Prototyping\Shaders\WorldCoordDiffuse.shader" />
      <None Include="Assets\Shader\UIOverlay.shader" />
-     <None Include="Assets\Examples\License.txt" />
      <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
      <None Include="Assets\FacebookSDK\link.xml" />
      <None Include="Assets\AWSSDK\src\Core\Resources\awsconfig.xml" />
+     <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
  <Reference Include="UnityEngine.UI">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
@@ -106,6 +108,9 @@
  </Reference>
  <Reference Include="AWSSDK.IdentityManagement">
  <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.IdentityManagement.dll</HintPath>
+ </Reference>
+ <Reference Include="AWSSDK.MobileAnalytics">
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.MobileAnalytics.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.S3">
  <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.S3.dll</HintPath>

@@ -34,6 +34,7 @@ public class UserLogin : MonoBehaviour
             {   //User already logged in from a previous session                
                 Debug.Log("------- VREEL: User already logged in from a previous session");
                 AddFacebookTokenToCognito();
+                // m_AWSS3Client.InitS3ClientFB();//m_AWSS3Client.InitS3ClientFB(AccessToken.CurrentAccessToken.TokenString);
                 RequestUsername();
                 m_appDirector.SetProfileState();
             } 
@@ -41,8 +42,6 @@ public class UserLogin : MonoBehaviour
             {
                 Debug.Log("------- VREEL: User not logged in through Facebook");
                 m_fbInvalidLoginError.SetActive(true);
-                //Debug.Log("------- VREEL: FB.LogInWithReadPermissions");
-                //FB.LogInWithReadPermissions (null, FacebookLoginCallback);
             }
         }
         else
@@ -99,6 +98,8 @@ public class UserLogin : MonoBehaviour
         Debug.Log("------- VREEL: LoginsCount Before AddLogin(): " + m_AWSS3Client.GetCredentials().LoginsCount);
         m_AWSS3Client.GetCredentials().AddLogin ("graph.facebook.com", AccessToken.CurrentAccessToken.TokenString);
         Debug.Log("------- VREEL: LoginsCount After AddLogin(): " + m_AWSS3Client.GetCredentials().LoginsCount);
+        Debug.Log("------- VREEL: AuthRoleArn assumed: " + m_AWSS3Client.GetCredentials().AuthRoleArn);
+
     }
 
     private void RequestUsername()
@@ -138,6 +139,9 @@ public class UserLogin : MonoBehaviour
         {
             m_fbInvalidLoginError.SetActive(true);
         }
+
+            //Debug.Log("------- VREEL: FB.LogInWithReadPermissions");
+            //FB.LogInWithReadPermissions (null, FacebookLoginCallback);
     }
     */
 }
