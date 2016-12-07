@@ -1,13 +1,12 @@
 ﻿using UnityEngine;
-using System.Collections;            //IEnumerator
+using System;                       // Datetime
+using System.Collections;           // IEnumerator
 using System.Collections.Generic;   // List
 using System.IO;                    // Stream
 using Amazon;                       // UnityInitializer
 using Amazon.CognitoIdentity;       // CognitoAWSCredentials
 using Amazon.S3;                    // AmazonS3Client
 using Amazon.S3.Model;              // ListBucketsRequest
-
-using Amazon.SecurityToken;         // AmazonSecurityTokenServiceClient
 using Amazon.Runtime;               // SessionAWSCredentials
 /*
 using Amazon.S3.Util;
@@ -23,7 +22,6 @@ public class AWSS3Client : MonoBehaviour
 
     private AmazonS3Client m_s3Client = null;
     private CognitoAWSCredentials m_cognitoCredentials = null;
-    private AmazonSecurityTokenServiceClient m_stsClient = null;
 
     private int m_currS3ImageIndex = -1;
     private List<string> m_s3ImageFilePaths;
@@ -33,85 +31,49 @@ public class AWSS3Client : MonoBehaviour
 	{
 		UnityInitializer.AttachToGameObject(this.gameObject);
 
-        m_cognitoCredentials = new CognitoAWSCredentials(
-            "366575334313", // AWS Account ID
-            "eu-west-1:bb57e466-72ed-408d-8c84-301d0bae1a9f", // Identity Pool ID
-            "arn:aws:iam::366575334313:role/Cognito_VReelMainUnauth_Role", // unAuthRoleArn
-            "arn:aws:iam::366575334313:role/Cognito_VReelMainAuth_Role", // authRoleArn
-            RegionEndpoint.EUWest1 // Region
-        );            
-
-        /*
-        var cic = new AmazonCognitoIdentityClient();
-        cic.GetIdAsync();
-        cic.GetCredentialsForIdentityAsync();
-        */
-
-        //m_s3Client = new AmazonS3Client (m_cognitoCredentials, RegionEndpoint.EUWest1);
-
         m_s3ImageFilePaths = new List<string>();
 
         m_coroutineQueue = new CoroutineQueue( this );
         m_coroutineQueue.StartLoop();
 	}
 
-    public CognitoAWSCredentials GetCredentials()
+    public void InitS3ClientFB(string fbAccessToken)
     {
-        return m_cognitoCredentials; //TODO: Some sort of validity check!
-    }
+        m_cognitoCredentials = new CognitoAWSCredentials(
+            "366575334313", // AWS Account ID
+            "eu-west-1:bb57e466-72ed-408d-8c84-301d0bae1a9f", // Identity Pool ID
+            "arn:aws:iam::366575334313:role/Cognito_VReelMainUnauth_Role", // unAuthRoleArn
+            "arn:aws:iam::366575334313:role/Cognito_VReelMainAuth_Role", // authRoleArn
+            RegionEndpoint.EUWest1 // Region
+        );   
 
-    public void InitS3ClientFB()
-    {           
-        m_cognitoCredentials.GetIdentityIdAsync((responseObj) =>
+        m_cognitoCredentials.AddLogin("graph.facebook.com", fbAccessToken);
+
+        m_cognitoCredentials.GetIdentityIdAsync((idResponseObj) =>
         {
-            if (responseObj.Exception == null) 
-            {
-                string identityId = responseObj.Response;
-                InitS3ClientFBInternal(identityId);
-            }
-            else
+            if (idResponseObj.Exception != null)
             {
                 Debug.Log("------- VREEL: Exception while assuming IAM role for S3 bucket");
-                Debug.Log("------- VREEL: Receieved error: " + responseObj.Exception.ToString());
+                Debug.Log("------- VREEL: Receieved error: " + idResponseObj.Exception.ToString());
+                return;
             }
-        });
-    }
 
-    public void InitS3ClientFBInternal(string accessToken)
-    {
-        m_stsClient = new AmazonSecurityTokenServiceClient(new AnonymousAWSCredentials());//m_cognitoCredentials);
+            string identityId = idResponseObj.Response;
+            m_userLogin.SetCognitoUserID(identityId);
 
-        var roleRequest = new Amazon.SecurityToken.Model.AssumeRoleWithWebIdentityRequest()
-        {         
-            WebIdentityToken = accessToken,
-            ProviderId = "graph.facebook.com",
-            RoleArn = "arn:aws:iam::366575334313:role/Cognito_VReelMainAuth_Role",
-            RoleSessionName = "vreelAppSession",
-            DurationSeconds = 3600
-        };
-
-        m_stsClient.AssumeRoleWithWebIdentityAsync( roleRequest, (responseObj) =>
-        {
-            if (responseObj.Exception == null)
-            {                
-                var credentials = responseObj.Response.Credentials;
-
-                SessionAWSCredentials sessionCredentials = new SessionAWSCredentials(
-                    credentials.AccessKeyId, 
-                    credentials.SecretAccessKey, 
-                    credentials.SessionToken
+            m_cognitoCredentials.GetCredentialsAsync((credentialsResponseObj) =>
+            {
+                SessionAWSCredentials sessionCreds = new SessionAWSCredentials(
+                    credentialsResponseObj.Response.AccessKey, 
+                    credentialsResponseObj.Response.SecretKey, 
+                    credentialsResponseObj.Response.Token
                 );
 
                 AmazonS3Config s3Config = new AmazonS3Config();
                 s3Config.RegionEndpoint = RegionEndpoint.EUWest1;
 
-                m_s3Client = new AmazonS3Client(sessionCredentials, s3Config);
-            }
-            else
-            {
-                Debug.Log("------- VREEL: Exception while assuming IAM role for S3 bucket");
-                Debug.Log("------- VREEL: Receieved error: " + responseObj.Response.HttpStatusCode.ToString());
-            }
+                m_s3Client = new AmazonS3Client(sessionCreds, s3Config);
+            });
         });
     }
         
@@ -176,10 +138,13 @@ public class AWSS3Client : MonoBehaviour
 
         Debug.Log("------- VREEL: UploadImage with FileName: " + fileName);
 
-        var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-        string key = m_userLogin.GetUserID() + "/" + Path.GetFileName(fileName);
+        string datePattern = "yyyy_MM_dd_hh_mm_ss";
+        string date = DateTime.UtcNow.ToString(datePattern);
+        string key = m_userLogin.GetCognitoUserID() + "/" + date + "_" + Path.GetFileName(fileName);
 
-        Debug.Log("------- VREEL: Creating request object");
+        var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+        Debug.Log("------- VREEL: Creating request object with key: " + key);
         var request = new PostObjectRequest()
         {
             Bucket = m_s3BucketName,
@@ -213,12 +178,12 @@ public class AWSS3Client : MonoBehaviour
     private static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
     private IEnumerator DownloadAllImagesInternal()
     {
-        Debug.Log("------- VREEL: Fetching all the Objects from: " + m_s3BucketName + "/" + m_userLogin.GetUserID() + "/");
+        Debug.Log("------- VREEL: Fetching all the Objects from: " + m_s3BucketName + "/" + m_userLogin.GetCognitoUserID() + "/");
 
         var request = new ListObjectsRequest()
         {
             BucketName = m_s3BucketName,
-            Prefix =  m_userLogin.GetUserID()
+            Prefix =  m_userLogin.GetCognitoUserID()
         };
 
         while (m_s3Client == null) // We do this to ensure that this function only runs if there's a valid client
@@ -242,7 +207,7 @@ public class AWSS3Client : MonoBehaviour
                     }
                 });
 
-                m_s3ImageFilePaths.Reverse(); // Reversing to have the images appear in the order of newest first
+                m_s3ImageFilePaths.Reverse(); // Reversing to have the images appear in the order of newest - this works because I store images with a timestamp!
 
                 DownloadImagesAndSetSpheres();
             }

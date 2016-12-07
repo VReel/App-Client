@@ -9,11 +9,13 @@ public class UserLogin : MonoBehaviour
     [SerializeField] private AWSS3Client m_AWSS3Client;
     [SerializeField] private GameObject m_fbInvalidLoginError;
 
+    private string m_cachedCognitoId;
     private string m_cachedUsername;
 
     public void Start()
     {
         Facebook.Unity.FB.Init();
+        m_cachedCognitoId = "";
         m_cachedUsername = "";
     }
 
@@ -21,7 +23,9 @@ public class UserLogin : MonoBehaviour
     {
         if (Application.isEditor)
         {
-            RequestUsername();
+            m_cachedCognitoId = "Editor";
+            m_cachedUsername = "Editor";
+
             m_appDirector.SetProfileState();
             return;
         }
@@ -31,11 +35,10 @@ public class UserLogin : MonoBehaviour
             FB.ActivateApp();
 
             if (FB.IsLoggedIn) 
-            {   //User already logged in from a previous session                
-                Debug.Log("------- VREEL: User already logged in from a previous session");
-                AddFacebookTokenToCognito();
-                //m_AWSS3Client.InitS3ClientFB();
-                m_AWSS3Client.InitS3ClientFBInternal(AccessToken.CurrentAccessToken.TokenString);
+            {
+                Debug.Log("------- VREEL: User is logged into Facebook");
+
+                m_AWSS3Client.InitS3ClientFB(AccessToken.CurrentAccessToken.TokenString);
                 RequestUsername();
                 m_appDirector.SetProfileState();
             } 
@@ -51,16 +54,32 @@ public class UserLogin : MonoBehaviour
         }
     }
 
-    public string GetUserID()
+    public void SetCognitoUserID(string cognitoUserID)
+    {
+        m_cachedCognitoId = cognitoUserID;
+    }
+
+    public string GetCognitoUserID()
+    {
+        string userID = "Error";
+        if (FB.IsInitialized && FB.IsLoggedIn && m_cachedCognitoId != "")
+        {
+            userID = m_cachedCognitoId;
+        }
+        else 
+        {
+            Debug.Log("------- VREEL: Serious error: UserID queried but FB is not LoggedIn and we're not in the Editor!");
+        }
+
+        return userID;
+    }
+
+    public string GetFBUserID()
     {
         string userID = "Error";
         if (FB.IsInitialized && FB.IsLoggedIn)
         {
             userID = AccessToken.CurrentAccessToken.UserId.ToString();
-        }
-        else if (Application.isEditor)
-        {
-            userID = "Editor";
         }
         else 
         {
@@ -90,19 +109,6 @@ public class UserLogin : MonoBehaviour
         return username;
     }
 
-    private void AddFacebookTokenToCognito()
-    {
-        Debug.Log("------- VREEL: AddFacebookTokenToCognito");
-        Debug.Log("------- VREEL: FB.IsInitialized: " + FB.IsInitialized + ", FB.IsLoggedIn: " + FB.IsLoggedIn);
-        Debug.Log("------- VREEL: AccessToken.UserId: " + AccessToken.CurrentAccessToken.UserId.ToString());
-        Debug.Log("------- VREEL: AccessToken.CurrentAccessToken: " + AccessToken.CurrentAccessToken.TokenString);
-        Debug.Log("------- VREEL: LoginsCount Before AddLogin(): " + m_AWSS3Client.GetCredentials().LoginsCount);
-        m_AWSS3Client.GetCredentials().AddLogin ("graph.facebook.com", AccessToken.CurrentAccessToken.TokenString);
-        Debug.Log("------- VREEL: LoginsCount After AddLogin(): " + m_AWSS3Client.GetCredentials().LoginsCount);
-        Debug.Log("------- VREEL: AuthRoleArn assumed: " + m_AWSS3Client.GetCredentials().AuthRoleArn);
-
-    }
-
     private void RequestUsername()
     {
         FB.API("/me?fields=first_name", HttpMethod.GET, UsernameCallback);
@@ -114,10 +120,6 @@ public class UserLogin : MonoBehaviour
         if (FB.IsLoggedIn && result.Error == null)
         {                                    
             m_cachedUsername = result.ResultDictionary["first_name"] as string;
-        }
-        else if (Application.isEditor)
-        {
-            m_cachedUsername = "Editor";
         }
         else 
         {
@@ -143,6 +145,20 @@ public class UserLogin : MonoBehaviour
 
             //Debug.Log("------- VREEL: FB.LogInWithReadPermissions");
             //FB.LogInWithReadPermissions (null, FacebookLoginCallback);
+    }
+    */
+
+    /*
+    private void PrintDebugTokenToCognito()
+    {
+        Debug.Log("------- VREEL: AddFacebookTokenToCognito");
+        Debug.Log("------- VREEL: FB.IsInitialized: " + FB.IsInitialized + ", FB.IsLoggedIn: " + FB.IsLoggedIn);
+        Debug.Log("------- VREEL: AccessToken.UserId: " + AccessToken.CurrentAccessToken.UserId.ToString());
+        Debug.Log("------- VREEL: AccessToken.CurrentAccessToken: " + AccessToken.CurrentAccessToken.TokenString);
+        //Debug.Log("------- VREEL: LoginsCount Before AddLogin(): " + m_AWSS3Client.GetCredentials().LoginsCount);
+        //m_AWSS3Client.GetCredentials().AddLogin ("graph.facebook.com", AccessToken.CurrentAccessToken.TokenString);
+        //Debug.Log("------- VREEL: LoginsCount After AddLogin(): " + m_AWSS3Client.GetCredentials().LoginsCount);
+        //Debug.Log("------- VREEL: AuthRoleArn assumed: " + m_AWSS3Client.GetCredentials().AuthRoleArn);
     }
     */
 }
