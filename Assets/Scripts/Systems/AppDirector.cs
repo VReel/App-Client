@@ -56,6 +56,8 @@ public class AppDirector : MonoBehaviour
             m_menuController.ShowWelcomeText();
         }
 
+        m_deviceGallery.InvalidateGalleryPictureLoading();
+
         m_menuController.SetProfileSubMenuActive(true);
         m_AWSS3Client.DownloadAllImages();
         m_appState = AppState.kProfile;
@@ -66,6 +68,8 @@ public class AppDirector : MonoBehaviour
         DisableAllOptions();
         SetImageSpheres(true);
         SetMenuBar(true);
+
+        m_AWSS3Client.InvalidateS3ImageLoading();
 
         m_menuController.SetGallerySubMenuActive(true);
         m_deviceGallery.OpenAndroidGallery();

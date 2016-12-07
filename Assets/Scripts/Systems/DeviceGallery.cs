@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;        //UnityWebRequest
+using System;                        //GC
 using System.IO;                     //DirectoryInfo
+//using System.Linq;                   //where, select
 using System.Collections;            //IEnumerator
 using System.Collections.Generic;    //List
 using System.Threading;              //Threading
@@ -9,46 +11,56 @@ public class DeviceGallery : MonoBehaviour
 {
     public GameObject[] m_imageSpheres;
 
-    private int m_currPictureIndex = 0;         // Using the word "Picture" to represent images that are stored on the device
+    private int m_currGalleryPictureIndex = 0;         // Using the word "Picture" to represent images that are stored on the device
     private List<string> m_pictureFilePaths;
-    private static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
     //private System.Threading.Thread m_thread;
-    private CoroutineQueue coroutineQueue;
+    private CoroutineQueue m_coroutineQueue;
+
+    AndroidJavaClass m_galleryJavaClass;
 
     public void Start()
     {
+        AndroidJNI.AttachCurrentThread();
+        m_galleryJavaClass = new AndroidJavaClass("io.vreel.vreel.VReelAndroidGallery");
+
         m_pictureFilePaths = new List<string>();
-        coroutineQueue = new CoroutineQueue( this );
-        coroutineQueue.StartLoop();
+        m_coroutineQueue = new CoroutineQueue( this );
+        m_coroutineQueue.StartLoop();
+    }
+
+    public void InvalidateGalleryPictureLoading() // This function is called in order to stop any ongoing picture loading 
+    {
+        m_currGalleryPictureIndex = -1;
     }
 
     public bool IsIndexAtStart()
     {
-        return m_currPictureIndex == 0;
+        return m_currGalleryPictureIndex <= 0;
     }
 
     public bool IsIndexAtEnd()
     {
         int numImageSpheres = m_imageSpheres.GetLength(0);
         int numFiles = m_pictureFilePaths.Count;
-        return m_currPictureIndex >= (numFiles - numImageSpheres);       
+        return m_currGalleryPictureIndex >= (numFiles - numImageSpheres);       
     }
 
     public void OpenAndroidGallery()
     {
         Debug.Log("------- VREEL: OpenAndroidGallery() called");
 
-        // This is only Gear 360 images! I need to figure out how to find all 360 images regardless of where they live in the device
-        m_currPictureIndex = 0;
+        m_currGalleryPictureIndex = 0;
         m_pictureFilePaths.Clear();
-        string path = "/storage/emulated/0/DCIM/Gear 360/";
 
-        Debug.Log("------- VREEL: Storing all FilePaths from directory: " + path);
+        Debug.Log("------- VREEL: About to call GetImagesPath function...");
+        string imagesTopLevelDirectory = m_galleryJavaClass.CallStatic<string>("GetAndroidImagesPath"); //string path = "/storage/emulated/0/DCIM/Gear 360/";
+        Debug.Log("------- VREEL: Storing all FilePaths from directory: " + imagesTopLevelDirectory);
 
-        StoreAllFilePaths(path);
+        m_coroutineQueue.EnqueueAction(StoreAllImageFilePaths(imagesTopLevelDirectory));
 
+        m_currGalleryPictureIndex = 0;
         int numImageSpheres = m_imageSpheres.GetLength(0);
-        LoadPictures(m_currPictureIndex, numImageSpheres);
+        m_coroutineQueue.EnqueueAction(LoadPictures(m_currGalleryPictureIndex, numImageSpheres));
     }
 
     public void NextPictures()
@@ -58,10 +70,10 @@ public class DeviceGallery : MonoBehaviour
         int numImageSpheres = m_imageSpheres.GetLength(0);
         int numFilePaths = m_pictureFilePaths.Count;
 
-        m_currPictureIndex = Mathf.Clamp(m_currPictureIndex + numImageSpheres, 0, numFilePaths);
+        m_currGalleryPictureIndex = Mathf.Clamp(m_currGalleryPictureIndex + numImageSpheres, 0, numFilePaths);
 
-        coroutineQueue.Clear(); // Ensure we stop loading somethign that we may be loading
-        LoadPictures(m_currPictureIndex, numImageSpheres);
+        m_coroutineQueue.Clear(); // Ensure we stop loading somethign that we may be loading
+        m_coroutineQueue.EnqueueAction(LoadPictures(m_currGalleryPictureIndex, numImageSpheres));
     }
 
     public void PreviousPictures()
@@ -71,26 +83,104 @@ public class DeviceGallery : MonoBehaviour
         int numImageSpheres = m_imageSpheres.GetLength(0);
         int numFilePaths = m_pictureFilePaths.Count;
 
-        m_currPictureIndex = Mathf.Clamp(m_currPictureIndex - numImageSpheres, 0, numFilePaths);
+        m_currGalleryPictureIndex = Mathf.Clamp(m_currGalleryPictureIndex - numImageSpheres, 0, numFilePaths);
 
-        coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
-        LoadPictures(m_currPictureIndex, numImageSpheres);
+        m_coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
+        m_coroutineQueue.EnqueueAction(LoadPictures(m_currGalleryPictureIndex, numImageSpheres));
     }
 
-    private void StoreAllFilePaths(string path)
-    {
-        foreach (string filePath in System.IO.Directory.GetFiles(path))
+    private IEnumerator StoreAllImageFilePaths(string imagesTopLevelDirectory)
+    {        
+        // TODO: Make sure this whole function doesn't block at all - 
+        //       Steps 1 and 2 can sort of be merged to reduce iterations per frame
+
+        // 1) Find all files that could potentially be 360 images.
+        var files = GetAllFileNamesRecursively(imagesTopLevelDirectory);
+        yield return new WaitForEndOfFrame();
+
+        // 2) Add the files that are actually 360 images to "m_pictureFilePaths"
+        // In order to reduce the block on the main thread we only search over kNumFilesPerIteration
+        const int kNumFilesPerIteration = 100;
+        int numFilesSearched = 0;
+        foreach (string filePath in files)
         { 
-            if (ImageExtensions.Contains(Path.GetExtension(filePath).ToUpperInvariant())) // Check that the file is indeed an image
-            {                
+            if (Is360Image(filePath))
+            {   
                 m_pictureFilePaths.Add(filePath);
+            }
+
+            numFilesSearched++;
+            if (numFilesSearched % kNumFilesPerIteration == 0)
+            {
+                GC.Collect();
+                yield return new WaitForEndOfFrame();
+            }
+        }
+            
+        Debug.Log("------- VREEL: Searched the directory " + imagesTopLevelDirectory + ", through " + numFilesSearched +
+            " files, and found " + m_pictureFilePaths.Count + " 360-image files!");
+
+        // 3) Sort files in order of newest first, so that users see their most recent gallery images!
+        yield return new WaitForEndOfFrame();
+        m_pictureFilePaths.Sort(delegate(string file1, string file2)
+        {
+            return File.GetCreationTime(file2).CompareTo(File.GetCreationTime(file1));
+        });
+    }
+
+    private List<string> GetAllFileNamesRecursively(string baseDirectory)
+    {
+        // We iterate over all files in the given top level directory, recursively searching through all the subdirectories
+        var files = new List<string>();
+        FileAttributes undesiredAttributes = (FileAttributes.Hidden | FileAttributes.System | FileAttributes.Temporary);
+
+        foreach(string filePath in System.IO.Directory.GetFiles(baseDirectory, "*", SearchOption.TopDirectoryOnly))
+        {            
+            FileAttributes checkedFileAttributes = File.GetAttributes(filePath) & undesiredAttributes;
+            if (checkedFileAttributes == 0)
+            {
+                files.Add(filePath);
             }
         }
 
-        m_pictureFilePaths.Reverse(); // Reversing to have the pictures appear in the order of newest first
+        foreach(string dirName in System.IO.Directory.GetDirectories(baseDirectory, "*", SearchOption.TopDirectoryOnly))
+        {
+            FileAttributes checkedFolderAttributes = (new DirectoryInfo(dirName).Attributes) & undesiredAttributes;
+            if (checkedFolderAttributes == 0)
+            {
+                files.AddRange(GetAllFileNamesRecursively(dirName));
+            }
+        }
+
+        return files;
+    }
+        
+    private static readonly List<string> s_imageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
+    private bool Is360Image(string filePath)
+    {            
+        // Check that it has an image file extension 
+        if (!s_imageExtensions.Contains(Path.GetExtension(filePath).ToUpperInvariant()))
+        {
+            Debug.Log("------- VREEL: File: " + filePath + " is not an image!");
+            return false;
+        }
+
+        // NOTE: My current rudimentatry implementation of this function is very simply to check if the aspect ratio is 2:1!
+        // This works the majority of the time because all 360 images have a 2:1 ratio,
+        // and its not a standard aspect ratio for any other type of image!
+
+        Debug.Log("------- VREEL: About to call Aspect Ratio function for file: " + filePath);
+        float aspectRatio = m_galleryJavaClass.CallStatic<float>("CalcAspectRatio", filePath);
+        Debug.Log("------- VREEL: Aspect Ratio: " + aspectRatio);
+
+        const float kDesiredAspectRatio = 2.0f;
+        bool isImage360 = Mathf.Abs(aspectRatio - kDesiredAspectRatio) < Mathf.Epsilon;
+        Debug.Log("------- VREEL: Image: " + filePath + " is 360: " + isImage360);
+
+        return isImage360;
     }
 
-    private void LoadPictures(int startingPictureIndex, int numImages)
+    private IEnumerator LoadPictures(int startingPictureIndex, int numImages)
     {
         Debug.Log(string.Format("------- VREEL: Loading {0} pictures beginning at index {1}. There are {2} pictures in the gallery!", 
             numImages, startingPictureIndex, m_pictureFilePaths.Count));
@@ -103,8 +193,8 @@ public class DeviceGallery : MonoBehaviour
             if (currPictureIndex < m_pictureFilePaths.Count)
             {                   
                 string filePath = m_pictureFilePaths[currPictureIndex];
-                coroutineQueue.EnqueueAction(LoadPicturesInternal(filePath, sphereIndex));
-                coroutineQueue.EnqueueWait(2.0f);
+                m_coroutineQueue.EnqueueAction(LoadPicturesInternal(filePath, sphereIndex, currPictureIndex, numImages));
+                m_coroutineQueue.EnqueueWait(2.0f);
             }
             else
             {
@@ -113,10 +203,20 @@ public class DeviceGallery : MonoBehaviour
         }
 
         Resources.UnloadUnusedAssets();
+        yield return null;
     }
 
-    private IEnumerator LoadPicturesInternal(string filePath, int sphereIndex)
-    {        
+    private IEnumerator LoadPicturesInternal(string filePath, int sphereIndex, int pictureIndex, int numImages)
+    {                           
+        bool pictureRequestStillValid = (m_currGalleryPictureIndex <= pictureIndex) &&  (pictureIndex < m_currGalleryPictureIndex + numImages); // Request no longer valid as user pressed Next or Previous arrows
+        string logString02 = string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", pictureRequestStillValid, m_currGalleryPictureIndex, pictureIndex, numImages); 
+        Debug.Log(logString02);
+        if (!pictureRequestStillValid)
+        {
+            Debug.Log("------- VREEL: Gallery request stopped because user has moved off that page: " + filePath);
+            yield break;
+        }
+
         Debug.Log("------- VREEL: Loading from filePath: " + filePath);
 
         // NOTE: When I keep calling www.texture it will crash due to multiple allocations!

@@ -91,7 +91,10 @@
      <None Include="Assets\Standard Assets\Prototyping\Shaders\ProceduralSkyBox.shader" />
      <None Include="Assets\Standard Assets\Prototyping\Shaders\WorldCoordDiffuse.shader" />
      <None Include="Assets\Shader\UIOverlay.shader" />
+     <None Include="Assets\Plugins\Android\classes\AndroidManifest.xml" />
+     <None Include="Assets\Plugins\Android\Build.xml" />
      <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
+     <None Include="Assets\Plugins\Android\classes\Build.xml" />
      <None Include="Assets\FacebookSDK\link.xml" />
      <None Include="Assets\AWSSDK\src\Core\Resources\awsconfig.xml" />
      <None Include="Assets\Plugins\Android\AndroidManifest.xml" />

@@ -34,7 +34,8 @@ public class UserLogin : MonoBehaviour
             {   //User already logged in from a previous session                
                 Debug.Log("------- VREEL: User already logged in from a previous session");
                 AddFacebookTokenToCognito();
-                // m_AWSS3Client.InitS3ClientFB();//m_AWSS3Client.InitS3ClientFB(AccessToken.CurrentAccessToken.TokenString);
+                //m_AWSS3Client.InitS3ClientFB();
+                m_AWSS3Client.InitS3ClientFBInternal(AccessToken.CurrentAccessToken.TokenString);
                 RequestUsername();
                 m_appDirector.SetProfileState();
             } 

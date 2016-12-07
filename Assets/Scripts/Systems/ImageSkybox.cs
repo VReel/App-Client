@@ -29,6 +29,11 @@ public class ImageSkybox : MonoBehaviour
 
         // RenderSettings.skybox = texture; // TODO: have the skybox be used instead of this sphere around the user
 
+        if (filePath == null)
+        {
+            // TODO: Workout where its coming from...
+        }
+
         Debug.Log("------- VREEL: Changed skybox to = " + filePath);
     }
 }

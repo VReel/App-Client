@@ -25,12 +25,11 @@ public class AWSS3Client : MonoBehaviour
     private CognitoAWSCredentials m_cognitoCredentials = null;
     private AmazonSecurityTokenServiceClient m_stsClient = null;
 
-    private int m_currS3ImageIndex = 0;
+    private int m_currS3ImageIndex = -1;
     private List<string> m_s3ImageFilePaths;
-    private static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
-    private CoroutineQueue coroutineQueue;
+    private CoroutineQueue m_coroutineQueue;
 
-    void Start() 
+    public void Start() 
 	{
 		UnityInitializer.AttachToGameObject(this.gameObject);
 
@@ -48,12 +47,12 @@ public class AWSS3Client : MonoBehaviour
         cic.GetCredentialsForIdentityAsync();
         */
 
-        m_s3Client = new AmazonS3Client (m_cognitoCredentials, RegionEndpoint.EUWest1);
+        //m_s3Client = new AmazonS3Client (m_cognitoCredentials, RegionEndpoint.EUWest1);
 
         m_s3ImageFilePaths = new List<string>();
 
-        coroutineQueue = new CoroutineQueue( this );
-        coroutineQueue.StartLoop();
+        m_coroutineQueue = new CoroutineQueue( this );
+        m_coroutineQueue.StartLoop();
 	}
 
     public CognitoAWSCredentials GetCredentials()
@@ -115,10 +114,17 @@ public class AWSS3Client : MonoBehaviour
             }
         });
     }
+        
+    //TODO Make use of word picture and image consistent!\
+    //TODO Improve function names... especially the 4 Download functions at the bottom...
+    public void InvalidateS3ImageLoading() // This function is called in order to stop any ongoing picture loading 
+    {
+        m_currS3ImageIndex = -1;
+    }
 
     public bool IsIndexAtStart()
     {
-        return m_currS3ImageIndex == 0;
+        return m_currS3ImageIndex <= 0;
     }
 
     public bool IsIndexAtEnd()
@@ -130,12 +136,12 @@ public class AWSS3Client : MonoBehaviour
 
     public void UploadImage()
     {
-        coroutineQueue.EnqueueAction(UploadImageInternal());
+        m_coroutineQueue.EnqueueAction(UploadImageInternal());
     }
 
     public void DownloadAllImages()
     {
-        coroutineQueue.EnqueueAction(DownloadAllImagesInternal());
+        m_coroutineQueue.EnqueueAction(DownloadAllImagesInternal());
     }       
 
     public void NextImages()
@@ -147,7 +153,7 @@ public class AWSS3Client : MonoBehaviour
 
         m_currS3ImageIndex = Mathf.Clamp(m_currS3ImageIndex + numImageSpheres, 0, numFilePaths);
 
-        coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
+        m_coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
         DownloadImagesAndSetSpheres();
     }
 
@@ -160,7 +166,7 @@ public class AWSS3Client : MonoBehaviour
 
         m_currS3ImageIndex = Mathf.Clamp(m_currS3ImageIndex - numImageSpheres, 0, numFilePaths);
 
-        coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
+        m_coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
         DownloadImagesAndSetSpheres();
     }
 
@@ -204,6 +210,7 @@ public class AWSS3Client : MonoBehaviour
         });
     }
 
+    private static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
     private IEnumerator DownloadAllImagesInternal()
     {
         Debug.Log("------- VREEL: Fetching all the Objects from: " + m_s3BucketName + "/" + m_userLogin.GetUserID() + "/");
@@ -214,11 +221,12 @@ public class AWSS3Client : MonoBehaviour
             Prefix =  m_userLogin.GetUserID()
         };
 
-        while (m_s3Client == null)
+        while (m_s3Client == null) // We do this to ensure that this function only runs if there's a valid client
         {
-            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame(); //This will essentially block this coroutine queue, without blocking the main thread
         }
 
+        m_currS3ImageIndex = 0;
         m_s3Client.ListObjectsAsync(request, (responseObject) =>
         {
             if (responseObject.Exception == null)
@@ -285,20 +293,20 @@ public class AWSS3Client : MonoBehaviour
         {               
             var response = s3ResponseObj.Response;
             if (response != null && response.ResponseStream != null)
-            {   
-                bool requestStillValid = (m_currS3ImageIndex <= pictureIndex) &&  (pictureIndex < m_currS3ImageIndex + numImages); // Request no longer valid as user pressed Next or Previous arrows
-                string logString02 = string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", requestStillValid, m_currS3ImageIndex, pictureIndex, numImages); 
+            {                   
+                bool imageRequestStillValid = (m_currS3ImageIndex <= pictureIndex) &&  (pictureIndex < m_currS3ImageIndex + numImages); // Request no longer valid as user pressed Next or Previous arrows
+                string logString02 = string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", imageRequestStillValid, m_currS3ImageIndex, pictureIndex, numImages); 
                 Debug.Log(logString02);
-                if (requestStillValid)
+                if (imageRequestStillValid)
                 {
-                    coroutineQueue.EnqueueAction(ConvertStreamAndSetImage(response, sphereIndex, fullFilePath));
-                    coroutineQueue.EnqueueWait(2.0f);
+                    m_coroutineQueue.EnqueueAction(ConvertStreamAndSetImage(response, sphereIndex, fullFilePath));
+                    m_coroutineQueue.EnqueueWait(2.0f);
 
                     Debug.Log("------- VREEL: Successfully downloaded and set " + fullFilePath);
                 }
                 else
                 {
-                    Debug.Log("------- VREEL: Downloaded item successfully but was thrown away because user has moved to previous or next: " + fullFilePath);
+                    Debug.Log("------- VREEL: Downloaded item successfully but was thrown away because user has moved off that page: " + fullFilePath);
                 }
 
                 Resources.UnloadUnusedAssets();
