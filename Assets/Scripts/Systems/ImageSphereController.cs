@@ -9,6 +9,8 @@ public class ImageSphereController : MonoBehaviour
     // Member Variables
     // **************************
 
+    public float m_defaultSphereScale = 1.0f;
+    public float m_scalingFactor = 0.88f;
     public GameObject[] m_imageSpheres;
 
     // **************************
@@ -18,6 +20,16 @@ public class ImageSphereController : MonoBehaviour
     public void Start()
     {
         HideAllImageSpheres();
+    }
+
+    public float GetDefaultSphereScale()
+    {
+        return m_defaultSphereScale;
+    }
+
+    public float GetScalingFactor()
+    {
+        return m_scalingFactor;
     }
 
     public int GetNumSpheres()

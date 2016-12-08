@@ -7,15 +7,14 @@ public class ImageSphere : MonoBehaviour
     // Member Variables
     // **************************
 
-    public float m_defaultScale = 1.0f;
-    public float m_scalingFactor = 0.88f;
-    
+    [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
 
     private Texture2D m_imageSphereTexture;
     private string m_imageFilePath; // All ImageSphere's have a path (either through the internet, or local to the device) associated with them!
     private string kEmptyString = "emptyString";
+    private CoroutineQueue m_coroutineQueue;
 
     // **************************
     // Public functions
@@ -24,6 +23,8 @@ public class ImageSphere : MonoBehaviour
     public void Awake()
     {
         m_imageSphereTexture = new Texture2D(2,2); // TODO Create a default texture for loading showing the VReel logo
+        m_coroutineQueue = new CoroutineQueue( this );
+        m_coroutineQueue.StartLoop();
     }
 
     public string GetImageFilePath()
@@ -46,7 +47,8 @@ public class ImageSphere : MonoBehaviour
         m_imageFilePath = filePath;
         m_imageSphereTexture = texture;
 
-        StartCoroutine(AnimateSetTexture());
+        m_coroutineQueue.Clear();
+        m_coroutineQueue.EnqueueAction(AnimateSetTexture());
     }
 
     public void SetImageAndFilePath(ref WWW www, string filePath)
@@ -54,14 +56,16 @@ public class ImageSphere : MonoBehaviour
         m_imageFilePath = filePath;
         www.LoadImageIntoTexture(m_imageSphereTexture);
 
-        StartCoroutine(AnimateSetTexture());
+        m_coroutineQueue.Clear();
+        m_coroutineQueue.EnqueueAction(AnimateSetTexture());
     }
 
     public void Hide()
     {
         m_imageFilePath = kEmptyString;
 
-        StartCoroutine(AnimateHide());
+        m_coroutineQueue.Clear();
+        m_coroutineQueue.EnqueueAction(AnimateHide());
     }
 
     // **************************
@@ -69,31 +73,36 @@ public class ImageSphere : MonoBehaviour
     // **************************
 
     private IEnumerator AnimateSetTexture()
-    {        
+    {   
         const float kMinShrink = 0.05f; // Minimum value you the sphere can shrink to...
+        float scalingFactor = m_imageSphereController.GetScalingFactor();
+        float defaultScale = m_imageSphereController.GetDefaultSphereScale();
+
         while (transform.localScale.magnitude > kMinShrink)
         {
-            transform.localScale = transform.localScale * m_scalingFactor;
+            transform.localScale = transform.localScale * scalingFactor;
             yield return new WaitForEndOfFrame();
         }
 
         gameObject.GetComponent<MeshRenderer>().material.mainTexture = m_imageSphereTexture;
 
-        while (transform.localScale.magnitude < m_defaultScale)
+        while (transform.localScale.magnitude < defaultScale)
         {
-            transform.localScale = transform.localScale / m_scalingFactor;
+            transform.localScale = transform.localScale / scalingFactor;
             yield return new WaitForEndOfFrame();
         }
 
-        transform.localScale = new Vector3(m_defaultScale, m_defaultScale, m_defaultScale);
+        transform.localScale = new Vector3(defaultScale, defaultScale, defaultScale);
     }
 
     private IEnumerator AnimateHide()
     {        
+        float scalingFactor = m_imageSphereController.GetScalingFactor();
+
         const float kMinShrink = 0.005f; // Minimum value you the sphere can shrink to...
         while (transform.localScale.magnitude > kMinShrink)
         {
-            transform.localScale = transform.localScale * m_scalingFactor;
+            transform.localScale = transform.localScale * scalingFactor;
             yield return new WaitForEndOfFrame();
         }
     }
