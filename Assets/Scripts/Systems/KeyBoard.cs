@@ -4,7 +4,10 @@ using UnityEngine.UI;
 
 public class KeyBoard : MonoBehaviour 
 {
-	// Use this for initialization
+    // **************************
+    // Member Variables
+    // **************************
+    	
 	public float m_blinkingTime = 1.5f;
     public Text m_objectiveTextObject;
     public float m_distPos = 0.1f;
@@ -22,7 +25,11 @@ public class KeyBoard : MonoBehaviour
     private Text[] m_allSymbolChars;
     private string m_blinkText, m_actualText;
 
-	void Start () 
+    // **************************
+    // Public functions
+    // **************************
+
+	public void Start () 
 	{
 		/*  USE THIS AS A PROTOTYPE ONLY
 		//GameObject[] go = GameObject.FindGameObjectsWithTag("char");
@@ -234,6 +241,10 @@ public class KeyBoard : MonoBehaviour
             m_symbolMode = false;
 		}		
 	}
+
+    // **************************
+    // Private/Helper functions
+    // **************************
 
     private string ReplaceStringWithAsterixes(string actualString)
     {

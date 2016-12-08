@@ -14,8 +14,12 @@ using Amazon.S3.Util;
 
 public class AWSS3Client : MonoBehaviour 
 {   
+    // **************************
+    // Member Variables
+    // **************************
+
     public string m_s3BucketName = null;
-    public GameObject[] m_imageSpheres;
+    [SerializeField] private ImageSphereController m_imageSphereController;
 
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private UserLogin m_userLogin;
@@ -26,6 +30,10 @@ public class AWSS3Client : MonoBehaviour
     private int m_currS3ImageIndex = -1;
     private List<string> m_s3ImageFilePaths;
     private CoroutineQueue m_coroutineQueue;
+
+    // **************************
+    // Public functions
+    // **************************
 
     public void Start() 
 	{
@@ -83,17 +91,22 @@ public class AWSS3Client : MonoBehaviour
     {
         m_currS3ImageIndex = -1;
     }
-
-    public bool IsIndexAtStart()
+        
+    public bool IsS3ImageIndexAtStart()
     {
         return m_currS3ImageIndex <= 0;
     }
 
-    public bool IsIndexAtEnd()
+    public bool IsS3ImageIndexAtEnd()
     {
-        int numImageSpheres = m_imageSpheres.GetLength(0);
+        int numImageSpheres = m_imageSphereController.GetNumSpheres();
         int numFiles = m_s3ImageFilePaths.Count;
         return m_currS3ImageIndex >= (numFiles - numImageSpheres);       
+    }
+
+    public bool IsS3ClientValid()
+    {
+        return m_s3Client != null;
     }
 
     public void UploadImage()
@@ -110,10 +123,10 @@ public class AWSS3Client : MonoBehaviour
     {
         Debug.Log("------- VREEL: NextPictures() called");
 
-        int numImageSpheres = m_imageSpheres.GetLength(0);
+        int numImagesToLoad = m_imageSphereController.GetNumSpheres();
         int numFilePaths = m_s3ImageFilePaths.Count;
 
-        m_currS3ImageIndex = Mathf.Clamp(m_currS3ImageIndex + numImageSpheres, 0, numFilePaths);
+        m_currS3ImageIndex = Mathf.Clamp(m_currS3ImageIndex + numImagesToLoad, 0, numFilePaths);
 
         m_coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
         DownloadImagesAndSetSpheres();
@@ -123,17 +136,26 @@ public class AWSS3Client : MonoBehaviour
     {
         Debug.Log("------- VREEL: PreviousPictures() called");
 
-        int numImageSpheres = m_imageSpheres.GetLength(0);
+        int numImagesToLoad = m_imageSphereController.GetNumSpheres();
         int numFilePaths = m_s3ImageFilePaths.Count;
 
-        m_currS3ImageIndex = Mathf.Clamp(m_currS3ImageIndex - numImageSpheres, 0, numFilePaths);
+        m_currS3ImageIndex = Mathf.Clamp(m_currS3ImageIndex - numImagesToLoad, 0, numFilePaths);
 
         m_coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
         DownloadImagesAndSetSpheres();
     }
 
+    // **************************
+    // Private/Helper functions
+    // **************************
+
     private IEnumerator UploadImageInternal()
     {
+        while (!IsS3ClientValid()) // We do this to ensure that this function only runs if there's a valid client
+        {
+            yield return new WaitForEndOfFrame(); //This will essentially block this coroutine queue, without blocking the main thread
+        }
+
         string fileName =  m_imageSkybox.GetImageFilePath();
 
         Debug.Log("------- VREEL: UploadImage with FileName: " + fileName);
@@ -155,11 +177,6 @@ public class AWSS3Client : MonoBehaviour
 
         Debug.Log("------- VREEL: Making HTTP post call");
 
-        while (m_s3Client == null)
-        {
-            yield return new WaitForEndOfFrame();
-        }
-
         m_s3Client.PostObjectAsync(request, (responseObj) =>
         {
             if (responseObj.Exception == null)
@@ -178,6 +195,12 @@ public class AWSS3Client : MonoBehaviour
     private static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
     private IEnumerator DownloadAllImagesInternal()
     {
+        while (!IsS3ClientValid()) // We do this to ensure that this function only runs if there's a valid client
+        {
+            Debug.Log("------- VREEL: S3 Client not constructed yet");
+            yield return new WaitForEndOfFrame(); //This will essentially block this coroutine queue, without blocking the main thread
+        }
+
         Debug.Log("------- VREEL: Fetching all the Objects from: " + m_s3BucketName + "/" + m_userLogin.GetCognitoUserID() + "/");
 
         var request = new ListObjectsRequest()
@@ -185,11 +208,6 @@ public class AWSS3Client : MonoBehaviour
             BucketName = m_s3BucketName,
             Prefix =  m_userLogin.GetCognitoUserID()
         };
-
-        while (m_s3Client == null) // We do this to ensure that this function only runs if there's a valid client
-        {
-            yield return new WaitForEndOfFrame(); //This will essentially block this coroutine queue, without blocking the main thread
-        }
 
         m_currS3ImageIndex = 0;
         m_s3Client.ListObjectsAsync(request, (responseObject) =>
@@ -220,8 +238,8 @@ public class AWSS3Client : MonoBehaviour
 
     private void DownloadImagesAndSetSpheres()
     {
-        int numImageSpheres = m_imageSpheres.GetLength(0);
-        DownloadImagesAndSetSpheresInternal(m_currS3ImageIndex, numImageSpheres);
+        int numImagesToLoad = m_imageSphereController.GetNumSpheres();
+        DownloadImagesAndSetSpheresInternal(m_currS3ImageIndex, numImagesToLoad);
     }
 
     private void DownloadImagesAndSetSpheresInternal(int startingPictureIndex, int numImages)
@@ -241,7 +259,7 @@ public class AWSS3Client : MonoBehaviour
             }
             else
             {
-                m_imageSpheres[sphereIndex].GetComponent<SelectImage>().Hide();
+                m_imageSphereController.HideSphereAtIndex(sphereIndex);
             }
         }
 
@@ -317,7 +335,7 @@ public class AWSS3Client : MonoBehaviour
         Debug.Log("------- VREEL: Finished iterating, length of byte[] is " + myBinary.Length);
 
         // TODO: Make copying texture not block!
-        m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndFilePath(myBinary, fullFilePath);
+        m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, myBinary, fullFilePath);
         yield return new WaitForEndOfFrame();
 
         Debug.Log("------- VREEL: Finished Setting Image!");

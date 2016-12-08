@@ -5,9 +5,17 @@ using Amazon.CognitoIdentity;
 
 public class Analytics : MonoBehaviour 
 {
+    // **************************
+    // Member Variables
+    // **************************
+
     private MobileAnalyticsManager m_analyticsManager;
 
-    void Start() 
+    // **************************
+    // Public functions
+    // **************************
+
+    public void Start() 
     {        
         // TODO: Move Cognito Identity Pool to be in EUWest1 region!
         // TODO: Add custom events for number of images viewed, number of images uploaded, etc.
@@ -24,9 +32,13 @@ public class Analytics : MonoBehaviour
         ); 
     }
 
+    // **************************
+    // Private/Helper functions
+    // **************************
+
     // You want this session management code only in one game object
     // that persists through the game life cycles using “DontDestroyOnLoad (transform.gameObject);”
-    void OnApplicationFocus(bool focus) 
+    private void OnApplicationFocus(bool focus) 
     {
         if (m_analyticsManager != null) 
         {

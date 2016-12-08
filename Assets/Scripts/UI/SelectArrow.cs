@@ -3,6 +3,10 @@ using UnityEngine.UI;
 
 public class SelectArrow : MonoBehaviour 
 {
+    // **************************
+    // Member Variables
+    // **************************
+    
     public enum ArrowType
     {
         kPrev,
@@ -17,10 +21,18 @@ public class SelectArrow : MonoBehaviour
     [SerializeField] private AWSS3Client m_awsS3Client;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
 
+    // **************************
+    // Public functions
+    // **************************
+
     public void Update() //TODO: Remove this Update and make it event based!
     {
         UpdateActive();
     }
+
+    // **************************
+    // Private/Helper functions
+    // **************************
 
     private void UpdateActive()
     {
@@ -43,22 +55,22 @@ public class SelectArrow : MonoBehaviour
         {
             if (m_arrowType == ArrowType.kNext)
             {
-                return !m_deviceGallery.IsIndexAtEnd();
+                return !m_deviceGallery.IsGalleryIndexAtEnd();
             }
             else if (m_arrowType == ArrowType.kPrev)
             {
-                return !m_deviceGallery.IsIndexAtStart();
+                return !m_deviceGallery.IsGalleryIndexAtStart();
             }
         }
         else if (m_awsS3Client != null)
         {
             if (m_arrowType == ArrowType.kNext)
             {
-                return !m_awsS3Client.IsIndexAtEnd();
+                return !m_awsS3Client.IsS3ImageIndexAtEnd();
             }
             else if (m_arrowType == ArrowType.kPrev)
             {
-                return !m_awsS3Client.IsIndexAtStart();
+                return !m_awsS3Client.IsS3ImageIndexAtStart();
             }      
         }
 

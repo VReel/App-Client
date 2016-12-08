@@ -9,14 +9,21 @@ using System.Threading;              //Threading
 
 public class DeviceGallery : MonoBehaviour 
 {
-    public GameObject[] m_imageSpheres;
+    // **************************
+    // Member Variables
+    // **************************
+
+    [SerializeField] private ImageSphereController m_imageSphereController;
 
     private int m_currGalleryPictureIndex = 0;         // Using the word "Picture" to represent images that are stored on the device
     private List<string> m_pictureFilePaths;
-    //private System.Threading.Thread m_thread;
     private CoroutineQueue m_coroutineQueue;
 
     AndroidJavaClass m_galleryJavaClass;
+
+    // **************************
+    // Public functions
+    // **************************
 
     public void Start()
     {
@@ -33,14 +40,14 @@ public class DeviceGallery : MonoBehaviour
         m_currGalleryPictureIndex = -1;
     }
 
-    public bool IsIndexAtStart()
+    public bool IsGalleryIndexAtStart()
     {
         return m_currGalleryPictureIndex <= 0;
     }
 
-    public bool IsIndexAtEnd()
+    public bool IsGalleryIndexAtEnd()
     {
-        int numImageSpheres = m_imageSpheres.GetLength(0);
+        int numImageSpheres = m_imageSphereController.GetNumSpheres();
         int numFiles = m_pictureFilePaths.Count;
         return m_currGalleryPictureIndex >= (numFiles - numImageSpheres);       
     }
@@ -59,35 +66,39 @@ public class DeviceGallery : MonoBehaviour
         m_coroutineQueue.EnqueueAction(StoreAllImageFilePaths(imagesTopLevelDirectory));
 
         m_currGalleryPictureIndex = 0;
-        int numImageSpheres = m_imageSpheres.GetLength(0);
-        m_coroutineQueue.EnqueueAction(LoadPictures(m_currGalleryPictureIndex, numImageSpheres));
+        int numImagesToLoad = m_imageSphereController.GetNumSpheres();
+        m_coroutineQueue.EnqueueAction(LoadPictures(m_currGalleryPictureIndex, numImagesToLoad));
     }
 
     public void NextPictures()
     {
         Debug.Log("------- VREEL: NextPictures() called");
 
-        int numImageSpheres = m_imageSpheres.GetLength(0);
+        int numImagesToLoad = m_imageSphereController.GetNumSpheres();
         int numFilePaths = m_pictureFilePaths.Count;
 
-        m_currGalleryPictureIndex = Mathf.Clamp(m_currGalleryPictureIndex + numImageSpheres, 0, numFilePaths);
+        m_currGalleryPictureIndex = Mathf.Clamp(m_currGalleryPictureIndex + numImagesToLoad, 0, numFilePaths);
 
-        m_coroutineQueue.Clear(); // Ensure we stop loading somethign that we may be loading
-        m_coroutineQueue.EnqueueAction(LoadPictures(m_currGalleryPictureIndex, numImageSpheres));
+        m_coroutineQueue.Clear(); // Throw away previous operations
+        m_coroutineQueue.EnqueueAction(LoadPictures(m_currGalleryPictureIndex, numImagesToLoad));
     }
 
     public void PreviousPictures()
     {
         Debug.Log("------- VREEL: PreviousPictures() called");
 
-        int numImageSpheres = m_imageSpheres.GetLength(0);
+        int numImagesToLoad = m_imageSphereController.GetNumSpheres();
         int numFilePaths = m_pictureFilePaths.Count;
 
-        m_currGalleryPictureIndex = Mathf.Clamp(m_currGalleryPictureIndex - numImageSpheres, 0, numFilePaths);
+        m_currGalleryPictureIndex = Mathf.Clamp(m_currGalleryPictureIndex - numImagesToLoad, 0, numFilePaths);
 
-        m_coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
-        m_coroutineQueue.EnqueueAction(LoadPictures(m_currGalleryPictureIndex, numImageSpheres));
+        m_coroutineQueue.Clear(); // Throw away previous operations
+        m_coroutineQueue.EnqueueAction(LoadPictures(m_currGalleryPictureIndex, numImagesToLoad));
     }
+
+    // **************************
+    // Private/Helper functions
+    // **************************
 
     private IEnumerator StoreAllImageFilePaths(string imagesTopLevelDirectory)
     {        
@@ -180,25 +191,25 @@ public class DeviceGallery : MonoBehaviour
         return isImage360;
     }
 
-    private IEnumerator LoadPictures(int startingPictureIndex, int numImages)
+    private IEnumerator LoadPictures(int startingPictureIndex, int numImagesToLoad)
     {
         Debug.Log(string.Format("------- VREEL: Loading {0} pictures beginning at index {1}. There are {2} pictures in the gallery!", 
-            numImages, startingPictureIndex, m_pictureFilePaths.Count));
+            numImagesToLoad, startingPictureIndex, m_pictureFilePaths.Count));
 
         Resources.UnloadUnusedAssets();
 
         int currPictureIndex = startingPictureIndex;
-        for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, currPictureIndex++)
+        for (int sphereIndex = 0; sphereIndex < numImagesToLoad; sphereIndex++, currPictureIndex++)
         {
             if (currPictureIndex < m_pictureFilePaths.Count)
             {                   
                 string filePath = m_pictureFilePaths[currPictureIndex];
-                m_coroutineQueue.EnqueueAction(LoadPicturesInternal(filePath, sphereIndex, currPictureIndex, numImages));
+                m_coroutineQueue.EnqueueAction(LoadPicturesInternal(filePath, sphereIndex, currPictureIndex, numImagesToLoad));
                 m_coroutineQueue.EnqueueWait(2.0f);
             }
             else
             {
-                m_imageSpheres[sphereIndex].GetComponent<SelectImage>().Hide();
+                m_imageSphereController.HideSphereAtIndex(sphereIndex);
             }
         }
 
@@ -218,6 +229,8 @@ public class DeviceGallery : MonoBehaviour
         }
 
         Debug.Log("------- VREEL: Loading from filePath: " + filePath);
+
+        //private System.Threading.Thread m_thread;
 
         // NOTE: When I keep calling www.texture it will crash due to multiple allocations!
 
@@ -261,7 +274,7 @@ public class DeviceGallery : MonoBehaviour
         // TODO: Make the copying of www.texture into this function call not block! 
         //Debug.Log("------- VREEL: Calling SetImageAndFilePath which will block on copying texture of size height x width: " + www.texture.height + " x " + www.texture.width);
         //m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndFilePath(ref www, filePath);
-        m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndFilePath(www.texture, filePath);
+        m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, www.texture, filePath);
 
         /*
         SelectImage currImageSphere = m_imageSpheres[sphereIndex].GetComponent<SelectImage>();
@@ -319,7 +332,7 @@ public class DeviceGallery : MonoBehaviour
         //Apply changes to the Texture
         myTexture.Apply();
 
-        m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndFilePath(myTexture, filePath);
+        m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, myTexture, filePath);
 
         Resources.UnloadUnusedAssets();
     }

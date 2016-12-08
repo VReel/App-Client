@@ -1,8 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;            //IEnumerator
 
-public class SelectImage : MonoBehaviour 
+public class ImageSphere : MonoBehaviour 
 {
+    // **************************
+    // Member Variables
+    // **************************
+
     public float m_defaultScale = 1.0f;
     public float m_scalingFactor = 0.88f;
     
@@ -13,9 +17,13 @@ public class SelectImage : MonoBehaviour
     private string m_imageFilePath; // All ImageSphere's have a path (either through the internet, or local to the device) associated with them!
     private string kEmptyString = "emptyString";
 
+    // **************************
+    // Public functions
+    // **************************
+
     public void Awake()
     {
-        m_imageSphereTexture = new Texture2D(2,2);
+        m_imageSphereTexture = new Texture2D(2,2); // TODO Create a default texture for loading showing the VReel logo
     }
 
     public string GetImageFilePath()
@@ -55,6 +63,10 @@ public class SelectImage : MonoBehaviour
 
         StartCoroutine(AnimateHide());
     }
+
+    // **************************
+    // Private/Helper functions
+    // **************************
 
     private IEnumerator AnimateSetTexture()
     {        

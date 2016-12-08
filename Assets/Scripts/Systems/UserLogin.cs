@@ -5,18 +5,31 @@ using Facebook.MiniJSON;    // Json
 
 public class UserLogin : MonoBehaviour 
 {   
+    // **************************
+    // Member Variables
+    // **************************
+
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private AWSS3Client m_AWSS3Client;
     [SerializeField] private GameObject m_fbInvalidLoginError;
 
+    private CoroutineQueue m_coroutineQueue;
     private string m_cachedCognitoId;
     private string m_cachedUsername;
+
+    // **************************
+    // Public functions
+    // **************************
 
     public void Start()
     {
         Facebook.Unity.FB.Init();
+
         m_cachedCognitoId = "";
         m_cachedUsername = "";
+
+        m_coroutineQueue = new CoroutineQueue( this );
+        m_coroutineQueue.StartLoop();
     }
 
     public void LoginWithFacebook()
@@ -26,7 +39,7 @@ public class UserLogin : MonoBehaviour
             m_cachedCognitoId = "Editor";
             m_cachedUsername = "Editor";
 
-            m_appDirector.SetProfileState();
+            m_appDirector.RequestProfileState();
             return;
         }
 
@@ -40,7 +53,7 @@ public class UserLogin : MonoBehaviour
 
                 m_AWSS3Client.InitS3ClientFB(AccessToken.CurrentAccessToken.TokenString);
                 RequestUsername();
-                m_appDirector.SetProfileState();
+                m_coroutineQueue.EnqueueAction(ProgressAppDirectorPastLogin());
             } 
             else 
             {
@@ -109,12 +122,16 @@ public class UserLogin : MonoBehaviour
         return username;
     }
 
+    // **************************
+    // Private/Helper functions
+    // **************************
+
     private void RequestUsername()
     {
         FB.API("/me?fields=first_name", HttpMethod.GET, UsernameCallback);
     }
 
-    void UsernameCallback(IGraphResult result)
+    private void UsernameCallback(IGraphResult result)
     {
         Debug.Log("------- VREEL: UsernameCallback() called!");
         if (FB.IsLoggedIn && result.Error == null)
@@ -126,6 +143,17 @@ public class UserLogin : MonoBehaviour
             Debug.Log("------- VREEL: Error Response: " + result.Error);
         }
         Debug.Log("------- VREEL: Cached Username as: " + m_cachedUsername);
+    }
+
+    private IEnumerator ProgressAppDirectorPastLogin()
+    {
+        // This moves the App Director to the profile state when the S3 Client has been initialised
+        while (!m_AWSS3Client.IsS3ClientValid())
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
+        m_appDirector.RequestProfileState();
     }
 
     /*

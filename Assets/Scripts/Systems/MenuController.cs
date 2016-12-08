@@ -5,6 +5,10 @@ using System.Collections;   // IEnumerator
 
 public class MenuController : MonoBehaviour 
 {
+    // **************************
+    // Member Variables
+    // **************************
+
     public bool m_swipeEnabled = true;      // When on, swiping switches the menu on/off
 
     [SerializeField] private GameObject m_menuSubTree;
@@ -18,6 +22,10 @@ public class MenuController : MonoBehaviour
     [SerializeField] private GameObject[] m_menuBarButtons;
 
     private bool m_isMenuActive = true;
+
+    // **************************
+    // Public functions
+    // **************************
 
     public bool GetMenuActive()
     {
@@ -52,6 +60,10 @@ public class MenuController : MonoBehaviour
     {
         StartCoroutine(InternalShowWelcomeText());
     }
+
+    // **************************
+    // Private/Helper functions
+    // **************************
 
     private IEnumerator InternalShowWelcomeText()
     {

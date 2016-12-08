@@ -7,14 +7,9 @@ using UnityEngine.VR; //VRSettings
 
 public class AppDirector : MonoBehaviour 
 {   
-    [SerializeField] private MenuController m_menuController;
-    [SerializeField] private GameObject m_imageSpheres;
-    [SerializeField] private GameObject m_menuBar;
-    [SerializeField] private AWSS3Client m_AWSS3Client;
-    [SerializeField] private DeviceGallery m_deviceGallery;
-    [SerializeField] private UserLogin m_userLogin;
-
-    private AppState m_appState;
+    // **************************
+    // Member Variables
+    // **************************
 
     public enum AppState
     {
@@ -22,6 +17,19 @@ public class AppDirector : MonoBehaviour
         kProfile,       // User is viewing their profile, hence accessing their own folder in the S3 Bucket
         kGallery        // User is viewing their 360 photo gallery, they can scroll through all the 360 photos on their phone
     }
+
+    [SerializeField] private GameObject m_menuBar;
+    [SerializeField] private MenuController m_menuController;
+    [SerializeField] private ImageSphereController m_imageSphereController;
+    [SerializeField] private AWSS3Client m_AWSS3Client;
+    [SerializeField] private DeviceGallery m_deviceGallery;
+    [SerializeField] private UserLogin m_userLogin;
+
+    private AppState m_appState;
+
+    // **************************
+    // Public functions
+    // **************************
 
     public void Start()
     {
@@ -35,20 +43,39 @@ public class AppDirector : MonoBehaviour
         return m_appState;
     }
 
-    public void SetLoginState()
+    public void RequestLoginState()
+    {
+        SetLoginState();
+    }
+
+    public void RequestProfileState()
+    {
+        SetProfileState();
+    }
+
+    public void RequestGalleryState()
+    {
+        SetGalleryState();
+    }
+
+    // **************************
+    // Private/Helper functions
+    // **************************
+
+    private void SetLoginState()
     {        
         DisableAllOptions();
-        SetImageSpheres(false);
+        m_imageSphereController.HideAllImageSpheres();
         SetMenuBar(false);
 
         m_menuController.SetLoginSubMenuActive(true);
         m_appState = AppState.kLogin;
     }
 
-    public void SetProfileState()
+    private void SetProfileState()
     {
         DisableAllOptions();
-        SetImageSpheres(true);
+        m_imageSphereController.HideAllImageSpheres();
         SetMenuBar(true);
 
         if (m_appState == AppState.kLogin) // If we are coming from the login screen, set the welcome message
@@ -63,10 +90,10 @@ public class AppDirector : MonoBehaviour
         m_appState = AppState.kProfile;
     }
 
-    public void SetGalleryState()
+    private void SetGalleryState()
     {
         DisableAllOptions();
-        SetImageSpheres(true);
+        m_imageSphereController.HideAllImageSpheres();
         SetMenuBar(true);
 
         m_AWSS3Client.InvalidateS3ImageLoading();
@@ -81,17 +108,12 @@ public class AppDirector : MonoBehaviour
         m_menuController.SetAllSubMenusActive(false);
     }
 
-    private void SetImageSpheres(bool active)
-    {
-        m_imageSpheres.SetActive(active);
-    }
-
     private void SetMenuBar(bool active)
     {
         m_menuBar.SetActive(active);
     }
 
-    private void InvertVREnabled() // Unsuable until Oculus update their SDK...
+    private void InvertVREnabled() // Unavailable until Oculus update their SDK...
     {        
         VRSettings.enabled = !VRSettings.enabled;
     }
