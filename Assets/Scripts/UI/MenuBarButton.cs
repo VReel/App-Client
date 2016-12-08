@@ -8,10 +8,10 @@ public class MenuBarButton : MonoBehaviour
 {
     [SerializeField] private GameObject m_menuSection;      // This Section of the menu is only visible when this object is Selected!
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
+    [SerializeField] private Sprite m_spriteButtonUp;
     [SerializeField] private Sprite m_spriteButtonSelected;
 
-    private bool m_isSelected = false;   
-    private Sprite m_spriteButtonUp;    // This is used to store the Button's Up sprite while we're selected, and reset it afterwards
+    private bool m_isSelected = false;
 
     public bool GetIsSelected()
     {
@@ -21,7 +21,6 @@ public class MenuBarButton : MonoBehaviour
     public void OnButtonSelected()
     {
         m_isSelected = true;
-        m_spriteButtonUp = m_menuButton.GetSpriteButtonUp();
         m_menuButton.SetSpriteButtonUp(m_spriteButtonSelected);
         m_menuButton.RefreshButtonSprite();
     }
@@ -29,11 +28,8 @@ public class MenuBarButton : MonoBehaviour
     public void OnButtonDeselected()
     {
         m_isSelected = false;
-        if (m_spriteButtonUp != null)
-        {
-            m_menuButton.SetSpriteButtonUp(m_spriteButtonUp);
-            m_menuButton.RefreshButtonSprite();
-        }
+        m_menuButton.SetSpriteButtonUp(m_spriteButtonUp);
+        m_menuButton.RefreshButtonSprite();
     }
 
     public void SetMenuSectionActive(bool active)

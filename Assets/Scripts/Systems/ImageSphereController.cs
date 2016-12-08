@@ -19,7 +19,7 @@ public class ImageSphereController : MonoBehaviour
 
     public void Start()
     {
-        HideAllImageSpheres();
+        ForceHideAllImageSpheres();
         SetIndexOnAllImageSpheres();
     }
 
@@ -91,6 +91,14 @@ public class ImageSphereController : MonoBehaviour
         for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
         {
             m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetSphereIndex(sphereIndex);
+        }
+    }
+
+    public void ForceHideAllImageSpheres()
+    {
+        for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
+        {
+            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().ForceHide();
         }
     }
 }

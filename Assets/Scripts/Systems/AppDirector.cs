@@ -45,17 +45,26 @@ public class AppDirector : MonoBehaviour
 
     public void RequestLoginState()
     {
-        SetLoginState();
+        if (m_appState != AppState.kLogin)
+        {
+            SetLoginState();
+        }
     }
 
     public void RequestProfileState()
     {
-        SetProfileState();
+        if (m_appState != AppState.kProfile)
+        {
+            SetProfileState();
+        }
     }
 
     public void RequestGalleryState()
     {
-        SetGalleryState();
+        if (m_appState != AppState.kGallery)
+        {
+            SetGalleryState();
+        }
     }
 
     // **************************

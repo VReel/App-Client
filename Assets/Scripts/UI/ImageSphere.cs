@@ -11,6 +11,7 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
 
+    private const float kMinShrink = 0.005f; // Minimum value the sphere will shrink to...
     private const string kEmptyString = "emptyString";
     private int m_imageSphereIndex = -1; // ImageSphere's know their index - this is currently only for Debug!
     private Texture2D m_imageSphereTexture;
@@ -79,6 +80,13 @@ public class ImageSphere : MonoBehaviour
         m_coroutineQueue.EnqueueAction(AnimateHide());
     }
 
+    public void ForceHide()
+    {
+        m_imageFilePath = kEmptyString;
+
+        transform.localScale = new Vector3(kMinShrink, kMinShrink, kMinShrink);
+    }
+
     // **************************
     // Private/Helper functions
     // **************************
@@ -87,7 +95,6 @@ public class ImageSphere : MonoBehaviour
     {   
         Debug.Log("------- VREEL: AnimateSetTexture() began on sphere: " + m_imageSphereIndex);
 
-        const float kMinShrink = 0.05f; // Minimum value the sphere will shrink to...
         float scalingFactor = m_imageSphereController.GetScalingFactor();
         float defaultScale = m_imageSphereController.GetDefaultSphereScale();
 
@@ -114,7 +121,6 @@ public class ImageSphere : MonoBehaviour
 
         float scalingFactor = m_imageSphereController.GetScalingFactor();
 
-        const float kMinShrink = 0.005f; // Minimum value the sphere will shrink to...
         while (transform.localScale.magnitude > kMinShrink)
         {
             transform.localScale = transform.localScale * scalingFactor;
