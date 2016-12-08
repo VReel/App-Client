@@ -219,7 +219,11 @@ public class DeviceGallery : MonoBehaviour
 
     private IEnumerator LoadPicturesInternal(string filePath, int sphereIndex, int pictureIndex, int numImages)
     {                           
-        bool pictureRequestStillValid = (m_currGalleryPictureIndex <= pictureIndex) &&  (pictureIndex < m_currGalleryPictureIndex + numImages); // Request no longer valid as user pressed Next or Previous arrows
+        bool pictureRequestStillValid = 
+            (m_currGalleryPictureIndex != -1) && 
+            (m_currGalleryPictureIndex <= pictureIndex) &&  
+            (pictureIndex < m_currGalleryPictureIndex + numImages); // Request no longer valid as user has moved on from this page
+        
         string logString02 = string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", pictureRequestStillValid, m_currGalleryPictureIndex, pictureIndex, numImages); 
         Debug.Log(logString02);
         if (!pictureRequestStillValid)

@@ -277,7 +277,11 @@ public class AWSS3Client : MonoBehaviour
             var response = s3ResponseObj.Response;
             if (response != null && response.ResponseStream != null)
             {                   
-                bool imageRequestStillValid = (m_currS3ImageIndex <= pictureIndex) &&  (pictureIndex < m_currS3ImageIndex + numImages); // Request no longer valid as user pressed Next or Previous arrows
+                bool imageRequestStillValid = 
+                    (m_currS3ImageIndex != -1) && 
+                    (m_currS3ImageIndex <= pictureIndex) &&  
+                    (pictureIndex < m_currS3ImageIndex + numImages); // Request no longer valid as user has moved on from this page
+                
                 string logString02 = string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", imageRequestStillValid, m_currS3ImageIndex, pictureIndex, numImages); 
                 Debug.Log(logString02);
                 if (imageRequestStillValid)

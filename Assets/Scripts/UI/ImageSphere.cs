@@ -11,9 +11,10 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
 
+    private const string kEmptyString = "emptyString";
+    private int m_imageSphereIndex = -1; // ImageSphere's know their index - this is currently only for Debug!
     private Texture2D m_imageSphereTexture;
     private string m_imageFilePath; // All ImageSphere's have a path (either through the internet, or local to the device) associated with them!
-    private string kEmptyString = "emptyString";
     private CoroutineQueue m_coroutineQueue;
 
     // **************************
@@ -23,8 +24,13 @@ public class ImageSphere : MonoBehaviour
     public void Awake()
     {
         m_imageSphereTexture = new Texture2D(2,2); // TODO Create a default texture for loading showing the VReel logo
-        m_coroutineQueue = new CoroutineQueue( this );
+        m_coroutineQueue = new CoroutineQueue(this);
         m_coroutineQueue.StartLoop();
+    }
+
+    public void SetSphereIndex(int imageSphereIndex)
+    {
+        m_imageSphereIndex = imageSphereIndex;
     }
 
     public string GetImageFilePath()
@@ -37,15 +43,18 @@ public class ImageSphere : MonoBehaviour
         m_imageFilePath = filePath;
         m_imageSphereTexture.LoadImage(textureStream);
 
-        Debug.Log("------- VREEL: Finished Loading Image, texture width x height:  " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
+        Debug.Log("------- VREEL: Finished Loading Image from TextureStream, texture width x height:  " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
 
-        StartCoroutine(AnimateSetTexture());
+        m_coroutineQueue.Clear();
+        m_coroutineQueue.EnqueueAction(AnimateSetTexture());
     }
 
     public void SetImageAndFilePath(Texture2D texture, string filePath)
     {
         m_imageFilePath = filePath;
         m_imageSphereTexture = texture;
+
+        Debug.Log("------- VREEL: Finished Loading Image from TextureStream, texture width x height:  " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
 
         m_coroutineQueue.Clear();
         m_coroutineQueue.EnqueueAction(AnimateSetTexture());
@@ -55,6 +64,8 @@ public class ImageSphere : MonoBehaviour
     {
         m_imageFilePath = filePath;
         www.LoadImageIntoTexture(m_imageSphereTexture);
+
+        Debug.Log("------- VREEL: Finished Loading Image from TextureStream, texture width x height:  " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
 
         m_coroutineQueue.Clear();
         m_coroutineQueue.EnqueueAction(AnimateSetTexture());
@@ -74,7 +85,9 @@ public class ImageSphere : MonoBehaviour
 
     private IEnumerator AnimateSetTexture()
     {   
-        const float kMinShrink = 0.05f; // Minimum value you the sphere can shrink to...
+        Debug.Log("------- VREEL: AnimateSetTexture() began on sphere: " + m_imageSphereIndex);
+
+        const float kMinShrink = 0.05f; // Minimum value the sphere will shrink to...
         float scalingFactor = m_imageSphereController.GetScalingFactor();
         float defaultScale = m_imageSphereController.GetDefaultSphereScale();
 
@@ -97,9 +110,11 @@ public class ImageSphere : MonoBehaviour
 
     private IEnumerator AnimateHide()
     {        
+        Debug.Log("------- VREEL: AnimateHide() called on sphere: " + m_imageSphereIndex);
+
         float scalingFactor = m_imageSphereController.GetScalingFactor();
 
-        const float kMinShrink = 0.005f; // Minimum value you the sphere can shrink to...
+        const float kMinShrink = 0.005f; // Minimum value the sphere will shrink to...
         while (transform.localScale.magnitude > kMinShrink)
         {
             transform.localScale = transform.localScale * scalingFactor;
@@ -124,6 +139,8 @@ public class ImageSphere : MonoBehaviour
 
     private void SetSkybox()
     {    
+        Debug.Log("------- VREEL: SetSkybox() got called on sphere: " + m_imageSphereIndex);
+
         if (m_imageSphereSkybox != null)
         {            
             m_imageSphereSkybox.SetImageAndPath(m_imageSphereTexture, m_imageFilePath);

@@ -20,6 +20,7 @@ public class ImageSphereController : MonoBehaviour
     public void Start()
     {
         HideAllImageSpheres();
+        SetIndexOnAllImageSpheres();
     }
 
     public float GetDefaultSphereScale()
@@ -78,6 +79,18 @@ public class ImageSphereController : MonoBehaviour
         else
         {
             Debug.Log("------- VREEL: Invalid request to SetImageAndFilePathAtIndex: " + sphereIndex);
+        }
+    }
+
+    // **************************
+    // Private/Helper functions
+    // **************************
+
+    private void SetIndexOnAllImageSpheres()
+    {
+        for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
+        {
+            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetSphereIndex(sphereIndex);
         }
     }
 }
