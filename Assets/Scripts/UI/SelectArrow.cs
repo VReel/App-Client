@@ -15,6 +15,7 @@ public class SelectArrow : MonoBehaviour
         
     [SerializeField] private MeshCollider m_meshCollider;
     [SerializeField] private Image m_arrowImage;
+    [SerializeField] private Image m_transparentBackgroundImage;
     [SerializeField] private ArrowType m_arrowType = ArrowType.kNext;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private DeviceGallery m_deviceGallery;
@@ -39,6 +40,7 @@ public class SelectArrow : MonoBehaviour
         bool shouldBeActive = ShouldBeActive();
         m_meshCollider.enabled = shouldBeActive;
         m_arrowImage.enabled = shouldBeActive;
+        m_transparentBackgroundImage.enabled = shouldBeActive;
     }
 
     private bool ShouldBeActive()
