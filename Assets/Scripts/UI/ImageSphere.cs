@@ -37,25 +37,26 @@ public class ImageSphere : MonoBehaviour
     public string GetImageFilePath()
     {
         return m_imageFilePath;
-    }
-
-    public void SetImageAndFilePath(byte[] textureStream, string filePath)
-    {
-        m_imageFilePath = filePath;
-        m_imageSphereTexture.LoadImage(textureStream);
-
-        Debug.Log("------- VREEL: Finished Loading Image from TextureStream, texture width x height:  " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
-
-        m_coroutineQueue.Clear();
-        m_coroutineQueue.EnqueueAction(AnimateSetTexture());
-    }
+    }        
 
     public void SetImageAndFilePath(Texture2D texture, string filePath)
     {
         m_imageFilePath = filePath;
         m_imageSphereTexture = texture;
 
-        Debug.Log("------- VREEL: Finished Loading Image from TextureStream, texture width x height:  " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
+        Debug.Log("------- VREEL: Finished Loading Image from Texture2D, about to set texture with width x height:  " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
+
+        m_coroutineQueue.Clear();
+        m_coroutineQueue.EnqueueAction(AnimateSetTexture());
+    }
+
+    /*
+    public void SetImageAndFilePath(byte[] textureStream, string filePath)
+    {
+        m_imageFilePath = filePath;
+        m_imageSphereTexture.LoadImage(textureStream);
+
+        Debug.Log("------- VREEL: Finished Loading Image from TextureStream, about to set texture with width x height:  " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
 
         m_coroutineQueue.Clear();
         m_coroutineQueue.EnqueueAction(AnimateSetTexture());
@@ -66,11 +67,12 @@ public class ImageSphere : MonoBehaviour
         m_imageFilePath = filePath;
         www.LoadImageIntoTexture(m_imageSphereTexture);
 
-        Debug.Log("------- VREEL: Finished Loading Image from TextureStream, texture width x height:  " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
+        Debug.Log("------- VREEL: Finished Loading Image from WWW, about to set texture with width x height:  " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
 
         m_coroutineQueue.Clear();
         m_coroutineQueue.EnqueueAction(AnimateSetTexture());
     }
+    */
 
     public void Hide()
     {

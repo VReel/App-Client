@@ -11,6 +11,7 @@ public class UserLogin : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private AWSS3Client m_AWSS3Client;
+    [SerializeField] private GameObject m_staticLoadingIcon;
     [SerializeField] private GameObject m_fbInvalidLoginError;
 
     private CoroutineQueue m_coroutineQueue;
@@ -30,6 +31,9 @@ public class UserLogin : MonoBehaviour
 
         m_coroutineQueue = new CoroutineQueue( this );
         m_coroutineQueue.StartLoop();
+
+        m_staticLoadingIcon.SetActive(false);
+        m_fbInvalidLoginError.SetActive(false);
     }
 
     public void LoginWithFacebook()
@@ -51,6 +55,7 @@ public class UserLogin : MonoBehaviour
             {
                 Debug.Log("------- VREEL: User is logged into Facebook");
 
+                m_staticLoadingIcon.SetActive(true);
                 m_AWSS3Client.InitS3ClientFB(AccessToken.CurrentAccessToken.TokenString);
                 RequestUsername();
                 m_coroutineQueue.EnqueueAction(ProgressAppDirectorPastLogin());
@@ -63,7 +68,7 @@ public class UserLogin : MonoBehaviour
         }
         else
         {
-            Debug.Log("------- VREEL: Serious error: FB failed to Initialise!");
+            Debug.Log("------- VREEL: ERROR - FB failed to Initialise!");
         }
     }
 
@@ -81,7 +86,7 @@ public class UserLogin : MonoBehaviour
         }
         else 
         {
-            Debug.Log("------- VREEL: Serious error: UserID queried but FB is not LoggedIn and we're not in the Editor!");
+            Debug.Log("------- VREEL: ERROR - UserID queried but FB is not LoggedIn and we're not in the Editor!");
         }
 
         return userID;
@@ -96,7 +101,7 @@ public class UserLogin : MonoBehaviour
         }
         else 
         {
-            Debug.Log("------- VREEL: Serious error: UserID queried but FB is not LoggedIn and we're not in the Editor!");
+            Debug.Log("------- VREEL: ERROR - UserID queried but FB is not LoggedIn and we're not in the Editor!");
         }
 
         return userID;
@@ -116,8 +121,8 @@ public class UserLogin : MonoBehaviour
         }
         else 
         {
-            Debug.Log("------- VREEL: Serious error: Username queried but FB is not LoggedIn and we're not in the Editor!");
-        }
+            Debug.Log("------- VREEL: ERROR - Username queried but FB is not LoggedIn and we're not in the Editor!");
+        }            
 
         return username;
     }
@@ -154,6 +159,7 @@ public class UserLogin : MonoBehaviour
         }
 
         m_appDirector.RequestProfileState();
+        m_staticLoadingIcon.SetActive(false);
     }
 
     /*

@@ -19,14 +19,14 @@ public class AWSS3Client : MonoBehaviour
     // **************************
 
     public string m_s3BucketName = null;
-    [SerializeField] private ImageSphereController m_imageSphereController;
 
+    [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private UserLogin m_userLogin;
+    [SerializeField] private GameObject m_staticLoadingIcon;
 
     private AmazonS3Client m_s3Client = null;
     private CognitoAWSCredentials m_cognitoCredentials = null;
-
     private int m_currS3ImageIndex = -1;
     private List<string> m_s3ImageFilePaths;
     private CoroutineQueue m_coroutineQueue;
@@ -156,6 +156,8 @@ public class AWSS3Client : MonoBehaviour
             yield return new WaitForEndOfFrame(); //This will essentially block this coroutine queue, without blocking the main thread
         }
 
+        m_staticLoadingIcon.SetActive(true);
+
         string fileName =  m_imageSkybox.GetImageFilePath();
 
         Debug.Log("------- VREEL: UploadImage with FileName: " + fileName);
@@ -189,6 +191,8 @@ public class AWSS3Client : MonoBehaviour
                 Debug.Log("------- VREEL: Exception while posting the result object");
                 Debug.Log("------- VREEL: Receieved error: " + responseObj.Response.HttpStatusCode.ToString());
             }
+
+            m_staticLoadingIcon.SetActive(false);
         });
     }
 
@@ -289,7 +293,7 @@ public class AWSS3Client : MonoBehaviour
                     m_coroutineQueue.EnqueueAction(ConvertStreamAndSetImage(response, sphereIndex, fullFilePath));
                     m_coroutineQueue.EnqueueWait(2.0f);
 
-                    Debug.Log("------- VREEL: Successfully downloaded and set " + fullFilePath);
+                    Debug.Log("------- VREEL: Successfully downloaded and requested to set " + fullFilePath);
                 }
                 else
                 {
@@ -339,7 +343,9 @@ public class AWSS3Client : MonoBehaviour
         Debug.Log("------- VREEL: Finished iterating, length of byte[] is " + myBinary.Length);
 
         // TODO: Make copying texture not block!
-        m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, myBinary, fullFilePath);
+        Texture2D newImage = new Texture2D(2,2); 
+        newImage.LoadImage(myBinary);
+        m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, newImage, fullFilePath);
         yield return new WaitForEndOfFrame();
 
         Debug.Log("------- VREEL: Finished Setting Image!");

@@ -70,6 +70,7 @@ public class ImageSphereController : MonoBehaviour
         }
     }
 
+    /*
     public void SetImageAndFilePathAtIndex(int sphereIndex, byte[] textureStream, string filePath)
     {
         if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
@@ -81,6 +82,7 @@ public class ImageSphereController : MonoBehaviour
             Debug.Log("------- VREEL: Invalid request to SetImageAndFilePathAtIndex: " + sphereIndex);
         }
     }
+    */
 
     // **************************
     // Private/Helper functions
