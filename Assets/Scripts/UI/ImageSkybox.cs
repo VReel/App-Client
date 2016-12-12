@@ -18,6 +18,11 @@ public class ImageSkybox : MonoBehaviour
         m_skyboxTexture = new Texture2D(2,2);
     }
 
+    public bool IsTextureValid()
+    {
+        return m_skyboxTexture != null;
+    }
+
     public Texture GetTexture()
     {
         return m_skyboxTexture;

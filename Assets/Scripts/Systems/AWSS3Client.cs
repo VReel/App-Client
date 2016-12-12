@@ -24,6 +24,7 @@ public class AWSS3Client : MonoBehaviour
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private UserLogin m_userLogin;
     [SerializeField] private GameObject m_staticLoadingIcon;
+    [SerializeField] private GameObject m_newUserText;
 
     private AmazonS3Client m_s3Client = null;
     private CognitoAWSCredentials m_cognitoCredentials = null;
@@ -85,7 +86,7 @@ public class AWSS3Client : MonoBehaviour
         });
     }
         
-    //TODO Make use of word picture and image consistent!\
+    //TODO Make use of the word "picture" and "image" consistent!
     //TODO Improve function names... especially the 4 Download functions at the bottom...
     public void InvalidateS3ImageLoading() // This function is called in order to stop any ongoing picture loading 
     {
@@ -215,10 +216,12 @@ public class AWSS3Client : MonoBehaviour
 
         m_currS3ImageIndex = 0;
         m_s3Client.ListObjectsAsync(request, (responseObject) =>
-        {
+        {            
             if (responseObject.Exception == null)
             {
-                Debug.Log("------- VREEL: Got Response, printing now!");
+                Debug.Log("------- VREEL: Got successful response from ListObjectsAsync(), storing file paths!");
+
+                m_s3ImageFilePaths.Clear();
 
                 responseObject.Response.S3Objects.ForEach((s3object) => //NOTE: Making this into a seperate function seemed more work than worth
                 {
@@ -237,6 +240,9 @@ public class AWSS3Client : MonoBehaviour
             {
                 Debug.Log("------- VREEL: Got an Exception calling 'ListObjectsAsync()'");
             }
+                
+            bool noImagesUploaded = m_s3ImageFilePaths.Count <= 0;
+            m_newUserText.SetActive(noImagesUploaded); // If the user has yet to upload any images then show them the New User Text!
         });
     }
 

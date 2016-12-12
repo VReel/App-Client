@@ -146,6 +146,11 @@ public class MenuController : MonoBehaviour
                 image.enabled = visible;
             }
 
+            foreach(var text in m_menuSubTree.GetComponentsInChildren<Text>())
+            {                
+                text.enabled = visible;
+            }
+
             foreach(var collider in m_menuSubTree.GetComponentsInChildren<Collider>())
             {                
                 collider.enabled = visible;
