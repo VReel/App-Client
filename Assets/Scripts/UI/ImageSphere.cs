@@ -11,12 +11,14 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
 
-    private const float kMinShrink = 0.005f; // Minimum value the sphere will shrink to...
-    private const string kEmptyString = "emptyString";
     private int m_imageSphereIndex = -1; // ImageSphere's know their index - this is currently only for Debug!
     private Texture2D m_imageSphereTexture;
     private string m_imageFilePath; // All ImageSphere's have a path (either through the internet, or local to the device) associated with them!
     private CoroutineQueue m_coroutineQueue;
+
+    private const float kMinShrink = 0.0005f; // Minimum value the sphere will shrink to...
+    private const string kEmptyString = "emptyString";
+    private const string kLoadingTextureFilePath = "LoadingImage";
 
     // **************************
     // Public functions
@@ -95,7 +97,7 @@ public class ImageSphere : MonoBehaviour
 
     private IEnumerator AnimateSetTexture()
     {   
-        Debug.Log("------- VREEL: AnimateSetTexture() began on sphere: " + m_imageSphereIndex);
+        Debug.Log("------- VREEL: AnimateSetTexture() began on sphere: " + m_imageSphereIndex+1);
 
         float scalingFactor = m_imageSphereController.GetScalingFactor();
         float defaultScale = m_imageSphereController.GetDefaultSphereScale();
@@ -119,7 +121,7 @@ public class ImageSphere : MonoBehaviour
 
     private IEnumerator AnimateHide()
     {        
-        Debug.Log("------- VREEL: AnimateHide() called on sphere: " + m_imageSphereIndex);
+        Debug.Log("------- VREEL: AnimateHide() called on sphere: " + m_imageSphereIndex+1);
 
         float scalingFactor = m_imageSphereController.GetScalingFactor();
 
@@ -147,9 +149,9 @@ public class ImageSphere : MonoBehaviour
 
     private void SetSkybox()
     {    
-        Debug.Log("------- VREEL: SetSkybox() got called on sphere: " + m_imageSphereIndex);
+        Debug.Log("------- VREEL: SetSkybox() got called on sphere: " + m_imageSphereIndex+1);
 
-        if (m_imageSphereSkybox != null)
+        if (m_imageSphereSkybox != null && m_imageFilePath != kEmptyString && m_imageFilePath != kLoadingTextureFilePath)
         {            
             m_imageSphereSkybox.SetImageAndPath(m_imageSphereTexture, m_imageFilePath);
         }

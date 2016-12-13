@@ -2,7 +2,6 @@
 using UnityEngine.Networking;        //UnityWebRequest
 using System;                        //GC
 using System.IO;                     //DirectoryInfo
-//using System.Linq;                   //where, select
 using System.Collections;            //IEnumerator
 using System.Collections.Generic;    //List
 using System.Threading;              //Threading
@@ -14,12 +13,12 @@ public class DeviceGallery : MonoBehaviour
     // **************************
 
     [SerializeField] private ImageSphereController m_imageSphereController;
+    [SerializeField] private ImageSkybox m_imageSkybox;
 
     private int m_currGalleryPictureIndex = 0;         // Using the word "Picture" to represent images that are stored on the device
     private List<string> m_pictureFilePaths;
     private CoroutineQueue m_coroutineQueue;
-
-    AndroidJavaClass m_galleryJavaClass;
+    private AndroidJavaClass m_galleryJavaClass;
 
     // **************************
     // Public functions
@@ -63,10 +62,11 @@ public class DeviceGallery : MonoBehaviour
         string imagesTopLevelDirectory = m_galleryJavaClass.CallStatic<string>("GetAndroidImagesPath"); //string path = "/storage/emulated/0/DCIM/Gear 360/";
         Debug.Log("------- VREEL: Storing all FilePaths from directory: " + imagesTopLevelDirectory);
 
-        m_coroutineQueue.EnqueueAction(StoreAllImageFilePaths(imagesTopLevelDirectory));
+        m_coroutineQueue.EnqueueAction(StoreAllImageGalleryFilePaths(imagesTopLevelDirectory));
 
         m_currGalleryPictureIndex = 0;
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
+        m_imageSphereController.SetAllImageSpheresToLoading();
         m_coroutineQueue.EnqueueAction(LoadPictures(m_currGalleryPictureIndex, numImagesToLoad));
     }
 
@@ -100,7 +100,7 @@ public class DeviceGallery : MonoBehaviour
     // Private/Helper functions
     // **************************
 
-    private IEnumerator StoreAllImageFilePaths(string imagesTopLevelDirectory)
+    private IEnumerator StoreAllImageGalleryFilePaths(string imagesTopLevelDirectory)
     {        
         // TODO: Make sure this whole function doesn't block at all - 
         //       Steps 1 and 2 can sort of be merged to reduce iterations per frame
@@ -222,7 +222,8 @@ public class DeviceGallery : MonoBehaviour
         bool pictureRequestStillValid = 
             (m_currGalleryPictureIndex != -1) && 
             (m_currGalleryPictureIndex <= pictureIndex) &&  
-            (pictureIndex < m_currGalleryPictureIndex + numImages); // Request no longer valid as user has moved on from this page
+            (pictureIndex < m_currGalleryPictureIndex + numImages) && // Request no longer valid as user has moved on from this page
+            (filePath.CompareTo(m_imageSkybox.GetImageFilePath()) != 0); // If file-path is the same then ignore request
         
         string logString02 = string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", pictureRequestStillValid, m_currGalleryPictureIndex, pictureIndex, numImages); 
         Debug.Log(logString02);

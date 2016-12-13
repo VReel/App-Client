@@ -20,18 +20,16 @@ public class Analytics : MonoBehaviour
     // **************************
 
     public void Start() 
-    {        
-        // TODO: Move Cognito Identity Pool to be in EUWest1 region!
-
+    {                
         var credentials = new CognitoAWSCredentials(
             "us-east-1:76e86965-28da-4906-bf7d-ed48c4e50477", // Amazon Cognito Identity Pool ID
-            RegionEndpoint.USEast1 // Cognito Identity Region
+            RegionEndpoint.EUWest1 // Cognito Identity Region
         ); 
         
         m_analyticsManager = MobileAnalyticsManager.GetOrCreateInstance(
             "410c9ef3e9d94a74afaa2d5bb96426f9", // Amazon Mobile Analytics App ID
             credentials,
-            RegionEndpoint.USEast1 // Cognito Identity Region
+            RegionEndpoint.EUWest1 // Cognito Identity Region
         ); 
     }
 

@@ -161,38 +161,4 @@ public class UserLogin : MonoBehaviour
         m_appDirector.RequestProfileState();
         m_staticLoadingIcon.SetActive(false);
     }
-
-    /*
-    private void FacebookLoginCallback(ILoginResult result)
-    {
-        Debug.Log("------- VREEL: FacebookLoginCallback");
-        Debug.Log("------- VREEL: FB.IsInitialized: " + FB.IsInitialized + ", FB.IsLoggedIn: " + FB.IsLoggedIn);
-        if (FB.IsLoggedIn)
-        {
-            AddFacebookTokenToCognito();
-            m_appDirector.SetProfileState();
-        }
-        else
-        {
-            m_fbInvalidLoginError.SetActive(true);
-        }
-
-            //Debug.Log("------- VREEL: FB.LogInWithReadPermissions");
-            //FB.LogInWithReadPermissions (null, FacebookLoginCallback);
-    }
-    */
-
-    /*
-    private void PrintDebugTokenToCognito()
-    {
-        Debug.Log("------- VREEL: AddFacebookTokenToCognito");
-        Debug.Log("------- VREEL: FB.IsInitialized: " + FB.IsInitialized + ", FB.IsLoggedIn: " + FB.IsLoggedIn);
-        Debug.Log("------- VREEL: AccessToken.UserId: " + AccessToken.CurrentAccessToken.UserId.ToString());
-        Debug.Log("------- VREEL: AccessToken.CurrentAccessToken: " + AccessToken.CurrentAccessToken.TokenString);
-        //Debug.Log("------- VREEL: LoginsCount Before AddLogin(): " + m_AWSS3Client.GetCredentials().LoginsCount);
-        //m_AWSS3Client.GetCredentials().AddLogin ("graph.facebook.com", AccessToken.CurrentAccessToken.TokenString);
-        //Debug.Log("------- VREEL: LoginsCount After AddLogin(): " + m_AWSS3Client.GetCredentials().LoginsCount);
-        //Debug.Log("------- VREEL: AuthRoleArn assumed: " + m_AWSS3Client.GetCredentials().AuthRoleArn);
-    }
-    */
 }

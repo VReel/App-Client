@@ -95,7 +95,7 @@ public class AppDirector : MonoBehaviour
         m_deviceGallery.InvalidateGalleryPictureLoading();
 
         m_menuController.SetProfileSubMenuActive(true);
-        m_AWSS3Client.DownloadAllImages();
+        m_AWSS3Client.OpenProfile();
         m_appState = AppState.kProfile;
     }
 

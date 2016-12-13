@@ -32,6 +32,8 @@ public class AWSS3Client : MonoBehaviour
     private List<string> m_s3ImageFilePaths;
     private CoroutineQueue m_coroutineQueue;
 
+    private const float kImageRequestDelay = 2.0f;
+
     // **************************
     // Public functions
     // **************************
@@ -87,7 +89,6 @@ public class AWSS3Client : MonoBehaviour
     }
         
     //TODO Make use of the word "picture" and "image" consistent!
-    //TODO Improve function names... especially the 4 Download functions at the bottom...
     public void InvalidateS3ImageLoading() // This function is called in order to stop any ongoing picture loading 
     {
         m_currS3ImageIndex = -1;
@@ -115,9 +116,10 @@ public class AWSS3Client : MonoBehaviour
         m_coroutineQueue.EnqueueAction(UploadImageInternal());
     }
 
-    public void DownloadAllImages()
+    public void OpenProfile()
     {
-        m_coroutineQueue.EnqueueAction(DownloadAllImagesInternal());
+        m_imageSphereController.SetAllImageSpheresToLoading();
+        m_coroutineQueue.EnqueueAction(StoreAllS3ImagePathsAndSetSpheres());
     }       
 
     public void NextImages()
@@ -186,11 +188,15 @@ public class AWSS3Client : MonoBehaviour
             {
                 string logString = string.Format("------- VREEL: Uploaded {0} posted to bucket {1}", responseObj.Request.Key, responseObj.Request.Bucket);
                 Debug.Log(logString);
+
+                //TODO: Flash up a message showing successful Upload!
             }
             else
             {
                 Debug.Log("------- VREEL: Exception while posting the result object");
                 Debug.Log("------- VREEL: Receieved error: " + responseObj.Response.HttpStatusCode.ToString());
+
+                //TODO: Flash up a message showing an error has occured - asking user to try again...
             }
 
             m_staticLoadingIcon.SetActive(false);
@@ -198,7 +204,7 @@ public class AWSS3Client : MonoBehaviour
     }
 
     private static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
-    private IEnumerator DownloadAllImagesInternal()
+    private IEnumerator StoreAllS3ImagePathsAndSetSpheres()
     {
         while (!IsS3ClientValid()) // We do this to ensure that this function only runs if there's a valid client
         {
@@ -239,6 +245,8 @@ public class AWSS3Client : MonoBehaviour
             else
             {
                 Debug.Log("------- VREEL: Got an Exception calling 'ListObjectsAsync()'");
+
+                //TODO: Flash up a message showing an error has occured accessing their Images...
             }
                 
             bool noImagesUploaded = m_s3ImageFilePaths.Count <= 0;
@@ -290,14 +298,15 @@ public class AWSS3Client : MonoBehaviour
                 bool imageRequestStillValid = 
                     (m_currS3ImageIndex != -1) && 
                     (m_currS3ImageIndex <= pictureIndex) &&  
-                    (pictureIndex < m_currS3ImageIndex + numImages); // Request no longer valid as user has moved on from this page
+                    (pictureIndex < m_currS3ImageIndex + numImages) && // Request no longer valid as user has moved on from this page
+                    (filePath.CompareTo(m_imageSkybox.GetImageFilePath()) != 0); // If file-path is the same then ignore request
                 
                 string logString02 = string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", imageRequestStillValid, m_currS3ImageIndex, pictureIndex, numImages); 
                 Debug.Log(logString02);
                 if (imageRequestStillValid)
                 {
-                    m_coroutineQueue.EnqueueAction(ConvertStreamAndSetImage(response, sphereIndex, fullFilePath));
-                    m_coroutineQueue.EnqueueWait(2.0f);
+                    m_coroutineQueue.EnqueueAction(ConvertStreamAndSetImageSphere(response, sphereIndex, fullFilePath));
+                    m_coroutineQueue.EnqueueWait(kImageRequestDelay);
 
                     Debug.Log("------- VREEL: Successfully downloaded and requested to set " + fullFilePath);
                 }
@@ -312,11 +321,13 @@ public class AWSS3Client : MonoBehaviour
             {
                 Debug.Log("------- VREEL: Got an Exception calling GetObjectAsync() for: " + fullFilePath);
                 Debug.Log("------- VREEL: Exception was: " + s3ResponseObj.Exception.ToString());
+
+                //TODO: Flash up a message showing an error has occured loading Image, ask them to try opening gallery again if problem persists ...
             }
         });
     }
 
-    private IEnumerator ConvertStreamAndSetImage(Amazon.S3.Model.GetObjectResponse response, int sphereIndex, string fullFilePath)
+    private IEnumerator ConvertStreamAndSetImageSphere(Amazon.S3.Model.GetObjectResponse response, int sphereIndex, string fullFilePath)
     {
         Debug.Log("------- VREEL: ConvertStreamAndSetImage for " + fullFilePath);
 

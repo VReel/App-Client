@@ -9,9 +9,12 @@ public class ImageSphereController : MonoBehaviour
     // Member Variables
     // **************************
 
-    public float m_defaultSphereScale = 1.0f;
-    public float m_scalingFactor = 0.88f;
-    public GameObject[] m_imageSpheres;
+    [SerializeField] private float m_defaultSphereScale = 1.0f;
+    [SerializeField] private float m_scalingFactor = 0.88f;
+    [SerializeField] private GameObject[] m_imageSpheres;
+    [SerializeField] private Texture2D m_loadingSphereTexture;
+
+    private string kLoadingTextureFilePath = "LoadingImage";
 
     // **************************
     // Public functions
@@ -38,6 +41,26 @@ public class ImageSphereController : MonoBehaviour
         return m_imageSpheres.GetLength(0);
     }
 
+    public void SetAllImageSpheresToLoading()
+    {
+        for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
+        {
+            SetImageAndFilePathAtIndex(sphereIndex, m_loadingSphereTexture, kLoadingTextureFilePath);
+        }
+    }
+
+    public void SetImageAndFilePathAtIndex(int sphereIndex, Texture2D texture, string filePath)
+    {
+        if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
+        {
+            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetImageAndFilePath(texture, filePath);
+        }
+        else
+        {
+            Debug.Log("------- VREEL: Invalid request to SetImageAndFilePathAtIndex: " + sphereIndex);
+        }
+    }
+
     public void HideAllImageSpheres()
     {
         for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
@@ -57,32 +80,6 @@ public class ImageSphereController : MonoBehaviour
             Debug.Log("------- VREEL: Invalid request to HideSphereAtIndex: " + sphereIndex);
         }
     }
-        
-    public void SetImageAndFilePathAtIndex(int sphereIndex, Texture2D texture, string filePath)
-    {
-        if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
-        {
-            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetImageAndFilePath(texture, filePath);
-        }
-        else
-        {
-            Debug.Log("------- VREEL: Invalid request to SetImageAndFilePathAtIndex: " + sphereIndex);
-        }
-    }
-
-    /*
-    public void SetImageAndFilePathAtIndex(int sphereIndex, byte[] textureStream, string filePath)
-    {
-        if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
-        {
-            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetImageAndFilePath(textureStream, filePath);
-        }
-        else
-        {
-            Debug.Log("------- VREEL: Invalid request to SetImageAndFilePathAtIndex: " + sphereIndex);
-        }
-    }
-    */
 
     // **************************
     // Private/Helper functions
