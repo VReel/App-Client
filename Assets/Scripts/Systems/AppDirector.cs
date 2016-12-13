@@ -92,7 +92,7 @@ public class AppDirector : MonoBehaviour
             m_menuController.ShowWelcomeText();
         }
 
-        m_deviceGallery.InvalidateGalleryPictureLoading();
+        m_deviceGallery.InvalidateGalleryImageLoading();
 
         m_menuController.SetProfileSubMenuActive(true);
         m_AWSS3Client.OpenProfile();

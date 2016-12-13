@@ -8,9 +8,6 @@ using Amazon.CognitoIdentity;       // CognitoAWSCredentials
 using Amazon.S3;                    // AmazonS3Client
 using Amazon.S3.Model;              // ListBucketsRequest
 using Amazon.Runtime;               // SessionAWSCredentials
-/*
-using Amazon.S3.Util;
-*/
 
 public class AWSS3Client : MonoBehaviour 
 {   
@@ -28,7 +25,7 @@ public class AWSS3Client : MonoBehaviour
 
     private AmazonS3Client m_s3Client = null;
     private CognitoAWSCredentials m_cognitoCredentials = null;
-    private int m_currS3ImageIndex = -1;
+    private int m_currS3ImageFilePathIndex = -1;
     private List<string> m_s3ImageFilePaths;
     private CoroutineQueue m_coroutineQueue;
 
@@ -89,21 +86,22 @@ public class AWSS3Client : MonoBehaviour
     }
         
     //TODO Make use of the word "picture" and "image" consistent!
-    public void InvalidateS3ImageLoading() // This function is called in order to stop any ongoing picture loading 
+    public void InvalidateS3ImageLoading() // This function is called in order to stop any ongoing image loading 
     {
-        m_currS3ImageIndex = -1;
+        m_coroutineQueue.Clear();
+        m_currS3ImageFilePathIndex = -1;
     }
         
     public bool IsS3ImageIndexAtStart()
     {
-        return m_currS3ImageIndex <= 0;
+        return m_currS3ImageFilePathIndex <= 0;
     }
 
     public bool IsS3ImageIndexAtEnd()
     {
         int numImageSpheres = m_imageSphereController.GetNumSpheres();
         int numFiles = m_s3ImageFilePaths.Count;
-        return m_currS3ImageIndex >= (numFiles - numImageSpheres);       
+        return m_currS3ImageFilePathIndex >= (numFiles - numImageSpheres);       
     }
 
     public bool IsS3ClientValid()
@@ -124,12 +122,12 @@ public class AWSS3Client : MonoBehaviour
 
     public void NextImages()
     {
-        Debug.Log("------- VREEL: NextPictures() called");
+        Debug.Log("------- VREEL: NextImages() called");
 
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
         int numFilePaths = m_s3ImageFilePaths.Count;
 
-        m_currS3ImageIndex = Mathf.Clamp(m_currS3ImageIndex + numImagesToLoad, 0, numFilePaths);
+        m_currS3ImageFilePathIndex = Mathf.Clamp(m_currS3ImageFilePathIndex + numImagesToLoad, 0, numFilePaths);
 
         m_coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
         DownloadImagesAndSetSpheres();
@@ -137,12 +135,12 @@ public class AWSS3Client : MonoBehaviour
 
     public void PreviousImages()
     {
-        Debug.Log("------- VREEL: PreviousPictures() called");
+        Debug.Log("------- VREEL: PreviousImages() called");
 
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
         int numFilePaths = m_s3ImageFilePaths.Count;
 
-        m_currS3ImageIndex = Mathf.Clamp(m_currS3ImageIndex - numImagesToLoad, 0, numFilePaths);
+        m_currS3ImageFilePathIndex = Mathf.Clamp(m_currS3ImageFilePathIndex - numImagesToLoad, 0, numFilePaths);
 
         m_coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
         DownloadImagesAndSetSpheres();
@@ -220,7 +218,7 @@ public class AWSS3Client : MonoBehaviour
             Prefix =  m_userLogin.GetCognitoUserID()
         };
 
-        m_currS3ImageIndex = 0;
+        m_currS3ImageFilePathIndex = 0;
         m_s3Client.ListObjectsAsync(request, (responseObject) =>
         {            
             if (responseObject.Exception == null)
@@ -248,7 +246,7 @@ public class AWSS3Client : MonoBehaviour
 
                 //TODO: Flash up a message showing an error has occured accessing their Images...
             }
-                
+
             bool noImagesUploaded = m_s3ImageFilePaths.Count <= 0;
             m_newUserText.SetActive(noImagesUploaded); // If the user has yet to upload any images then show them the New User Text!
         });
@@ -257,23 +255,23 @@ public class AWSS3Client : MonoBehaviour
     private void DownloadImagesAndSetSpheres()
     {
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
-        DownloadImagesAndSetSpheresInternal(m_currS3ImageIndex, numImagesToLoad);
+        DownloadImagesAndSetSpheresInternal(m_currS3ImageFilePathIndex, numImagesToLoad);
     }
 
-    private void DownloadImagesAndSetSpheresInternal(int startingPictureIndex, int numImages)
+    private void DownloadImagesAndSetSpheresInternal(int startingS3ImageIndex, int numImages)
     {
-        Debug.Log(string.Format("------- VREEL: Downloading {0} pictures beginning at index {1}. There are {2} pictures in this S3 folder!", 
-            numImages, startingPictureIndex, m_s3ImageFilePaths.Count));
+        Debug.Log(string.Format("------- VREEL: Downloading {0} images beginning at index {1}. There are {2} images in this S3 folder!", 
+            numImages, startingS3ImageIndex, m_s3ImageFilePaths.Count));
 
         Resources.UnloadUnusedAssets();
 
-        int currPictureIndex = startingPictureIndex;
-        for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, currPictureIndex++)
+        int currS3ImageIndex = startingS3ImageIndex;
+        for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, currS3ImageIndex++)
         {
-            if (currPictureIndex < m_s3ImageFilePaths.Count)
+            if (currS3ImageIndex < m_s3ImageFilePaths.Count)
             {                   
-                string filePath = m_s3ImageFilePaths[currPictureIndex];
-                DownloadImage(filePath, sphereIndex, currPictureIndex, numImages);
+                string filePath = m_s3ImageFilePaths[currS3ImageIndex];
+                DownloadImage(filePath, sphereIndex, currS3ImageIndex, numImages);
             }
             else
             {
@@ -284,7 +282,7 @@ public class AWSS3Client : MonoBehaviour
         Resources.UnloadUnusedAssets();
     }
 
-    private void DownloadImage(string filePath, int sphereIndex, int pictureIndex, int numImages)
+    private void DownloadImage(string filePath, int sphereIndex, int thisS3ImageIndex, int numImages)
     {
         string fullFilePath = m_s3BucketName + filePath;
         string logString01 = string.Format("------- VREEL: Downloading {0} from bucket {1}", filePath, m_s3BucketName);       
@@ -296,12 +294,12 @@ public class AWSS3Client : MonoBehaviour
             if (response != null && response.ResponseStream != null)
             {                   
                 bool imageRequestStillValid = 
-                    (m_currS3ImageIndex != -1) && 
-                    (m_currS3ImageIndex <= pictureIndex) &&  
-                    (pictureIndex < m_currS3ImageIndex + numImages) && // Request no longer valid as user has moved on from this page
+                    (m_currS3ImageFilePathIndex != -1) && 
+                    (m_currS3ImageFilePathIndex <= thisS3ImageIndex) &&  
+                    (thisS3ImageIndex < m_currS3ImageFilePathIndex + numImages) && // Request no longer valid as user has moved on from this page
                     (filePath.CompareTo(m_imageSkybox.GetImageFilePath()) != 0); // If file-path is the same then ignore request
                 
-                string logString02 = string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", imageRequestStillValid, m_currS3ImageIndex, pictureIndex, numImages); 
+                string logString02 = string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", imageRequestStillValid, m_currS3ImageFilePathIndex, thisS3ImageIndex, numImages); 
                 Debug.Log(logString02);
                 if (imageRequestStillValid)
                 {

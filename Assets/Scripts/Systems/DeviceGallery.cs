@@ -14,9 +14,10 @@ public class DeviceGallery : MonoBehaviour
 
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
+    [SerializeField] private GameObject m_noGalleryImagesText;
 
-    private int m_currGalleryPictureIndex = 0;         // Using the word "Picture" to represent images that are stored on the device
-    private List<string> m_pictureFilePaths;
+    private int m_currGalleryImageIndex = 0;
+    private List<string> m_galleryImageFilePaths;
     private CoroutineQueue m_coroutineQueue;
     private AndroidJavaClass m_galleryJavaClass;
 
@@ -29,71 +30,73 @@ public class DeviceGallery : MonoBehaviour
         AndroidJNI.AttachCurrentThread();
         m_galleryJavaClass = new AndroidJavaClass("io.vreel.vreel.VReelAndroidGallery");
 
-        m_pictureFilePaths = new List<string>();
+        m_galleryImageFilePaths = new List<string>();
         m_coroutineQueue = new CoroutineQueue( this );
         m_coroutineQueue.StartLoop();
     }
 
-    public void InvalidateGalleryPictureLoading() // This function is called in order to stop any ongoing picture loading 
+    public void InvalidateGalleryImageLoading() // This function is called in order to stop any ongoing image loading 
     {
-        m_currGalleryPictureIndex = -1;
+        m_coroutineQueue.Clear();
+        m_currGalleryImageIndex = -1;
     }
 
     public bool IsGalleryIndexAtStart()
     {
-        return m_currGalleryPictureIndex <= 0;
+        return m_currGalleryImageIndex <= 0;
     }
 
     public bool IsGalleryIndexAtEnd()
     {
         int numImageSpheres = m_imageSphereController.GetNumSpheres();
-        int numFiles = m_pictureFilePaths.Count;
-        return m_currGalleryPictureIndex >= (numFiles - numImageSpheres);       
+        int numFiles = m_galleryImageFilePaths.Count;
+        return m_currGalleryImageIndex >= (numFiles - numImageSpheres);       
     }
 
     public void OpenAndroidGallery()
     {
         Debug.Log("------- VREEL: OpenAndroidGallery() called");
 
-        m_currGalleryPictureIndex = 0;
-        m_pictureFilePaths.Clear();
+        m_currGalleryImageIndex = 0;
+        m_galleryImageFilePaths.Clear();
 
         Debug.Log("------- VREEL: About to call GetImagesPath function...");
         string imagesTopLevelDirectory = m_galleryJavaClass.CallStatic<string>("GetAndroidImagesPath"); //string path = "/storage/emulated/0/DCIM/Gear 360/";
+        m_imageSkybox.SetTopLevelDirectory(imagesTopLevelDirectory);
         Debug.Log("------- VREEL: Storing all FilePaths from directory: " + imagesTopLevelDirectory);
 
         m_coroutineQueue.EnqueueAction(StoreAllImageGalleryFilePaths(imagesTopLevelDirectory));
 
-        m_currGalleryPictureIndex = 0;
+        m_currGalleryImageIndex = 0;
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
         m_imageSphereController.SetAllImageSpheresToLoading();
-        m_coroutineQueue.EnqueueAction(LoadPictures(m_currGalleryPictureIndex, numImagesToLoad));
+        m_coroutineQueue.EnqueueAction(LoadImages(m_currGalleryImageIndex, numImagesToLoad));
     }
 
-    public void NextPictures()
+    public void NextImages()
     {
-        Debug.Log("------- VREEL: NextPictures() called");
+        Debug.Log("------- VREEL: NextImages() called");
 
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
-        int numFilePaths = m_pictureFilePaths.Count;
+        int numFilePaths = m_galleryImageFilePaths.Count;
 
-        m_currGalleryPictureIndex = Mathf.Clamp(m_currGalleryPictureIndex + numImagesToLoad, 0, numFilePaths);
+        m_currGalleryImageIndex = Mathf.Clamp(m_currGalleryImageIndex + numImagesToLoad, 0, numFilePaths);
 
         m_coroutineQueue.Clear(); // Throw away previous operations
-        m_coroutineQueue.EnqueueAction(LoadPictures(m_currGalleryPictureIndex, numImagesToLoad));
+        m_coroutineQueue.EnqueueAction(LoadImages(m_currGalleryImageIndex, numImagesToLoad));
     }
 
-    public void PreviousPictures()
+    public void PreviousImages()
     {
-        Debug.Log("------- VREEL: PreviousPictures() called");
+        Debug.Log("------- VREEL: PreviousImages() called");
 
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
-        int numFilePaths = m_pictureFilePaths.Count;
+        int numFilePaths = m_galleryImageFilePaths.Count;
 
-        m_currGalleryPictureIndex = Mathf.Clamp(m_currGalleryPictureIndex - numImagesToLoad, 0, numFilePaths);
+        m_currGalleryImageIndex = Mathf.Clamp(m_currGalleryImageIndex - numImagesToLoad, 0, numFilePaths);
 
         m_coroutineQueue.Clear(); // Throw away previous operations
-        m_coroutineQueue.EnqueueAction(LoadPictures(m_currGalleryPictureIndex, numImagesToLoad));
+        m_coroutineQueue.EnqueueAction(LoadImages(m_currGalleryImageIndex, numImagesToLoad));
     }
 
     // **************************
@@ -109,7 +112,7 @@ public class DeviceGallery : MonoBehaviour
         var files = GetAllFileNamesRecursively(imagesTopLevelDirectory);
         yield return new WaitForEndOfFrame();
 
-        // 2) Add the files that are actually 360 images to "m_pictureFilePaths"
+        // 2) Add the files that are actually 360 images to "m_galleryImageFilePaths"
         // In order to reduce the block on the main thread we only search over kNumFilesPerIteration
         const int kNumFilesPerIteration = 100;
         int numFilesSearched = 0;
@@ -117,7 +120,7 @@ public class DeviceGallery : MonoBehaviour
         { 
             if (Is360Image(filePath))
             {   
-                m_pictureFilePaths.Add(filePath);
+                m_galleryImageFilePaths.Add(filePath);
             }
 
             numFilesSearched++;
@@ -129,14 +132,17 @@ public class DeviceGallery : MonoBehaviour
         }
             
         Debug.Log("------- VREEL: Searched the directory " + imagesTopLevelDirectory + ", through " + numFilesSearched +
-            " files, and found " + m_pictureFilePaths.Count + " 360-image files!");
+            " files, and found " + m_galleryImageFilePaths.Count + " 360-image files!");
 
         // 3) Sort files in order of newest first, so that users see their most recent gallery images!
         yield return new WaitForEndOfFrame();
-        m_pictureFilePaths.Sort(delegate(string file1, string file2)
+        m_galleryImageFilePaths.Sort(delegate(string file1, string file2)
         {
             return File.GetCreationTime(file2).CompareTo(File.GetCreationTime(file1));
         });
+
+        bool noImagesInGallery = m_galleryImageFilePaths.Count <= 0;
+        m_noGalleryImagesText.SetActive(noImagesInGallery); // If the user has yet take any 360-images then show them the NoGalleryImagesText!
     }
 
     private List<string> GetAllFileNamesRecursively(string baseDirectory)
@@ -191,20 +197,20 @@ public class DeviceGallery : MonoBehaviour
         return isImage360;
     }
 
-    private IEnumerator LoadPictures(int startingPictureIndex, int numImagesToLoad)
+    private IEnumerator LoadImages(int startingGalleryImageIndex, int numImagesToLoad)
     {
-        Debug.Log(string.Format("------- VREEL: Loading {0} pictures beginning at index {1}. There are {2} pictures in the gallery!", 
-            numImagesToLoad, startingPictureIndex, m_pictureFilePaths.Count));
+        Debug.Log(string.Format("------- VREEL: Loading {0} images beginning at index {1}. There are {2} images in the gallery!", 
+            numImagesToLoad, startingGalleryImageIndex, m_galleryImageFilePaths.Count));
 
         Resources.UnloadUnusedAssets();
 
-        int currPictureIndex = startingPictureIndex;
-        for (int sphereIndex = 0; sphereIndex < numImagesToLoad; sphereIndex++, currPictureIndex++)
+        int currGalleryImageIndex = startingGalleryImageIndex;
+        for (int sphereIndex = 0; sphereIndex < numImagesToLoad; sphereIndex++, currGalleryImageIndex++)
         {
-            if (currPictureIndex < m_pictureFilePaths.Count)
+            if (currGalleryImageIndex < m_galleryImageFilePaths.Count)
             {                   
-                string filePath = m_pictureFilePaths[currPictureIndex];
-                m_coroutineQueue.EnqueueAction(LoadPicturesInternal(filePath, sphereIndex, currPictureIndex, numImagesToLoad));
+                string filePath = m_galleryImageFilePaths[currGalleryImageIndex];
+                m_coroutineQueue.EnqueueAction(LoadImagesInternal(filePath, sphereIndex, currGalleryImageIndex, numImagesToLoad));
                 m_coroutineQueue.EnqueueWait(2.0f);
             }
             else
@@ -217,17 +223,17 @@ public class DeviceGallery : MonoBehaviour
         yield return null;
     }
 
-    private IEnumerator LoadPicturesInternal(string filePath, int sphereIndex, int pictureIndex, int numImages)
+    private IEnumerator LoadImagesInternal(string filePath, int sphereIndex, int thisGalleryImageIndex, int numImages)
     {                           
-        bool pictureRequestStillValid = 
-            (m_currGalleryPictureIndex != -1) && 
-            (m_currGalleryPictureIndex <= pictureIndex) &&  
-            (pictureIndex < m_currGalleryPictureIndex + numImages) && // Request no longer valid as user has moved on from this page
+        bool imageRequestStillValid = 
+            (m_currGalleryImageIndex != -1) && 
+            (m_currGalleryImageIndex <= thisGalleryImageIndex) &&  
+            (thisGalleryImageIndex < m_currGalleryImageIndex + numImages) && // Request no longer valid as user has moved on from this page
             (filePath.CompareTo(m_imageSkybox.GetImageFilePath()) != 0); // If file-path is the same then ignore request
         
-        string logString02 = string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", pictureRequestStillValid, m_currGalleryPictureIndex, pictureIndex, numImages); 
+        string logString02 = string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", imageRequestStillValid, m_currGalleryImageIndex, thisGalleryImageIndex, numImages); 
         Debug.Log(logString02);
-        if (!pictureRequestStillValid)
+        if (!imageRequestStillValid)
         {
             Debug.Log("------- VREEL: Gallery request stopped because user has moved off that page: " + filePath);
             yield break;
@@ -271,7 +277,7 @@ public class DeviceGallery : MonoBehaviour
         //Texture2D texture = new Texture2D(2, 2);
         //texture.LoadImage(fileByteData);
 
-        //coroutineQueue.EnqueueAction(LoadPicturesInternal2(www.texture, filePath, sphereIndex));
+        //coroutineQueue.EnqueueAction(LoadImagesInternal2(www.texture, filePath, sphereIndex));
         //coroutineQueue.EnqueueWait(2.0f);
 
         //Debug.Log("------- VREEL: Loaded data into texture");
@@ -296,7 +302,7 @@ public class DeviceGallery : MonoBehaviour
         Resources.UnloadUnusedAssets();
     }
 
-    private IEnumerator LoadPicturesInternal2(Texture2D source, string filePath, int sphereIndex)
+    private IEnumerator LoadImagesInternal2(Texture2D source, string filePath, int sphereIndex)
     {
         int textureWidth = source.width;
         int textureHeight = source.height;
@@ -312,7 +318,7 @@ public class DeviceGallery : MonoBehaviour
         int iterationCounter = 0;
         Color tempSourceColor = Color.black;
 
-        Debug.Log("------- VREEL: Entering LoadPicturesInternal2 loop");
+        Debug.Log("------- VREEL: Entering LoadImagesInternal2 loop");
         for (int y = 0; y < textureHeight; y++)
         {
             for (int x = 0; x < textureWidth; x++)
@@ -327,7 +333,7 @@ public class DeviceGallery : MonoBehaviour
 
                 if (iterationCounter % kNumIterationsPerFrame == 0)
                 {
-                    Debug.Log("------- VREEL: Yielding LoadPicturesInternal2 at Iteration number: " 
+                    Debug.Log("------- VREEL: Yielding LoadImagesInternal2 at Iteration number: " 
                         + iterationCounter + " Pixel: (" + x + "," + y + ")");
                     yield return new WaitForEndOfFrame(); 
                 }

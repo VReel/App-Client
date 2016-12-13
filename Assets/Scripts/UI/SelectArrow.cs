@@ -20,13 +20,12 @@ public class SelectArrow : MonoBehaviour
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private DeviceGallery m_deviceGallery;
     [SerializeField] private AWSS3Client m_awsS3Client;
-    [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
 
     // **************************
     // Public functions
     // **************************
 
-    public void Update() //TODO: Remove this Update and make it event based!
+    public void Update() //TODO: Remove this Update and make this a simpler event based class!
     {
         UpdateActive();
     }
@@ -77,48 +76,5 @@ public class SelectArrow : MonoBehaviour
         }
 
         return true;
-    }
-
-    private void OnEnable ()
-    {
-        m_menuButton.OnButtonSelected += OnButtonSelected;
-    }
-
-    private void OnDisable ()
-    {
-        m_menuButton.OnButtonSelected -= OnButtonSelected;
-    }        
-
-    private void OnButtonSelected(VRStandardAssets.Menu.MenuButton button)
-    {
-        ArrowPressed();
-    }
-
-    private void ArrowPressed()   
-    {    
-        Debug.Log("------- VREEL: Called Scroll() on a " + m_arrowType);
-
-        if (m_deviceGallery != null)
-        {
-            if (m_arrowType == ArrowType.kNext)
-            {
-                m_deviceGallery.NextPictures();
-            }
-            else if (m_arrowType == ArrowType.kPrev)
-            {
-                m_deviceGallery.PreviousPictures();
-            }      
-        }
-        else if (m_awsS3Client != null)
-        {
-            if (m_arrowType == ArrowType.kNext)
-            {
-                m_awsS3Client.NextImages();
-            }
-            else if (m_arrowType == ArrowType.kPrev)
-            {
-                m_awsS3Client.PreviousImages();
-            }      
-        }
     }
 }
