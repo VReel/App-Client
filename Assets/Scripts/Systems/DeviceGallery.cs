@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
-using UnityEngine.Networking;        //UnityWebRequest
-using System;                        //GC
-using System.IO;                     //DirectoryInfo
-using System.Collections;            //IEnumerator
-using System.Collections.Generic;    //List
-using System.Threading;              //Threading
+using UnityEngine.UI;               //Text
+using UnityEngine.Networking;       //UnityWebRequest
+using System;                       //GC
+using System.IO;                    //DirectoryInfo
+using System.Collections;           //IEnumerator
+using System.Collections.Generic;   //List
+using System.Threading;             //Threading
 
 public class DeviceGallery : MonoBehaviour 
 {
@@ -15,7 +16,7 @@ public class DeviceGallery : MonoBehaviour
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private GameObject m_noGalleryImagesText;
-    [SerializeField] private GameObject m_galleryMessage; // TODO: use for reporting errors!
+    [SerializeField] private GameObject m_galleryMessage;
 
     private int m_currGalleryImageIndex = 0;
     private List<string> m_galleryImageFilePaths;
@@ -145,30 +146,61 @@ public class DeviceGallery : MonoBehaviour
         bool noImagesInGallery = m_galleryImageFilePaths.Count <= 0;
         m_noGalleryImagesText.SetActive(noImagesInGallery); // If the user has yet take any 360-images then show them the NoGalleryImagesText!
     }
-
-    //TODO: Handle the case where app does not have permission to acccess files
+    
     private List<string> GetAllFileNamesRecursively(string baseDirectory)
     {
         // We iterate over all files in the given top level directory, recursively searching through all the subdirectories
         var files = new List<string>();
         FileAttributes undesiredAttributes = (FileAttributes.Hidden | FileAttributes.System | FileAttributes.Temporary);
 
-        foreach(string filePath in System.IO.Directory.GetFiles(baseDirectory, "*", SearchOption.TopDirectoryOnly))
-        {            
-            FileAttributes checkedFileAttributes = File.GetAttributes(filePath) & undesiredAttributes;
-            if (checkedFileAttributes == 0)
-            {
-                files.Add(filePath);
+        try
+        {
+            foreach(string filePath in System.IO.Directory.GetFiles(baseDirectory, "*", SearchOption.TopDirectoryOnly))
+            {            
+                FileAttributes checkedFileAttributes = File.GetAttributes(filePath) & undesiredAttributes;
+                if (checkedFileAttributes == 0)
+                {
+                    files.Add(filePath);
+                }
             }
         }
-
-        foreach(string dirName in System.IO.Directory.GetDirectories(baseDirectory, "*", SearchOption.TopDirectoryOnly))
+        catch 
         {
-            FileAttributes checkedFolderAttributes = (new DirectoryInfo(dirName).Attributes) & undesiredAttributes;
-            if (checkedFolderAttributes == 0)
+            Debug.Log("------- VREEL: Call to GetFiles() failed for: " + baseDirectory);
+
+            // Report Failure in Gallery
+            Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
+            if (galleryTextComponent != null)
             {
-                files.AddRange(GetAllFileNamesRecursively(dirName));
+                galleryTextComponent.text = "Reading files Failed!\n Check permissions!";
+                galleryTextComponent.color = Color.red;
             }
+            m_galleryMessage.SetActive(true);
+        }
+
+        try
+        {
+            foreach(string dirName in System.IO.Directory.GetDirectories(baseDirectory, "*", SearchOption.TopDirectoryOnly))
+            {
+                FileAttributes checkedFolderAttributes = (new DirectoryInfo(dirName).Attributes) & undesiredAttributes;
+                if (checkedFolderAttributes == 0)
+                {
+                    files.AddRange(GetAllFileNamesRecursively(dirName));
+                }
+            }
+        }
+        catch 
+        {
+            Debug.Log("------- VREEL: Call to GetDirectories() failed for: " + baseDirectory);
+
+            // Report Failure in Gallery
+            Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
+            if (galleryTextComponent != null)
+            {
+                galleryTextComponent.text = "Reading files Failed!\n Check permissions!";
+                galleryTextComponent.color = Color.red;
+            }
+            m_galleryMessage.SetActive(true);
         }
 
         return files;
