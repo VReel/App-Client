@@ -151,9 +151,8 @@ public class UserLogin : MonoBehaviour
     }
 
     private IEnumerator ProgressAppDirectorPastLogin()
-    {
-        // This moves the App Director to the profile state when the S3 Client has been initialised
-        while (!m_AWSS3Client.IsS3ClientValid())
+    {        
+        while (!m_AWSS3Client.IsS3ClientValid()) // This moves the App Director to the profile state when the S3 Client has been initialised
         {
             yield return new WaitForEndOfFrame();
         }

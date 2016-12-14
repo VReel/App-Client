@@ -15,6 +15,7 @@ public class DeviceGallery : MonoBehaviour
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private GameObject m_noGalleryImagesText;
+    [SerializeField] private GameObject m_galleryMessage; // TODO: use for reporting errors!
 
     private int m_currGalleryImageIndex = 0;
     private List<string> m_galleryImageFilePaths;
@@ -145,6 +146,7 @@ public class DeviceGallery : MonoBehaviour
         m_noGalleryImagesText.SetActive(noImagesInGallery); // If the user has yet take any 360-images then show them the NoGalleryImagesText!
     }
 
+    //TODO: Handle the case where app does not have permission to acccess files
     private List<string> GetAllFileNamesRecursively(string baseDirectory)
     {
         // We iterate over all files in the given top level directory, recursively searching through all the subdirectories

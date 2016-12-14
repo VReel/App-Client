@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;               // Text
 using System;                       // Datetime
 using System.Collections;           // IEnumerator
 using System.Collections.Generic;   // List
@@ -22,6 +23,8 @@ public class AWSS3Client : MonoBehaviour
     [SerializeField] private UserLogin m_userLogin;
     [SerializeField] private GameObject m_staticLoadingIcon;
     [SerializeField] private GameObject m_newUserText;
+    [SerializeField] private GameObject m_profileMessage;
+    [SerializeField] private GameObject m_galleryMessage;
 
     private AmazonS3Client m_s3Client = null;
     private CognitoAWSCredentials m_cognitoCredentials = null;
@@ -84,8 +87,7 @@ public class AWSS3Client : MonoBehaviour
             });
         });
     }
-        
-    //TODO Make use of the word "picture" and "image" consistent!
+    
     public void InvalidateS3ImageLoading() // This function is called in order to stop any ongoing image loading 
     {
         m_coroutineQueue.Clear();
@@ -130,7 +132,7 @@ public class AWSS3Client : MonoBehaviour
         m_currS3ImageFilePathIndex = Mathf.Clamp(m_currS3ImageFilePathIndex + numImagesToLoad, 0, numFilePaths);
 
         m_coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
-        DownloadImagesAndSetSpheres();
+        m_coroutineQueue.EnqueueAction(DownloadImagesAndSetSpheres());
     }
 
     public void PreviousImages()
@@ -143,7 +145,7 @@ public class AWSS3Client : MonoBehaviour
         m_currS3ImageFilePathIndex = Mathf.Clamp(m_currS3ImageFilePathIndex - numImagesToLoad, 0, numFilePaths);
 
         m_coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
-        DownloadImagesAndSetSpheres();
+        m_coroutineQueue.EnqueueAction(DownloadImagesAndSetSpheres());
     }
 
     // **************************
@@ -187,14 +189,28 @@ public class AWSS3Client : MonoBehaviour
                 string logString = string.Format("------- VREEL: Uploaded {0} posted to bucket {1}", responseObj.Request.Key, responseObj.Request.Bucket);
                 Debug.Log(logString);
 
-                //TODO: Flash up a message showing successful Upload!
+                // Report Success in Gallery
+                Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
+                if (galleryTextComponent != null)
+                {
+                    galleryTextComponent.text = "Succesful Upload!";
+                    galleryTextComponent.color = Color.black;
+                }
+                m_galleryMessage.SetActive(true);
             }
             else
             {
                 Debug.Log("------- VREEL: Exception while posting the result object");
                 Debug.Log("------- VREEL: Receieved error: " + responseObj.Response.HttpStatusCode.ToString());
 
-                //TODO: Flash up a message showing an error has occured - asking user to try again...
+                // Report Failure in Gallery
+                Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
+                if (galleryTextComponent != null)
+                {
+                    galleryTextComponent.text = "Failed to Upload!\n Try again later!";
+                    galleryTextComponent.color = Color.red;
+                }
+                m_galleryMessage.SetActive(true);
             }
 
             m_staticLoadingIcon.SetActive(false);
@@ -238,13 +254,20 @@ public class AWSS3Client : MonoBehaviour
 
                 m_s3ImageFilePaths.Reverse(); // Reversing to have the images appear in the order of newest - this works because I store images with a timestamp!
 
-                DownloadImagesAndSetSpheres();
+                m_coroutineQueue.EnqueueAction(DownloadImagesAndSetSpheres());
             }
             else
             {
                 Debug.Log("------- VREEL: Got an Exception calling 'ListObjectsAsync()'");
 
-                //TODO: Flash up a message showing an error has occured accessing their Images...
+                // Report Failure in Profile
+                Text profileTextComponent = m_profileMessage.GetComponentInChildren<Text>();
+                if (profileTextComponent != null)
+                {
+                    profileTextComponent.text = "Failed to get Images!\n Try again later!";
+                    profileTextComponent.color = Color.red;
+                }
+                m_profileMessage.SetActive(true);
             }
 
             bool noImagesUploaded = m_s3ImageFilePaths.Count <= 0;
@@ -252,8 +275,14 @@ public class AWSS3Client : MonoBehaviour
         });
     }
 
-    private void DownloadImagesAndSetSpheres()
+    private IEnumerator DownloadImagesAndSetSpheres()
     {
+        while (!IsS3ClientValid()) // We do this to ensure that this function only runs if there's a valid client
+        {
+            Debug.Log("------- VREEL: S3 Client not constructed yet");
+            yield return new WaitForEndOfFrame(); //This will essentially block this coroutine queue, without blocking the main thread
+        }
+
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
         DownloadImagesAndSetSpheresInternal(m_currS3ImageFilePathIndex, numImagesToLoad);
     }
@@ -320,7 +349,14 @@ public class AWSS3Client : MonoBehaviour
                 Debug.Log("------- VREEL: Got an Exception calling GetObjectAsync() for: " + fullFilePath);
                 Debug.Log("------- VREEL: Exception was: " + s3ResponseObj.Exception.ToString());
 
-                //TODO: Flash up a message showing an error has occured loading Image, ask them to try opening gallery again if problem persists ...
+                // Report Failure in Profile
+                Text profileTextComponent = m_profileMessage.GetComponentInChildren<Text>();
+                if (profileTextComponent != null)
+                {
+                    profileTextComponent.text = "Failed getting Image!\n Re-open Profile!";
+                    profileTextComponent.color = Color.red;
+                }
+                m_profileMessage.SetActive(true);
             }
         });
     }
@@ -386,5 +422,5 @@ public class AWSS3Client : MonoBehaviour
             b = ms.ToArray();
         }
         return b;
-    }        
+    }
 }
