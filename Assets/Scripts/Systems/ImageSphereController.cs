@@ -93,7 +93,7 @@ public class ImageSphereController : MonoBehaviour
         }
     }
 
-    public void ForceHideAllImageSpheres()
+    private void ForceHideAllImageSpheres()
     {
         for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
         {

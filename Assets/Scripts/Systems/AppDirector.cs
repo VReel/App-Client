@@ -45,6 +45,7 @@ public class AppDirector : MonoBehaviour
 
     public void RequestLoginState()
     {
+        Debug.Log("------- VREEL: RequestLoginState() called");
         if (m_appState != AppState.kLogin)
         {
             SetLoginState();
@@ -53,6 +54,7 @@ public class AppDirector : MonoBehaviour
 
     public void RequestProfileState()
     {
+        Debug.Log("------- VREEL: RequestProfileState() called");
         if (m_appState != AppState.kProfile)
         {
             SetProfileState();
@@ -61,6 +63,7 @@ public class AppDirector : MonoBehaviour
 
     public void RequestGalleryState()
     {
+        Debug.Log("------- VREEL: RequestGalleryState() called");
         if (m_appState != AppState.kGallery)
         {
             SetGalleryState();
@@ -76,6 +79,9 @@ public class AppDirector : MonoBehaviour
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
         SetMenuBar(false);
+
+        m_deviceGallery.InvalidateGalleryImageLoading();
+        m_AWSS3Client.InvalidateS3ImageLoading();
 
         m_menuController.SetLoginSubMenuActive(true);
         m_appState = AppState.kLogin;

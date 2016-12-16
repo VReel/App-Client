@@ -4,28 +4,31 @@ using System.Collections.Generic;
 
 public class CoroutineQueue
 {
-    MonoBehaviour m_Owner = null;
-    Coroutine m_InternalCoroutine = null;
+    MonoBehaviour m_owner = null;
+    Coroutine m_mainInternalCoroutine = null;
     Queue<IEnumerator> actions = new Queue<IEnumerator>();
+
     public CoroutineQueue(MonoBehaviour aCoroutineOwner)
     {
-        m_Owner = aCoroutineOwner;
+        m_owner = aCoroutineOwner;
     }
 
     public void StartLoop()
     {
-        m_InternalCoroutine = m_Owner.StartCoroutine(Process());
+        m_mainInternalCoroutine = m_owner.StartCoroutine(Process());
     }
 
     public void StopLoop()
     {
-        m_Owner.StopCoroutine(m_InternalCoroutine);
-        m_InternalCoroutine = null;
+        m_owner.StopCoroutine(m_mainInternalCoroutine);
+        m_mainInternalCoroutine = null;
     }
 
     public void Clear()
     {
         actions.Clear();
+        m_owner.StopAllCoroutines();
+        m_mainInternalCoroutine = m_owner.StartCoroutine(Process());
     }
 
     public void EnqueueAction(IEnumerator aAction)
@@ -48,9 +51,13 @@ public class CoroutineQueue
         while (true)
         {
             if (actions.Count > 0)
-                yield return m_Owner.StartCoroutine(actions.Dequeue());
+            {                                
+                yield return m_owner.StartCoroutine(actions.Dequeue());
+            }
             else
+            {
                 yield return null;
+            }
         }
     }
 }

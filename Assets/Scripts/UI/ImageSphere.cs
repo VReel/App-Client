@@ -88,6 +88,7 @@ public class ImageSphere : MonoBehaviour
     {
         m_imageFilePath = kEmptyString;
 
+        m_coroutineQueue.Clear();
         transform.localScale = new Vector3(kMinShrink, kMinShrink, kMinShrink);
     }
 
@@ -97,7 +98,7 @@ public class ImageSphere : MonoBehaviour
 
     private IEnumerator AnimateSetTexture()
     {   
-        Debug.Log("------- VREEL: AnimateSetTexture() began on sphere: " + m_imageSphereIndex+1);
+        Debug.Log("------- VREEL: AnimateSetTexture() began on sphere: " + (m_imageSphereIndex+1) );
 
         float scalingFactor = m_imageSphereController.GetScalingFactor();
         float defaultScale = m_imageSphereController.GetDefaultSphereScale();

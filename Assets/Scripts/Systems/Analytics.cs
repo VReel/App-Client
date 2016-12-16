@@ -21,15 +21,16 @@ public class Analytics : MonoBehaviour
 
     public void Start() 
     {                
+        //TODO: Move this pool over to EUWest1!
         var credentials = new CognitoAWSCredentials(
             "us-east-1:76e86965-28da-4906-bf7d-ed48c4e50477", // Amazon Cognito Identity Pool ID
-            RegionEndpoint.EUWest1 // Cognito Identity Region
+            RegionEndpoint.USEast1 // Cognito Identity Region
         ); 
         
         m_analyticsManager = MobileAnalyticsManager.GetOrCreateInstance(
             "410c9ef3e9d94a74afaa2d5bb96426f9", // Amazon Mobile Analytics App ID
             credentials,
-            RegionEndpoint.EUWest1 // Cognito Identity Region
+            RegionEndpoint.USEast1 // Cognito Identity Region
         ); 
     }
 
@@ -44,6 +45,22 @@ public class Analytics : MonoBehaviour
     public void GallerySelected()
     {
         CustomEvent customEvent = new CustomEvent("GallerySelected");
+        customEvent.AddAttribute("CognitoID", m_userLogin.GetCognitoUserID());
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
+
+    public void LoginSelected()
+    {
+        CustomEvent customEvent = new CustomEvent("LoginSelected");
+        customEvent.AddAttribute("CognitoID", m_userLogin.GetCognitoUserID());
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
+
+    public void LogoutSelected()
+    {
+        CustomEvent customEvent = new CustomEvent("LogoutSelected");
         customEvent.AddAttribute("CognitoID", m_userLogin.GetCognitoUserID());
 
         m_analyticsManager.RecordEvent(customEvent);

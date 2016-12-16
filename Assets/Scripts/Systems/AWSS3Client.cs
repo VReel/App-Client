@@ -46,10 +46,14 @@ public class AWSS3Client : MonoBehaviour
 
         m_coroutineQueue = new CoroutineQueue( this );
         m_coroutineQueue.StartLoop();
+
+        m_staticLoadingIcon.SetActive(false);
 	}
 
     public void InitS3ClientFB(string fbAccessToken)
     {
+        Debug.Log("------- VREEL: InitS3ClientFB() called!");
+
         m_cognitoCredentials = new CognitoAWSCredentials(
             "366575334313", // AWS Account ID
             "eu-west-1:bb57e466-72ed-408d-8c84-301d0bae1a9f", // Identity Pool ID
@@ -58,13 +62,17 @@ public class AWSS3Client : MonoBehaviour
             RegionEndpoint.EUWest1 // Region
         );   
 
+        m_cognitoCredentials.ClearIdentityCache();
+
         m_cognitoCredentials.AddLogin("graph.facebook.com", fbAccessToken);
 
         m_cognitoCredentials.GetIdentityIdAsync((idResponseObj) =>
         {
+            Debug.Log("------- VREEL: GetIdentityIdAsync() lambda called!");
+
             if (idResponseObj.Exception != null)
             {
-                Debug.Log("------- VREEL: Exception while assuming IAM role for S3 bucket");
+                Debug.Log("------- VREEL: Exception while calling GetIdentityIdAsync()");
                 Debug.Log("------- VREEL: Receieved error: " + idResponseObj.Exception.ToString());
                 return;
             }
@@ -74,6 +82,15 @@ public class AWSS3Client : MonoBehaviour
 
             m_cognitoCredentials.GetCredentialsAsync((credentialsResponseObj) =>
             {
+                Debug.Log("------- VREEL: GetCredentialsAsync() lambda called!");
+
+                if (credentialsResponseObj.Exception != null)
+                {
+                    Debug.Log("------- VREEL: Exception while calling GetCredentialsAsync()");
+                    Debug.Log("------- VREEL: Receieved error: " + credentialsResponseObj.Exception.ToString());
+                    return;
+                }
+
                 SessionAWSCredentials sessionCreds = new SessionAWSCredentials(
                     credentialsResponseObj.Response.AccessKey, 
                     credentialsResponseObj.Response.SecretKey, 
@@ -87,11 +104,14 @@ public class AWSS3Client : MonoBehaviour
             });
         });
     }
-    
+        
     public void InvalidateS3ImageLoading() // This function is called in order to stop any ongoing image loading 
-    {
-        m_coroutineQueue.Clear();
+    {        
         m_currS3ImageFilePathIndex = -1;
+        if (m_coroutineQueue != null)
+        {
+            m_coroutineQueue.Clear();
+        }
     }
         
     public bool IsS3ImageIndexAtStart()
@@ -106,6 +126,16 @@ public class AWSS3Client : MonoBehaviour
         return m_currS3ImageFilePathIndex >= (numFiles - numImageSpheres);       
     }
 
+    public void ClearClient()
+    {
+        if (m_cognitoCredentials != null)
+        {
+            m_cognitoCredentials.Clear();
+        }
+
+        m_s3Client = null;
+    }
+
     public bool IsS3ClientValid()
     {
         return m_s3Client != null;
@@ -113,11 +143,15 @@ public class AWSS3Client : MonoBehaviour
 
     public void UploadImage()
     {
+        Debug.Log("------- VREEL: UploadImage() called");
+
         m_coroutineQueue.EnqueueAction(UploadImageInternal());
     }
 
     public void OpenProfile()
     {
+        Debug.Log("------- VREEL: OpenProfile() called");
+
         m_imageSphereController.SetAllImageSpheresToLoading();
         m_coroutineQueue.EnqueueAction(StoreAllS3ImagePathsAndSetSpheres());
     }       

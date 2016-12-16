@@ -15,6 +15,7 @@ public class DeviceGallery : MonoBehaviour
 
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
+    [SerializeField] private UserLogin m_userLogin;
     [SerializeField] private GameObject m_noGalleryImagesText;
     [SerializeField] private GameObject m_galleryMessage;
 
@@ -39,8 +40,11 @@ public class DeviceGallery : MonoBehaviour
 
     public void InvalidateGalleryImageLoading() // This function is called in order to stop any ongoing image loading 
     {
-        m_coroutineQueue.Clear();
         m_currGalleryImageIndex = -1;
+        if (m_coroutineQueue != null)
+        {
+            m_coroutineQueue.Clear();
+        }
     }
 
     public bool IsGalleryIndexAtStart()
@@ -56,7 +60,7 @@ public class DeviceGallery : MonoBehaviour
     }
 
     public void OpenAndroidGallery()
-    {
+    {        
         Debug.Log("------- VREEL: OpenAndroidGallery() called");
 
         m_currGalleryImageIndex = 0;
