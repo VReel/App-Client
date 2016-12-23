@@ -371,7 +371,7 @@ public class AWSS3Client : MonoBehaviour
                 Debug.Log(logString02);
                 if (imageRequestStillValid)
                 {
-                    m_coroutineQueue.EnqueueAction(LoadImageInternal(response, sphereIndex, fullFilePath));
+                    m_coroutineQueue.EnqueueAction(LoadImageInternalUnity(response, sphereIndex, fullFilePath));
                     m_coroutineQueue.EnqueueWait(kImageRequestDelay);
 
                     Debug.Log("------- VREEL: Successfully downloaded and requested to set " + fullFilePath);
@@ -400,7 +400,7 @@ public class AWSS3Client : MonoBehaviour
         });
     }
 
-    private IEnumerator LoadImageInternal(Amazon.S3.Model.GetObjectResponse response, int sphereIndex, string fullFilePath)
+    private IEnumerator LoadImageInternalPlugin(Amazon.S3.Model.GetObjectResponse response, int sphereIndex, string fullFilePath)
     {        
         Debug.Log("------- VREEL: LoadImageInternal for " + fullFilePath);
 
@@ -409,9 +409,8 @@ public class AWSS3Client : MonoBehaviour
             yield return m_cppPlugin.LoadImageFromStream(m_threadJob, stream, m_imageSphereController, sphereIndex, fullFilePath);
         }
     }
-
-    /*
-    private IEnumerator ConvertStreamAndSetImageSphere(Amazon.S3.Model.GetObjectResponse response, int sphereIndex, string fullFilePath)
+        
+    private IEnumerator LoadImageInternalUnity(Amazon.S3.Model.GetObjectResponse response, int sphereIndex, string fullFilePath)
     {
         Debug.Log("------- VREEL: ConvertStreamAndSetImage for " + fullFilePath);
 
@@ -443,7 +442,6 @@ public class AWSS3Client : MonoBehaviour
         // The following is generally coming out to around 6-7MB in size...
         Debug.Log("------- VREEL: Finished iterating, length of byte[] is " + myBinary.Length);
 
-        // TODO: Make copying texture not block!
         Texture2D newImage = new Texture2D(2,2); 
         newImage.LoadImage(myBinary);
         m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, newImage, fullFilePath);
@@ -453,25 +451,4 @@ public class AWSS3Client : MonoBehaviour
 
         Resources.UnloadUnusedAssets();
     }
-
-    // TODO Understand this function properly...
-    private byte[] ToByteArray(Stream stream)
-    {
-        byte[] b = null;
-        using( MemoryStream ms = new MemoryStream() )
-        {
-            int count = 0;
-            do
-            {
-                byte[] buf = new byte[1024];
-                count = stream.Read(buf, 0, 1024);
-                ms.Write(buf, 0, count);
-            } 
-            while(stream.CanRead && count > 0);
-
-            b = ms.ToArray();
-        }
-        return b;
-    }
-    */
 }
