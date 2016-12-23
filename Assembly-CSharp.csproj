@@ -71,10 +71,13 @@
      <Compile Include="Assets\Scripts\Systems\Analytics.cs" />
      <Compile Include="Assets\Scripts\Systems\AppDirector.cs" />
      <Compile Include="Assets\Scripts\Systems\CoroutineQueue.cs" />
+     <Compile Include="Assets\Scripts\Systems\CppPlugin.cs" />
      <Compile Include="Assets\Scripts\Systems\DeviceGallery.cs" />
+     <Compile Include="Assets\Scripts\Systems\FPSDisplay.cs" />
      <Compile Include="Assets\Scripts\Systems\ImageSphereController.cs" />
      <Compile Include="Assets\Scripts\Systems\KeyBoard.cs" />
      <Compile Include="Assets\Scripts\Systems\MenuController.cs" />
+     <Compile Include="Assets\Scripts\Systems\ThreadJob.cs" />
      <Compile Include="Assets\Scripts\Systems\UserLogin.cs" />
      <Compile Include="Assets\Scripts\Systems\VRCameraController.cs" />
      <Compile Include="Assets\Scripts\UI\ImageSkybox.cs" />

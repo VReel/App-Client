@@ -31,6 +31,8 @@ public class AWSS3Client : MonoBehaviour
     private int m_currS3ImageFilePathIndex = -1;
     private List<string> m_s3ImageFilePaths;
     private CoroutineQueue m_coroutineQueue;
+    private ThreadJob m_threadJob;
+    private CppPlugin m_cppPlugin;
 
     private const float kImageRequestDelay = 2.0f;
 
@@ -46,6 +48,9 @@ public class AWSS3Client : MonoBehaviour
 
         m_coroutineQueue = new CoroutineQueue( this );
         m_coroutineQueue.StartLoop();
+
+        m_threadJob = new ThreadJob(this);
+        m_cppPlugin = new CppPlugin(this);
 
         m_staticLoadingIcon.SetActive(false);
 	}
@@ -366,7 +371,7 @@ public class AWSS3Client : MonoBehaviour
                 Debug.Log(logString02);
                 if (imageRequestStillValid)
                 {
-                    m_coroutineQueue.EnqueueAction(ConvertStreamAndSetImageSphere(response, sphereIndex, fullFilePath));
+                    m_coroutineQueue.EnqueueAction(LoadImageInternal(response, sphereIndex, fullFilePath));
                     m_coroutineQueue.EnqueueWait(kImageRequestDelay);
 
                     Debug.Log("------- VREEL: Successfully downloaded and requested to set " + fullFilePath);
@@ -395,6 +400,17 @@ public class AWSS3Client : MonoBehaviour
         });
     }
 
+    private IEnumerator LoadImageInternal(Amazon.S3.Model.GetObjectResponse response, int sphereIndex, string fullFilePath)
+    {        
+        Debug.Log("------- VREEL: LoadImageInternal for " + fullFilePath);
+
+        using (var stream = response.ResponseStream)
+        {
+            yield return m_cppPlugin.LoadImageFromStream(m_threadJob, stream, m_imageSphereController, sphereIndex, fullFilePath);
+        }
+    }
+
+    /*
     private IEnumerator ConvertStreamAndSetImageSphere(Amazon.S3.Model.GetObjectResponse response, int sphereIndex, string fullFilePath)
     {
         Debug.Log("------- VREEL: ConvertStreamAndSetImage for " + fullFilePath);
@@ -457,4 +473,5 @@ public class AWSS3Client : MonoBehaviour
         }
         return b;
     }
+    */
 }

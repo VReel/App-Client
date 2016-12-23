@@ -23,6 +23,8 @@ public class DeviceGallery : MonoBehaviour
     private List<string> m_galleryImageFilePaths;
     private CoroutineQueue m_coroutineQueue;
     private AndroidJavaClass m_galleryJavaClass;
+    private ThreadJob m_threadJob;
+    private CppPlugin m_cppPlugin;
 
     // **************************
     // Public functions
@@ -36,6 +38,9 @@ public class DeviceGallery : MonoBehaviour
         m_galleryImageFilePaths = new List<string>();
         m_coroutineQueue = new CoroutineQueue( this );
         m_coroutineQueue.StartLoop();
+
+        m_threadJob = new ThreadJob(this);
+        m_cppPlugin = new CppPlugin(this);
     }
 
     public void InvalidateGalleryImageLoading() // This function is called in order to stop any ongoing image loading 
@@ -242,14 +247,33 @@ public class DeviceGallery : MonoBehaviour
 
         Resources.UnloadUnusedAssets();
 
+        bool imageRequestStillValid = 
+            (m_currGalleryImageIndex != -1) && 
+            (m_currGalleryImageIndex <= startingGalleryImageIndex) &&  
+            (startingGalleryImageIndex < m_currGalleryImageIndex + numImagesToLoad); // Request no longer valid as user has moved on from this page
+
+        string logString = string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", imageRequestStillValid, startingGalleryImageIndex, m_currGalleryImageIndex, numImagesToLoad); 
+        Debug.Log(logString);
+        if (!imageRequestStillValid)
+        {
+            Debug.Log("------- VREEL: LoadImages() with index = " + startingGalleryImageIndex + " has failed");
+            yield break;
+        }
+            
         int currGalleryImageIndex = startingGalleryImageIndex;
         for (int sphereIndex = 0; sphereIndex < numImagesToLoad; sphereIndex++, currGalleryImageIndex++)
         {
             if (currGalleryImageIndex < m_galleryImageFilePaths.Count)
-            {                   
+            {                       
                 string filePath = m_galleryImageFilePaths[currGalleryImageIndex];
-                m_coroutineQueue.EnqueueAction(LoadImagesInternal(filePath, sphereIndex, currGalleryImageIndex, numImagesToLoad));
-                m_coroutineQueue.EnqueueWait(2.0f);
+
+                bool filePathStillValid = filePath.CompareTo(m_imageSkybox.GetImageFilePath()) != 0; // If file-path is the same then ignore request
+                Debug.Log("------- VREEL: Checking that filePath has changed has returned = " + filePathStillValid);
+                if (filePathStillValid)
+                {
+                    m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(filePath, sphereIndex));
+                    m_coroutineQueue.EnqueueWait(2.0f);
+                }
             }
             else
             {
@@ -261,6 +285,33 @@ public class DeviceGallery : MonoBehaviour
         yield return null;
     }
 
+    private IEnumerator LoadImageInternalPlugin(string filePath, int sphereIndex)
+    {   
+        yield return m_cppPlugin.LoadImageFromPath(m_threadJob, m_imageSphereController, sphereIndex, filePath);
+    }
+
+    private IEnumerator LoadImageInternalUnity(string filePath, int sphereIndex)
+    {
+        Debug.Log("------- VREEL: Calling LoadPicturesInternalUnity() from filePath: " + filePath);
+
+        WWW www = new WWW("file://" + filePath);
+        yield return www;
+
+        Debug.Log("------- VREEL: Calling LoadImageIntoTexture()");
+        Texture2D myNewTexture2D = new Texture2D(2,2);
+        www.LoadImageIntoTexture(myNewTexture2D);
+        yield return new WaitForEndOfFrame();
+        Debug.Log("------- VREEL: Finished LoadImageIntoTexture()");
+
+        Debug.Log("------- VREEL: Calling SetImageAndFilePath()");
+        m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, myNewTexture2D, filePath);
+        yield return new WaitForEndOfFrame();
+        Debug.Log("------- VREEL: Finished SetImageAndFilePath()");
+
+        Resources.UnloadUnusedAssets();
+    }
+
+    /*
     private IEnumerator LoadImagesInternal(string filePath, int sphereIndex, int thisGalleryImageIndex, int numImages)
     {                           
         bool imageRequestStillValid = 
@@ -292,7 +343,7 @@ public class DeviceGallery : MonoBehaviour
         yield return www;
 
         //UnityWebRequest uwr = new UnityWebRequest(url);
-        /*
+
         UnityWebRequest uwr = new UnityWebRequest("file://" + filePath);
         DownloadHandlerTexture textureDownloadHandler = new DownloadHandlerTexture(true);
         uwr.downloadHandler = textureDownloadHandler;
@@ -305,7 +356,7 @@ public class DeviceGallery : MonoBehaviour
 
         Texture2D t = textureDownloadHandler.texture;
         Debug.Log("------- VREEL: Downloaded texture of size height x width: " + t.height + " x " + t.width);
-        */
+
 
         //ResourceRequest request = Resources.LoadAsync(filePath);
         //yield return request;
@@ -325,7 +376,7 @@ public class DeviceGallery : MonoBehaviour
         //m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndFilePath(ref www, filePath);
         m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, www.texture, filePath);
 
-        /*
+        
         SelectImage currImageSphere = m_imageSpheres[sphereIndex].GetComponent<SelectImage>();
 
         System.Threading.Thread tempThread = new Thread(() => 
@@ -333,56 +384,11 @@ public class DeviceGallery : MonoBehaviour
 
         tempThread.Start();
         yield return tempThread.Join();
-        */
+
 
         //Debug.Log("------- VREEL: Set texture on ImageSphere");
 
         Resources.UnloadUnusedAssets();
     }
-
-    private IEnumerator LoadImagesInternal2(Texture2D source, string filePath, int sphereIndex)
-    {
-        int textureWidth = source.width;
-        int textureHeight = source.height;
-
-        Debug.Log("------- VREEL: Downloaded texture is being copied, Width x Height= " 
-            + textureWidth + " x " + textureHeight + " ; Size in pixels = " 
-            + textureWidth * textureHeight );
-
-        Texture2D myTexture = new Texture2D(textureWidth, textureHeight, source.format, false);
-        yield return myTexture;
-
-        const int kNumIterationsPerFrame = 400000;
-        int iterationCounter = 0;
-        Color tempSourceColor = Color.black;
-
-        Debug.Log("------- VREEL: Entering LoadImagesInternal2 loop");
-        for (int y = 0; y < textureHeight; y++)
-        {
-            for (int x = 0; x < textureWidth; x++)
-            {                
-                //Debug.Log("------- VREEL: GetPixel(" + x + "," + y + ")");
-                tempSourceColor = source.GetPixel(x, y);
-
-                //Debug.Log("------- VREEL: SetPixel(" + x + "," + y + ")");
-                myTexture.SetPixel(x, y, tempSourceColor);
-
-                iterationCounter++;
-
-                if (iterationCounter % kNumIterationsPerFrame == 0)
-                {
-                    Debug.Log("------- VREEL: Yielding LoadImagesInternal2 at Iteration number: " 
-                        + iterationCounter + " Pixel: (" + x + "," + y + ")");
-                    yield return new WaitForEndOfFrame(); 
-                }
-            }
-        }
-
-        //Apply changes to the Texture
-        myTexture.Apply();
-
-        m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, myTexture, filePath);
-
-        Resources.UnloadUnusedAssets();
-    }
+*/
 }
