@@ -271,7 +271,7 @@ public class DeviceGallery : MonoBehaviour
                 Debug.Log("------- VREEL: Checking that filePath has changed has returned = " + filePathStillValid);
                 if (filePathStillValid)
                 {
-                    m_coroutineQueue.EnqueueAction(LoadImageInternalUnity(filePath, sphereIndex));
+                    m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(filePath, sphereIndex));
                     m_coroutineQueue.EnqueueWait(2.0f);
                 }
             }

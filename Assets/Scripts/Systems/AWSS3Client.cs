@@ -371,7 +371,7 @@ public class AWSS3Client : MonoBehaviour
                 Debug.Log(logString02);
                 if (imageRequestStillValid)
                 {
-                    m_coroutineQueue.EnqueueAction(LoadImageInternalUnity(response, sphereIndex, fullFilePath));
+                    m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(response, sphereIndex, fullFilePath));
                     m_coroutineQueue.EnqueueWait(kImageRequestDelay);
 
                     Debug.Log("------- VREEL: Successfully downloaded and requested to set " + fullFilePath);

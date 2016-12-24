@@ -10,20 +10,26 @@ extern "C"
 // **************************
 // Member Variables
 // **************************
-    
+
 int imageWidth = 0;
 int imageHeight = 0;
-    
+
 // **************************
 // Helper functions
 // **************************
-    
-void TransferPixelsFromSrcToDest(int* pImage, int* pDest, int numPixels)
+
+void TransferPixelsFromSrcToDest(int* pImage, int* pDest, int width, int height)
 {
-    for(int* pSrc = pImage + (numPixels-1); pSrc >= pImage; --pSrc)
+    //memcpy(pDest, pImage, numPixels);
+
+    int numPixels = width*height;
+    for(int* pSrc = pImage + (numPixels-1); pSrc >= pImage; pSrc -= width)
     {
-        *pDest = *pSrc;
-        ++pDest;
+        for (int* pScanLine = pSrc - (width-1); pScanLine <= pSrc; ++pScanLine)
+        {
+            *pDest = *pScanLine;
+            ++pDest;
+        }
     }
 }
 
@@ -67,7 +73,7 @@ bool LoadIntoPixelsFromImagePath(char* pFileName, void* pPixelData)
     int width = -1, height = -1, type = -1;
 
     stbi_uc* pImage = stbi_load(pFileName, &width, &height, &type, 4);
-    TransferPixelsFromSrcToDest((int*) pImage, (int*) pPixelData, width*height);
+    TransferPixelsFromSrcToDest((int*) pImage, (int*) pPixelData, width, height);
     stbi_image_free(pImage);
 
     return (width*height) > 0;
@@ -79,7 +85,7 @@ bool LoadIntoPixelsFromImageData(void* pRawData, void* pPixelData, int dataLengt
     int width = -1, height = -1, type = -1;
 
     stbi_uc* pImage = stbi_load_from_memory(pDataAddress, dataLength, &width, &height, &type, 4);
-    TransferPixelsFromSrcToDest((int*) pImage, (int*) pPixelData, width*height);
+    TransferPixelsFromSrcToDest((int*) pImage, (int*) pPixelData, width, height);
     stbi_image_free(pImage);
 
     return (width*height) > 0;
