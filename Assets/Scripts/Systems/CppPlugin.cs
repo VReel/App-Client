@@ -90,6 +90,8 @@ public class CppPlugin
         yield return new WaitForEndOfFrame();
         myNewTexture2D.Apply();
         yield return new WaitForEndOfFrame();
+        pixelsDataHandle.Free();
+        yield return new WaitForEndOfFrame();
         Debug.Log("------- VREEL: Finished SetPixels32() and Apply() on myNewTexture2D!");
 
 
@@ -153,6 +155,7 @@ public class CppPlugin
         yield return new WaitForEndOfFrame();
         myNewTexture2D.Apply();
         yield return new WaitForEndOfFrame();
+        pixelsDataHandle.Free();
         rawDataHandle.Free();
         yield return new WaitForEndOfFrame();
         Debug.Log("------- VREEL: Finished SetPixels32() and Apply() on myNewTexture2D!");
