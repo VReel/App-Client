@@ -21,6 +21,7 @@ public class AWSS3Client : MonoBehaviour
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private UserLogin m_userLogin;
+    [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private GameObject m_staticLoadingIcon;
     [SerializeField] private GameObject m_newUserText;
     [SerializeField] private GameObject m_profileMessage;
@@ -146,6 +147,11 @@ public class AWSS3Client : MonoBehaviour
         return m_s3Client != null;
     }
 
+    public IEnumerator WaitForValidS3Client()
+    {
+        while (!IsS3ClientValid()) yield return null;
+    }
+
     public void UploadImage()
     {
         Debug.Log("------- VREEL: UploadImage() called");
@@ -193,10 +199,8 @@ public class AWSS3Client : MonoBehaviour
 
     private IEnumerator UploadImageInternal()
     {
-        while (!IsS3ClientValid()) // We do this to ensure that this function only runs if there's a valid client
-        {
-            yield return new WaitForEndOfFrame(); //This will essentially block this coroutine queue, without blocking the main thread
-        }
+        yield return m_appDirector.VerifyInternetConnection();
+        yield return WaitForValidS3Client();
 
         m_staticLoadingIcon.SetActive(true);
 
@@ -259,11 +263,8 @@ public class AWSS3Client : MonoBehaviour
     private static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
     private IEnumerator StoreAllS3ImagePathsAndSetSpheres()
     {
-        while (!IsS3ClientValid()) // We do this to ensure that this function only runs if there's a valid client
-        {
-            Debug.Log("------- VREEL: S3 Client not constructed yet");
-            yield return new WaitForEndOfFrame(); //This will essentially block this coroutine queue, without blocking the main thread
-        }
+        yield return m_appDirector.VerifyInternetConnection();
+        yield return WaitForValidS3Client();
 
         Debug.Log("------- VREEL: Fetching all the Objects from: " + m_s3BucketName + "/" + m_userLogin.GetCognitoUserID() + "/");
 
@@ -316,11 +317,8 @@ public class AWSS3Client : MonoBehaviour
 
     private IEnumerator DownloadImagesAndSetSpheres()
     {
-        while (!IsS3ClientValid()) // We do this to ensure that this function only runs if there's a valid client
-        {
-            Debug.Log("------- VREEL: S3 Client not constructed yet");
-            yield return new WaitForEndOfFrame(); //This will essentially block this coroutine queue, without blocking the main thread
-        }
+        yield return m_appDirector.VerifyInternetConnection();
+        yield return WaitForValidS3Client();
 
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
         DownloadImagesAndSetSpheresInternal(m_currS3ImageFilePathIndex, numImagesToLoad);
@@ -339,7 +337,7 @@ public class AWSS3Client : MonoBehaviour
             if (currS3ImageIndex < m_s3ImageFilePaths.Count)
             {                   
                 string filePath = m_s3ImageFilePaths[currS3ImageIndex];
-                DownloadImage(filePath, sphereIndex, currS3ImageIndex, numImages);
+                m_coroutineQueue.EnqueueAction(DownloadImage(filePath, sphereIndex, currS3ImageIndex, numImages));
             }
             else
             {
@@ -350,8 +348,11 @@ public class AWSS3Client : MonoBehaviour
         Resources.UnloadUnusedAssets();
     }
 
-    private void DownloadImage(string filePath, int sphereIndex, int thisS3ImageIndex, int numImages)
+    private IEnumerator DownloadImage(string filePath, int sphereIndex, int thisS3ImageIndex, int numImages)
     {
+        yield return m_appDirector.VerifyInternetConnection();
+        yield return WaitForValidS3Client();
+
         string fullFilePath = m_s3BucketName + filePath;
         string logString01 = string.Format("------- VREEL: Downloading {0} from bucket {1}", filePath, m_s3BucketName);       
         Debug.Log(logString01);

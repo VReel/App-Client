@@ -67,6 +67,9 @@
      <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\GraphRequest.cs" />
      <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\MainMenu.cs" />
      <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\Pay.cs" />
+     <Compile Include="Assets\InternetReachabilityVerifier\Examples\CustomIRVExample.cs" />
+     <Compile Include="Assets\InternetReachabilityVerifier\Examples\IRVExample.cs" />
+     <Compile Include="Assets\InternetReachabilityVerifier\Examples\SkeletonIRVExample.cs" />
      <Compile Include="Assets\Scripts\Systems\AWSS3Client.cs" />
      <Compile Include="Assets\Scripts\Systems\Analytics.cs" />
      <Compile Include="Assets\Scripts\Systems\AppDirector.cs" />
@@ -75,6 +78,7 @@
      <Compile Include="Assets\Scripts\Systems\DeviceGallery.cs" />
      <Compile Include="Assets\Scripts\Systems\FPSDisplay.cs" />
      <Compile Include="Assets\Scripts\Systems\ImageSphereController.cs" />
+     <Compile Include="Assets\Scripts\Systems\InternetReachabilityVerifier.cs" />
      <Compile Include="Assets\Scripts\Systems\KeyBoard.cs" />
      <Compile Include="Assets\Scripts\Systems\MenuController.cs" />
      <Compile Include="Assets\Scripts\Systems\ThreadJob.cs" />
@@ -89,6 +93,7 @@
      <None Include="Assets\Standard Assets\Prototyping\Shaders\WorldCoordDiffuse.shader" />
      <None Include="Assets\Shader\UIOverlay.shader" />
      <None Include="Assets\Plugins\Android\classes\AndroidManifest.xml" />
+     <None Include="Assets\InternetReachabilityVerifier\Examples\internetreachabilityverifier.txt" />
      <None Include="Assets\Plugins\Android\Build.xml" />
      <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
      <None Include="Assets\Plugins\Android\classes\Build.xml" />

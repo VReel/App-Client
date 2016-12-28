@@ -42,50 +42,12 @@ public class UserLogin : MonoBehaviour
 
     public void LoginWithFacebook() // Called when User Logs in for the first time, or has logged out.
     {
-        if (Application.isEditor)
-        {
-            m_cachedCognitoId = "Editor";
-            m_cachedFBId = "1";
-            m_cachedFBUsername = "Editor";
-
-            m_appDirector.RequestProfileState();
-            return;
-        }
-
-        if (FB.IsInitialized) // About to log into Cognito account through Facebook
-        {                       
-            Debug.Log("------- VREEL: User about to Log In to Facebook");
-
-            FB.LogInWithReadPermissions(null, (logInResponseObj) => 
-            {
-                if (FB.IsLoggedIn)
-                {
-                    Debug.Log("------- VREEL: User successfully logged into Facebook");
-                    RunLoginCode();
-                }
-                else
-                {
-                    Debug.Log("------- VREEL: Failed to login through Facebook");
-                    m_fbInvalidLoginError.SetActive(true);
-                }
-            });
-        }
-        else
-        {
-            Debug.Log("------- VREEL: ERROR - FB failed to Initialise!");
-        }
+        m_coroutineQueue.EnqueueAction(LoginWithFacebookInternal());
     }
 
     public void LogoutWithFacebook()
     {
-        Debug.Log("------- VREEL: LogOut() called");
-
-        if (FB.IsInitialized) 
-        {                        
-            m_AWSS3Client.ClearClient();
-            FB.LogOut();
-            m_appDirector.RequestLoginState();
-        }
+        m_coroutineQueue.EnqueueAction(LogoutWithFacebookInternal());
     }
 
     public void SetCognitoUserID(string cognitoUserID)
@@ -160,7 +122,7 @@ public class UserLogin : MonoBehaviour
         {
             Debug.Log("------- VREEL: ERROR - FB failed to Initialise!");
         }
-    }
+    }        
 
     private void RunLoginCode()
     {
@@ -184,6 +146,58 @@ public class UserLogin : MonoBehaviour
         else
         {
             Debug.Log("------- VREEL: Failed to run Login Code!");
+        }
+    }
+
+    private IEnumerator LoginWithFacebookInternal()
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        if (Application.isEditor)
+        {
+            m_cachedCognitoId = "Editor";
+            m_cachedFBId = "1";
+            m_cachedFBUsername = "Editor";
+
+            m_appDirector.RequestProfileState();
+            yield break;
+        }
+
+        if (FB.IsInitialized) // About to log into Cognito account through Facebook
+        {                       
+            Debug.Log("------- VREEL: User about to Log In to Facebook");
+
+            FB.LogInWithReadPermissions(null, (logInResponseObj) => 
+            {
+                if (FB.IsLoggedIn)
+                {
+                    Debug.Log("------- VREEL: User successfully logged into Facebook");
+                    RunLoginCode();
+                }
+                else
+                {
+                    Debug.Log("------- VREEL: Failed to login through Facebook");
+                    m_fbInvalidLoginError.SetActive(true);
+                }
+            });
+        }
+        else
+        {
+            Debug.Log("------- VREEL: ERROR - FB failed to Initialise!");
+        }
+    }
+
+    private IEnumerator LogoutWithFacebookInternal()
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        Debug.Log("------- VREEL: LogOut() called");
+
+        if (FB.IsInitialized) 
+        {                        
+            m_AWSS3Client.ClearClient();
+            FB.LogOut();
+            m_appDirector.RequestLoginState();
         }
     }
 

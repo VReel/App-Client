@@ -92,6 +92,7 @@
      <None Include="Assets\Standard Assets\Prototyping\Shaders\WorldCoordDiffuse.shader" />
      <None Include="Assets\Shader\UIOverlay.shader" />
      <None Include="Assets\Plugins\Android\classes\AndroidManifest.xml" />
+     <None Include="Assets\InternetReachabilityVerifier\Examples\internetreachabilityverifier.txt" />
      <None Include="Assets\Plugins\Android\Build.xml" />
      <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
      <None Include="Assets\Plugins\Android\classes\Build.xml" />

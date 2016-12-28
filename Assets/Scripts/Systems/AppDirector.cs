@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
-using UnityEngine.VR; //VRSettings
+using UnityEngine.VR;               //VRSettings
+using System.Collections;           //IEnumerator
 
 // AppDirector keeps track of the current state of the App 
 // and is in charge of ensuring that work is correctly delegated to other components
@@ -24,8 +25,11 @@ public class AppDirector : MonoBehaviour
     [SerializeField] private AWSS3Client m_AWSS3Client;
     [SerializeField] private DeviceGallery m_deviceGallery;
     [SerializeField] private UserLogin m_userLogin;
+    [SerializeField] private InternetReachabilityVerifier m_internetReachabilityVerifier;
+    [SerializeField] private GameObject m_lostConnectionIcon;
 
     private AppState m_appState;
+    private CoroutineQueue m_coroutineQueue;
 
     // **************************
     // Public functions
@@ -33,9 +37,12 @@ public class AppDirector : MonoBehaviour
 
     public void Start()
     {
-        m_appState = AppState.kLogin;
+        m_coroutineQueue = new CoroutineQueue( this );
+        m_coroutineQueue.StartLoop();
 
-        SetLoginState();
+        m_coroutineQueue.EnqueueAction(SetLoginState());
+
+        m_lostConnectionIcon.SetActive(false);
     }
 
     public AppState GetState()
@@ -48,7 +55,7 @@ public class AppDirector : MonoBehaviour
         Debug.Log("------- VREEL: RequestLoginState() called");
         if (m_appState != AppState.kLogin)
         {
-            SetLoginState();
+            m_coroutineQueue.EnqueueAction(SetLoginState());
         }
     }
 
@@ -57,7 +64,7 @@ public class AppDirector : MonoBehaviour
         Debug.Log("------- VREEL: RequestProfileState() called");
         if (m_appState != AppState.kProfile)
         {
-            SetProfileState();
+            m_coroutineQueue.EnqueueAction(SetProfileState());
         }
     }
 
@@ -66,15 +73,33 @@ public class AppDirector : MonoBehaviour
         Debug.Log("------- VREEL: RequestGalleryState() called");
         if (m_appState != AppState.kGallery)
         {
-            SetGalleryState();
+            m_coroutineQueue.EnqueueAction(SetGalleryState());
         }
+    }
+
+    public IEnumerator VerifyInternetConnection()
+    {
+        if (m_internetReachabilityVerifier.status == InternetReachabilityVerifier.Status.NetVerified)
+        {
+            yield break;
+        }
+
+        Debug.Log("------- VREEL: Lost Internet Connection");
+
+        m_lostConnectionIcon.SetActive(true);
+
+        yield return m_internetReachabilityVerifier.waitForNetVerifiedStatus();
+
+        m_lostConnectionIcon.SetActive(false);
+
+        Debug.Log("------- VREEL: Got the Internet Connection back!");
     }
 
     // **************************
     // Private/Helper functions
     // **************************
 
-    private void SetLoginState()
+    private IEnumerator SetLoginState()
     {        
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
@@ -85,9 +110,11 @@ public class AppDirector : MonoBehaviour
 
         m_menuController.SetLoginSubMenuActive(true);
         m_appState = AppState.kLogin;
+
+        yield break;
     }
 
-    private void SetProfileState()
+    private IEnumerator SetProfileState()
     {
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
@@ -103,9 +130,11 @@ public class AppDirector : MonoBehaviour
         m_menuController.SetProfileSubMenuActive(true);
         m_AWSS3Client.OpenProfile();
         m_appState = AppState.kProfile;
+
+        yield break;
     }
 
-    private void SetGalleryState()
+    private IEnumerator SetGalleryState()
     {
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
@@ -116,6 +145,8 @@ public class AppDirector : MonoBehaviour
         m_menuController.SetGallerySubMenuActive(true);
         m_deviceGallery.OpenAndroidGallery();
         m_appState = AppState.kGallery;
+
+        yield break;
     }
 
     private void DisableAllOptions()
@@ -126,7 +157,7 @@ public class AppDirector : MonoBehaviour
     private void SetMenuBar(bool active)
     {
         m_menuBar.SetActive(active);
-    }
+    }       
 
     private void InvertVREnabled() // Unavailable until Oculus update their SDK...
     {        

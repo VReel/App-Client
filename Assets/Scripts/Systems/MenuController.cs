@@ -137,24 +137,19 @@ public class MenuController : MonoBehaviour
         if (m_menuSubTree != null)
         {
             //We Trawl through all the subobjects, hiding all meshes, images and colliders!
-            foreach(var mesh in m_menuSubTree.GetComponentsInChildren<MeshRenderer>())
+            foreach(var renderer in m_menuSubTree.GetComponentsInChildren<Renderer>())
             {                
-                mesh.enabled = visible;
+                renderer.enabled = visible; // Handles Mesh + SpriteRenderer components
             }
 
-            foreach(var image in m_menuSubTree.GetComponentsInChildren<UnityEngine.UI.Image>())
+            foreach(var ui in m_menuSubTree.GetComponentsInChildren<UnityEngine.UI.Graphic>())
             {                
-                image.enabled = visible;
-            }
-
-            foreach(var text in m_menuSubTree.GetComponentsInChildren<Text>())
-            {                
-                text.enabled = visible;
+                ui.enabled = visible; // Handles Images + Text components
             }
 
             foreach(var collider in m_menuSubTree.GetComponentsInChildren<Collider>())
             {                
-                collider.enabled = visible;
+                collider.enabled = visible; // Handles BoxCollider + MeshCollider components
             }
         }
 
