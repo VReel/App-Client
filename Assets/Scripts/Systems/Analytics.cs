@@ -79,8 +79,8 @@ public class Analytics : MonoBehaviour
         {
             customEvent.AddAttribute("AppState", "Gallery");
         }
-
-        customEvent.AddMetric("SphereNumber", sphereNumber);
+            
+        customEvent.AddAttribute("SphereNumber", sphereNumber.ToString());
 
         m_analyticsManager.RecordEvent(customEvent);
     }
