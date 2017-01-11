@@ -22,7 +22,7 @@ public class DeviceGallery : MonoBehaviour
     private int m_currGalleryImageIndex = 0;
     private List<string> m_galleryImageFilePaths;
     private CoroutineQueue m_coroutineQueue;
-    private AndroidJavaClass m_galleryJavaClass;
+    private AndroidJavaClass m_javaPluginClass;
     private ThreadJob m_threadJob;
     private CppPlugin m_cppPlugin;
 
@@ -33,7 +33,7 @@ public class DeviceGallery : MonoBehaviour
     public void Start()
     {
         AndroidJNI.AttachCurrentThread();
-        m_galleryJavaClass = new AndroidJavaClass("io.vreel.vreel.VReelAndroidGallery");
+        m_javaPluginClass = new AndroidJavaClass("io.vreel.vreel.JavaPlugin");
 
         m_galleryImageFilePaths = new List<string>();
         m_coroutineQueue = new CoroutineQueue( this );
@@ -72,7 +72,7 @@ public class DeviceGallery : MonoBehaviour
         m_galleryImageFilePaths.Clear();
 
         Debug.Log("------- VREEL: About to call GetImagesPath function...");
-        string imagesTopLevelDirectory = m_galleryJavaClass.CallStatic<string>("GetAndroidImagesPath"); //string path = "/storage/emulated/0/DCIM/Gear 360/";
+        string imagesTopLevelDirectory = m_javaPluginClass.CallStatic<string>("GetAndroidImagesPath"); //string path = "/storage/emulated/0/DCIM/Gear 360/";
         m_imageSkybox.SetTopLevelDirectory(imagesTopLevelDirectory);
         Debug.Log("------- VREEL: Storing all FilePaths from directory: " + imagesTopLevelDirectory);
 
@@ -230,7 +230,7 @@ public class DeviceGallery : MonoBehaviour
         // and its not a standard aspect ratio for any other type of image!
 
         Debug.Log("------- VREEL: About to call Aspect Ratio function for file: " + filePath);
-        float aspectRatio = m_galleryJavaClass.CallStatic<float>("CalcAspectRatio", filePath);
+        float aspectRatio = m_javaPluginClass.CallStatic<float>("CalcAspectRatio", filePath);
         Debug.Log("------- VREEL: Aspect Ratio: " + aspectRatio);
 
         const float kDesiredAspectRatio = 2.0f;

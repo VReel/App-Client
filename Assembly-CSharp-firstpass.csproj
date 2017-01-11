@@ -91,11 +91,8 @@
      <None Include="Assets\Standard Assets\Prototyping\Shaders\ProceduralSkyBox.shader" />
      <None Include="Assets\Standard Assets\Prototyping\Shaders\WorldCoordDiffuse.shader" />
      <None Include="Assets\Shader\UIOverlay.shader" />
-     <None Include="Assets\Plugins\Android\classes\AndroidManifest.xml" />
      <None Include="Assets\InternetReachabilityVerifier\Examples\internetreachabilityverifier.txt" />
-     <None Include="Assets\Plugins\Android\Build.xml" />
      <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
-     <None Include="Assets\Plugins\Android\classes\Build.xml" />
      <None Include="Assets\FacebookSDK\link.xml" />
      <None Include="Assets\AWSSDK\src\Core\Resources\awsconfig.xml" />
      <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
@@ -106,37 +103,37 @@
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.CognitoIdentity">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.CognitoIdentity.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/AWSSDK/AWSSDK.CognitoIdentity.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.CognitoSync">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.CognitoSync.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/AWSSDK/AWSSDK.CognitoSync.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.Core">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.Core.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/AWSSDK/AWSSDK.Core.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.DynamoDBv2">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.DynamoDBv2.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/AWSSDK/AWSSDK.DynamoDBv2.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.IdentityManagement">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.IdentityManagement.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/AWSSDK/AWSSDK.IdentityManagement.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.MobileAnalytics">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.MobileAnalytics.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/AWSSDK/AWSSDK.MobileAnalytics.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.S3">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.S3.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/AWSSDK/AWSSDK.S3.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.SecurityToken">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.SecurityToken.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/AWSSDK/AWSSDK.SecurityToken.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.SQS">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/AWSSDK/AWSSDK.SQS.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/AWSSDK/AWSSDK.SQS.dll</HintPath>
  </Reference>
  <Reference Include="Facebook.Unity">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/FacebookSDK/Plugins/Facebook.Unity.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/FacebookSDK/Plugins/Facebook.Unity.dll</HintPath>
  </Reference>
  <Reference Include="Facebook.Unity.Settings">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VReelApp/Assets/FacebookSDK/Plugins/Settings/Facebook.Unity.Settings.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/FacebookSDK/Plugins/Settings/Facebook.Unity.Settings.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
