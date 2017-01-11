@@ -7,7 +7,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-#define  LOG_TAG    "----------------- VREEL: libandroidcppnative"
+#define  LOG_TAG    "----------------- VREEL: CppPlugin - "
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 
 // **************************
@@ -16,12 +16,12 @@
 
 int m_numInits = 0; // Acts a bit like a reference counter, ensuring only 1 Init() and 1 Terminate()
 
-const int kNumTextures = 2;
-GLuint m_textureIDs[kNumTextures];
-int m_currTextureIndex = kNumTextures-1; // This is so when the modulus operation is performed, we begin at index 0
+GLuint* m_textureIDs;
+int m_initMaxNumTextures = 0; // Set on Init - sets maximum textures to gen!
+int m_currTextureIndex = 0;
 
-const int kMaxImageWidth = 10 * 1024;
-const int kMaxImageHeight = 5 * 1024;
+const int kMaxImageWidth = 12 * 1024;
+const int kMaxImageHeight = 6 * 1024;
 stbi_uc* m_pWorkingMemory = NULL;
 int m_currImageWidth = 0;
 int m_currImageHeight = 0;
@@ -88,20 +88,21 @@ void Init()
 {
     if (m_numInits == 0)
     {
-        LOGI("Calling Init() in C++ Plugin!");
+        LOGI("Calling Init()!");
 
-        LOGI("glGenTextures(%d, m_textureIDs)", kNumTextures);
-        glGenTextures(kNumTextures, m_textureIDs);
+        LOGI("glGenTextures(%d, m_textureIDs)", m_initMaxNumTextures);
+        m_textureIDs = new GLuint[m_initMaxNumTextures];
+        glGenTextures(m_initMaxNumTextures, m_textureIDs);
         PrintAllGlError();
 
-        for (int i = 0; i < kNumTextures; i++)
+        for (int i = 0; i < m_initMaxNumTextures; i++)
         {
             LOGI("Genned texture to Handle = %u \n", m_textureIDs[i]);
         }
 
         m_pWorkingMemory = new stbi_uc[kMaxImageWidth * kMaxImageHeight * sizeof(int32_t)];
 
-        LOGI("Finished Init() in C++ Plugin!");
+        LOGI("Finished Init()!");
     }
 
     m_numInits++;
@@ -113,23 +114,22 @@ void Terminate()
 
     if (m_numInits == 0)
     {
-        LOGI("Calling Terminate() in C++ Plugin!");
+        LOGI("Calling Terminate()!");
 
-        LOGI("glDeleteTextures(%d, m_textureIDs)", kNumTextures);
-        glDeleteTextures(kNumTextures, m_textureIDs);
+        LOGI("glDeleteTextures(%d, m_textureIDs)", m_initMaxNumTextures);
+        glDeleteTextures(m_initMaxNumTextures, m_textureIDs);
         PrintAllGlError();
 
+        delete[] m_textureIDs;
         delete[] m_pWorkingMemory;
 
-        LOGI("Finished Terminate() in C++ Plugin!");
+        LOGI("Finished Terminate()!");
     }
 }
 
 void CreateEmptyTexture()
 {
-    LOGI("Calling CreateEmptyTexture() in C++ Plugin");
-
-    m_currTextureIndex = (m_currTextureIndex + 1) % kNumTextures;
+    LOGI("Calling CreateEmptyTexture()");
 
     LOGI("glBindTexture(GL_TEXTURE_2D, textureId)");
     GLuint textureId = m_textureIDs[m_currTextureIndex];
@@ -143,13 +143,13 @@ void CreateEmptyTexture()
     m_isLoadingIntoTexture = true;
     m_textureLoadingYOffset = 0;
 
-    LOGI("Finished CreateEmptyTexture() in C++ Plugin!");
+    LOGI("Finished CreateEmptyTexture()!");
 }
 
 // This function is called repeatedly like a for-loop with the variable m_textureLoadingYOffset updating every iteration
 void LoadScanlinesIntoTextureFromWorkingMemory()
 {
-    LOGI("Calling LoadScanlinesIntoTextureFromWorkingMemory() in C++ Plugin");
+    LOGI("Calling LoadScanlinesIntoTextureFromWorkingMemory()");
 
     LOGI("glBindTexture(GL_TEXTURE_2D, textureId)");
     GLuint textureId = m_textureIDs[m_currTextureIndex];
@@ -174,7 +174,7 @@ void LoadScanlinesIntoTextureFromWorkingMemory()
         m_isLoadingIntoTexture = false;
     }
 
-    LOGI("Finished LoadScanlinesIntoTextureFromWorkingMemory() in C++ Plugin! Loading in progress = %d", m_isLoadingIntoTexture);
+    LOGI("Finished LoadScanlinesIntoTextureFromWorkingMemory()! Loading in progress = %d", m_isLoadingIntoTexture);
 }
 
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
@@ -209,6 +209,16 @@ UnityRenderingEvent GetRenderEventFunc()
     return OnRenderEvent;
 }
 
+void SetInitMaxNumTextures(int initMaxNumTextures)
+{
+    m_initMaxNumTextures = initMaxNumTextures;
+}
+
+void SetCurrTextureIndex(int currTextureIndex)
+{
+    m_currTextureIndex = currTextureIndex;
+}
+
 bool IsLoadingIntoTexture()
 {
     return m_isLoadingIntoTexture;
@@ -231,7 +241,7 @@ int GetCurrStoredImageHeight()
 
 bool LoadIntoWorkingMemoryFromImagePath(char* pFileName)
 {
-    LOGI("Calling LoadIntoWorkingMemoryFromImagePath() in C++ Plugin");
+    LOGI("Calling LoadIntoWorkingMemoryFromImagePath()");
 
     int type = -1;
     m_currImageWidth = m_currImageHeight = 0;
@@ -246,14 +256,14 @@ bool LoadIntoWorkingMemoryFromImagePath(char* pFileName)
         LOGI("ERROR - Image Loaded is greater than Working Memory!!!");
     }
 
-    LOGI("Finished LoadIntoWorkingMemoryFromImagePath() in C++ Plugin!");
+    LOGI("Finished LoadIntoWorkingMemoryFromImagePath()!");
 
     return (m_currImageWidth * m_currImageHeight) > 0;
 }
 
 bool LoadIntoWorkingMemoryFromImageData(void* pRawData, int dataLength)
 {
-    LOGI("Calling LoadIntoWorkingMemoryFromImageData() in C++ Plugin");
+    LOGI("Calling LoadIntoWorkingMemoryFromImageData()");
 
     int type = -1;
     m_currImageWidth = m_currImageHeight = 0;
@@ -268,7 +278,7 @@ bool LoadIntoWorkingMemoryFromImageData(void* pRawData, int dataLength)
         LOGI("ERROR - Image Loaded is greater than Working Memory!!!");
     }
 
-    LOGI("Finished LoadIntoWorkingMemoryFromImageData() in C++ Plugin!");
+    LOGI("Finished LoadIntoWorkingMemoryFromImageData()!");
 
     return (m_currImageWidth * m_currImageHeight) > 0;
 }

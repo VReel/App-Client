@@ -12,11 +12,15 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
 
     private int m_imageSphereIndex = -1; // ImageSphere's know their index - this is currently only for Debug!
+    private int m_currPluginTextureIndex = -1; // ImageSphere's track the index of the underlying texture they are pointing to in the C++ plugin
     private Texture2D m_imageSphereTexture;
     private string m_imageFilePath; // All ImageSphere's have a path (either through the internet, or local to the device) associated with them!
     private CoroutineQueue m_coroutineQueue;
 
     private const float kMinShrink = 0.0005f; // Minimum value the sphere will shrink to...
+    private const int kLoadingTextureIndex = -1;
+
+    // TODO: Detelete these two strings below
     private const string kEmptyString = "emptyString";
     private const string kLoadingTextureFilePath = "LoadingImage";
 
@@ -39,14 +43,23 @@ public class ImageSphere : MonoBehaviour
     public string GetImageFilePath()
     {
         return m_imageFilePath;
-    }        
+    }
 
-    public void SetImageAndFilePath(Texture2D texture, string filePath)
+    public int GetCurrPluginTextureIndex()
+    {
+        return m_currPluginTextureIndex;
+    }
+
+    public void SetImageAndFilePath(Texture2D texture, string filePath, int pluginTextureIndex)
     {
         m_imageFilePath = filePath;
         m_imageSphereTexture = texture;
+        m_currPluginTextureIndex = pluginTextureIndex;
 
-        Debug.Log("------- VREEL: Finished Loading Image from Texture2D, about to set texture with width x height:  " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
+        Debug.Log("------- VREEL: Finished Loading Image from Texture2D, " +
+            "FilePath = " + m_imageFilePath +
+            " , PluginTextureIndex = " + pluginTextureIndex +
+            " , Texture size = " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
 
         m_coroutineQueue.Clear();
         m_coroutineQueue.EnqueueAction(AnimateSetTexture());
@@ -78,6 +91,7 @@ public class ImageSphere : MonoBehaviour
 
     public void Hide()
     {
+        m_currPluginTextureIndex = kLoadingTextureIndex;
         m_imageFilePath = kEmptyString;
 
         m_coroutineQueue.Clear();
@@ -86,6 +100,7 @@ public class ImageSphere : MonoBehaviour
 
     public void ForceHide()
     {
+        m_currPluginTextureIndex = kLoadingTextureIndex;
         m_imageFilePath = kEmptyString;
 
         m_coroutineQueue.Clear();
@@ -152,7 +167,7 @@ public class ImageSphere : MonoBehaviour
     {    
         Debug.Log("------- VREEL: SetSkybox() got called on sphere: " + m_imageSphereIndex+1);
 
-        if (m_imageSphereSkybox != null && m_imageFilePath != kEmptyString && m_imageFilePath != kLoadingTextureFilePath)
+        if (m_imageSphereSkybox != null && m_currPluginTextureIndex != kLoadingTextureIndex)
         {            
             m_imageSphereSkybox.SetImageAndPath(m_imageSphereTexture, m_imageFilePath);
         }

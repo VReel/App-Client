@@ -26,6 +26,23 @@ public class ImageSphereController : MonoBehaviour
         SetIndexOnAllImageSpheres();
     }
 
+    public int GetAvailablePluginTextureIndex(int sphereIndex)
+    {
+        int textureIndexAvailable = -1;
+
+        int currTextureIndex = m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().GetCurrPluginTextureIndex();
+        if (currTextureIndex == -1 || currTextureIndex == (sphereIndex + GetNumSpheres()) )
+        {
+            textureIndexAvailable = sphereIndex;
+        }
+        else if (currTextureIndex == sphereIndex)
+        {
+            textureIndexAvailable = sphereIndex + GetNumSpheres();
+        }
+
+        return textureIndexAvailable;
+    }
+
     public float GetDefaultSphereScale()
     {
         return m_defaultSphereScale;
@@ -41,19 +58,20 @@ public class ImageSphereController : MonoBehaviour
         return m_imageSpheres.GetLength(0);
     }
 
+    //TODO: Have an underlying texture reserved just for the Loading image!
     public void SetAllImageSpheresToLoading()
     {
         for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
         {
-            SetImageAndFilePathAtIndex(sphereIndex, m_loadingSphereTexture, kLoadingTextureFilePath);
+            SetImageAndFilePathAtIndex(sphereIndex, m_loadingSphereTexture, kLoadingTextureFilePath, -1);
         }
     }
 
-    public void SetImageAndFilePathAtIndex(int sphereIndex, Texture2D texture, string filePath)
+    public void SetImageAndFilePathAtIndex(int sphereIndex, Texture2D texture, string filePath, int pluginTextureIndex)
     {
         if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
         {
-            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetImageAndFilePath(texture, filePath);
+            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetImageAndFilePath(texture, filePath, pluginTextureIndex);
         }
         else
         {

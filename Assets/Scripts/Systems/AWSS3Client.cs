@@ -445,7 +445,7 @@ public class AWSS3Client : MonoBehaviour
 
         Texture2D newImage = new Texture2D(2,2); 
         newImage.LoadImage(myBinary);
-        m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, newImage, fullFilePath);
+        m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, newImage, fullFilePath, -1);
         yield return new WaitForEndOfFrame();
 
         Debug.Log("------- VREEL: Finished Setting Image!");

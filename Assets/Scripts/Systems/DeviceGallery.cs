@@ -304,91 +304,10 @@ public class DeviceGallery : MonoBehaviour
         Debug.Log("------- VREEL: Finished LoadImageIntoTexture()");
 
         Debug.Log("------- VREEL: Calling SetImageAndFilePath()");
-        m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, myNewTexture2D, filePath);
+        m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, myNewTexture2D, filePath, -1);
         yield return new WaitForEndOfFrame();
         Debug.Log("------- VREEL: Finished SetImageAndFilePath()");
 
         Resources.UnloadUnusedAssets();
     }
-
-    /*
-    private IEnumerator LoadImagesInternal(string filePath, int sphereIndex, int thisGalleryImageIndex, int numImages)
-    {                           
-        bool imageRequestStillValid = 
-            (m_currGalleryImageIndex != -1) && 
-            (m_currGalleryImageIndex <= thisGalleryImageIndex) &&  
-            (thisGalleryImageIndex < m_currGalleryImageIndex + numImages) && // Request no longer valid as user has moved on from this page
-            (filePath.CompareTo(m_imageSkybox.GetImageFilePath()) != 0); // If file-path is the same then ignore request
-        
-        string logString02 = string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", imageRequestStillValid, m_currGalleryImageIndex, thisGalleryImageIndex, numImages); 
-        Debug.Log(logString02);
-        if (!imageRequestStillValid)
-        {
-            Debug.Log("------- VREEL: Gallery request stopped because user has moved off that page: " + filePath);
-            yield break;
-        }
-
-        Debug.Log("------- VREEL: Loading from filePath: " + filePath);
-
-        //private System.Threading.Thread m_thread;
-
-        // NOTE: When I keep calling www.texture it will crash due to multiple allocations!
-
-        WWW www = new WWW("file://" + filePath);
-        //string path = "/storage/emulated/0/DCIM/Gear 360/SAM_100_0093.jpg";
-        //WWW www = new WWW("file://" + path);
-        //string url = "http://lookingglass.services/wp-content/uploads/2016/06/360panorama.jpg"; // 950KB
-        //string url = "https://upload.wikimedia.org/wikipedia/commons/6/6f/Helvellyn_Striding_Edge_360_Panorama,_Lake_District_-_June_09.jpg"; // 9.3MB
-        //WWW www = new WWW(url);
-        yield return www;
-
-        //UnityWebRequest uwr = new UnityWebRequest(url);
-
-        UnityWebRequest uwr = new UnityWebRequest("file://" + filePath);
-        DownloadHandlerTexture textureDownloadHandler = new DownloadHandlerTexture(true);
-        uwr.downloadHandler = textureDownloadHandler;
-        yield return uwr.Send();
-        if(uwr.isError) 
-        {
-            Debug.Log("------- VREEL: Error on loading texture");
-            yield break;
-        }
-
-        Texture2D t = textureDownloadHandler.texture;
-        Debug.Log("------- VREEL: Downloaded texture of size height x width: " + t.height + " x " + t.width);
-
-
-        //ResourceRequest request = Resources.LoadAsync(filePath);
-        //yield return request;
-        //m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndFilePath(request.asset as Texture2D, filePath);
-
-        //byte[] fileByteData = File.ReadAllBytes(filePath); // make sure to have Write Access: External (SDCard)
-        //Texture2D texture = new Texture2D(2, 2);
-        //texture.LoadImage(fileByteData);
-
-        //coroutineQueue.EnqueueAction(LoadImagesInternal2(www.texture, filePath, sphereIndex));
-        //coroutineQueue.EnqueueWait(2.0f);
-
-        //Debug.Log("------- VREEL: Loaded data into texture");
-
-        // TODO: Make the copying of www.texture into this function call not block! 
-        //Debug.Log("------- VREEL: Calling SetImageAndFilePath which will block on copying texture of size height x width: " + www.texture.height + " x " + www.texture.width);
-        //m_imageSpheres[sphereIndex].GetComponent<SelectImage>().SetImageAndFilePath(ref www, filePath);
-        m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, www.texture, filePath);
-
-        
-        SelectImage currImageSphere = m_imageSpheres[sphereIndex].GetComponent<SelectImage>();
-
-        System.Threading.Thread tempThread = new Thread(() => 
-            currImageSphere.SetImageAndFilePath(www.texture, filePath));
-
-        tempThread.Start();
-        yield return tempThread.Join();
-
-
-        //Debug.Log("------- VREEL: Set texture on ImageSphere");
-
-        Resources.UnloadUnusedAssets();
-    }
-*/
 }
