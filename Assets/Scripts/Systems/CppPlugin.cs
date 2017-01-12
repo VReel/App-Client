@@ -42,10 +42,8 @@ public class CppPlugin
     // Member Variables
     // **************************
 
-    // TODO: Have this come from the ImageSphereController or something of the like
-    private const int kMaxNumTextures = (5 * 2) + (1 * 2); // 5 ImageSpheres plus 1 SkyboxSphere
-
     private MonoBehaviour m_owner = null;
+    private ThreadJob m_threadJob;
 
     // These are functions that use OpenGL and hence must be run from the Render Thread!
     enum RenderFunctions
@@ -68,13 +66,15 @@ public class CppPlugin
     // (5) Finally CreateExternalTexture() is called with the texture that’s been created beneath us! 
     // (6) Terminate() calls glDeleteTextures() and delete[] on m_pWorkingMemory
 
-    public CppPlugin(MonoBehaviour owner)
+    public CppPlugin(MonoBehaviour owner, int maxNumTextures)
     {
         m_owner = owner;
         Debug.Log("------- VREEL: A CppPlugin was created by = " + m_owner.name);
 
-        SetInitMaxNumTextures(kMaxNumTextures);
+        SetInitMaxNumTextures(maxNumTextures);
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kInit);
+
+        m_threadJob = new ThreadJob(owner);
 
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
@@ -86,26 +86,25 @@ public class CppPlugin
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kTerminate);
     }
 
-    public IEnumerator LoadImageFromPath(ThreadJob threadJob, ImageSphereController imageSphereController, int sphereIndex, string filePath)
+    public IEnumerator LoadImageFromPath(ImageSphereController imageSphereController, int sphereIndex, string filePath, int textureIndex)
     {
         yield return new WaitForEndOfFrame();
-        Debug.Log("------- VREEL: Calling LoadPicturesInternal() from filePath: " + filePath);
+        Debug.Log("------- VREEL: Calling LoadImageFromPath() from filePath: " + filePath + ", with TextureIndex: " + textureIndex);
         StringBuilder filePathForCpp = new StringBuilder(filePath);
 
         Debug.Log("------- VREEL: Calling LoadIntoWorkingMemoryFromImagePath(), on background thread!");
-        yield return threadJob.WaitFor();
+        yield return m_threadJob.WaitFor();
         bool ranJobSuccessfully = false;
-        threadJob.Start( () => 
+        m_threadJob.Start( () => 
             ranJobSuccessfully = LoadIntoWorkingMemoryFromImagePath(filePathForCpp)
         );
-        yield return threadJob.WaitFor();
+        yield return m_threadJob.WaitFor();
         Debug.Log("------- VREEL: Finished LoadIntoWorkingMemoryFromImagePath(), ran Job Successully = " + ranJobSuccessfully); 
 
 
         Debug.Log("------- VREEL: Calling CreateEmptyTexture()");
         yield return new WaitForEndOfFrame();
-        int availablePluginTextureIndex = imageSphereController.GetAvailablePluginTextureIndex(sphereIndex);
-        SetCurrTextureIndex(availablePluginTextureIndex);
+        SetCurrTextureIndex(textureIndex);
         yield return new WaitForEndOfFrame();
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kCreateEmptyTexture);
         yield return new WaitForSeconds(0.1f); // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
@@ -137,45 +136,44 @@ public class CppPlugin
 
 
         Debug.Log("------- VREEL: Calling SetImageAndFilePath()");
-        imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, newTexture, filePath, availablePluginTextureIndex);
+        imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, newTexture, filePath, textureIndex);
         yield return new WaitForEndOfFrame();
         Debug.Log("------- VREEL: Finished SetImageAndFilePath()");
 
         Resources.UnloadUnusedAssets();
     }   
 
-    public IEnumerator LoadImageFromStream(ThreadJob threadJob, Stream imageStream, ImageSphereController imageSphereController, int sphereIndex, string filePath)
+    public IEnumerator LoadImageFromStream(ImageSphereController imageSphereController, int sphereIndex, Stream imageStream, string filePath, int textureIndex)
     {        
         yield return new WaitForEndOfFrame();
-        Debug.Log("------- VREEL: ConvertStreamAndSetImage for " + filePath);
+        Debug.Log("------- VREEL: Calling LoadImageFromStream() for " + filePath + ", with TextureIndex: " + textureIndex);
 
         Debug.Log("------- VREEL: Calling ToByteArray(), on background thread!");
-        yield return threadJob.WaitFor();
+        yield return m_threadJob.WaitFor();
         bool ranJobSuccessfully = false;
         byte[] myBinary = null;
-        threadJob.Start( () => 
+        m_threadJob.Start( () => 
             ranJobSuccessfully = ToByteArray(imageStream, ref myBinary)
         );
-        yield return threadJob.WaitFor();
+        yield return m_threadJob.WaitFor();
         Debug.Log("------- VREEL: Finished ToByteArray(), ran Job Successully = " + ranJobSuccessfully);
 
         Debug.Log("------- VREEL: Calling LoadIntoWorkingMemoryFromImagePath(), on background thread!");
         GCHandle rawDataHandle = GCHandle.Alloc(myBinary, GCHandleType.Pinned);
         IntPtr rawDataPtr = rawDataHandle.AddrOfPinnedObject();
-        yield return threadJob.WaitFor();
+        yield return m_threadJob.WaitFor();
         ranJobSuccessfully = false;
-        threadJob.Start( () => 
+        m_threadJob.Start( () => 
             ranJobSuccessfully = LoadIntoWorkingMemoryFromImageData(rawDataPtr, myBinary.Length)
         );
-        yield return threadJob.WaitFor();
+        yield return m_threadJob.WaitFor();
         rawDataHandle.Free();
         Debug.Log("------- VREEL: Finished LoadIntoWorkingMemoryFromImagePath(), ran Job Successully = " + ranJobSuccessfully); 
 
 
         Debug.Log("------- VREEL: Calling CreateEmptyTexture()");
         yield return new WaitForEndOfFrame();
-        int availablePluginTextureIndex = imageSphereController.GetAvailablePluginTextureIndex(sphereIndex);
-        SetCurrTextureIndex(availablePluginTextureIndex);
+        SetCurrTextureIndex(textureIndex);
         yield return new WaitForEndOfFrame();
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kCreateEmptyTexture);
         yield return new WaitForSeconds(0.1f); // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
@@ -207,7 +205,7 @@ public class CppPlugin
 
 
         Debug.Log("------- VREEL: Calling SetImageAndFilePath()");
-        imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, newTexture, filePath, availablePluginTextureIndex);
+        imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, newTexture, filePath, textureIndex);
         yield return new WaitForEndOfFrame();
         Debug.Log("------- VREEL: Finished SetImageAndFilePath()");
 

@@ -32,8 +32,6 @@ public class AWSS3Client : MonoBehaviour
     private int m_currS3ImageFilePathIndex = -1;
     private List<string> m_s3ImageFilePaths;
     private CoroutineQueue m_coroutineQueue;
-    private ThreadJob m_threadJob;
-    private CppPlugin m_cppPlugin;
 
     private const float kImageRequestDelay = 2.0f;
 
@@ -49,9 +47,6 @@ public class AWSS3Client : MonoBehaviour
 
         m_coroutineQueue = new CoroutineQueue( this );
         m_coroutineQueue.StartLoop();
-
-        m_threadJob = new ThreadJob(this);
-        m_cppPlugin = new CppPlugin(this);
 
         m_staticLoadingIcon.SetActive(false);
 	}
@@ -407,7 +402,7 @@ public class AWSS3Client : MonoBehaviour
 
         using (var stream = response.ResponseStream)
         {
-            yield return m_cppPlugin.LoadImageFromStream(m_threadJob, stream, m_imageSphereController, sphereIndex, fullFilePath);
+            yield return m_imageSphereController.LoadImageFromStream(stream, sphereIndex, fullFilePath);
         }
     }
         

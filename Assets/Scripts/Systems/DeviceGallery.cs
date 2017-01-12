@@ -23,8 +23,6 @@ public class DeviceGallery : MonoBehaviour
     private List<string> m_galleryImageFilePaths;
     private CoroutineQueue m_coroutineQueue;
     private AndroidJavaClass m_javaPluginClass;
-    private ThreadJob m_threadJob;
-    private CppPlugin m_cppPlugin;
 
     // **************************
     // Public functions
@@ -38,9 +36,6 @@ public class DeviceGallery : MonoBehaviour
         m_galleryImageFilePaths = new List<string>();
         m_coroutineQueue = new CoroutineQueue( this );
         m_coroutineQueue.StartLoop();
-
-        m_threadJob = new ThreadJob(this);
-        m_cppPlugin = new CppPlugin(this);
     }
 
     public void InvalidateGalleryImageLoading() // This function is called in order to stop any ongoing image loading 
@@ -114,6 +109,7 @@ public class DeviceGallery : MonoBehaviour
     // Private/Helper functions
     // **************************
 
+    // TODO: Make this not block!!!
     private IEnumerator StoreAllImageGalleryFilePaths(string imagesTopLevelDirectory)
     {        
         // TODO: Make sure this whole function doesn't block at all - 
@@ -287,7 +283,7 @@ public class DeviceGallery : MonoBehaviour
 
     private IEnumerator LoadImageInternalPlugin(string filePath, int sphereIndex)
     {   
-        yield return m_cppPlugin.LoadImageFromPath(m_threadJob, m_imageSphereController, sphereIndex, filePath);
+        yield return m_imageSphereController.LoadImageFromPath(sphereIndex, filePath);
     }
 
     private IEnumerator LoadImageInternalUnity(string filePath, int sphereIndex)

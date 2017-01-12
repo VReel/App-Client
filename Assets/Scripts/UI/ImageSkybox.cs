@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;           // IEnumerator
 
 public class ImageSkybox : MonoBehaviour 
 {
@@ -6,11 +7,13 @@ public class ImageSkybox : MonoBehaviour
     // Member Variables
     // **************************
 
+    [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private GameObject m_uploadButton;
 
+    private int m_currTextureIndex = -1; // ImageSkybox must track the index of the underlying texture it points to in C++ plugin
     private Texture2D m_skyboxTexture;
     private string m_imageFilePath; // Points to where the Image came from (S3 Bucket, or Local Device)
-    private string m_imagesTopLevelDirectory;
+    private string m_imagesTopLevelDirectory;   
 
     // **************************
     // Public functions
@@ -43,7 +46,7 @@ public class ImageSkybox : MonoBehaviour
         m_imagesTopLevelDirectory = imagesTopLevelDirectory;
     }
 
-    public void SetImageAndPath(Texture2D texture, string filePath)
+    public void SetImageAndPath(Texture2D texture, string filePath, int textureIndex)
     {        
         if (filePath.Length <= 0)
         {
@@ -55,14 +58,19 @@ public class ImageSkybox : MonoBehaviour
         m_imageFilePath = filePath;
         m_skyboxTexture = texture;
 
+        m_imageSphereController.SetTextureInUse(m_currTextureIndex, false);
+        m_currTextureIndex = textureIndex;
+        m_imageSphereController.SetTextureInUse(m_currTextureIndex, true);
+
         // Currently the ImageSkybox class is responsible for switching on the Upload button when its possible to select it
         bool isImageFromDevice = m_imageFilePath.StartsWith(m_imagesTopLevelDirectory);
         m_uploadButton.SetActive(isImageFromDevice);
 
         gameObject.GetComponent<MeshRenderer>().material.mainTexture = m_skyboxTexture;
 
-        // RenderSettings.skybox = texture; // TODO: have the skybox be used instead of this sphere around the user
+        // TODO: have the skybox be used instead of just a sphere around the user
+        // RenderSettings.skybox = texture; 
 
-        Debug.Log("------- VREEL: Changed skybox to = " + filePath);
+        Debug.Log("------- VREEL: Changed skybox to = " + m_imageFilePath + ", with TextureID = " + m_currTextureIndex);
     }
 }
