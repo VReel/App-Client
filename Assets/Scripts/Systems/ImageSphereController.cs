@@ -20,7 +20,7 @@ public class ImageSphereController : MonoBehaviour
     private const int kLoadingTextureIndex = -1;
     private string kLoadingTextureFilePath = "LoadingImage";
 
-    private const int kMaxNumTextures = 8; // 5 ImageSpheres + 1 Skybox + 2 spare textures
+    private const int kMaxNumTextures = 9; // 5 ImageSpheres + 1 Skybox + 3 spare textures
     private int[] m_textureIndexUsage;
     private CppPlugin m_cppPlugin;
 

@@ -47,6 +47,8 @@ public class ImageSphere : MonoBehaviour
 
     public void SetImageAndFilePath(Texture2D texture, string filePath, int textureIndex)
     {
+        m_imageSphereController.SetTextureInUse(textureIndex, true);
+
         m_imageFilePath = filePath;
         m_imageSphereTexture = texture;
 
@@ -54,20 +56,6 @@ public class ImageSphere : MonoBehaviour
             "FilePath = " + m_imageFilePath +
             " , PluginTextureIndex = " + textureIndex +
             " , Texture size = " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
-
-        m_coroutineQueue.Clear();
-        m_coroutineQueue.EnqueueAction(AnimateSetTexture(textureIndex));
-    }
-
-    public void SetImageAndFilePath(IntPtr texturePtr, string filePath, int textureIndex)
-    {
-        m_imageFilePath = filePath;
-        m_imageSphereTexture.UpdateExternalTexture(texturePtr);
-
-        Debug.Log("------- VREEL: Finished Loading Image from Texture2D, " +
-            "FilePath = " + m_imageFilePath +
-            " , PluginTextureIndex = " + textureIndex +
-            " , TexturePtr = " + texturePtr);
 
         m_coroutineQueue.Clear();
         m_coroutineQueue.EnqueueAction(AnimateSetTexture(textureIndex));
@@ -112,7 +100,6 @@ public class ImageSphere : MonoBehaviour
 
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, false);
         m_currTextureIndex = textureIndex;
-        m_imageSphereController.SetTextureInUse(m_currTextureIndex, true);
 
         // Scale up
         while (transform.localScale.magnitude < defaultScale)

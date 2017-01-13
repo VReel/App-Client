@@ -2,6 +2,7 @@
 using Amazon;
 using Amazon.CognitoIdentity;           // CognitoAWSCredentials
 using Amazon.MobileAnalytics.MobileAnalyticsManager; // MobileAnalyticsManager
+using System.Collections;               // IEnumerator
 
 public class Analytics : MonoBehaviour 
 {
@@ -14,6 +15,7 @@ public class Analytics : MonoBehaviour
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
 
     private MobileAnalyticsManager m_analyticsManager;
+    private CoroutineQueue m_coroutineQueue;
 
     // **************************
     // Public functions
@@ -32,6 +34,9 @@ public class Analytics : MonoBehaviour
             credentials,
             RegionEndpoint.USEast1 // Cognito Identity Region
         ); 
+
+        m_coroutineQueue = new CoroutineQueue( this );
+        m_coroutineQueue.StartLoop();
     }
 
     public void ProfileSelected()
@@ -52,10 +57,7 @@ public class Analytics : MonoBehaviour
 
     public void LoginSelected()
     {
-        CustomEvent customEvent = new CustomEvent("LoginSelected");
-        customEvent.AddAttribute("CognitoID", m_userLogin.GetCognitoUserID());
-
-        m_analyticsManager.RecordEvent(customEvent);
+        m_coroutineQueue.EnqueueAction(LoginSelectedInternal());
     }
 
     public void LogoutSelected()
@@ -138,6 +140,19 @@ public class Analytics : MonoBehaviour
     // **************************
     // Private/Helper functions
     // **************************
+
+    private IEnumerator LoginSelectedInternal()
+    {
+        while (!m_userLogin.HasCachedCognitoUserID())
+        {
+            yield return null;
+        }
+
+        CustomEvent customEvent = new CustomEvent("LoginSelected");
+        customEvent.AddAttribute("CognitoID", m_userLogin.GetCognitoUserID());
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
 
     // You want this session management code only in one game object
     // that persists through the game life cycles using “DontDestroyOnLoad (transform.gameObject);”

@@ -26,7 +26,7 @@ stbi_uc* m_pWorkingMemory = NULL;
 int m_currImageWidth = 0;
 int m_currImageHeight = 0;
 
-const int kMaxPixelsUploadedPerFrame = 1 * 1024 * 1024;
+int m_maxPixelsUploadedPerFrame = 1 * 1024 * 1024;
 bool m_isLoadingIntoTexture = false;
 GLint m_textureLoadingYOffset = 0;
 
@@ -158,7 +158,7 @@ void LoadScanlinesIntoTextureFromWorkingMemory()
 
     // Each iteration we upload up to kMaxPixelsPerUpload worth of width-long scanlines,
     //  up until the last one where we only upload the remaining scanlines
-    const GLint kIdealNumberOfScanlinesToUpload = kMaxPixelsUploadedPerFrame/m_currImageWidth;
+    const GLint kIdealNumberOfScanlinesToUpload = m_maxPixelsUploadedPerFrame/m_currImageWidth;
     GLsizei height = (m_textureLoadingYOffset + kIdealNumberOfScanlinesToUpload < m_currImageHeight)
                      ? kIdealNumberOfScanlinesToUpload
                      : (m_currImageHeight - m_textureLoadingYOffset);
@@ -212,6 +212,11 @@ UnityRenderingEvent GetRenderEventFunc()
 void SetInitMaxNumTextures(int initMaxNumTextures)
 {
     m_initMaxNumTextures = initMaxNumTextures;
+}
+
+void SetMaxPixelsUploadedPerFrame(int maxPixelsUploadedPerFrame)
+{
+    m_maxPixelsUploadedPerFrame = maxPixelsUploadedPerFrame;
 }
 
 void SetCurrTextureIndex(int currTextureIndex)

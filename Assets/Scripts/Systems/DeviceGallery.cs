@@ -285,7 +285,6 @@ public class DeviceGallery : MonoBehaviour
                 if (filePathStillValid)
                 {
                     m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(filePath, sphereIndex));
-                    m_coroutineQueue.EnqueueWait(2.0f);
                 }
             }
             else

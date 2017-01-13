@@ -55,35 +55,36 @@ public class UserLogin : MonoBehaviour
         m_cachedCognitoId = cognitoUserID;
     }
 
-    public string GetCognitoUserID()
+    public bool HasCachedCognitoUserID()
     {
-        string userID = "Error";
-        if (FB.IsInitialized && FB.IsLoggedIn && m_cachedCognitoId != "")
-        {
-            userID = m_cachedCognitoId;
-        }
-        else 
-        {
-            Debug.Log("------- VREEL: ERROR - UserID queried but FB is not LoggedIn!");
-        }
-
-        return userID;
+        return m_cachedCognitoId.Length > 0;
     }
 
+    public string GetCognitoUserID()
+    {        
+        if (FB.IsInitialized && FB.IsLoggedIn && HasCachedCognitoUserID())
+        {
+            return m_cachedCognitoId;
+        }
+
+        Debug.Log("------- VREEL: ERROR - CognitoUserID queried but FB is not LoggedIn!");
+
+        return "Error";
+    }
+
+    /*
     public string GetFBUserID()
     {
-        string userID = "Error";
         if (FB.IsInitialized && FB.IsLoggedIn)
         {
-            userID = m_cachedFBId;
-        }
-        else 
-        {
-            Debug.Log("------- VREEL: ERROR - UserID queried but FB is not LoggedIn!");
+            return m_cachedFBId;
         }
 
-        return userID;
+        Debug.Log("------- VREEL: ERROR - FBUserID queried but FB is not LoggedIn!");
+
+        return "Error";  
     }
+    */
 
     public bool HasCachedUsername()
     {
@@ -91,18 +92,15 @@ public class UserLogin : MonoBehaviour
     }
 
     public string GetUsername()
-    {
-        string username = "Error";
-        if (FB.IsInitialized && FB.IsLoggedIn)
+    {        
+        if (FB.IsInitialized && FB.IsLoggedIn && HasCachedUsername())
         {
-            username = m_cachedFBUsername;
+            return m_cachedFBUsername;
         }
-        else 
-        {
-            Debug.Log("------- VREEL: ERROR - Username queried but FB is not LoggedIn!");
-        }            
 
-        return username;
+        Debug.Log("------- VREEL: ERROR - Username queried but FB is not LoggedIn!");
+
+        return "Error";
     }
 
     // **************************
@@ -149,6 +147,27 @@ public class UserLogin : MonoBehaviour
         }
     }
 
+    private void CacheFacebookIdAndUsername()
+    {
+        m_cachedFBId = AccessToken.CurrentAccessToken.UserId.ToString();
+        FB.API("/me?fields=first_name", HttpMethod.GET, UsernameCallback);
+    }
+
+    private void UsernameCallback(IGraphResult result)
+    {
+        Debug.Log("------- VREEL: UsernameCallback() called!");
+        if (FB.IsLoggedIn && result.Error == null)
+        {                                    
+            m_cachedFBUsername = result.ResultDictionary["first_name"] as string;
+        }
+        else 
+        {
+            Debug.Log("------- VREEL: Error Response: " + result.Error);
+        }
+
+        Debug.Log("------- VREEL: Cached Username as: " + m_cachedFBUsername);
+    }
+
     private IEnumerator LoginWithFacebookInternal()
     {
         yield return m_appDirector.VerifyInternetConnection();
@@ -157,6 +176,10 @@ public class UserLogin : MonoBehaviour
         {                       
             Debug.Log("------- VREEL: User about to Log In to Facebook");
 
+            // TODO: Improve the usage of this function as it does 2 bad things:
+            // (1) It frames out when its called...
+            // (2) If called in VR when the user is logging in for their first time, 
+            //      it expects users to come out of VR to accept Facebook Login...
             FB.LogInWithReadPermissions(null, (logInResponseObj) => 
             {
                 if (FB.IsLoggedIn)
@@ -189,27 +212,6 @@ public class UserLogin : MonoBehaviour
             FB.LogOut();
             m_appDirector.RequestLoginState();
         }
-    }
-
-    private void CacheFacebookIdAndUsername()
-    {
-        m_cachedFBId = AccessToken.CurrentAccessToken.UserId.ToString();
-        FB.API("/me?fields=first_name", HttpMethod.GET, UsernameCallback);
-    }
-
-    private void UsernameCallback(IGraphResult result)
-    {
-        Debug.Log("------- VREEL: UsernameCallback() called!");
-        if (FB.IsLoggedIn && result.Error == null)
-        {                                    
-            m_cachedFBUsername = result.ResultDictionary["first_name"] as string;
-        }
-        else 
-        {
-            Debug.Log("------- VREEL: Error Response: " + result.Error);
-        }
-
-        Debug.Log("------- VREEL: Cached Username as: " + m_cachedFBUsername);
     }
 
     private IEnumerator ProgressAppDirectorPastLogin()

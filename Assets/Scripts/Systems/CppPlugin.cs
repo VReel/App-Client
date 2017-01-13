@@ -28,6 +28,9 @@ public class CppPlugin
     private static extern void SetInitMaxNumTextures(int initMaxNumTextures);
 
     [DllImport ("cppplugin")]
+    private static extern void SetMaxPixelsUploadedPerFrame(int maxPixelsUploadedPerFrame);
+
+    [DllImport ("cppplugin")]
     private static extern void SetCurrTextureIndex(int currTextureIndex);
 
     [DllImport ("cppplugin")]
@@ -52,6 +55,8 @@ public class CppPlugin
     // Member Variables
     // **************************
 
+    private const int kMaxPixelsUploadedPerFrame = 1 * 1024 * 1024;
+    private const float kWaitForGLRenderCall = 2.0f/60.0f; // Wait 2 frames
     private MonoBehaviour m_owner = null;
     private ThreadJob m_threadJob;
 
@@ -73,6 +78,7 @@ public class CppPlugin
         m_owner = owner;
         Debug.Log("------- VREEL: A CppPlugin was Created and Initialised by = " + m_owner.name + " - with MaxNumTextures: " + maxNumTextures);
 
+        SetMaxPixelsUploadedPerFrame(kMaxPixelsUploadedPerFrame);
         SetInitMaxNumTextures(maxNumTextures);
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kInit);
 
@@ -107,7 +113,7 @@ public class CppPlugin
         SetCurrTextureIndex(textureIndex);
         yield return new WaitForEndOfFrame();
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kCreateEmptyTexture);
-        yield return new WaitForSeconds(0.1f); // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
+        yield return new WaitForSeconds(kWaitForGLRenderCall); // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
         Debug.Log("------- VREEL: Finished CreateEmptyTexture(), Texture Handle = " + GetCurrStoredTexturePtr() );
 
 
@@ -115,7 +121,7 @@ public class CppPlugin
         while (IsLoadingIntoTexture())
         {            
             GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kLoadScanlinesIntoTextureFromWorkingMemory);
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(kWaitForGLRenderCall);
         }
         Debug.Log("------- VREEL: Finished LoadScanlinesIntoTextureFromWorkingMemory()");
 
@@ -176,7 +182,7 @@ public class CppPlugin
         SetCurrTextureIndex(textureIndex);
         yield return new WaitForEndOfFrame();
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kCreateEmptyTexture);
-        yield return new WaitForSeconds(0.1f); // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
+        yield return new WaitForSeconds(kWaitForGLRenderCall); // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
         Debug.Log("------- VREEL: Finished CreateEmptyTexture(), Texture Handle = " + GetCurrStoredTexturePtr() );
 
 
@@ -184,7 +190,7 @@ public class CppPlugin
         while (IsLoadingIntoTexture())
         {            
             GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kLoadScanlinesIntoTextureFromWorkingMemory);
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(kWaitForGLRenderCall); // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
         }
         Debug.Log("------- VREEL: Finished LoadScanlinesIntoTextureFromWorkingMemory()");
 

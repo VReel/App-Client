@@ -33,8 +33,6 @@ public class AWSS3Client : MonoBehaviour
     private List<string> m_s3ImageFilePaths;
     private CoroutineQueue m_coroutineQueue;
 
-    private const float kImageRequestDelay = 2.0f;
-
     // **************************
     // Public functions
     // **************************
@@ -368,7 +366,6 @@ public class AWSS3Client : MonoBehaviour
                 if (imageRequestStillValid)
                 {
                     m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(response, sphereIndex, fullFilePath));
-                    m_coroutineQueue.EnqueueWait(kImageRequestDelay);
 
                     Debug.Log("------- VREEL: Successfully downloaded and requested to set " + fullFilePath);
                 }
