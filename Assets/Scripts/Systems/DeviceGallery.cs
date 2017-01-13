@@ -23,6 +23,7 @@ public class DeviceGallery : MonoBehaviour
     private List<string> m_galleryImageFilePaths;
     private CoroutineQueue m_coroutineQueue;
     private AndroidJavaClass m_javaPluginClass;
+    private ThreadJob m_threadJob;
 
     // **************************
     // Public functions
@@ -36,6 +37,8 @@ public class DeviceGallery : MonoBehaviour
         m_galleryImageFilePaths = new List<string>();
         m_coroutineQueue = new CoroutineQueue( this );
         m_coroutineQueue.StartLoop();
+
+        m_threadJob = new ThreadJob(this);
     }
 
     public void InvalidateGalleryImageLoading() // This function is called in order to stop any ongoing image loading 
@@ -109,19 +112,21 @@ public class DeviceGallery : MonoBehaviour
     // Private/Helper functions
     // **************************
 
-    // TODO: Make this not block!!!
     private IEnumerator StoreAllImageGalleryFilePaths(string imagesTopLevelDirectory)
-    {        
-        // TODO: Make sure this whole function doesn't block at all - 
-        //       Steps 1 and 2 can sort of be merged to reduce iterations per frame
-
+    {                
         // 1) Find all files that could potentially be 360 images.
-        var files = GetAllFileNamesRecursively(imagesTopLevelDirectory);
-        yield return new WaitForEndOfFrame();
+        Debug.Log("------- VREEL: Calling GetAllFileNamesRecursively()");
+        List<string> files = new List<string>();
+        m_threadJob.Start( () => 
+            files = GetAllFileNamesRecursively(imagesTopLevelDirectory)
+        );
+        yield return m_threadJob.WaitFor();
 
+        // TODO: Add CalcAspectRatio() to C++ Plugin, which should then allow me to thread this function out...
+        //      the only reason its not currently threaded is because of the Android Plugin needing to be called...
         // 2) Add the files that are actually 360 images to "m_galleryImageFilePaths"
-        // In order to reduce the block on the main thread we only search over kNumFilesPerIteration
-        const int kNumFilesPerIteration = 100;
+        Debug.Log("------- VREEL: Calling FilterAndAdd360Images()");
+        const int kNumFilesPerIteration = 1;
         int numFilesSearched = 0;
         foreach (string filePath in files)
         { 
@@ -132,21 +137,23 @@ public class DeviceGallery : MonoBehaviour
 
             numFilesSearched++;
             if (numFilesSearched % kNumFilesPerIteration == 0)
-            {
-                GC.Collect();
+            {                
                 yield return new WaitForEndOfFrame();
             }
         }
-            
+
         Debug.Log("------- VREEL: Searched the directory " + imagesTopLevelDirectory + ", through " + numFilesSearched +
             " files, and found " + m_galleryImageFilePaths.Count + " 360-image files!");
 
         // 3) Sort files in order of newest first, so that users see their most recent gallery images!
         yield return new WaitForEndOfFrame();
-        m_galleryImageFilePaths.Sort(delegate(string file1, string file2)
-        {
-            return File.GetCreationTime(file2).CompareTo(File.GetCreationTime(file1));
-        });
+        bool ranSuccessfully = false;
+        m_threadJob.Start( () => 
+            ranSuccessfully = SortGalleryImageFilePaths()           
+        );
+        yield return m_threadJob.WaitFor();
+
+        //GC.Collect();
 
         bool noImagesInGallery = m_galleryImageFilePaths.Count <= 0;
         m_noGalleryImagesText.SetActive(noImagesInGallery); // If the user has yet take any 360-images then show them the NoGalleryImagesText!
@@ -234,6 +241,16 @@ public class DeviceGallery : MonoBehaviour
         Debug.Log("------- VREEL: Image: " + filePath + " is 360: " + isImage360);
 
         return isImage360;
+    }
+
+    private bool SortGalleryImageFilePaths()
+    {
+        m_galleryImageFilePaths.Sort(delegate(string file1, string file2)
+        {
+            return File.GetCreationTime(file2).CompareTo(File.GetCreationTime(file1));
+        });
+
+        return true;
     }
 
     private IEnumerator LoadImages(int startingGalleryImageIndex, int numImagesToLoad)

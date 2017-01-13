@@ -73,30 +73,6 @@ public class ImageSphere : MonoBehaviour
         m_coroutineQueue.EnqueueAction(AnimateSetTexture(textureIndex));
     }
 
-    /*
-    public void SetImageAndFilePath(byte[] textureStream, string filePath)
-    {
-        m_imageFilePath = filePath;
-        m_imageSphereTexture.LoadImage(textureStream);
-
-        Debug.Log("------- VREEL: Finished Loading Image from TextureStream, about to set texture with width x height:  " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
-
-        m_coroutineQueue.Clear();
-        m_coroutineQueue.EnqueueAction(AnimateSetTexture());
-    }
-
-    public void SetImageAndFilePath(ref WWW www, string filePath)
-    {
-        m_imageFilePath = filePath;
-        www.LoadImageIntoTexture(m_imageSphereTexture);
-
-        Debug.Log("------- VREEL: Finished Loading Image from WWW, about to set texture with width x height:  " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
-
-        m_coroutineQueue.Clear();
-        m_coroutineQueue.EnqueueAction(AnimateSetTexture());
-    }
-    */
-
     public void Hide()
     {        
         m_imageFilePath = kEmptyString;

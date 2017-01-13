@@ -7,6 +7,16 @@ using System.Runtime.InteropServices; // DllImport
 
 public class CppPlugin
 {
+    // The C++ Plugin is predominantly used for Asynchronous Texture loading as Texture2D's only load Synchronously.
+    //
+    // It works with the following function order:
+    // (1) Init() calls glGenTextures() for m_initMaxNumTextures and allocates m_pWorkingMemory for pixel loading
+    // (2) LoadIntoWorkingMemoryFromImagePath() calls through to stbi_load() and sets pixels into m_pWorkingMemory
+    // (3) CreateEmptyTexture() calls glTexImage2D() hence allocating the actual texture
+    // (4) LoadScanlinesIntoTextureFromWorkingMemory() is called repeatedly until all scanlines are uploaded to the texture through glTexSubImage2D
+    // (5) Finally CreateExternalTexture() is called with the texture that’s been created beneath us! 
+    // (6) Terminate() calls glDeleteTextures() and delete[] on m_pWorkingMemory
+
     // **************************
     // C++ Plugin declerations
     // **************************
@@ -56,27 +66,17 @@ public class CppPlugin
 
     // **************************
     // Public functions
-    // **************************
-
-    // FUNCTION ORDER:
-    // (1) Init() calls glGenTextures() and allocates m_pWorkingMemory
-    // (2) LoadIntoWorkingMemoryFromImagePath() calls through to stbi_load() and sets pixels into m_pWorkingMemory
-    // (3) CreateEmptyTexture() calls glTexImage2D() hence allocating the actual texture
-    // (4) LoadScanlinesIntoTextureFromWorkingMemory() is called repeatedly until all scanlines are uploaded to the texture through glTexSubImage2D
-    // (5) Finally CreateExternalTexture() is called with the texture that’s been created beneath us! 
-    // (6) Terminate() calls glDeleteTextures() and delete[] on m_pWorkingMemory
+    // *************************
 
     public CppPlugin(MonoBehaviour owner, int maxNumTextures)
     {
         m_owner = owner;
-        Debug.Log("------- VREEL: A CppPlugin was created by = " + m_owner.name);
+        Debug.Log("------- VREEL: A CppPlugin was Created and Initialised by = " + m_owner.name + " - with MaxNumTextures: " + maxNumTextures);
 
         SetInitMaxNumTextures(maxNumTextures);
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kInit);
 
         m_threadJob = new ThreadJob(owner);
-
-        Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
 
     ~CppPlugin()

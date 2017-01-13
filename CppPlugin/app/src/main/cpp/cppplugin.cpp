@@ -20,8 +20,8 @@ GLuint* m_textureIDs;
 int m_initMaxNumTextures = 0; // Set on Init - sets maximum textures to gen!
 int m_currTextureIndex = 0;
 
-const int kMaxImageWidth = 12 * 1024;
-const int kMaxImageHeight = 6 * 1024;
+const int kMaxImageWidth = 16 * 1024;
+const int kMaxImageHeight = 8 * 1024;
 stbi_uc* m_pWorkingMemory = NULL;
 int m_currImageWidth = 0;
 int m_currImageHeight = 0;
