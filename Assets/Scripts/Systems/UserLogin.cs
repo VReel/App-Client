@@ -64,7 +64,7 @@ public class UserLogin : MonoBehaviour
         }
         else 
         {
-            Debug.Log("------- VREEL: ERROR - UserID queried but FB is not LoggedIn and we're not in the Editor!");
+            Debug.Log("------- VREEL: ERROR - UserID queried but FB is not LoggedIn!");
         }
 
         return userID;
@@ -79,7 +79,7 @@ public class UserLogin : MonoBehaviour
         }
         else 
         {
-            Debug.Log("------- VREEL: ERROR - UserID queried but FB is not LoggedIn and we're not in the Editor!");
+            Debug.Log("------- VREEL: ERROR - UserID queried but FB is not LoggedIn!");
         }
 
         return userID;
@@ -93,13 +93,13 @@ public class UserLogin : MonoBehaviour
     public string GetUsername()
     {
         string username = "Error";
-        if ( (FB.IsInitialized && FB.IsLoggedIn) || Application.isEditor)
+        if (FB.IsInitialized && FB.IsLoggedIn)
         {
             username = m_cachedFBUsername;
         }
         else 
         {
-            Debug.Log("------- VREEL: ERROR - Username queried but FB is not LoggedIn and we're not in the Editor!");
+            Debug.Log("------- VREEL: ERROR - Username queried but FB is not LoggedIn!");
         }            
 
         return username;
@@ -152,16 +152,6 @@ public class UserLogin : MonoBehaviour
     private IEnumerator LoginWithFacebookInternal()
     {
         yield return m_appDirector.VerifyInternetConnection();
-
-        if (Application.isEditor)
-        {
-            m_cachedCognitoId = "Editor";
-            m_cachedFBId = "1";
-            m_cachedFBUsername = "Editor";
-
-            m_appDirector.RequestProfileState();
-            yield break;
-        }
 
         if (FB.IsInitialized) // About to log into Cognito account through Facebook
         {                       
