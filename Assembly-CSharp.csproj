@@ -45,15 +45,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Examples\AmazonMobileAnalyticsSample.cs" />
-     <Compile Include="Assets\Examples\CognitoSyncManagerSample.cs" />
-     <Compile Include="Assets\Examples\DynamoDBBaseExample.cs" />
-     <Compile Include="Assets\Examples\DynamoDBExample.cs" />
-     <Compile Include="Assets\Examples\HighLevelTableExample.cs" />
-     <Compile Include="Assets\Examples\LowLevelTableExample.cs" />
-     <Compile Include="Assets\Examples\S3Example.cs" />
-     <Compile Include="Assets\Examples\SQSExample.cs" />
-     <Compile Include="Assets\Examples\TableQueryAndScanExample.cs" />
+     <Compile Include="Assets\AWSSDK\Examples\AmazonMobileAnalyticsSample.cs" />
+     <Compile Include="Assets\AWSSDK\Examples\CognitoSyncManagerSample.cs" />
+     <Compile Include="Assets\AWSSDK\Examples\DynamoDBBaseExample.cs" />
+     <Compile Include="Assets\AWSSDK\Examples\DynamoDBExample.cs" />
+     <Compile Include="Assets\AWSSDK\Examples\HighLevelTableExample.cs" />
+     <Compile Include="Assets\AWSSDK\Examples\LowLevelTableExample.cs" />
+     <Compile Include="Assets\AWSSDK\Examples\S3Example.cs" />
+     <Compile Include="Assets\AWSSDK\Examples\SQSExample.cs" />
+     <Compile Include="Assets\AWSSDK\Examples\TableQueryAndScanExample.cs" />
      <Compile Include="Assets\FacebookSDK\Examples\Scripts\ConsoleBase.cs" />
      <Compile Include="Assets\FacebookSDK\Examples\Scripts\LogView.cs" />
      <Compile Include="Assets\FacebookSDK\Examples\Scripts\MenuBase.cs" />
@@ -88,12 +88,17 @@
      <Compile Include="Assets\Scripts\UI\ImageSphere.cs" />
      <Compile Include="Assets\Scripts\UI\MenuBarButton.cs" />
      <Compile Include="Assets\Scripts\UI\SelectArrow.cs" />
-     <None Include="Assets\Examples\License.txt" />
-     <None Include="Assets\Standard Assets\Prototyping\Shaders\ProceduralSkyBox.shader" />
-     <None Include="Assets\Standard Assets\Prototyping\Shaders\WorldCoordDiffuse.shader" />
-     <None Include="Assets\Shader\UIOverlay.shader" />
+     <Compile Include="Assets\Scripts\VR\MenuButton.cs" />
+     <Compile Include="Assets\Scripts\VR\Reticle.cs" />
+     <Compile Include="Assets\Scripts\VR\VRDeviceManager.cs" />
+     <Compile Include="Assets\Scripts\VR\VREyeRaycaster.cs" />
+     <Compile Include="Assets\Scripts\VR\VRFPSCounter.cs" />
+     <Compile Include="Assets\Scripts\VR\VRInput.cs" />
+     <Compile Include="Assets\Scripts\VR\VRInteractiveItem.cs" />
+     <Compile Include="Assets\Scripts\VR\VRTrackingReset.cs" />
+     <None Include="Assets\AWSSDK\Examples\License.txt" />
+     <None Include="Assets\Art\Shader\UIOverlay.shader" />
      <None Include="Assets\InternetReachabilityVerifier\Examples\internetreachabilityverifier.txt" />
-     <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
      <None Include="Assets\FacebookSDK\link.xml" />
      <None Include="Assets\AWSSDK\src\Core\Resources\awsconfig.xml" />
      <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
@@ -136,10 +141,6 @@
  <Reference Include="Facebook.Unity.Settings">
  <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/FacebookSDK/Plugins/Settings/Facebook.Unity.Settings.dll</HintPath>
  </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
-      <Project>{ACE4D1AD-ED2A-9DFD-A13C-53E4B8906DF4}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

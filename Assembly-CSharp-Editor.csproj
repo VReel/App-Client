@@ -46,12 +46,9 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Editor\CrossPlatformInput\CrossPlatformInputInitialize.cs" />
-     <None Include="Assets\Examples\License.txt" />
-     <None Include="Assets\Standard Assets\Prototyping\Shaders\ProceduralSkyBox.shader" />
-     <None Include="Assets\Standard Assets\Prototyping\Shaders\WorldCoordDiffuse.shader" />
+     <None Include="Assets\AWSSDK\Examples\License.txt" />
      <None Include="Assets\Shader\UIOverlay.shader" />
      <None Include="Assets\InternetReachabilityVerifier\Examples\internetreachabilityverifier.txt" />
-     <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
      <None Include="Assets\FacebookSDK\link.xml" />
      <None Include="Assets\AWSSDK\src\Core\Resources\awsconfig.xml" />
      <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
@@ -129,8 +126,6 @@
  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
-      <Project>{ACE4D1AD-ED2A-9DFD-A13C-53E4B8906DF4}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
     <ProjectReference Include="Assembly-CSharp.csproj">
       <Project>{21994056-71B4-7107-13DD-CEB7317720FC}</Project>      <Name>Assembly-CSharp</Name>    </ProjectReference>
   </ItemGroup>
