@@ -42,12 +42,12 @@ public class ThreadJob
     public ThreadJob(MonoBehaviour owner)
     {
         m_owner = owner;
-        Debug.Log("------- VREEL: A ThreadJob was created by = " + m_owner.name);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: A ThreadJob was created by = " + m_owner.name);
     }
 
     public void Start(Func<object> threadFunc)
     {
-        Debug.Log("------- VREEL: Start on Thread has been called!");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Start on Thread has been called!");
 
         //TODO: Make the ThreadFunc have its own "IsDone" flag, 
         //      because the current method means that only one ThreadFunc is allowed to run at a time...
@@ -70,11 +70,11 @@ public class ThreadJob
 
     private void Run(object stateInfo)
     {
-        Debug.Log("------- VREEL: Began Running function on background thread!");
+        // if (Debug.isDebugBuild) Debug.Log("------- VREEL: Began Running function on background thread!");
 
         m_threadFunc();
         IsDone = true;
 
-        Debug.Log("------- VREEL: Finished Running function on background thread!");
+        // if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished Running function on background thread!");
     }
 }

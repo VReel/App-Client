@@ -52,7 +52,8 @@ public class ImageSphere : MonoBehaviour
         m_imageFilePath = filePath;
         m_imageSphereTexture = texture;
 
-        Debug.Log("------- VREEL: Finished Loading Image from Texture2D, " +
+        if (Debug.isDebugBuild) 
+            Debug.Log("------- VREEL: Finished Loading Image from Texture2D, " +
             "FilePath = " + m_imageFilePath +
             " , PluginTextureIndex = " + textureIndex +
             " , Texture size = " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
@@ -83,7 +84,7 @@ public class ImageSphere : MonoBehaviour
 
     private IEnumerator AnimateSetTexture(int textureIndex)
     {   
-        Debug.Log("------- VREEL: AnimateSetTexture() began on sphere: " + (m_imageSphereIndex+1) );
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateSetTexture() began on sphere: " + (m_imageSphereIndex+1) );
 
         float scalingFactor = m_imageSphereController.GetScalingFactor();
         float defaultScale = m_imageSphereController.GetDefaultSphereScale();
@@ -113,7 +114,7 @@ public class ImageSphere : MonoBehaviour
 
     private IEnumerator AnimateHide()
     {        
-        Debug.Log("------- VREEL: AnimateHide() called on sphere: " + (m_imageSphereIndex+1));
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateHide() called on sphere: " + (m_imageSphereIndex+1));
 
         float scalingFactor = m_imageSphereController.GetScalingFactor();
 
@@ -144,7 +145,7 @@ public class ImageSphere : MonoBehaviour
 
     private void SetSkybox()
     {    
-        Debug.Log("------- VREEL: SetSkybox() got called on sphere: " + (m_imageSphereIndex+1));
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: SetSkybox() got called on sphere: " + (m_imageSphereIndex+1));
 
         if (m_imageSphereSkybox != null && m_imageSphereSkybox.GetImageFilePath() != m_imageFilePath && m_currTextureIndex != kLoadingTextureIndex)
         {            

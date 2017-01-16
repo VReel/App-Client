@@ -67,7 +67,7 @@ public class UserLogin : MonoBehaviour
             return m_cachedCognitoId;
         }
 
-        Debug.Log("------- VREEL: ERROR - CognitoUserID queried but FB is not LoggedIn!");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - CognitoUserID queried but FB is not LoggedIn!");
 
         return "Error";
     }
@@ -98,7 +98,7 @@ public class UserLogin : MonoBehaviour
             return m_cachedFBUsername;
         }
 
-        Debug.Log("------- VREEL: ERROR - Username queried but FB is not LoggedIn!");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - Username queried but FB is not LoggedIn!");
 
         return "Error";
     }
@@ -109,7 +109,7 @@ public class UserLogin : MonoBehaviour
 
     private void InitCallback()
     {
-        Debug.Log("------- VREEL: InitCallback() activating app and attempting to RunLoginCode()");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: InitCallback() activating app and attempting to RunLoginCode()");
 
         if (FB.IsInitialized)
         {
@@ -118,7 +118,7 @@ public class UserLogin : MonoBehaviour
         }
         else
         {
-            Debug.Log("------- VREEL: ERROR - FB failed to Initialise!");
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - FB failed to Initialise!");
         }
     }        
 
@@ -126,14 +126,15 @@ public class UserLogin : MonoBehaviour
     {
         if (FB.IsLoggedIn)
         {
-            Debug.Log("------- VREEL: Running Login Code!");
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: Running Login Code!");
             
             m_cachedCognitoId = "";
             m_cachedFBId = "";
             m_cachedFBUsername = "";
             m_staticLoadingIcon.SetActive(true);
-
-            Debug.Log("------- VREEL: Calling Init with: " + AccessToken.CurrentAccessToken.TokenString + 
+                       
+            if (Debug.isDebugBuild) 
+                Debug.Log("------- VREEL: Calling Init with: " + AccessToken.CurrentAccessToken.TokenString + 
                 ", for Facebook user with ID: " + AccessToken.CurrentAccessToken.UserId +
                 ", token's LastRefresh: " + AccessToken.CurrentAccessToken.LastRefresh);
 
@@ -143,7 +144,7 @@ public class UserLogin : MonoBehaviour
         }
         else
         {
-            Debug.Log("------- VREEL: Failed to run Login Code!");
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: Failed to run Login Code!");
         }
     }
 
@@ -155,17 +156,17 @@ public class UserLogin : MonoBehaviour
 
     private void UsernameCallback(IGraphResult result)
     {
-        Debug.Log("------- VREEL: UsernameCallback() called!");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: UsernameCallback() called!");
         if (FB.IsLoggedIn && result.Error == null)
         {                                    
             m_cachedFBUsername = result.ResultDictionary["first_name"] as string;
         }
         else 
         {
-            Debug.Log("------- VREEL: Error Response: " + result.Error);
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: Error Response: " + result.Error);
         }
 
-        Debug.Log("------- VREEL: Cached Username as: " + m_cachedFBUsername);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Cached Username as: " + m_cachedFBUsername);
     }
 
     private IEnumerator LoginWithFacebookInternal()
@@ -174,7 +175,7 @@ public class UserLogin : MonoBehaviour
 
         if (FB.IsInitialized) // About to log into Cognito account through Facebook
         {                       
-            Debug.Log("------- VREEL: User about to Log In to Facebook");
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: User about to Log In to Facebook");
 
             // TODO: Improve the usage of this function as it does 2 bad things:
             // (1) It frames out when its called...
@@ -184,19 +185,19 @@ public class UserLogin : MonoBehaviour
             {
                 if (FB.IsLoggedIn)
                 {
-                    Debug.Log("------- VREEL: User successfully logged into Facebook");
+                    if (Debug.isDebugBuild) Debug.Log("------- VREEL: User successfully logged into Facebook");
                     RunLoginCode();
                 }
                 else
                 {
-                    Debug.Log("------- VREEL: Failed to login through Facebook");
+                    if (Debug.isDebugBuild) Debug.Log("------- VREEL: Failed to login through Facebook");
                     m_fbInvalidLoginError.SetActive(true);
                 }
             });
         }
         else
         {
-            Debug.Log("------- VREEL: ERROR - FB failed to Initialise!");
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - FB failed to Initialise!");
         }
     }
 
@@ -204,7 +205,7 @@ public class UserLogin : MonoBehaviour
     {
         yield return m_appDirector.VerifyInternetConnection();
 
-        Debug.Log("------- VREEL: LogOut() called");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: LogOut() called");
 
         if (FB.IsInitialized) 
         {                        
@@ -224,7 +225,7 @@ public class UserLogin : MonoBehaviour
             timeoutTimer -= Time.deltaTime;
             if (timeoutTimer <= 0)
             {
-                Debug.Log("------- VREEL: ProgressAppDirectorPastLogin timed out, login error!");
+                if (Debug.isDebugBuild) Debug.Log("------- VREEL: ProgressAppDirectorPastLogin timed out, login error!");
                 m_fbInvalidLoginError.SetActive(true);
                 m_staticLoadingIcon.SetActive(false);
                 yield break;

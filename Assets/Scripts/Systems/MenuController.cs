@@ -72,7 +72,7 @@ public class MenuController : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
-        Debug.Log("------- VREEL: Setting Welcome Text!");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Welcome Text!");
         Text profileTextComponent = m_profileMessage.GetComponentInChildren<Text>();
         if (profileTextComponent != null)
         {
@@ -121,14 +121,14 @@ public class MenuController : MonoBehaviour
         {
             SetMenuVisible(false);
 
-            Debug.Log("------- VREEL: Hide Menu");
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: Hide Menu");
         }
 
         if (swipe == VRStandardAssets.Utils.VRInput.SwipeDirection.DOWN)
         {
             SetMenuVisible(true);
 
-            Debug.Log("------- VREEL: Show Menu");
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: Show Menu");
         }
     }
 

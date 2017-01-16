@@ -83,7 +83,6 @@
      <Compile Include="Assets\Scripts\Systems\MenuController.cs" />
      <Compile Include="Assets\Scripts\Systems\ThreadJob.cs" />
      <Compile Include="Assets\Scripts\Systems\UserLogin.cs" />
-     <Compile Include="Assets\Scripts\Systems\VRCameraController.cs" />
      <Compile Include="Assets\Scripts\UI\ImageSkybox.cs" />
      <Compile Include="Assets\Scripts\UI\ImageSphere.cs" />
      <Compile Include="Assets\Scripts\UI\MenuBarButton.cs" />

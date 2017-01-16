@@ -8,7 +8,7 @@
 #include "stb_image.h"
 
 #define  LOG_TAG    "----------------- VREEL: CppPlugin - "
-#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
+#define  LOGI(...) //__android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 
 // **************************
 // Member Variables

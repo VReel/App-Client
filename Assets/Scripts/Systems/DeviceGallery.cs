@@ -64,15 +64,15 @@ public class DeviceGallery : MonoBehaviour
 
     public void OpenAndroidGallery()
     {        
-        Debug.Log("------- VREEL: OpenAndroidGallery() called");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenAndroidGallery() called");
 
         m_currGalleryImageIndex = 0;
         m_galleryImageFilePaths.Clear();
 
-        Debug.Log("------- VREEL: About to call GetImagesPath function...");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: About to call GetImagesPath function...");
         string imagesTopLevelDirectory = m_javaPluginClass.CallStatic<string>("GetAndroidImagesPath"); //string path = "/storage/emulated/0/DCIM/Gear 360/";
         m_imageSkybox.SetTopLevelDirectory(imagesTopLevelDirectory);
-        Debug.Log("------- VREEL: Storing all FilePaths from directory: " + imagesTopLevelDirectory);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Storing all FilePaths from directory: " + imagesTopLevelDirectory);
 
         m_coroutineQueue.EnqueueAction(StoreAllImageGalleryFilePaths(imagesTopLevelDirectory));
 
@@ -84,7 +84,7 @@ public class DeviceGallery : MonoBehaviour
 
     public void NextImages()
     {
-        Debug.Log("------- VREEL: NextImages() called");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: NextImages() called");
 
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
         int numFilePaths = m_galleryImageFilePaths.Count;
@@ -97,7 +97,7 @@ public class DeviceGallery : MonoBehaviour
 
     public void PreviousImages()
     {
-        Debug.Log("------- VREEL: PreviousImages() called");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreviousImages() called");
 
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
         int numFilePaths = m_galleryImageFilePaths.Count;
@@ -115,17 +115,19 @@ public class DeviceGallery : MonoBehaviour
     private IEnumerator StoreAllImageGalleryFilePaths(string imagesTopLevelDirectory)
     {                
         // 1) Find all files that could potentially be 360 images.
-        Debug.Log("------- VREEL: Calling GetAllFileNamesRecursively()");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling GetAllFileNamesRecursively()");
         List<string> files = new List<string>();
+        bool isDebugBuild = Debug.isDebugBuild;
+        Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
         m_threadJob.Start( () => 
-            files = GetAllFileNamesRecursively(imagesTopLevelDirectory)
+            files = GetAllFileNamesRecursively(imagesTopLevelDirectory, isDebugBuild, galleryTextComponent)
         );
         yield return m_threadJob.WaitFor();
 
         // TODO: Add CalcAspectRatio() to C++ Plugin, which should then allow me to thread this function out...
         //      the only reason its not currently threaded is because of the Android Plugin needing to be called...
         // 2) Add the files that are actually 360 images to "m_galleryImageFilePaths"
-        Debug.Log("------- VREEL: Calling FilterAndAdd360Images()");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling FilterAndAdd360Images()");
         const int kNumFilesPerIteration = 1;
         int numFilesSearched = 0;
         foreach (string filePath in files)
@@ -142,7 +144,7 @@ public class DeviceGallery : MonoBehaviour
             }
         }
 
-        Debug.Log("------- VREEL: Searched the directory " + imagesTopLevelDirectory + ", through " + numFilesSearched +
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Searched the directory " + imagesTopLevelDirectory + ", through " + numFilesSearched +
             " files, and found " + m_galleryImageFilePaths.Count + " 360-image files!");
 
         // 3) Sort files in order of newest first, so that users see their most recent gallery images!
@@ -159,7 +161,7 @@ public class DeviceGallery : MonoBehaviour
         m_noGalleryImagesText.SetActive(noImagesInGallery); // If the user has yet take any 360-images then show them the NoGalleryImagesText!
     }
     
-    private List<string> GetAllFileNamesRecursively(string baseDirectory)
+    private List<string> GetAllFileNamesRecursively(string baseDirectory, bool isDebugBuild, Text galleryTextComponent)
     {
         // We iterate over all files in the given top level directory, recursively searching through all the subdirectories
         var files = new List<string>();
@@ -178,10 +180,9 @@ public class DeviceGallery : MonoBehaviour
         }
         catch 
         {
-            Debug.Log("------- VREEL: Call to GetFiles() failed for: " + baseDirectory);
+            if (isDebugBuild) Debug.Log("------- VREEL: Call to GetFiles() failed for: " + baseDirectory);
 
             // Report Failure in Gallery
-            Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
             if (galleryTextComponent != null)
             {
                 galleryTextComponent.text = "Reading files Failed!\n Check permissions!";
@@ -197,16 +198,15 @@ public class DeviceGallery : MonoBehaviour
                 FileAttributes checkedFolderAttributes = (new DirectoryInfo(dirName).Attributes) & undesiredAttributes;
                 if (checkedFolderAttributes == 0)
                 {
-                    files.AddRange(GetAllFileNamesRecursively(dirName));
+                    files.AddRange(GetAllFileNamesRecursively(dirName, isDebugBuild, galleryTextComponent));
                 }
             }
         }
         catch 
         {
-            Debug.Log("------- VREEL: Call to GetDirectories() failed for: " + baseDirectory);
+            if (isDebugBuild) Debug.Log("------- VREEL: Call to GetDirectories() failed for: " + baseDirectory);
 
             // Report Failure in Gallery
-            Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
             if (galleryTextComponent != null)
             {
                 galleryTextComponent.text = "Reading files Failed!\n Check permissions!";
@@ -224,7 +224,7 @@ public class DeviceGallery : MonoBehaviour
         // Check that it has an image file extension 
         if (!s_imageExtensions.Contains(Path.GetExtension(filePath).ToUpperInvariant()))
         {
-            Debug.Log("------- VREEL: File: " + filePath + " is not an image!");
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: File: " + filePath + " is not an image!");
             return false;
         }
 
@@ -232,13 +232,13 @@ public class DeviceGallery : MonoBehaviour
         // This works the majority of the time because all 360 images have a 2:1 ratio,
         // and its not a standard aspect ratio for any other type of image!
 
-        Debug.Log("------- VREEL: About to call Aspect Ratio function for file: " + filePath);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: About to call Aspect Ratio function for file: " + filePath);
         float aspectRatio = m_javaPluginClass.CallStatic<float>("CalcAspectRatio", filePath);
-        Debug.Log("------- VREEL: Aspect Ratio: " + aspectRatio);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Aspect Ratio: " + aspectRatio);
 
         const float kDesiredAspectRatio = 2.0f;
         bool isImage360 = Mathf.Abs(aspectRatio - kDesiredAspectRatio) < Mathf.Epsilon;
-        Debug.Log("------- VREEL: Image: " + filePath + " is 360: " + isImage360);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Image: " + filePath + " is 360: " + isImage360);
 
         return isImage360;
     }
@@ -255,7 +255,7 @@ public class DeviceGallery : MonoBehaviour
 
     private IEnumerator LoadImages(int startingGalleryImageIndex, int numImagesToLoad)
     {
-        Debug.Log(string.Format("------- VREEL: Loading {0} images beginning at index {1}. There are {2} images in the gallery!", 
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Loading {0} images beginning at index {1}. There are {2} images in the gallery!", 
             numImagesToLoad, startingGalleryImageIndex, m_galleryImageFilePaths.Count));
 
         Resources.UnloadUnusedAssets();
@@ -266,10 +266,10 @@ public class DeviceGallery : MonoBehaviour
             (startingGalleryImageIndex < m_currGalleryImageIndex + numImagesToLoad); // Request no longer valid as user has moved on from this page
 
         string logString = string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", imageRequestStillValid, startingGalleryImageIndex, m_currGalleryImageIndex, numImagesToLoad); 
-        Debug.Log(logString);
+        if (Debug.isDebugBuild) Debug.Log(logString);
         if (!imageRequestStillValid)
         {
-            Debug.Log("------- VREEL: LoadImages() with index = " + startingGalleryImageIndex + " has failed");
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: LoadImages() with index = " + startingGalleryImageIndex + " has failed");
             yield break;
         }
             
@@ -281,7 +281,7 @@ public class DeviceGallery : MonoBehaviour
                 string filePath = m_galleryImageFilePaths[currGalleryImageIndex];
 
                 bool filePathStillValid = filePath.CompareTo(m_imageSkybox.GetImageFilePath()) != 0; // If file-path is the same then ignore request
-                Debug.Log("------- VREEL: Checking that filePath has changed has returned = " + filePathStillValid);
+                if (Debug.isDebugBuild) Debug.Log("------- VREEL: Checking that filePath has changed has returned = " + filePathStillValid);
                 if (filePathStillValid)
                 {
                     m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(filePath, sphereIndex));
@@ -304,21 +304,21 @@ public class DeviceGallery : MonoBehaviour
 
     private IEnumerator LoadImageInternalUnity(string filePath, int sphereIndex)
     {
-        Debug.Log("------- VREEL: Calling LoadPicturesInternalUnity() from filePath: " + filePath);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadPicturesInternalUnity() from filePath: " + filePath);
 
         WWW www = new WWW("file://" + filePath);
         yield return www;
 
-        Debug.Log("------- VREEL: Calling LoadImageIntoTexture()");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageIntoTexture()");
         Texture2D myNewTexture2D = new Texture2D(2,2);
         www.LoadImageIntoTexture(myNewTexture2D);
         yield return new WaitForEndOfFrame();
-        Debug.Log("------- VREEL: Finished LoadImageIntoTexture()");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadImageIntoTexture()");
 
-        Debug.Log("------- VREEL: Calling SetImageAndFilePath()");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAndFilePath()");
         m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, myNewTexture2D, filePath, -1);
         yield return new WaitForEndOfFrame();
-        Debug.Log("------- VREEL: Finished SetImageAndFilePath()");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAndFilePath()");
 
         Resources.UnloadUnusedAssets();
     }

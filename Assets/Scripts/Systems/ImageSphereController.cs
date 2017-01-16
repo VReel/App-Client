@@ -60,7 +60,7 @@ public class ImageSphereController : MonoBehaviour
                 --m_textureIndexUsage[textureID];
             }
 
-            Debug.Log("------- VREEL: TextureID = " + textureID + ", InUse = " + inUse);
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: TextureID = " + textureID + ", InUse = " + inUse);
             DebugPrintTextureIndexUsage();
         }
     }
@@ -96,7 +96,7 @@ public class ImageSphereController : MonoBehaviour
         }
         else
         {
-            Debug.Log("------- VREEL: Invalid request to SetImageAndFilePathAtIndex: " + sphereIndex);
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: Invalid request to SetImageAndFilePathAtIndex: " + sphereIndex);
         }
     }
 
@@ -116,7 +116,7 @@ public class ImageSphereController : MonoBehaviour
         }
         else
         {
-            Debug.Log("------- VREEL: Invalid request to HideSphereAtIndex: " + sphereIndex);
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: Invalid request to HideSphereAtIndex: " + sphereIndex);
         }
     }
 
@@ -134,7 +134,7 @@ public class ImageSphereController : MonoBehaviour
             }
         }
 
-        Debug.Log("------- VREEL: ERROR - We have no more textures available!!!");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - We have no more textures available!!!");
         DebugPrintTextureIndexUsage();
         
         return -1;
@@ -158,7 +158,8 @@ public class ImageSphereController : MonoBehaviour
 
     private void DebugPrintTextureIndexUsage()
     {
-        Debug.Log("------- VREEL: " + m_textureIndexUsage[0] + ", " + m_textureIndexUsage[1] + ", " + m_textureIndexUsage[2] 
+        if (Debug.isDebugBuild) 
+            Debug.Log("------- VREEL: " + m_textureIndexUsage[0] + ", " + m_textureIndexUsage[1] + ", " + m_textureIndexUsage[2] 
             + ", " + m_textureIndexUsage[3] + ", " + m_textureIndexUsage[4] + ", " + m_textureIndexUsage[5] 
             + ", " + m_textureIndexUsage[6] + ", " + m_textureIndexUsage[7]); 
         // + ", " + m_textureIndexUsage[8] + ", " + m_textureIndexUsage[9]);

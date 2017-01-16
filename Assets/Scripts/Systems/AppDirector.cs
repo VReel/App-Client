@@ -54,7 +54,7 @@ public class AppDirector : MonoBehaviour
 
     public void RequestLoginState()
     {
-        Debug.Log("------- VREEL: RequestLoginState() called");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestLoginState() called");
         if (m_appState != AppState.kLogin)
         {
             m_coroutineQueue.EnqueueAction(SetLoginState());
@@ -63,7 +63,7 @@ public class AppDirector : MonoBehaviour
 
     public void RequestProfileState()
     {
-        Debug.Log("------- VREEL: RequestProfileState() called");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestProfileState() called");
         if (m_appState != AppState.kProfile)
         {
             m_coroutineQueue.EnqueueAction(SetProfileState());
@@ -72,7 +72,7 @@ public class AppDirector : MonoBehaviour
 
     public void RequestGalleryState()
     {
-        Debug.Log("------- VREEL: RequestGalleryState() called");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestGalleryState() called");
         if (m_appState != AppState.kGallery)
         {
             m_coroutineQueue.EnqueueAction(SetGalleryState());
@@ -86,7 +86,7 @@ public class AppDirector : MonoBehaviour
             yield break;
         }
 
-        Debug.Log("------- VREEL: Lost Internet Connection");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Lost Internet Connection");
 
         m_lostConnectionIcon.SetActive(true);
 
@@ -94,7 +94,7 @@ public class AppDirector : MonoBehaviour
 
         m_lostConnectionIcon.SetActive(false);
 
-        Debug.Log("------- VREEL: Got the Internet Connection back!");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Got the Internet Connection back!");
     }
 
     // **************************

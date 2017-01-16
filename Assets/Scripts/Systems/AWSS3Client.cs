@@ -51,7 +51,7 @@ public class AWSS3Client : MonoBehaviour
 
     public void InitS3ClientFB(string fbAccessToken)
     {
-        Debug.Log("------- VREEL: InitS3ClientFB() called!");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: InitS3ClientFB() called!");
 
         m_cognitoCredentials = new CognitoAWSCredentials(
             "366575334313", // AWS Account ID
@@ -67,7 +67,7 @@ public class AWSS3Client : MonoBehaviour
 
         m_cognitoCredentials.GetIdentityIdAsync((idResponseObj) =>
         {
-            Debug.Log("------- VREEL: GetIdentityIdAsync() lambda called!");
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: GetIdentityIdAsync() lambda called!");
 
             if (idResponseObj.Exception != null)
             {
@@ -81,12 +81,12 @@ public class AWSS3Client : MonoBehaviour
 
             m_cognitoCredentials.GetCredentialsAsync((credentialsResponseObj) =>
             {
-                Debug.Log("------- VREEL: GetCredentialsAsync() lambda called!");
+                if (Debug.isDebugBuild) Debug.Log("------- VREEL: GetCredentialsAsync() lambda called!");
 
                 if (credentialsResponseObj.Exception != null)
                 {
-                    Debug.Log("------- VREEL: Exception while calling GetCredentialsAsync()");
-                    Debug.Log("------- VREEL: Receieved error: " + credentialsResponseObj.Exception.ToString());
+                    if (Debug.isDebugBuild) Debug.Log("------- VREEL: Exception while calling GetCredentialsAsync()");
+                    if (Debug.isDebugBuild) Debug.Log("------- VREEL: Receieved error: " + credentialsResponseObj.Exception.ToString());
                     return;
                 }
 
@@ -147,14 +147,14 @@ public class AWSS3Client : MonoBehaviour
 
     public void UploadImage()
     {
-        Debug.Log("------- VREEL: UploadImage() called");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: UploadImage() called");
 
         m_coroutineQueue.EnqueueAction(UploadImageInternal());
     }
 
     public void OpenProfile()
     {
-        Debug.Log("------- VREEL: OpenProfile() called");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenProfile() called");
 
         m_imageSphereController.SetAllImageSpheresToLoading();
         m_coroutineQueue.EnqueueAction(StoreAllS3ImagePathsAndSetSpheres());
@@ -162,7 +162,7 @@ public class AWSS3Client : MonoBehaviour
 
     public void NextImages()
     {
-        Debug.Log("------- VREEL: NextImages() called");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: NextImages() called");
 
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
         int numFilePaths = m_s3ImageFilePaths.Count;
@@ -175,7 +175,7 @@ public class AWSS3Client : MonoBehaviour
 
     public void PreviousImages()
     {
-        Debug.Log("------- VREEL: PreviousImages() called");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreviousImages() called");
 
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
         int numFilePaths = m_s3ImageFilePaths.Count;
@@ -199,7 +199,7 @@ public class AWSS3Client : MonoBehaviour
 
         string fileName =  m_imageSkybox.GetImageFilePath();
 
-        Debug.Log("------- VREEL: UploadImage with FileName: " + fileName);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: UploadImage with FileName: " + fileName);
 
         string datePattern = "yyyy_MM_dd_hh_mm_ss";
         string date = DateTime.UtcNow.ToString(datePattern);
@@ -207,7 +207,7 @@ public class AWSS3Client : MonoBehaviour
 
         var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-        Debug.Log("------- VREEL: Creating request object with key: " + key);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Creating request object with key: " + key);
         var request = new PostObjectRequest()
         {
             Bucket = m_s3BucketName,
@@ -216,14 +216,14 @@ public class AWSS3Client : MonoBehaviour
             CannedACL = S3CannedACL.Private
         };
 
-        Debug.Log("------- VREEL: Making HTTP post call");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Making HTTP post call");
 
         m_s3Client.PostObjectAsync(request, (responseObj) =>
         {
             if (responseObj.Exception == null)
             {
                 string logString = string.Format("------- VREEL: Uploaded {0} posted to bucket {1}", responseObj.Request.Key, responseObj.Request.Bucket);
-                Debug.Log(logString);
+                if (Debug.isDebugBuild) Debug.Log(logString);
 
                 // Report Success in Gallery
                 Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
@@ -236,8 +236,8 @@ public class AWSS3Client : MonoBehaviour
             }
             else
             {
-                Debug.Log("------- VREEL: Exception while posting the result object");
-                Debug.Log("------- VREEL: Receieved error: " + responseObj.Response.HttpStatusCode.ToString());
+                if (Debug.isDebugBuild) Debug.Log("------- VREEL: Exception while posting the result object");
+                if (Debug.isDebugBuild) Debug.Log("------- VREEL: Receieved error: " + responseObj.Response.HttpStatusCode.ToString());
 
                 // Report Failure in Gallery
                 Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
@@ -259,7 +259,7 @@ public class AWSS3Client : MonoBehaviour
         yield return m_appDirector.VerifyInternetConnection();
         yield return WaitForValidS3Client();
 
-        Debug.Log("------- VREEL: Fetching all the Objects from: " + m_s3BucketName + "/" + m_userLogin.GetCognitoUserID() + "/");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Fetching all the Objects from: " + m_s3BucketName + "/" + m_userLogin.GetCognitoUserID() + "/");
 
         var request = new ListObjectsRequest()
         {
@@ -272,7 +272,7 @@ public class AWSS3Client : MonoBehaviour
         {            
             if (responseObject.Exception == null)
             {
-                Debug.Log("------- VREEL: Got successful response from ListObjectsAsync(), storing file paths!");
+                if (Debug.isDebugBuild) Debug.Log("------- VREEL: Got successful response from ListObjectsAsync(), storing file paths!");
 
                 m_s3ImageFilePaths.Clear();
 
@@ -281,7 +281,7 @@ public class AWSS3Client : MonoBehaviour
                     if (ImageExtensions.Contains(Path.GetExtension(s3object.Key).ToUpperInvariant())) // Check that the file is indeed an image
                     {   
                         m_s3ImageFilePaths.Add(s3object.Key);
-                        Debug.Log("------- VREEL: Stored FileName: " + s3object.Key);
+                        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Stored FileName: " + s3object.Key);
                     }
                 });
 
@@ -291,7 +291,7 @@ public class AWSS3Client : MonoBehaviour
             }
             else
             {
-                Debug.Log("------- VREEL: Got an Exception calling 'ListObjectsAsync()'");
+                if (Debug.isDebugBuild) Debug.Log("------- VREEL: Got an Exception calling 'ListObjectsAsync()'");
 
                 // Report Failure in Profile
                 Text profileTextComponent = m_profileMessage.GetComponentInChildren<Text>();
@@ -319,8 +319,7 @@ public class AWSS3Client : MonoBehaviour
 
     private void DownloadImagesAndSetSpheresInternal(int startingS3ImageIndex, int numImages)
     {
-        Debug.Log(string.Format("------- VREEL: Downloading {0} images beginning at index {1}. There are {2} images in this S3 folder!", 
-            numImages, startingS3ImageIndex, m_s3ImageFilePaths.Count));
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading {0} images beginning at index {1}. There are {2} images in this S3 folder!", numImages, startingS3ImageIndex, m_s3ImageFilePaths.Count));
 
         Resources.UnloadUnusedAssets();
 
@@ -346,9 +345,8 @@ public class AWSS3Client : MonoBehaviour
         yield return m_appDirector.VerifyInternetConnection();
         yield return WaitForValidS3Client();
 
-        string fullFilePath = m_s3BucketName + filePath;
-        string logString01 = string.Format("------- VREEL: Downloading {0} from bucket {1}", filePath, m_s3BucketName);       
-        Debug.Log(logString01);
+        string fullFilePath = m_s3BucketName + filePath;           
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading {0} from bucket {1}", filePath, m_s3BucketName));
 
         m_s3Client.GetObjectAsync(m_s3BucketName, filePath, (s3ResponseObj) =>
         {               
@@ -361,25 +359,24 @@ public class AWSS3Client : MonoBehaviour
                     (thisS3ImageIndex < m_currS3ImageFilePathIndex + numImages) && // Request no longer valid as user has moved on from this page
                     (filePath.CompareTo(m_imageSkybox.GetImageFilePath()) != 0); // If file-path is the same then ignore request
                 
-                string logString02 = string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", imageRequestStillValid, m_currS3ImageFilePathIndex, thisS3ImageIndex, numImages); 
-                Debug.Log(logString02);
+                if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", imageRequestStillValid, m_currS3ImageFilePathIndex, thisS3ImageIndex, numImages) );
                 if (imageRequestStillValid)
                 {
                     m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(response, sphereIndex, fullFilePath));
 
-                    Debug.Log("------- VREEL: Successfully downloaded and requested to set " + fullFilePath);
+                    if (Debug.isDebugBuild) Debug.Log("------- VREEL: Successfully downloaded and requested to set " + fullFilePath);
                 }
                 else
                 {
-                    Debug.Log("------- VREEL: Downloaded item successfully but was thrown away because user has moved off that page: " + fullFilePath);
+                    if (Debug.isDebugBuild) Debug.Log("------- VREEL: Downloaded item successfully but was thrown away because user has moved off that page: " + fullFilePath);
                 }
 
                 Resources.UnloadUnusedAssets();
             }
             else
             {
-                Debug.Log("------- VREEL: Got an Exception calling GetObjectAsync() for: " + fullFilePath);
-                Debug.Log("------- VREEL: Exception was: " + s3ResponseObj.Exception.ToString());
+                if (Debug.isDebugBuild) Debug.Log("------- VREEL: Got an Exception calling GetObjectAsync() for: " + fullFilePath);
+                if (Debug.isDebugBuild) Debug.Log("------- VREEL: Exception was: " + s3ResponseObj.Exception.ToString());
 
                 // Report Failure in Profile
                 Text profileTextComponent = m_profileMessage.GetComponentInChildren<Text>();
@@ -395,7 +392,7 @@ public class AWSS3Client : MonoBehaviour
 
     private IEnumerator LoadImageInternalPlugin(Amazon.S3.Model.GetObjectResponse response, int sphereIndex, string fullFilePath)
     {        
-        Debug.Log("------- VREEL: LoadImageInternal for " + fullFilePath);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: LoadImageInternal for " + fullFilePath);
 
         using (var stream = response.ResponseStream)
         {
@@ -405,7 +402,7 @@ public class AWSS3Client : MonoBehaviour
         
     private IEnumerator LoadImageInternalUnity(Amazon.S3.Model.GetObjectResponse response, int sphereIndex, string fullFilePath)
     {
-        Debug.Log("------- VREEL: ConvertStreamAndSetImage for " + fullFilePath);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: ConvertStreamAndSetImage for " + fullFilePath);
 
         const int kNumIterationsPerFrame = 150;
         byte[] myBinary = null;
@@ -433,14 +430,14 @@ public class AWSS3Client : MonoBehaviour
         }
 
         // The following is generally coming out to around 6-7MB in size...
-        Debug.Log("------- VREEL: Finished iterating, length of byte[] is " + myBinary.Length);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished iterating, length of byte[] is " + myBinary.Length);
 
         Texture2D newImage = new Texture2D(2,2); 
         newImage.LoadImage(myBinary);
         m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, newImage, fullFilePath, -1);
         yield return new WaitForEndOfFrame();
 
-        Debug.Log("------- VREEL: Finished Setting Image!");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished Setting Image!");
 
         Resources.UnloadUnusedAssets();
     }

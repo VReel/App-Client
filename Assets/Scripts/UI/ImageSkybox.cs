@@ -51,7 +51,7 @@ public class ImageSkybox : MonoBehaviour
         if (filePath.Length <= 0)
         {
             m_uploadButton.SetActive(false);
-            Debug.Log("------- VREEL: ERROR - attempting to set skybox to an empty filepath!");
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - attempting to set skybox to an empty filepath!");
             return;
         }
 
@@ -71,6 +71,6 @@ public class ImageSkybox : MonoBehaviour
         // TODO: have the skybox be used instead of just a sphere around the user
         // RenderSettings.skybox = texture; 
 
-        Debug.Log("------- VREEL: Changed skybox to = " + m_imageFilePath + ", with TextureID = " + m_currTextureIndex);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Changed skybox to = " + m_imageFilePath + ", with TextureID = " + m_currTextureIndex);
     }
 }

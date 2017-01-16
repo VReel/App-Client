@@ -24,13 +24,13 @@ public class FPSDisplay : MonoBehaviour
         float fps = 1.0f / m_deltaTime;
         if (fps < kFrameOutThreshold)
         {
-            Debug.Log("------- VREEL: We are Framing out at FPS = " + fps);
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: We are Framing out at FPS = " + fps);
         }
     }
 
     void OnGUI()
     {
-        if (!m_isVisible)
+        if (!m_isVisible || !Debug.isDebugBuild)
         {
             return;
         }

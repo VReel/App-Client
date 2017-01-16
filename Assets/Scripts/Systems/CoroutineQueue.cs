@@ -4,9 +4,17 @@ using System.Collections.Generic;
 
 public class CoroutineQueue
 {
+    // **************************
+    // Member Variables
+    // **************************
+
     MonoBehaviour m_owner = null;
     Coroutine m_mainInternalCoroutine = null;
     Queue<IEnumerator> actions = new Queue<IEnumerator>();
+
+    // **************************
+    // Public functions
+    // **************************
 
     public CoroutineQueue(MonoBehaviour aCoroutineOwner)
     {
@@ -40,6 +48,17 @@ public class CoroutineQueue
     {
         actions.Enqueue(Wait(aWaitTime));
     }
+
+    public void DebugPrint()
+    {
+        if (Debug.isDebugBuild) 
+            Debug.Log("------- VREEL: CoroutineQueue belonging to '" + m_owner + "' has started = " + (m_mainInternalCoroutine!=null) +
+                ", and has " + actions.Count + " Functions in the Queue!");
+    }
+
+    // **************************
+    // Private/Helper functions
+    // **************************
 
     private IEnumerator Wait(float aWaitTime)
     {
