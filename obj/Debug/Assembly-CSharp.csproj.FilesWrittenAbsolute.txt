@@ -83,3 +83,8 @@
 /Users/FoxBookAir/Documents/Unity/VR/VReelApp/Temp/bin/Debug/Mono.Cecil.Mdb.dll
 /Users/FoxBookAir/Documents/Unity/VR/VReelApp/Temp/bin/Debug/Assembly-CSharp.dll.mdb
 /Users/FoxBookAir/Documents/Unity/VR/VReelApp/Temp/bin/Debug/Assembly-CSharp.dll
+/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Temp/bin/Debug/UnityEngine.PlaymodeTestsRunner.dll
+/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Temp/bin/Debug/UnityEngine.Analytics.dll
+/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Temp/bin/Debug/UnityEngine.HoloLens.dll
+/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Temp/bin/Debug/UnityEngine.VR.dll
+/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Temp/bin/Debug/RestSharp.dll

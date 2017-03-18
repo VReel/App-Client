@@ -235,4 +235,4 @@ public class UserLogin : MonoBehaviour
         m_appDirector.RequestProfileState();
         m_staticLoadingIcon.SetActive(false);
     }
-}
+}   

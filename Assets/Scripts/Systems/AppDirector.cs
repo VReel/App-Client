@@ -6,6 +6,8 @@ using System.Collections;           //IEnumerator
 // and is in charge of ensuring that work is correctly delegated to other components
 // eg. LoginFlow handles login work, and MenuController enables appropriate menu options
 
+using System.Net;
+
 public class AppDirector : MonoBehaviour 
 {   
     // **************************
@@ -30,6 +32,13 @@ public class AppDirector : MonoBehaviour
 
     private AppState m_appState;
     private CoroutineQueue m_coroutineQueue;
+
+    /*
+     * 
+     * (need to check if ".NET 2.0" is enough for all the functionality we want to do!)
+     * HttpWebRequest myReq = (HttpWebRequest)WebRequest.Create("http://www.contoso.com/");
+     * 
+     */
 
     // **************************
     // Public functions
