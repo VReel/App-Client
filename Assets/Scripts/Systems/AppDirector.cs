@@ -27,18 +27,13 @@ public class AppDirector : MonoBehaviour
     [SerializeField] private AWSS3Client m_AWSS3Client;
     [SerializeField] private DeviceGallery m_deviceGallery;
     [SerializeField] private UserLogin m_userLogin;
+    [SerializeField] private LoginFlow m_loginFlow;
+    [SerializeField] private Profile m_profile;
     [SerializeField] private InternetReachabilityVerifier m_internetReachabilityVerifier;
     [SerializeField] private GameObject m_lostConnectionIcon;
 
     private AppState m_appState;
     private CoroutineQueue m_coroutineQueue;
-
-    /*
-     * 
-     * (need to check if ".NET 2.0" is enough for all the functionality we want to do!)
-     * HttpWebRequest myReq = (HttpWebRequest)WebRequest.Create("http://www.contoso.com/");
-     * 
-     */
 
     // **************************
     // Public functions
@@ -118,8 +113,10 @@ public class AppDirector : MonoBehaviour
 
         m_deviceGallery.InvalidateGalleryImageLoading();
         m_AWSS3Client.InvalidateS3ImageLoading();
+        m_loginFlow.SetLoginFlowPage(0);
 
         m_menuController.SetLoginSubMenuActive(true);
+        m_loginFlow.Restart(); // This kicks off the coroutine queue again so LoginFlow works...
         m_appState = AppState.kLogin;
 
         yield break;
@@ -139,6 +136,8 @@ public class AppDirector : MonoBehaviour
         m_deviceGallery.InvalidateGalleryImageLoading();
 
         m_menuController.SetProfileSubMenuActive(true);
+
+        m_profile.OpenProfile();
         m_AWSS3Client.OpenProfile();
         m_appState = AppState.kProfile;
 

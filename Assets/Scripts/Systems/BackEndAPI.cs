@@ -7,8 +7,10 @@ using System.Text;                  // Encoding
 using System.Collections;           // IEnumerator
 using RestSharp;                    // RestClient
 
+// This class acts simply as an API into the Back-End
+
 public class BackEndAPI
-{    
+{       
     // **************************
     // Member Variables
     // **************************
@@ -18,25 +20,24 @@ public class BackEndAPI
     const string m_vreelStagingApplicationID = "366vapr5iwscaicaswycf8lvwetzmkj1r6loby9nc3uq26flimxpbqnadbt6vam3";
     const string m_vreelProductionapplicationID = "ic4ycp0w6jagoi67liubw5dug6zszbq9gcvhfayu25ulc3vj5xp02sf99ingc0s4";
 
-    private RestClient m_vreelClient;
     private string m_vreelURL = "";
     private string m_applicationID = "";
-    private string m_client = "";
-    private string m_uid = "";
-    private string m_accessToken = "";
 
+    private RestClient m_vreelClient;
     private MonoBehaviour m_owner = null;
     private GameObject m_errorMessage;
+    private User m_user;
     private ThreadJob m_threadJob;
 
     // **************************
     // Public functions
     // **************************
 
-    public BackEndAPI(MonoBehaviour owner, GameObject errorMessage)
+    public BackEndAPI(MonoBehaviour owner, GameObject errorMessage, User user)
     {
         m_owner = owner;
         m_errorMessage = errorMessage;
+        m_user = user;
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: A BackEndAPI object was Created by = " + m_owner.name);
 
         // Version dependent code
@@ -49,7 +50,7 @@ public class BackEndAPI
 
     ~BackEndAPI()
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: A BackEndAPI object was Destructed by = " + m_owner.name);
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: A BackEndAPI object was Destructed by = " + m_owner.name);
     }
         
     public IEnumerator Register_CreateUser(string handle, string email, string password, string passwordConfirmation)
@@ -75,26 +76,19 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users' - Response: " + response.Content);
 
-        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        if (IsSuccessCode(response.StatusCode))
         {
             UpdateAccessToken(response);
+            UpdateLoginTokens(response);
 
-            foreach (Parameter parameter in response.Headers)
-            {
-                if (parameter.Name == "Client")
-                {
-                    m_client = parameter.Value.ToString();
-                }
-
-                if (parameter.Name == "Uid")
-                {
-                    m_uid = parameter.Value.ToString();
-                }
-            }
+            m_user.m_handle = handle;
+            m_user.m_email = email;
+            m_user.m_name = "";
+            m_user.m_profileDescription = "";
         }
         else // Error Handling
         {            
-            ShowErrors(response, "POST to '/users/sign_in'");
+            ShowErrors(response, "POST to '/users/'");
         }
     }
 
@@ -105,9 +99,9 @@ public class BackEndAPI
         
         var request = new RestRequest("/users", Method.PUT);
         request.AddHeader("vreel-application-id", m_applicationID);
-        request.AddHeader("client", m_client);
-        request.AddHeader("uid", m_uid);
-        request.AddHeader("access-token", m_accessToken);
+        request.AddHeader("client", m_user.m_client);
+        request.AddHeader("uid", m_user.m_uid);
+        request.AddHeader("access-token", m_user.m_accessToken);
 
         yield return m_threadJob.WaitFor();
         IRestResponse response = new RestResponse();
@@ -118,13 +112,13 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> PUT to '/users' - Response: " + response.Content);
 
-        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        if (IsSuccessCode(response.StatusCode))
         {
             UpdateAccessToken(response);
         }
         else // Error Handling
         {            
-            ShowErrors(response, "POST to '/users/sign_in'");
+            ShowErrors(response, "PUT to '/users'");
         }
     }
 
@@ -135,9 +129,9 @@ public class BackEndAPI
 
         var request = new RestRequest("/users", Method.DELETE);
         request.AddHeader("vreel-application-id", m_applicationID);
-        request.AddHeader("client", m_client);
-        request.AddHeader("uid", m_uid);
-        request.AddHeader("access-token", m_accessToken);
+        request.AddHeader("client", m_user.m_client);
+        request.AddHeader("uid", m_user.m_uid);
+        request.AddHeader("access-token", m_user.m_accessToken);
 
         yield return m_threadJob.WaitFor();
         IRestResponse response = new RestResponse();
@@ -148,13 +142,14 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/users' - Response: " + response.Content);
 
-        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        if (IsSuccessCode(response.StatusCode))
         {
             UpdateAccessToken(response);
+            m_user.Clear();
         }
         else // Error Handling
         {            
-            ShowErrors(response, "POST to '/users/sign_in'");
+            ShowErrors(response, "DELETE to '/users'");
         }
     }
 
@@ -177,13 +172,13 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users/password' - Response: " + response.Content);
 
-        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        if (IsSuccessCode(response.StatusCode))
         {
             UpdateAccessToken(response);
         }
         else // Error Handling
         {            
-            ShowErrors(response, "POST to '/users/sign_in'");
+            ShowErrors(response, "POST to '/users/password'");
         }
     }
         
@@ -206,40 +201,33 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users/sign_in' - Response: " + response.Content);
 
-        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        if (IsSuccessCode(response.StatusCode))
         {
             UpdateAccessToken(response);
+            UpdateLoginTokens(response);
 
-            foreach (Parameter parameter in response.Headers)
-            {
-                if (parameter.Name == "Client")
-                {
-                    m_client = parameter.Value.ToString();
-                }
+            var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_SignIn>(response.Content);
 
-                if (parameter.Name == "Uid")
-                {
-                    m_uid = parameter.Value.ToString();
-                }
-            }
+            m_user.m_handle = result.data.attributes.handle;
+            m_user.m_email = result.data.attributes.email;
+            m_user.m_name = result.data.attributes.name;
+            m_user.m_profileDescription = result.data.attributes.profile;
         }
         else // Error Handling
         {            
             ShowErrors(response, "POST to '/users/sign_in'");
         }
-
     }
-
-    // ------ !CURRENTLY UNUSED! -------- //
+        
     public IEnumerator Session_SignOut()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/users/sign_out' - Sign Out");
         
         var request = new RestRequest("/users/sign_out", Method.DELETE);
         request.AddHeader("vreel-application-id", m_applicationID);
-        request.AddHeader("client", m_client);
-        request.AddHeader("uid", m_uid);
-        request.AddHeader("access-token", m_accessToken);
+        request.AddHeader("client", m_user.m_client);
+        request.AddHeader("uid", m_user.m_uid);
+        request.AddHeader("access-token", m_user.m_accessToken);
 
         yield return m_threadJob.WaitFor();
         IRestResponse response = new RestResponse();
@@ -250,13 +238,14 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/users/sign_out' - Response: " + response.Content);
 
-        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        if (IsSuccessCode(response.StatusCode))
         {
             UpdateAccessToken(response);
+            m_user.Clear();
         }
         else // Error Handling
         {            
-            ShowErrors(response, "POST to '/users/sign_in'");
+            ShowErrors(response, "DELETE to '/users/sign_out'");
         }
     }
 
@@ -267,9 +256,9 @@ public class BackEndAPI
         
         var request = new RestRequest("/s3_presigned_url", Method.GET);
         request.AddHeader("vreel-application-id", m_applicationID);
-        request.AddHeader("client", m_client);
-        request.AddHeader("uid", m_uid);
-        request.AddHeader("access-token", m_accessToken);
+        request.AddHeader("client", m_user.m_client);
+        request.AddHeader("uid", m_user.m_uid);
+        request.AddHeader("access-token", m_user.m_accessToken);
 
         yield return m_threadJob.WaitFor();
         IRestResponse response = new RestResponse();
@@ -280,7 +269,7 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/s3_presigned_url' - Response: " + response.Content);
 
-        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        if (IsSuccessCode(response.StatusCode))
         {
             UpdateAccessToken(response);
 
@@ -300,20 +289,19 @@ public class BackEndAPI
         }
         else // Error Handling
         {            
-            ShowErrors(response, "POST to '/users/sign_in'");
+            ShowErrors(response, "GET to '/s3_presigned_url'");
         }
     }
-
-    // ------ !CURRENTLY UNUSED! -------- //
+        
     public IEnumerator Posts_GetAll()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts' - Get all posts");
 
         var request = new RestRequest("/posts", Method.GET);
         request.AddHeader("vreel-application-id", m_applicationID);
-        request.AddHeader("client", m_client);
-        request.AddHeader("uid", m_uid);
-        request.AddHeader("access-token", m_accessToken);
+        request.AddHeader("client", m_user.m_client);
+        request.AddHeader("uid", m_user.m_uid);
+        request.AddHeader("access-token", m_user.m_accessToken);
 
         yield return m_threadJob.WaitFor();
         IRestResponse response = new RestResponse();
@@ -324,13 +312,23 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts' - Response: " + response.Content);
 
-        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        if (IsSuccessCode(response.StatusCode))
         {
             UpdateAccessToken(response);
+
+            var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Profile>(response.Content);
+
+            Debug.Log("Test: " + result.GetType());
+            //Debug.Log("Test2: " + result.data.GetType());
+
+            //Debug.Log("Thumbnail URL: " + result.data.attributes.thumbnail_url.ToString());
+            //Debug.Log("Caption: " + result.data.attributes.caption.ToString());
+            //Debug.Log("Created At: " + result.data.attributes.created_at.ToString());
+            //Debug.Log("Edited: " + result.data.attributes.edited.ToString());
         }
         else // Error Handling
         {            
-            ShowErrors(response, "POST to '/users/sign_in'");
+            ShowErrors(response, "GET to '/posts'");
         }
     }
 
@@ -341,9 +339,9 @@ public class BackEndAPI
         
         var request = new RestRequest("/posts", Method.POST);
         request.AddHeader("vreel-application-id", m_applicationID);
-        request.AddHeader("client", m_client);
-        request.AddHeader("uid", m_uid);
-        request.AddHeader("access-token", m_accessToken);
+        request.AddHeader("client", m_user.m_client);
+        request.AddHeader("uid", m_user.m_uid);
+        request.AddHeader("access-token", m_user.m_accessToken);
 
         request.AddParameter("thumbnail_key", thumbnailKey);
         request.AddParameter("original_key", originalKey);
@@ -358,13 +356,13 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/posts' - Response: " + response.Content);
 
-        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        if (IsSuccessCode(response.StatusCode))
         {
             UpdateAccessToken(response);
         }
         else // Error Handling
         {            
-            ShowErrors(response, "POST to '/users/sign_in'");
+            ShowErrors(response, "POST to '/posts'");
         }
     }
 
@@ -423,19 +421,42 @@ public class BackEndAPI
         }
     }
 
+    private bool IsSuccessCode(HttpStatusCode statusCode)
+    {
+        return ((int)statusCode >= 200 && (int)statusCode < 300);
+    }
+
     private void UpdateAccessToken(IRestResponse response)
     {
         foreach (Parameter parameter in response.Headers)
         {
             if (parameter.Name == "Access-Token")
             {
-                m_accessToken = parameter.Value.ToString();
+                m_user.m_accessToken = parameter.Value.ToString();
             }               
+        }
+    }
+
+    private void UpdateLoginTokens(IRestResponse response)
+    {
+        foreach (Parameter parameter in response.Headers)
+        {
+            if (parameter.Name == "Client")
+            {
+                m_user.m_client = parameter.Value.ToString();
+            }
+
+            if (parameter.Name == "Uid")
+            {
+                m_user.m_uid = parameter.Value.ToString();
+            }
         }
     }
 
     private void ShowErrors(IRestResponse response, string debugString)
     {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> " + debugString + " - Error Code: " + response.StatusCode);
+
         var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Error>(response.Content);
 
         var errorText = m_errorMessage.GetComponentInChildren<Text>();
@@ -449,5 +470,5 @@ public class BackEndAPI
             errorText.text += "\n";
             m_errorMessage.SetActive(true);
         }
-    }
+    }        
 }

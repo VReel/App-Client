@@ -16,7 +16,6 @@ public class KeyBoard : MonoBehaviour
 
     private string m_previousText;      // Text before selecting inputform
     private string m_defaultText;       // Default value for inputform text
-    private bool m_isPassword;          // Should the resulting inputform text be set to asterixes?
     private float m_elapsedTime;
     private bool m_capitalLeters, m_symbolMode, m_blink;
     private int m_numLetters;
@@ -159,22 +158,19 @@ public class KeyBoard : MonoBehaviour
         }
     }
 
-    public void SelectTextInputIsPassword()
-    {
-        m_isPassword = true;
-    }
-
 	public void AcceptText()
 	{
-        if (m_isPassword)
-        {
-            m_actualText = ReplaceStringWithAsterixes(m_actualText);
-            m_isPassword = false;
-        }
-
         if (m_actualText.Length > 0)
         {
-            m_objectiveTextObject.text = m_actualText;
+            var passwordText = m_objectiveTextObject.GetComponent<PasswordText>();
+            if (passwordText != null)
+            {
+                passwordText.SetString(m_actualText);
+            }
+            else
+            {
+                m_objectiveTextObject.text = m_actualText;
+            }
         }
         else
         {
@@ -241,18 +237,4 @@ public class KeyBoard : MonoBehaviour
             m_symbolMode = false;
 		}		
 	}
-
-    // **************************
-    // Private/Helper functions
-    // **************************
-
-    private string ReplaceStringWithAsterixes(string actualString)
-    {
-        string returnString = "";
-        for (int i = 0; i < actualString.Length; i++)
-        {
-            returnString += "*";
-        }
-        return returnString;
-    }
 }

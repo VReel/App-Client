@@ -87,7 +87,7 @@ public class CppPlugin
 
     ~CppPlugin()
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: A CppPlugin was destructed by = " + m_owner.name);
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: A CppPlugin was destructed by = " + m_owner.name);
 
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kTerminate);
     }
