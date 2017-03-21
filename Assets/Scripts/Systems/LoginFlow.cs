@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;   // IEnumerator
-using UnityEngine.UI;       // UI
+using UnityEngine.UI;       // Text
 using RestSharp;
 
 public class LoginFlow : MonoBehaviour 
@@ -19,6 +19,7 @@ public class LoginFlow : MonoBehaviour
     [SerializeField] private Text m_signUpEmailInput;
     [SerializeField] private Text m_signUpPasswordInput;
     [SerializeField] private Text m_signUpPasswordConfirmationInput;
+    [SerializeField] private GameObject m_errorMessage;
 
     [SerializeField] private GameObject m_loginPage;
     [SerializeField] private GameObject m_signUpPage1;
@@ -43,10 +44,10 @@ public class LoginFlow : MonoBehaviour
 
     public void Start()
     {        
-        m_coroutineQueue = new CoroutineQueue( this );
+        m_coroutineQueue = new CoroutineQueue(this);
         m_coroutineQueue.StartLoop();
 
-        m_backEndAPI = new BackEndAPI(this);
+        m_backEndAPI = new BackEndAPI(this, m_errorMessage);
 
         m_staticLoadingIcon.SetActive(false);
     }
@@ -99,6 +100,18 @@ public class LoginFlow : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: LogIn() called");
 
         m_staticLoadingIcon.SetActive(true);
+
+        if (Debug.isDebugBuild) 
+        {
+            if (m_backEndAPI == null)
+            {
+                Debug.Log("------- VREEL: m_backEndAPI is null =/");
+            }
+            else
+            {
+                Debug.Log("------- VREEL: m_backEndAPI has type: " + m_backEndAPI.GetType().Name);
+            }
+        }
 
         yield return m_backEndAPI.Session_SignIn(
             m_loginUsernameEmailInput.text, 

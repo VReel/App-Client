@@ -1,69 +1,49 @@
 ﻿using UnityEngine;
-using System;               // Exception
-using System.Net;           // HttpWebRequest
-using System.IO;            // Stream, FileStream
-using System.Text;          // Encoding
-using System.Collections;   // IEnumerator
-using RestSharp;            // RestClient
+using UnityEngine.UI;               // Text
+using System;                       // Exception
+using System.Net;                   // HttpWebRequest
+using System.IO;                    // Stream, FileStream
+using System.Text;                  // Encoding
+using System.Collections;           // IEnumerator
+using RestSharp;                    // RestClient
 
 public class BackEndAPI
-{
-    // **************************
-    // JSON Deserialisation
-    // **************************
-
-    public class S3PresignedURL
-    {
-        public S3PresignedURLData data { get; set; }
-    }
-
-    public class S3PresignedURLData
-    {
-        public string type { get; set; }
-        public Attributes attributes { get; set; }
-    }
-
-    public class Attributes
-    {
-        public KeyAndURL original { get; set; }
-        public KeyAndURL thumbnail { get; set; }
-    }
-
-    public class KeyAndURL
-    {
-        public string key { get; set; }
-        public string url { get; set; }
-    }
-
+{    
     // **************************
     // Member Variables
     // **************************
 
-    const string m_vreelStagingApplicationID = "366vapr5iwscaicaswycf8lvwetzmkj1r6loby9nc3uq26flimxpbqnadbt6vam3";
-    const string m_vreelProductionapplicationID = "ic4ycp0w6jagoi67liubw5dug6zszbq9gcvhfayu25ulc3vj5xp02sf99ingc0s4";
     const string m_vreelStagingURL = "https://vreel-staging.herokuapp.com/v1";
     const string m_vreelProductionURL = "https://api.vreel.io/v1";
+    const string m_vreelStagingApplicationID = "366vapr5iwscaicaswycf8lvwetzmkj1r6loby9nc3uq26flimxpbqnadbt6vam3";
+    const string m_vreelProductionapplicationID = "ic4ycp0w6jagoi67liubw5dug6zszbq9gcvhfayu25ulc3vj5xp02sf99ingc0s4";
 
     private RestClient m_vreelClient;
+    private string m_vreelURL = "";
     private string m_applicationID = "";
     private string m_client = "";
     private string m_uid = "";
     private string m_accessToken = "";
 
     private MonoBehaviour m_owner = null;
+    private GameObject m_errorMessage;
     private ThreadJob m_threadJob;
 
     // **************************
     // Public functions
     // **************************
 
-    public BackEndAPI(MonoBehaviour owner)
+    public BackEndAPI(MonoBehaviour owner, GameObject errorMessage)
     {
         m_owner = owner;
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: An BackEndAPI object was Created by = " + m_owner.name);
+        m_errorMessage = errorMessage;
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: A BackEndAPI object was Created by = " + m_owner.name);
 
-        m_applicationID = m_vreelStagingApplicationID;
-        m_vreelClient = new RestClient(m_vreelStagingURL);
+        // Version dependent code
+        m_vreelURL = m_vreelStagingURL; //m_vreelProductionURL;
+        m_applicationID = m_vreelStagingApplicationID; //m_vreelProductionapplicationID;
+
+        m_vreelClient = new RestClient(m_vreelURL);
         m_threadJob = new ThreadJob(owner);
     }
 
@@ -93,15 +73,28 @@ public class BackEndAPI
         );
         yield return m_threadJob.WaitFor();
 
-        if (Debug.isDebugBuild) Debug.Log(response.Content);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users' - Response: " + response.Content);
 
         if (response.StatusCode == System.Net.HttpStatusCode.OK)
         {
             UpdateAccessToken(response);
+
+            foreach (Parameter parameter in response.Headers)
+            {
+                if (parameter.Name == "Client")
+                {
+                    m_client = parameter.Value.ToString();
+                }
+
+                if (parameter.Name == "Uid")
+                {
+                    m_uid = parameter.Value.ToString();
+                }
+            }
         }
-        else 
-        {
-            // TODO: Error handling...
+        else // Error Handling
+        {            
+            ShowErrors(response, "POST to '/users/sign_in'");
         }
     }
 
@@ -123,13 +116,15 @@ public class BackEndAPI
         );
         yield return m_threadJob.WaitFor();
 
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> PUT to '/users' - Response: " + response.Content);
+
         if (response.StatusCode == System.Net.HttpStatusCode.OK)
         {
             UpdateAccessToken(response);
         }
-        else 
-        {
-            // TODO: Error handling...
+        else // Error Handling
+        {            
+            ShowErrors(response, "POST to '/users/sign_in'");
         }
     }
 
@@ -151,13 +146,15 @@ public class BackEndAPI
         );
         yield return m_threadJob.WaitFor();
 
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/users' - Response: " + response.Content);
+
         if (response.StatusCode == System.Net.HttpStatusCode.OK)
         {
             UpdateAccessToken(response);
         }
-        else 
-        {
-            // TODO: Error handling...
+        else // Error Handling
+        {            
+            ShowErrors(response, "POST to '/users/sign_in'");
         }
     }
 
@@ -178,20 +175,22 @@ public class BackEndAPI
         );
         yield return m_threadJob.WaitFor();
 
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users/password' - Response: " + response.Content);
+
         if (response.StatusCode == System.Net.HttpStatusCode.OK)
         {
             UpdateAccessToken(response);
         }
-        else 
-        {
-            // TODO: Error handling...
+        else // Error Handling
+        {            
+            ShowErrors(response, "POST to '/users/sign_in'");
         }
     }
         
     public IEnumerator Session_SignIn(string login, string password)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users/sign_in' - Sign In");
-        
+
         var request = new RestRequest("/users/sign_in", Method.POST);
         request.AddHeader("vreel-application-id", m_applicationID);
 
@@ -205,7 +204,7 @@ public class BackEndAPI
         );
         yield return m_threadJob.WaitFor();
 
-        if (Debug.isDebugBuild) Debug.Log(response.Content);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users/sign_in' - Response: " + response.Content);
 
         if (response.StatusCode == System.Net.HttpStatusCode.OK)
         {
@@ -224,10 +223,11 @@ public class BackEndAPI
                 }
             }
         }
-        else
-        {
-            // TODO: Error handling...
+        else // Error Handling
+        {            
+            ShowErrors(response, "POST to '/users/sign_in'");
         }
+
     }
 
     // ------ !CURRENTLY UNUSED! -------- //
@@ -248,13 +248,15 @@ public class BackEndAPI
         );
         yield return m_threadJob.WaitFor();
 
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/users/sign_out' - Response: " + response.Content);
+
         if (response.StatusCode == System.Net.HttpStatusCode.OK)
         {
             UpdateAccessToken(response);
         }
-        else 
-        {
-            // TODO: Error handling...
+        else // Error Handling
+        {            
+            ShowErrors(response, "POST to '/users/sign_in'");
         }
     }
 
@@ -270,20 +272,24 @@ public class BackEndAPI
         request.AddHeader("access-token", m_accessToken);
 
         yield return m_threadJob.WaitFor();
-        IRestResponse<S3PresignedURL> response = new RestResponse<S3PresignedURL>();
+        IRestResponse response = new RestResponse();
         m_threadJob.Start( () => 
-            response = m_vreelClient.Execute<S3PresignedURL>(request)
+            response = m_vreelClient.Execute(request)
         );
         yield return m_threadJob.WaitFor();
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/s3_presigned_url' - Response: " + response.Content);
 
         if (response.StatusCode == System.Net.HttpStatusCode.OK)
         {
             UpdateAccessToken(response);
 
-            Debug.Log("Original - Key: " + response.Data.data.attributes.original.key.ToString());
-            Debug.Log("Original - URL: " + response.Data.data.attributes.original.url.ToString());
-            Debug.Log("Thumbnail - Key: " + response.Data.data.attributes.thumbnail.key.ToString());
-            Debug.Log("Thumbnail - URL: " + response.Data.data.attributes.thumbnail.url.ToString());
+            var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_S3PresignedURL>(response.Content);
+
+            Debug.Log("Original - Key: " + result.data.attributes.original.key.ToString());
+            Debug.Log("Original - URL: " + result.data.attributes.original.url.ToString());
+            Debug.Log("Thumbnail - Key: " + result.data.attributes.thumbnail.key.ToString());
+            Debug.Log("Thumbnail - URL: " + result.data.attributes.thumbnail.url.ToString());
 
             /*
             UploadObject(
@@ -292,9 +298,9 @@ public class BackEndAPI
             );
             */
         }
-        else 
-        {
-            // TODO: Error handling...
+        else // Error Handling
+        {            
+            ShowErrors(response, "POST to '/users/sign_in'");
         }
     }
 
@@ -316,13 +322,15 @@ public class BackEndAPI
         );
         yield return m_threadJob.WaitFor();
 
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts' - Response: " + response.Content);
+
         if (response.StatusCode == System.Net.HttpStatusCode.OK)
         {
             UpdateAccessToken(response);
         }
-        else 
-        {
-            // TODO: Error handling...
+        else // Error Handling
+        {            
+            ShowErrors(response, "POST to '/users/sign_in'");
         }
     }
 
@@ -348,13 +356,15 @@ public class BackEndAPI
         );
         yield return m_threadJob.WaitFor();
 
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/posts' - Response: " + response.Content);
+
         if (response.StatusCode == System.Net.HttpStatusCode.OK)
         {
             UpdateAccessToken(response);
         }
-        else 
-        {
-            // TODO: Error handling...
+        else // Error Handling
+        {            
+            ShowErrors(response, "POST to '/users/sign_in'");
         }
     }
 
@@ -421,6 +431,23 @@ public class BackEndAPI
             {
                 m_accessToken = parameter.Value.ToString();
             }               
+        }
+    }
+
+    private void ShowErrors(IRestResponse response, string debugString)
+    {
+        var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Error>(response.Content);
+
+        var errorText = m_errorMessage.GetComponentInChildren<Text>();
+        errorText.text = "";
+
+        foreach(var error in result.errors)
+        {
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> " + debugString + " - Error: " + error.detail.ToString());
+
+            errorText.text += error.detail.ToString();
+            errorText.text += "\n";
+            m_errorMessage.SetActive(true);
         }
     }
 }

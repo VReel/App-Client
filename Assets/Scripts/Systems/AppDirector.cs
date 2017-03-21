@@ -48,7 +48,7 @@ public class AppDirector : MonoBehaviour
     {
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
-        m_coroutineQueue = new CoroutineQueue( this );
+        m_coroutineQueue = new CoroutineQueue(this);
         m_coroutineQueue.StartLoop();
 
         m_coroutineQueue.EnqueueAction(SetLoginState());
