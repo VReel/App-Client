@@ -42,6 +42,11 @@ public class LoginFlow : MonoBehaviour
 
     public void Restart()
     {
+        if (m_coroutineQueue == null)
+        {
+            m_coroutineQueue = new CoroutineQueue(this);
+        }
+
         m_coroutineQueue.StartLoop();
     }
         
@@ -89,10 +94,20 @@ public class LoginFlow : MonoBehaviour
 
         m_staticLoadingIcon.SetActive(true);
 
-        // TEMPORARY!!!
+        // ----------------------------------------------------
+        // TEMPORARY HACK!!!
         yield return m_backEndAPI.Session_SignIn(
             "arthur", "BWM0SLA5"
         );
+
+        //yield return m_backEndAPI.S3_PresignedURL();
+
+        // TODO: m_backEndAPI.UploadObject(...);
+
+        //string thumbnailKey = m_backEndAPI.GetS3URLJSONData().data.attributes.thumbnail.key.ToString();
+        //string originalKey = m_backEndAPI.GetS3URLJSONData().data.attributes.original.key.ToString();
+        //yield return m_backEndAPI.Posts_Create(thumbnailKey, originalKey);
+        // ----------------------------------------------------
 
         /*
         yield return m_backEndAPI.Session_SignIn(

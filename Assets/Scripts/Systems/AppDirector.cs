@@ -113,6 +113,7 @@ public class AppDirector : MonoBehaviour
 
         m_deviceGallery.InvalidateGalleryImageLoading();
         m_AWSS3Client.InvalidateS3ImageLoading();
+        m_profile.InvalidateThumbnailLoading();
         m_loginFlow.SetLoginFlowPage(0);
 
         m_menuController.SetLoginSubMenuActive(true);
@@ -137,8 +138,8 @@ public class AppDirector : MonoBehaviour
 
         m_menuController.SetProfileSubMenuActive(true);
 
-        m_profile.OpenProfile();
         m_AWSS3Client.OpenProfile();
+        m_profile.OpenProfile();
         m_appState = AppState.kProfile;
 
         yield break;
@@ -151,6 +152,7 @@ public class AppDirector : MonoBehaviour
         SetMenuBar(true);
 
         m_AWSS3Client.InvalidateS3ImageLoading();
+        m_profile.InvalidateThumbnailLoading();
 
         m_menuController.SetGallerySubMenuActive(true);
         m_deviceGallery.OpenAndroidGallery();

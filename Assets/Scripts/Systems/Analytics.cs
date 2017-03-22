@@ -11,7 +11,7 @@ public class Analytics : MonoBehaviour
     // **************************
 
     [SerializeField] private AppDirector m_appDirector;
-    [SerializeField] private UserLogin m_userLogin;
+    [SerializeField] private User m_user;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
 
     private MobileAnalyticsManager m_analyticsManager;
@@ -20,6 +20,7 @@ public class Analytics : MonoBehaviour
     // **************************
     // Public functions
     // **************************
+
 
     public void Start() 
     {                
@@ -42,7 +43,7 @@ public class Analytics : MonoBehaviour
     public void ProfileSelected()
     {
         CustomEvent customEvent = new CustomEvent("ProfileSelected");
-        customEvent.AddAttribute("CognitoID", m_userLogin.GetCognitoUserID());
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
 
         m_analyticsManager.RecordEvent(customEvent);
     }
@@ -50,7 +51,7 @@ public class Analytics : MonoBehaviour
     public void GallerySelected()
     {
         CustomEvent customEvent = new CustomEvent("GallerySelected");
-        customEvent.AddAttribute("CognitoID", m_userLogin.GetCognitoUserID());
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
 
         m_analyticsManager.RecordEvent(customEvent);
     }
@@ -63,7 +64,7 @@ public class Analytics : MonoBehaviour
     public void LogoutSelected()
     {
         CustomEvent customEvent = new CustomEvent("LogoutSelected");
-        customEvent.AddAttribute("CognitoID", m_userLogin.GetCognitoUserID());
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
 
         m_analyticsManager.RecordEvent(customEvent);
     }
@@ -71,7 +72,7 @@ public class Analytics : MonoBehaviour
     public void ImageSphereSelected(int sphereNumber)
     {
         CustomEvent customEvent = new CustomEvent("ImageSphereSelected");
-        customEvent.AddAttribute("CognitoID", m_userLogin.GetCognitoUserID());
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
 
         if (m_appDirector.GetState() == AppDirector.AppState.kProfile)
         {
@@ -90,7 +91,7 @@ public class Analytics : MonoBehaviour
     public void PreviousArrowSelected()
     {
         CustomEvent customEvent = new CustomEvent("PreviousArrowSelected");
-        customEvent.AddAttribute("CognitoID", m_userLogin.GetCognitoUserID());
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
 
         if (m_appDirector.GetState() == AppDirector.AppState.kProfile)
         {
@@ -107,7 +108,7 @@ public class Analytics : MonoBehaviour
     public void NextArrowSelected()
     {
         CustomEvent customEvent = new CustomEvent("NextArrowSelected");
-        customEvent.AddAttribute("CognitoID", m_userLogin.GetCognitoUserID());
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
 
         if (m_appDirector.GetState() == AppDirector.AppState.kProfile)
         {
@@ -126,7 +127,7 @@ public class Analytics : MonoBehaviour
         //TODO: Split this into request and success/failure
         
         CustomEvent customEvent = new CustomEvent("ImageUploaded");
-        customEvent.AddAttribute("CognitoID", m_userLogin.GetCognitoUserID());
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
 
         if (m_imageSphereSkybox.IsTextureValid())
         {
@@ -143,13 +144,13 @@ public class Analytics : MonoBehaviour
 
     private IEnumerator LoginSelectedInternal()
     {
-        while (!m_userLogin.HasCachedCognitoUserID())
+        while (!m_user.IsLoggedIn())
         {
             yield return null;
         }
 
         CustomEvent customEvent = new CustomEvent("LoginSelected");
-        customEvent.AddAttribute("CognitoID", m_userLogin.GetCognitoUserID());
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
 
         m_analyticsManager.RecordEvent(customEvent);
     }

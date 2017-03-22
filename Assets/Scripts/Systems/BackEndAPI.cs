@@ -29,6 +29,9 @@ public class BackEndAPI
     private User m_user;
     private ThreadJob m_threadJob;
 
+    private VReelJSON.Model_Posts m_postsJSONData;
+    private VReelJSON.Model_S3PresignedURL m_s3URLJSONData;
+
     // **************************
     // Public functions
     // **************************
@@ -52,20 +55,32 @@ public class BackEndAPI
     {
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: A BackEndAPI object was Destructed by = " + m_owner.name);
     }
+
+    public VReelJSON.Model_Posts GetPostsJSONData()
+    {
+        return m_postsJSONData;
+    }
+
+    public VReelJSON.Model_S3PresignedURL GetS3URLJSONData()
+    {
+        return m_s3URLJSONData;
+    }
         
-    public IEnumerator Register_CreateUser(string handle, string email, string password, string passwordConfirmation)
+    public IEnumerator Register_CreateUser(string _handle, string _email, string _password, string _passwordConfirmation)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users' - Create New User");
 
         var request = new RestRequest("/users", Method.POST);
         request.AddHeader("vreel-application-id", m_applicationID);
 
-        request.AddParameter("handle", handle);
-        request.AddParameter("email", email);
-        request.AddParameter("password", password);
-        request.AddParameter("password_confirmation", passwordConfirmation);
-        request.AddParameter("name", "");
-        request.AddParameter("profile", "");
+        request.AddJsonBody(new { 
+            handle = _handle, 
+            email = _email,
+            password = _password,
+            password_confirmation = _passwordConfirmation,
+            name = "",
+            profile = ""
+        });
 
         yield return m_threadJob.WaitFor();
         IRestResponse response = new RestResponse();
@@ -81,8 +96,8 @@ public class BackEndAPI
             UpdateAccessToken(response);
             UpdateLoginTokens(response);
 
-            m_user.m_handle = handle;
-            m_user.m_email = email;
+            m_user.m_handle = _handle;
+            m_user.m_email = _email;
             m_user.m_name = "";
             m_user.m_profileDescription = "";
         }
@@ -154,14 +169,16 @@ public class BackEndAPI
     }
 
     // ------ !CURRENTLY UNUSED! -------- //
-    public IEnumerator Passwords_Password(string email)
+    public IEnumerator Passwords_Password(string _email)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users/password' - New Password Reset");
 
         var request = new RestRequest("/users/password", Method.POST);
         request.AddHeader("vreel-application-id", m_applicationID);
 
-        request.AddParameter("email", email);
+        request.AddJsonBody(new { 
+            email = _email
+        });
 
         yield return m_threadJob.WaitFor();
         IRestResponse response = new RestResponse();
@@ -182,15 +199,17 @@ public class BackEndAPI
         }
     }
         
-    public IEnumerator Session_SignIn(string login, string password)
+    public IEnumerator Session_SignIn(string _login, string _password)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users/sign_in' - Sign In");
 
         var request = new RestRequest("/users/sign_in", Method.POST);
         request.AddHeader("vreel-application-id", m_applicationID);
 
-        request.AddParameter("login", login);
-        request.AddParameter("password", password);
+        request.AddJsonBody(new { 
+            login = _login, 
+            password = _password,
+        });
 
         yield return m_threadJob.WaitFor();
         IRestResponse response = new RestResponse();
@@ -274,18 +293,28 @@ public class BackEndAPI
             UpdateAccessToken(response);
 
             var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_S3PresignedURL>(response.Content);
+            m_s3URLJSONData = result;
 
             Debug.Log("Original - Key: " + result.data.attributes.original.key.ToString());
             Debug.Log("Original - URL: " + result.data.attributes.original.url.ToString());
             Debug.Log("Thumbnail - Key: " + result.data.attributes.thumbnail.key.ToString());
             Debug.Log("Thumbnail - URL: " + result.data.attributes.thumbnail.url.ToString());
 
-            /*
+            // ----------------------------------------------------
+            // TEMPORARY HACK!!!
             UploadObject(
-                response.Data.attributes.original.url.ToString(),
+                result.data.attributes.original.url.ToString(),
                 System.IO.Directory.GetCurrentDirectory() + "/Assets/Berlin_Original.jpg"
             );
-            */
+            Debug.Log("------- VREEL: Uploaded Original object");
+
+            UploadObject(
+                result.data.attributes.thumbnail.url.ToString(),
+                System.IO.Directory.GetCurrentDirectory() + "/Assets/Berlin_Thumbnail.jpg"
+            );
+            Debug.Log("------- VREEL: Uploaded Thumbnail object");
+            // ----------------------------------------------------
+            
         }
         else // Error Handling
         {            
@@ -310,21 +339,16 @@ public class BackEndAPI
         );
         yield return m_threadJob.WaitFor();
 
+        m_postsJSONData = null;
+
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts' - Response: " + response.Content);
 
         if (IsSuccessCode(response.StatusCode))
         {
             UpdateAccessToken(response);
 
-            var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Profile>(response.Content);
-
-            Debug.Log("Test: " + result.GetType());
-            //Debug.Log("Test2: " + result.data.GetType());
-
-            //Debug.Log("Thumbnail URL: " + result.data.attributes.thumbnail_url.ToString());
-            //Debug.Log("Caption: " + result.data.attributes.caption.ToString());
-            //Debug.Log("Created At: " + result.data.attributes.created_at.ToString());
-            //Debug.Log("Edited: " + result.data.attributes.edited.ToString());
+            var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Posts>(response.Content);
+            m_postsJSONData = result;
         }
         else // Error Handling
         {            
@@ -333,9 +357,9 @@ public class BackEndAPI
     }
 
     // ------ !CURRENTLY UNUSED! -------- //
-    public IEnumerator Posts_Create(string thumbnailKey, string originalKey)
+    public IEnumerator Posts_Create(string _thumbnailKey, string _originalKey)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/posts' - Create new user");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/posts' - Create new post");
         
         var request = new RestRequest("/posts", Method.POST);
         request.AddHeader("vreel-application-id", m_applicationID);
@@ -343,9 +367,11 @@ public class BackEndAPI
         request.AddHeader("uid", m_user.m_uid);
         request.AddHeader("access-token", m_user.m_accessToken);
 
-        request.AddParameter("thumbnail_key", thumbnailKey);
-        request.AddParameter("original_key", originalKey);
-        request.AddParameter("caption", "");
+        request.AddJsonBody(new { 
+            thumbnail_key = _thumbnailKey, 
+            original_key = _originalKey,
+            caption = ""
+        });
 
         yield return m_threadJob.WaitFor();
         IRestResponse response = new RestResponse();
@@ -462,13 +488,16 @@ public class BackEndAPI
         var errorText = m_errorMessage.GetComponentInChildren<Text>();
         errorText.text = "";
 
-        foreach(var error in result.errors)
+        if (result.errors != null)
         {
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> " + debugString + " - Error: " + error.detail.ToString());
+            foreach(var error in result.errors)
+            {
+                if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> " + debugString + " - Error: " + error.detail.ToString());
 
-            errorText.text += error.detail.ToString();
-            errorText.text += "\n";
-            m_errorMessage.SetActive(true);
+                errorText.text += error.detail.ToString();
+                errorText.text += "\n";
+                m_errorMessage.SetActive(true);
+            }
         }
     }        
 }

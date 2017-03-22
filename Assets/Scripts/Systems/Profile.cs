@@ -4,11 +4,7 @@ using System;                       // Datetime
 using System.Collections;           // IEnumerator
 using System.Collections.Generic;   // List
 using System.IO;                    // Stream
-using Amazon;                       // UnityInitializer
-using Amazon.CognitoIdentity;       // CognitoAWSCredentials
-using Amazon.S3;                    // AmazonS3Client
-using Amazon.S3.Model;              // ListBucketsRequest
-using Amazon.Runtime;               // SessionAWSCredentials
+using System.Net;                   // HttpWebRequest
 
 public class Profile : MonoBehaviour 
 {   
@@ -16,26 +12,19 @@ public class Profile : MonoBehaviour
     // Member Variables
     // **************************
 
-    [SerializeField] private GameObject m_errorMessage;
-
-    private BackEndAPI m_backEndAPI;
-
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private AppDirector m_appDirector;
+    [SerializeField] private GameObject m_errorMessage;
     [SerializeField] private GameObject m_staticLoadingIcon;
     [SerializeField] private GameObject m_newUserText;   
     [SerializeField] private GameObject m_galleryMessage;
     [SerializeField] private User m_user;
 
-    private AmazonS3Client m_s3Client = null;
-    private CognitoAWSCredentials m_cognitoCredentials = null;
-    private int m_currS3ImageFilePathIndex = -1;
-    private List<string> m_s3ImageFilePaths;
+    private BackEndAPI m_backEndAPI;
+    private List<string> m_postThumbnailURLs;
+    private int m_currThumbnailURLIndex = -1;
     private CoroutineQueue m_coroutineQueue;
-
-    //TODO DELETE
-    //[SerializeField] private UserLogin m_userLogin;
 
     // **************************
     // Public functions
@@ -43,9 +32,7 @@ public class Profile : MonoBehaviour
 
     public void Start() 
 	{
-		//UnityInitializer.AttachToGameObject(this.gameObject);
-
-        m_s3ImageFilePaths = new List<string>();
+        m_postThumbnailURLs = new List<string>();
 
         m_coroutineQueue = new CoroutineQueue( this );
         m_coroutineQueue.StartLoop();
@@ -78,53 +65,35 @@ public class Profile : MonoBehaviour
         m_coroutineQueue.EnqueueAction(LogoutInternal());
     }
         
-    public void InvalidateS3ImageLoading() // This function is called in order to stop any ongoing image loading 
+    public void InvalidateThumbnailLoading() // This function is called in order to stop any ongoing image loading 
     {        
-        m_currS3ImageFilePathIndex = -1;
+        m_currThumbnailURLIndex = -1;
         if (m_coroutineQueue != null)
         {
             m_coroutineQueue.Clear();
         }
     }
         
-    public bool IsS3ImageIndexAtStart()
+    public bool IsThumbnailURLIndexAtStart()
     {
-        return m_currS3ImageFilePathIndex <= 0;
+        return m_currThumbnailURLIndex <= 0;
     }
 
-    public bool IsS3ImageIndexAtEnd()
+    public bool IsThumbnailURLIndexAtEnd()
     {
         int numImageSpheres = m_imageSphereController.GetNumSpheres();
-        int numFiles = m_s3ImageFilePaths.Count;
-        return m_currS3ImageFilePathIndex >= (numFiles - numImageSpheres);       
+        int numFiles = m_postThumbnailURLs.Count; // m_s3ImageFilePaths.Count;
+        return m_currThumbnailURLIndex >= (numFiles - numImageSpheres);       
     }
-
-    public void ClearClient()
-    {
-        if (m_cognitoCredentials != null)
-        {
-            m_cognitoCredentials.Clear();
-        }
-
-        m_s3Client = null;
-    }
-
-    public bool IsS3ClientValid()
-    {
-        return m_s3Client != null;
-    }
-
-    public IEnumerator WaitForValidS3Client()
-    {
-        while (!IsS3ClientValid()) yield return null;
-    }
-
+        
+    /*
     public void UploadImage()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: UploadImage() called");
 
         m_coroutineQueue.EnqueueAction(UploadImageInternal());
     }
+    */
 
     public void OpenProfile()
     {
@@ -140,9 +109,9 @@ public class Profile : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: NextImages() called");
 
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
-        int numFilePaths = m_s3ImageFilePaths.Count;
+        int numFilePaths = m_postThumbnailURLs.Count; // m_s3ImageFilePaths.Count;
 
-        m_currS3ImageFilePathIndex = Mathf.Clamp(m_currS3ImageFilePathIndex + numImagesToLoad, 0, numFilePaths);
+        m_currThumbnailURLIndex = Mathf.Clamp(m_currThumbnailURLIndex + numImagesToLoad, 0, numFilePaths);
 
         m_coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
         m_coroutineQueue.EnqueueAction(DownloadImagesAndSetSpheres());
@@ -153,9 +122,9 @@ public class Profile : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreviousImages() called");
 
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
-        int numFilePaths = m_s3ImageFilePaths.Count;
+        int numFilePaths = m_postThumbnailURLs.Count; // m_s3ImageFilePaths.Count;
 
-        m_currS3ImageFilePathIndex = Mathf.Clamp(m_currS3ImageFilePathIndex - numImagesToLoad, 0, numFilePaths);
+        m_currThumbnailURLIndex = Mathf.Clamp(m_currThumbnailURLIndex - numImagesToLoad, 0, numFilePaths);
 
         m_coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
         m_coroutineQueue.EnqueueAction(DownloadImagesAndSetSpheres());
@@ -178,10 +147,10 @@ public class Profile : MonoBehaviour
         m_staticLoadingIcon.SetActive(false);
     }
 
+    /*
     private IEnumerator UploadImageInternal()
     {
         yield return m_appDirector.VerifyInternetConnection();
-        yield return WaitForValidS3Client();
 
         m_staticLoadingIcon.SetActive(true);
 
@@ -240,97 +209,56 @@ public class Profile : MonoBehaviour
             m_staticLoadingIcon.SetActive(false);
         });
     }
-
-    private static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
+    */
+        
+    // TODO: Handle users who have more than 20 posts!
     private IEnumerator StoreAllPostURLsAndSetSpheres()
     {
         yield return m_appDirector.VerifyInternetConnection();
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Getting all Posts for Logged in User");
 
+        m_postThumbnailURLs.Clear();
+
         yield return m_backEndAPI.Posts_GetAll();
 
-        yield break;
-    }
-
-    private IEnumerator StoreAllS3ImagePathsAndSetSpheres()
-    {
-        yield return m_appDirector.VerifyInternetConnection();
-        yield return WaitForValidS3Client();
-
-        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Fetching all the Objects from: " + "" + "/" + m_userLogin.GetCognitoUserID() + "/");
-
-        var request = new ListObjectsRequest()
+        VReelJSON.Model_Posts posts = m_backEndAPI.GetPostsJSONData();
+        if (posts != null)
         {
-            BucketName = "", //m_s3BucketName,
-            Prefix = "prefix" //m_userLogin.GetCognitoUserID()
-        };
-
-        m_currS3ImageFilePathIndex = 0;
-        m_s3Client.ListObjectsAsync(request, (responseObject) =>
-        {            
-            if (responseObject.Exception == null)
-            {
-                if (Debug.isDebugBuild) Debug.Log("------- VREEL: Got successful response from ListObjectsAsync(), storing file paths!");
-
-                m_s3ImageFilePaths.Clear();
-
-                responseObject.Response.S3Objects.ForEach((s3object) => //NOTE: Making this into a seperate function seemed more work than worth
-                {
-                    if (ImageExtensions.Contains(Path.GetExtension(s3object.Key).ToUpperInvariant())) // Check that the file is indeed an image
-                    {   
-                        m_s3ImageFilePaths.Add(s3object.Key);
-                        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Stored FileName: " + s3object.Key);
-                    }
-                });
-
-                m_s3ImageFilePaths.Reverse(); // Reversing to have the images appear in the order of newest - this works because I store images with a timestamp!
-
-                m_coroutineQueue.EnqueueAction(DownloadImagesAndSetSpheres());
+            foreach (VReelJSON.PostData postData in posts.data)
+            {                
+                m_postThumbnailURLs.Add(postData.attributes.thumbnail_url.ToString());
             }
-            else
-            {
-                if (Debug.isDebugBuild) Debug.Log("------- VREEL: Got an Exception calling 'ListObjectsAsync()'");
+        }           
 
-                // Report Failure in Profile
-                /*
-                Text profileTextComponent = m_profileMessage.GetComponentInChildren<Text>();
-                if (profileTextComponent != null)
-                {
-                    profileTextComponent.text = "Failed to get Images!\n Try again later!";
-                    profileTextComponent.color = Color.red;
-                }
-                m_profileMessage.SetActive(true);
-                */
-            }
+        m_currThumbnailURLIndex = 0; // set to a valid Index
+        m_coroutineQueue.EnqueueAction(DownloadImagesAndSetSpheres());
 
-            bool noImagesUploaded = m_s3ImageFilePaths.Count <= 0;
-            m_newUserText.SetActive(noImagesUploaded); // If the user has yet to upload any images then show them the New User Text!
-        });
+        bool noImagesUploaded = m_postThumbnailURLs.Count <= 0;
+        m_newUserText.SetActive(noImagesUploaded); // If the user has yet to upload any images then show them the New User Text!
     }
 
     private IEnumerator DownloadImagesAndSetSpheres()
     {
         yield return m_appDirector.VerifyInternetConnection();
-        yield return WaitForValidS3Client();
 
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
-        DownloadImagesAndSetSpheresInternal(m_currS3ImageFilePathIndex, numImagesToLoad);
+        DownloadImagesAndSetSpheresInternal(m_currThumbnailURLIndex, numImagesToLoad);
     }
 
-    private void DownloadImagesAndSetSpheresInternal(int startingS3ImageIndex, int numImages)
+    private void DownloadImagesAndSetSpheresInternal(int startingThumbnailURLIndex, int numImages)
     {
-        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading {0} images beginning at index {1}. There are {2} images in this S3 folder!", numImages, startingS3ImageIndex, m_s3ImageFilePaths.Count));
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading {0} images beginning at index {1}. We've found {2} posts for the user!", numImages, startingThumbnailURLIndex, m_postThumbnailURLs.Count));
 
         Resources.UnloadUnusedAssets();
 
-        int currS3ImageIndex = startingS3ImageIndex;
-        for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, currS3ImageIndex++)
+        int currThumbnailURLIndex = startingThumbnailURLIndex;
+        for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, currThumbnailURLIndex++)
         {
-            if (currS3ImageIndex < m_s3ImageFilePaths.Count)
+            if (currThumbnailURLIndex < m_postThumbnailURLs.Count)
             {                   
-                string filePath = m_s3ImageFilePaths[currS3ImageIndex];
-                m_coroutineQueue.EnqueueAction(DownloadImage(filePath, sphereIndex, currS3ImageIndex, numImages));
+                string thumbnailURL = m_postThumbnailURLs[currThumbnailURLIndex];
+                m_coroutineQueue.EnqueueAction(DownloadImage(thumbnailURL, sphereIndex, currThumbnailURLIndex, numImages));
             }
             else
             {
@@ -341,56 +269,27 @@ public class Profile : MonoBehaviour
         Resources.UnloadUnusedAssets();
     }
 
-    private IEnumerator DownloadImage(string filePath, int sphereIndex, int thisS3ImageIndex, int numImages)
+    private IEnumerator DownloadImage(string url, int sphereIndex, int thisThumbnailURLIndex, int numImages)
     {
         yield return m_appDirector.VerifyInternetConnection();
-        yield return WaitForValidS3Client();
+                   
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading: " + url));
 
-        string fullFilePath = filePath; //m_s3BucketName + filePath;           
-        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading {0} from bucket {1}", filePath, ""));
+        HttpWebRequest http = (HttpWebRequest)WebRequest.Create(url);
+        m_coroutineQueue.EnqueueAction(LoadImageInternalUnity(http.GetResponse(), sphereIndex, url));
 
-        m_s3Client.GetObjectAsync("", filePath, (s3ResponseObj) => //m_s3BucketName
-        {               
-            var response = s3ResponseObj.Response;
-            if (response != null && response.ResponseStream != null)
-            {                   
-                bool imageRequestStillValid = 
-                    (m_currS3ImageFilePathIndex != -1) && 
-                    (m_currS3ImageFilePathIndex <= thisS3ImageIndex) &&  
-                    (thisS3ImageIndex < m_currS3ImageFilePathIndex + numImages) && // Request no longer valid as user has moved on from this page
-                    (filePath.CompareTo(m_imageSkybox.GetImageFilePath()) != 0); // If file-path is the same then ignore request
-                
-                if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", imageRequestStillValid, m_currS3ImageFilePathIndex, thisS3ImageIndex, numImages) );
-                if (imageRequestStillValid)
-                {
-                    m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(response, sphereIndex, fullFilePath));
-
-                    if (Debug.isDebugBuild) Debug.Log("------- VREEL: Successfully downloaded and requested to set " + fullFilePath);
-                }
-                else
-                {
-                    if (Debug.isDebugBuild) Debug.Log("------- VREEL: Downloaded item successfully but was thrown away because user has moved off that page: " + fullFilePath);
-                }
-
-                Resources.UnloadUnusedAssets();
-            }
-            else
+        /*
+        using (WebClient webClient = new WebClient()) 
+        {
+            byte [] data = webClient.DownloadData(url);
+            using (MemoryStream mem = new MemoryStream(data)) 
             {
-                if (Debug.isDebugBuild) Debug.Log("------- VREEL: Got an Exception calling GetObjectAsync() for: " + fullFilePath);
-                if (Debug.isDebugBuild) Debug.Log("------- VREEL: Exception was: " + s3ResponseObj.Exception.ToString());
-
-                // Report Failure in Profile
-                /*
-                Text profileTextComponent = m_profileMessage.GetComponentInChildren<Text>();
-                if (profileTextComponent != null)
-                {
-                    profileTextComponent.text = "Failed getting Image!\n Re-open Profile!";
-                    profileTextComponent.color = Color.red;
+                using (var yourImage = Image.FromStream(mem)) 
+                { 
                 }
-                m_profileMessage.SetActive(true);
-                */
             }
-        });
+        }
+        */
     }
 
     private IEnumerator LoadImageInternalPlugin(Amazon.S3.Model.GetObjectResponse response, int sphereIndex, string fullFilePath)
@@ -403,13 +302,13 @@ public class Profile : MonoBehaviour
         }
     }
         
-    private IEnumerator LoadImageInternalUnity(Amazon.S3.Model.GetObjectResponse response, int sphereIndex, string fullFilePath)
+    private IEnumerator LoadImageInternalUnity(WebResponse response, int sphereIndex, string fullFilePath)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: ConvertStreamAndSetImage for " + fullFilePath);
 
         const int kNumIterationsPerFrame = 150;
         byte[] myBinary = null;
-        using (var stream = response.ResponseStream)
+        using (var stream = response.GetResponseStream())
         {            
             using( MemoryStream ms = new MemoryStream() )
             {

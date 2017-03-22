@@ -72,37 +72,24 @@ namespace VReelJSON
 
     //--------------------------------------------
 
-    public class Model_Profile
-    {
-        [DeserializeAs(Name = "data")]
-        public ProfileData data { get; set; }
+    public class Model_Posts
+    {     
+        public List<PostData> data { get; set; }
     }
 
-    public class ProfileData
+    public class PostData
     {
-        [DeserializeAs(Name = "id")]
         public string id { get; set; }
-
-        [DeserializeAs(Name = "type")]
         public string type { get; set; }
-
-        [DeserializeAs(Name = "attributes")]
-        public ProfileAttributes attributes { get; set; }
+        public PostAttributes attributes { get; set; }
     }
 
-    public class ProfileAttributes
+    public class PostAttributes
     {
-        [DeserializeAs(Name = "thumbnail_url")]
         public string thumbnail_url { get; set; }
-
-        [DeserializeAs(Name = "caption")]
         public string caption { get; set; }
-
-        [DeserializeAs(Name = "created_at")]
         public string created_at { get; set; }
-
-        [DeserializeAs(Name = "edited")]
-        public string edited { get; set; }
+        public bool edited { get; set; }
     }       
 
     //--------------------------------------------
