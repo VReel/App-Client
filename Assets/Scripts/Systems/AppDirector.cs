@@ -24,8 +24,8 @@ public class AppDirector : MonoBehaviour
     [SerializeField] private GameObject m_menuBar;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private ImageSphereController m_imageSphereController;
-    [SerializeField] private AWSS3Client m_AWSS3Client;
     [SerializeField] private DeviceGallery m_deviceGallery;
+    [SerializeField] private AWSS3Client m_AWSS3Client;
     [SerializeField] private UserLogin m_userLogin;
     [SerializeField] private LoginFlow m_loginFlow;
     [SerializeField] private Profile m_profile;
@@ -112,7 +112,7 @@ public class AppDirector : MonoBehaviour
         SetMenuBar(false);
 
         m_deviceGallery.InvalidateGalleryImageLoading();
-        m_AWSS3Client.InvalidateS3ImageLoading();
+        //m_AWSS3Client.InvalidateS3ImageLoading();
         m_profile.InvalidateThumbnailLoading();
         m_loginFlow.SetLoginFlowPage(0);
 
@@ -138,7 +138,7 @@ public class AppDirector : MonoBehaviour
 
         m_menuController.SetProfileSubMenuActive(true);
 
-        m_AWSS3Client.OpenProfile();
+        //m_AWSS3Client.OpenProfile();
         m_profile.OpenProfile();
         m_appState = AppState.kProfile;
 
@@ -151,7 +151,7 @@ public class AppDirector : MonoBehaviour
         m_imageSphereController.HideAllImageSpheres();
         SetMenuBar(true);
 
-        m_AWSS3Client.InvalidateS3ImageLoading();
+        //m_AWSS3Client.InvalidateS3ImageLoading();
         m_profile.InvalidateThumbnailLoading();
 
         m_menuController.SetGallerySubMenuActive(true);

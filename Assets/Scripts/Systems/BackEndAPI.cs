@@ -29,8 +29,8 @@ public class BackEndAPI
     private User m_user;
     private ThreadJob m_threadJob;
 
-    private VReelJSON.Model_Posts m_postsJSONData;
-    private VReelJSON.Model_S3PresignedURL m_s3URLJSONData;
+    private VReelJSON.Model_Posts m_postsJSONResult;
+    private VReelJSON.Model_S3PresignedURL m_s3URLJSONResult;
 
     // **************************
     // Public functions
@@ -56,14 +56,20 @@ public class BackEndAPI
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: A BackEndAPI object was Destructed by = " + m_owner.name);
     }
 
-    public VReelJSON.Model_Posts GetPostsJSONData()
+    public VReelJSON.Model_Posts GetAllPostsResult()
     {
-        return m_postsJSONData;
+        return m_postsJSONResult;
     }
 
-    public VReelJSON.Model_S3PresignedURL GetS3URLJSONData()
+    public VReelJSON.Model_S3PresignedURL GetS3PresignedURLResult()
     {
-        return m_s3URLJSONData;
+        return m_s3URLJSONResult;
+    }
+
+    public IEnumerator UploadObject(string url, byte[] byteArray) // string filePath)
+    {
+        UploadObjectInternal(url, byteArray);
+        yield break;
     }
         
     public IEnumerator Register_CreateUser(string _handle, string _email, string _password, string _passwordConfirmation)
@@ -279,6 +285,8 @@ public class BackEndAPI
         request.AddHeader("uid", m_user.m_uid);
         request.AddHeader("access-token", m_user.m_accessToken);
 
+        m_s3URLJSONResult = null;
+
         yield return m_threadJob.WaitFor();
         IRestResponse response = new RestResponse();
         m_threadJob.Start( () => 
@@ -293,28 +301,7 @@ public class BackEndAPI
             UpdateAccessToken(response);
 
             var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_S3PresignedURL>(response.Content);
-            m_s3URLJSONData = result;
-
-            Debug.Log("Original - Key: " + result.data.attributes.original.key.ToString());
-            Debug.Log("Original - URL: " + result.data.attributes.original.url.ToString());
-            Debug.Log("Thumbnail - Key: " + result.data.attributes.thumbnail.key.ToString());
-            Debug.Log("Thumbnail - URL: " + result.data.attributes.thumbnail.url.ToString());
-
-            // ----------------------------------------------------
-            // TEMPORARY HACK!!!
-            UploadObject(
-                result.data.attributes.original.url.ToString(),
-                System.IO.Directory.GetCurrentDirectory() + "/Assets/Berlin_Original.jpg"
-            );
-            Debug.Log("------- VREEL: Uploaded Original object");
-
-            UploadObject(
-                result.data.attributes.thumbnail.url.ToString(),
-                System.IO.Directory.GetCurrentDirectory() + "/Assets/Berlin_Thumbnail.jpg"
-            );
-            Debug.Log("------- VREEL: Uploaded Thumbnail object");
-            // ----------------------------------------------------
-            
+            m_s3URLJSONResult = result;          
         }
         else // Error Handling
         {            
@@ -332,14 +319,14 @@ public class BackEndAPI
         request.AddHeader("uid", m_user.m_uid);
         request.AddHeader("access-token", m_user.m_accessToken);
 
+        m_postsJSONResult = null;
+
         yield return m_threadJob.WaitFor();
         IRestResponse response = new RestResponse();
         m_threadJob.Start( () => 
             response = m_vreelClient.Execute(request)
         );
         yield return m_threadJob.WaitFor();
-
-        m_postsJSONData = null;
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts' - Response: " + response.Content);
 
@@ -348,7 +335,7 @@ public class BackEndAPI
             UpdateAccessToken(response);
 
             var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Posts>(response.Content);
-            m_postsJSONData = result;
+            m_postsJSONResult = result;
         }
         else // Error Handling
         {            
@@ -396,16 +383,16 @@ public class BackEndAPI
     // Private/Helper functions
     // **************************
 
-    private void UploadObject(string url, string filePath)
+    private void UploadObjectInternal(string url, byte[] byteArray) //string filePath)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploading Object called with url: " + url + ", and filePath: " + filePath);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploading Object called with url: " + url ); //+ ", and filePath: " + filePath);
 
         HttpWebRequest httpRequest = WebRequest.Create(url) as HttpWebRequest;
         httpRequest.Method = "PUT";
 
         try
         {
-            byte[] byteArray = File.ReadAllBytes(filePath);
+            //byte[] byteArray = File.ReadAllBytes(filePath);
             httpRequest.ContentLength = byteArray.Length;
             Stream dataStream = httpRequest.GetRequestStream();
             dataStream.Write(byteArray, 0, byteArray.Length);
@@ -435,7 +422,7 @@ public class BackEndAPI
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: Upload Exception caught: " + e);
         }
 
-        Debug.Log("Finished Uploading FileStream...");
+        Debug.Log("------- VREEL: Finished Uploading FileStream...");
         try
         {
             HttpWebResponse response = httpRequest.GetResponse() as HttpWebResponse;

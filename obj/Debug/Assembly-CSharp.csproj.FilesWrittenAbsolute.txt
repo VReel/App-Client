@@ -88,3 +88,4 @@
 /Users/FoxBookAir/Documents/Unity/VR/VReelApp/Temp/bin/Debug/UnityEngine.HoloLens.dll
 /Users/FoxBookAir/Documents/Unity/VR/VReelApp/Temp/bin/Debug/UnityEngine.VR.dll
 /Users/FoxBookAir/Documents/Unity/VR/VReelApp/Temp/bin/Debug/RestSharp.dll
+/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Temp/bin/Debug/system.drawing.dll

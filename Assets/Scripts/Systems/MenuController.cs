@@ -16,7 +16,8 @@ public class MenuController : MonoBehaviour
     [SerializeField] private GameObject m_profileSubMenu;
     [SerializeField] private GameObject m_gallerySubMenu;
     [SerializeField] private GameObject m_profileMessage;
-    [SerializeField] private UserLogin m_userLogin;
+    [SerializeField] private User m_user;
+    //[SerializeField] private UserLogin m_userLogin;
     [SerializeField] private VRStandardAssets.Utils.Reticle m_reticle;
     [SerializeField] private VRStandardAssets.Utils.VRInput m_input;
     [SerializeField] private GameObject[] m_menuBarButtons;
@@ -67,7 +68,7 @@ public class MenuController : MonoBehaviour
 
     private IEnumerator InternalShowWelcomeText()
     {
-        while (!m_userLogin.HasCachedUsername())
+        while (!m_user.IsLoggedIn())
         {
             yield return new WaitForEndOfFrame();
         }
@@ -76,7 +77,7 @@ public class MenuController : MonoBehaviour
         Text profileTextComponent = m_profileMessage.GetComponentInChildren<Text>();
         if (profileTextComponent != null)
         {
-            profileTextComponent.text = "Welcome " + m_userLogin.GetUsername() + "!";
+            profileTextComponent.text = "Welcome " + m_user.m_handle + "!";
             profileTextComponent.color = Color.black;
         }
         m_profileMessage.SetActive(true);

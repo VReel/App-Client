@@ -2,7 +2,11 @@ package io.vreel.vreel;
  
 import com.unity3d.player.UnityPlayerActivity;
 import java.io.File;
+import java.nio.Buffer;
+
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -54,28 +58,14 @@ public class JavaPlugin extends UnityPlayerActivity
 		int imageWidth = options.outWidth;
 		int imageHeight = options.outHeight;		
 
-		/*
-		path = String.format("{0}:{1}", 
-				imageWidth/GCD(imageWidth,imageHeight), 
-				imageHeight/GCD(imageWidth,imageHeight));
-		Log.d(TAG, path);
-		*/
         return imageWidth/ (float) imageHeight; // casting to float in order to ensure float output
     }
     
-    /*
-    private static int GCD(int a, int b) // greatest common divisor - currently unused
+    public static void CreateThumbnail(String path, Buffer buf)
     {
-	    int remainder;
-	
-	    while( b != 0 )
-	    {
-	    	remainder = a % b;
-	        a = b;
-	        b = remainder;
-	    }
-	
-	    return a;
+    	final int kThumbnailWidth = 320;
+    	Bitmap thumbnailImage = 
+    			ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(path), kThumbnailWidth, kThumbnailWidth/2);    	
+    	thumbnailImage.copyPixelsToBuffer(buf);
     }
-    */
 }

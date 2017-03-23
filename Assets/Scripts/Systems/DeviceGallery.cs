@@ -7,30 +7,36 @@ using System.Collections;           //IEnumerator
 using System.Collections.Generic;   //List
 using System.Threading;             //Threading
 
+using System.Drawing;
+
 public class DeviceGallery : MonoBehaviour 
-{
+{    
     // **************************
     // Member Variables
     // **************************
 
+    [SerializeField] private AppDirector m_appDirector;
+    [SerializeField] private User m_user;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
-    [SerializeField] private UserLogin m_userLogin;
-    [SerializeField] private GameObject m_noGalleryImagesText;
+    [SerializeField] private GameObject m_errorMessage;
+    [SerializeField] private GameObject m_noGalleryImagesText;   
     [SerializeField] private GameObject m_galleryMessage;
+    [SerializeField] private GameObject m_staticLoadingIcon;
 
     private int m_currGalleryImageIndex = 0;
     private List<string> m_galleryImageFilePaths;
     private CoroutineQueue m_coroutineQueue;
     private AndroidJavaClass m_javaPluginClass;
     private ThreadJob m_threadJob;
+    private BackEndAPI m_backEndAPI;
 
     // **************************
     // Public functions
     // **************************
 
     public void Start()
-    {
+    {        
         AndroidJNI.AttachCurrentThread();
         m_javaPluginClass = new AndroidJavaClass("io.vreel.vreel.JavaPlugin");
 
@@ -39,6 +45,8 @@ public class DeviceGallery : MonoBehaviour
         m_coroutineQueue.StartLoop();
 
         m_threadJob = new ThreadJob(this);
+
+        m_backEndAPI = new BackEndAPI(this, m_errorMessage, m_user);
     }
 
     public void InvalidateGalleryImageLoading() // This function is called in order to stop any ongoing image loading 
@@ -60,6 +68,13 @@ public class DeviceGallery : MonoBehaviour
         int numImageSpheres = m_imageSphereController.GetNumSpheres();
         int numFiles = m_galleryImageFilePaths.Count;
         return m_currGalleryImageIndex >= (numFiles - numImageSpheres);       
+    }
+        
+    public void UploadImage()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: UploadImage() called");
+
+        m_coroutineQueue.EnqueueAction(UploadImageInternal());
     }
 
     public void OpenAndroidGallery()
@@ -111,6 +126,72 @@ public class DeviceGallery : MonoBehaviour
     // **************************
     // Private/Helper functions
     // **************************
+
+    private IEnumerator UploadImageInternal()
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        m_staticLoadingIcon.SetActive(true);
+
+        // 1) Get Original Image byte array
+        string originalImageFileName = m_imageSkybox.GetImageFilePath();
+        byte[] originalImageByteArray = File.ReadAllBytes(originalImageFileName);
+            // File.ReadAllBytes(System.IO.Directory.GetCurrentDirectory() + "/Assets/Berlin_Original.jpg"); 
+        //var stream = new FileStream(originalFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+        yield return new WaitForEndOfFrame();
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Step 1 Complete");
+
+        // 2) Create Thumbnail - TODO Get CreateThumbnail() to work!
+        const int kStandardThumbnailWidth = 320;
+        byte[] thumbnailImageByteArray = CreateThumbnail(originalImageFileName, kStandardThumbnailWidth);
+            //File.ReadAllBytes(System.IO.Directory.GetCurrentDirectory() + "/Assets/Berlin_Thumbnail.jpg"); 
+        yield return new WaitForEndOfFrame();
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Step 2 Complete");
+
+        // 3) Get PresignedURL
+        yield return m_backEndAPI.S3_PresignedURL();
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Step 3 Complete");
+
+        // 4) Upload Original
+        yield return m_backEndAPI.UploadObject(
+            m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.url.ToString(),
+            originalImageByteArray
+        );
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Step 4 Complete");
+
+        // 5) Upload Thumbnail
+        yield return m_backEndAPI.UploadObject(
+            m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.url.ToString(),
+            thumbnailImageByteArray
+        );
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Step 5 Complete");
+
+        // 6) Register Post as Created
+        yield return m_backEndAPI.Posts_Create(
+            m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.key.ToString(), 
+            m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.key.ToString()
+        );
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Step 6 Complete");
+
+        // 7) If there has been a successful upload -> Inform user that image has been uploaded      
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploaded image: " + originalImageFileName);
+        Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
+        if (galleryTextComponent != null)
+        {
+            galleryTextComponent.text = "Succesful Upload!";
+            galleryTextComponent.color = UnityEngine.Color.black;
+        }
+        m_galleryMessage.SetActive(true);
+
+
+        m_staticLoadingIcon.SetActive(false);
+    }
 
     private IEnumerator StoreAllImageGalleryFilePaths(string imagesTopLevelDirectory)
     {                
@@ -186,7 +267,7 @@ public class DeviceGallery : MonoBehaviour
             if (galleryTextComponent != null)
             {
                 galleryTextComponent.text = "Reading files Failed!\n Check permissions!";
-                galleryTextComponent.color = Color.red;
+                galleryTextComponent.color = UnityEngine.Color.red;
             }
             m_galleryMessage.SetActive(true);
         }
@@ -210,7 +291,7 @@ public class DeviceGallery : MonoBehaviour
             if (galleryTextComponent != null)
             {
                 galleryTextComponent.text = "Reading files Failed!\n Check permissions!";
-                galleryTextComponent.color = Color.red;
+                galleryTextComponent.color = UnityEngine.Color.red;
             }
             m_galleryMessage.SetActive(true);
         }
@@ -241,7 +322,7 @@ public class DeviceGallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Image: " + filePath + " is 360: " + isImage360);
 
         return isImage360;
-    }
+    }        
 
     private bool SortGalleryImageFilePaths()
     {
@@ -321,5 +402,36 @@ public class DeviceGallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAndFilePath()");
 
         Resources.UnloadUnusedAssets();
+    }
+
+    //TODO: GET THIS FUNCTION WORKING SOMEHOW!
+    public byte[] CreateThumbnail(string originalImagePath, int thumbnailWidth)
+    {
+        MemoryStream outputStream = new MemoryStream();
+
+
+        System.Drawing.Image image = System.Drawing.Image.FromFile(originalImagePath);
+        System.Drawing.Image thumbnail = image.GetThumbnailImage(thumbnailWidth, thumbnailWidth/2, ()=>false, IntPtr.Zero);
+        thumbnail.Save(outputStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+
+        /*
+        Bitmap sourceBitmap = new Bitmap(originalImagePath);
+        float heightRatio = sourceBitmap.Height / sourceBitmap.Width;
+        SizeF newSize = new SizeF(thumbnailWidth, thumbnailWidth * heightRatio);
+        Bitmap targetBitmap = new Bitmap((int) newSize.Width,(int) newSize.Height);
+
+        using (System.Drawing.Graphics graphics = System.Drawing.Graphics.FromImage(targetBitmap))
+        {
+            graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
+            graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+            graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+            graphics.DrawImage(sourceBitmap, 0, 0, newSize.Width, newSize.Height);
+
+            targetBitmap.Save(outputStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+        }
+        */
+
+        return outputStream.ToArray();
     }
 }

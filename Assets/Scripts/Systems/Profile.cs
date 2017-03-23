@@ -12,14 +12,13 @@ public class Profile : MonoBehaviour
     // Member Variables
     // **************************
 
+    [SerializeField] private AppDirector m_appDirector;
+    [SerializeField] private User m_user;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
-    [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private GameObject m_errorMessage;
     [SerializeField] private GameObject m_staticLoadingIcon;
     [SerializeField] private GameObject m_newUserText;   
-    [SerializeField] private GameObject m_galleryMessage;
-    [SerializeField] private User m_user;
 
     private BackEndAPI m_backEndAPI;
     private List<string> m_postThumbnailURLs;
@@ -84,16 +83,7 @@ public class Profile : MonoBehaviour
         int numImageSpheres = m_imageSphereController.GetNumSpheres();
         int numFiles = m_postThumbnailURLs.Count; // m_s3ImageFilePaths.Count;
         return m_currThumbnailURLIndex >= (numFiles - numImageSpheres);       
-    }
-        
-    /*
-    public void UploadImage()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: UploadImage() called");
-
-        m_coroutineQueue.EnqueueAction(UploadImageInternal());
-    }
-    */
+    }        
 
     public void OpenProfile()
     {
@@ -147,70 +137,6 @@ public class Profile : MonoBehaviour
         m_staticLoadingIcon.SetActive(false);
     }
 
-    /*
-    private IEnumerator UploadImageInternal()
-    {
-        yield return m_appDirector.VerifyInternetConnection();
-
-        m_staticLoadingIcon.SetActive(true);
-
-        string fileName =  m_imageSkybox.GetImageFilePath();
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: UploadImage with FileName: " + fileName);
-
-        string datePattern = "yyyy_MM_dd_hh_mm_ss";
-        string date = DateTime.UtcNow.ToString(datePattern);
-        string key = "key";//m_userLogin.GetCognitoUserID() + "/" + date + "_" + Path.GetFileName(fileName);
-
-        var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Creating request object with key: " + key);
-        var request = new PostObjectRequest()
-        {
-            Bucket = "",//m_s3BucketName,
-            Key = key,
-            InputStream = stream,
-            CannedACL = S3CannedACL.Private
-        };
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Making HTTP post call");
-
-        m_s3Client.PostObjectAsync(request, (responseObj) =>
-        {
-            if (responseObj.Exception == null)
-            {
-                string logString = string.Format("------- VREEL: Uploaded {0} posted to bucket {1}", responseObj.Request.Key, responseObj.Request.Bucket);
-                if (Debug.isDebugBuild) Debug.Log(logString);
-
-                // Report Success in Gallery
-                Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
-                if (galleryTextComponent != null)
-                {
-                    galleryTextComponent.text = "Succesful Upload!";
-                    galleryTextComponent.color = Color.black;
-                }
-                m_galleryMessage.SetActive(true);
-            }
-            else
-            {
-                if (Debug.isDebugBuild) Debug.Log("------- VREEL: Exception while posting the result object");
-                if (Debug.isDebugBuild) Debug.Log("------- VREEL: Receieved error: " + responseObj.Response.HttpStatusCode.ToString());
-
-                // Report Failure in Gallery
-                Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
-                if (galleryTextComponent != null)
-                {
-                    galleryTextComponent.text = "Failed to Upload!\n Try again later!";
-                    galleryTextComponent.color = Color.red;
-                }
-                m_galleryMessage.SetActive(true);
-            }
-
-            m_staticLoadingIcon.SetActive(false);
-        });
-    }
-    */
-        
     // TODO: Handle users who have more than 20 posts!
     private IEnumerator StoreAllPostURLsAndSetSpheres()
     {
@@ -222,7 +148,7 @@ public class Profile : MonoBehaviour
 
         yield return m_backEndAPI.Posts_GetAll();
 
-        VReelJSON.Model_Posts posts = m_backEndAPI.GetPostsJSONData();
+        VReelJSON.Model_Posts posts = m_backEndAPI.GetAllPostsResult();
         if (posts != null)
         {
             foreach (VReelJSON.PostData postData in posts.data)
