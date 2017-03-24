@@ -3,8 +3,9 @@ using UnityEngine.VR;               // VRSettings
 using UnityEngine.UI;               // Text
 using System;                       // string.Join
 using System.Collections;           // IEnumerator
-using System.Collections.Generic;   //List
+using System.Collections.Generic;   // List
 using System.IO;                    // Stream
+using System.Net;                   // HttpWebRequest
 
 public class ImageSphereController : MonoBehaviour 
 {
@@ -36,14 +37,14 @@ public class ImageSphereController : MonoBehaviour
         SetIndexOnAllImageSpheres();
     }
         
-    public IEnumerator LoadImageFromPathIntoImageSphere(int sphereIndex, string filePathAndIdentifier)
+    public void LoadImageFromPathIntoImageSphere(int sphereIndex, string filePathAndIdentifier, bool showLoading)
     {
-        yield return m_cppPlugin.LoadImageFromPathIntoImageSphere(this, sphereIndex, filePathAndIdentifier);
+        m_cppPlugin.LoadImageFromPathIntoImageSphere(this, sphereIndex, filePathAndIdentifier, showLoading);
     }
 
-    public IEnumerator LoadImageFromStreamIntoImageSphere(Stream stream, int sphereIndex, string imageIdentifier)
+    public void LoadImageFromURLIntoImageSphere(string url, int sphereIndex, string imageIdentifier, bool showLoading)
     {
-        yield return m_cppPlugin.LoadImageFromStreamIntoImageSphere(this, sphereIndex, stream, imageIdentifier);
+        m_cppPlugin.LoadImageFromURLIntoImageSphere(this, sphereIndex, url, imageIdentifier, showLoading);
     }
 
     public void SetTextureInUse(int textureID, bool inUse)

@@ -7,7 +7,7 @@ using System.Collections;           //IEnumerator
 using System.Collections.Generic;   //List
 using System.Threading;             //Threading
 
-using System.Drawing;
+//using System.Drawing;
 
 public class DeviceGallery : MonoBehaviour 
 {    
@@ -51,7 +51,7 @@ public class DeviceGallery : MonoBehaviour
         m_backEndAPI = new BackEndAPI(this, m_errorMessage, m_user);
     }
 
-    public void InvalidateGalleryImageLoading() // This function is called in order to stop any ongoing image loading 
+    public void InvalidateWork() // This function is called in order to stop any ongoing work
     {
         m_currGalleryImageIndex = -1;
         if (m_coroutineQueue != null)
@@ -108,6 +108,7 @@ public class DeviceGallery : MonoBehaviour
 
         m_currGalleryImageIndex = Mathf.Clamp(m_currGalleryImageIndex + numImagesToLoad, 0, numFilePaths);
 
+        m_cppPlugin.InvalidateLoading();
         m_coroutineQueue.Clear(); // Throw away previous operations
         m_coroutineQueue.EnqueueAction(LoadImages(m_currGalleryImageIndex, numImagesToLoad));
     }
@@ -121,6 +122,7 @@ public class DeviceGallery : MonoBehaviour
 
         m_currGalleryImageIndex = Mathf.Clamp(m_currGalleryImageIndex - numImagesToLoad, 0, numFilePaths);
 
+        m_cppPlugin.InvalidateLoading();
         m_coroutineQueue.Clear(); // Throw away previous operations
         m_coroutineQueue.EnqueueAction(LoadImages(m_currGalleryImageIndex, numImagesToLoad));
     }
@@ -129,8 +131,7 @@ public class DeviceGallery : MonoBehaviour
     // Private/Helper functions
     // **************************
 
-    //TODO: Add error handling!
-    private IEnumerator UploadImageInternal()
+    private IEnumerator UploadImageInternal() //NOTE: This function cannot be stopped midway because the LoadingIcon blocks UI interactions
     {
         yield return m_appDirector.VerifyInternetConnection();
 
@@ -153,41 +154,65 @@ public class DeviceGallery : MonoBehaviour
         yield return m_backEndAPI.S3_PresignedURL();
 
         // 4) Upload Original
-        yield return m_backEndAPI.UploadObject(
-            m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.url.ToString(),
-            originalImageByteArray
-        );
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            yield return m_backEndAPI.UploadObject(
+                m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.url.ToString(),
+                originalImageByteArray
+            );
+        }
 
         // 5) Upload Thumbnail
-        yield return m_backEndAPI.UploadObject(
-            m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.url.ToString(),
-            thumbnailImageByteArray
-        );
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            yield return m_backEndAPI.UploadObject(
+                m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.url.ToString(),
+                thumbnailImageByteArray
+            );
+        }
 
         // 6) Register Post as Created
-        yield return m_backEndAPI.Posts_Create(
-            m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.key.ToString(), 
-            m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.key.ToString()
-        );
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            yield return m_backEndAPI.Posts_Create(
+                m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.key.ToString(), 
+                m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.key.ToString()
+            );
+        }
 
         File.Delete(tempThumnailPath);
 
         // 7) If there has been a successful upload -> Inform user that image has been uploaded      
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploaded image: " + originalImageFilePath);
-        Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
-        if (galleryTextComponent != null)
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploaded image: " + originalImageFilePath + ", with Success: " + m_backEndAPI.IsLastAPICallSuccessful());
+        if (m_backEndAPI.IsLastAPICallSuccessful())
         {
-            galleryTextComponent.text = "Succesful Upload!";
-            galleryTextComponent.color = UnityEngine.Color.black;
+            Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
+            if (galleryTextComponent != null)
+            {
+                galleryTextComponent.text = "Succesful Upload!";
+                galleryTextComponent.color = UnityEngine.Color.black;
+            }
+            m_galleryMessage.SetActive(true);
         }
-        m_galleryMessage.SetActive(true);
-
+        else
+        {
+            // Report Failure in Gallery
+            Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
+            if (galleryTextComponent != null)
+            {
+                galleryTextComponent.text = "Oh no! We failed to Upload! =(\n Please try again!";
+                galleryTextComponent.color = UnityEngine.Color.red;
+            }
+            m_galleryMessage.SetActive(true);
+        }
 
         m_staticLoadingIcon.SetActive(false);
     }
 
     private IEnumerator StoreAllImageGalleryFilePaths(string imagesTopLevelDirectory)
     {                
+        m_staticLoadingIcon.SetActive(true);
+
         // 1) Find all files that could potentially be 360 images.
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling GetAllFileNamesRecursively()");
         List<string> files = new List<string>();
@@ -228,6 +253,8 @@ public class DeviceGallery : MonoBehaviour
             ranSuccessfully = SortGalleryImageFilePaths()           
         );
         yield return m_threadJob.WaitFor();
+
+        m_staticLoadingIcon.SetActive(false);
 
         bool noImagesInGallery = m_galleryImageFilePaths.Count <= 0;
         m_noGalleryImagesText.SetActive(noImagesInGallery); // If the user has yet take any 360-images then show them the NoGalleryImagesText!
@@ -356,7 +383,8 @@ public class DeviceGallery : MonoBehaviour
                 if (Debug.isDebugBuild) Debug.Log("------- VREEL: Checking that filePath has changed has returned = " + identifierValid);
                 if (identifierValid)
                 {
-                    m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(filePath, sphereIndex));
+                    bool showLoading = sphereIndex == 0; // The first one in the gallery should do some loading to let the user know things are happening
+                    m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(filePath, sphereIndex, showLoading));
                 }
             }
             else
@@ -369,9 +397,10 @@ public class DeviceGallery : MonoBehaviour
         yield return null;
     }
 
-    private IEnumerator LoadImageInternalPlugin(string filePath, int sphereIndex)
+    private IEnumerator LoadImageInternalPlugin(string filePath, int sphereIndex,bool showLoading)
     {   
-        yield return m_imageSphereController.LoadImageFromPathIntoImageSphere(sphereIndex, filePath);
+        m_imageSphereController.LoadImageFromPathIntoImageSphere(sphereIndex, filePath, showLoading);
+        yield break;
     }
 
     private IEnumerator LoadImageInternalUnity(string filePath, int sphereIndex)

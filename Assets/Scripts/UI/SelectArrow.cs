@@ -19,7 +19,7 @@ public class SelectArrow : MonoBehaviour
     [SerializeField] private ArrowType m_arrowType = ArrowType.kNext;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private DeviceGallery m_deviceGallery;
-    [SerializeField] private AWSS3Client m_awsS3Client;
+    [SerializeField] private Profile m_profile;
 
     // **************************
     // Public functions
@@ -63,15 +63,15 @@ public class SelectArrow : MonoBehaviour
                 return !m_deviceGallery.IsGalleryIndexAtStart();
             }
         }
-        else if (m_awsS3Client != null)
+        else if (m_profile != null)
         {
             if (m_arrowType == ArrowType.kNext)
             {
-                return !m_awsS3Client.IsS3ImageIndexAtEnd();
+                return !m_profile.IsPostIndexAtEnd();
             }
             else if (m_arrowType == ArrowType.kPrev)
             {
-                return !m_awsS3Client.IsS3ImageIndexAtStart();
+                return !m_profile.IsPostIndexAtStart();
             }      
         }
 

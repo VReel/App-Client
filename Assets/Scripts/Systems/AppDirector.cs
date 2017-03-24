@@ -24,11 +24,10 @@ public class AppDirector : MonoBehaviour
     [SerializeField] private GameObject m_menuBar;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private ImageSphereController m_imageSphereController;
-    [SerializeField] private DeviceGallery m_deviceGallery;
-    [SerializeField] private AWSS3Client m_AWSS3Client;
-    [SerializeField] private UserLogin m_userLogin;
-    [SerializeField] private LoginFlow m_loginFlow;
     [SerializeField] private Profile m_profile;
+    [SerializeField] private DeviceGallery m_deviceGallery;
+    [SerializeField] private LoginFlow m_loginFlow;
+    [SerializeField] private CppPlugin m_cppPlugin;
     [SerializeField] private InternetReachabilityVerifier m_internetReachabilityVerifier;
     [SerializeField] private GameObject m_lostConnectionIcon;
 
@@ -111,9 +110,9 @@ public class AppDirector : MonoBehaviour
         m_imageSphereController.HideAllImageSpheres();
         SetMenuBar(false);
 
-        m_deviceGallery.InvalidateGalleryImageLoading();
-        //m_AWSS3Client.InvalidateS3ImageLoading();
-        m_profile.InvalidatePostsLoading();
+        m_cppPlugin.InvalidateLoading();
+        m_deviceGallery.InvalidateWork();
+        m_profile.InvalidateWork();
         m_loginFlow.SetLoginFlowPage(0);
 
         m_menuController.SetLoginSubMenuActive(true);
@@ -134,11 +133,11 @@ public class AppDirector : MonoBehaviour
             m_menuController.ShowWelcomeText();
         }
 
-        m_deviceGallery.InvalidateGalleryImageLoading();
+        m_cppPlugin.InvalidateLoading();
+        m_deviceGallery.InvalidateWork();
 
         m_menuController.SetProfileSubMenuActive(true);
 
-        //m_AWSS3Client.OpenProfile();
         m_profile.OpenProfile();
         m_appState = AppState.kProfile;
 
@@ -151,8 +150,8 @@ public class AppDirector : MonoBehaviour
         m_imageSphereController.HideAllImageSpheres();
         SetMenuBar(true);
 
-        //m_AWSS3Client.InvalidateS3ImageLoading();
-        m_profile.InvalidatePostsLoading();
+        m_cppPlugin.InvalidateLoading();
+        m_profile.InvalidateWork();
 
         m_menuController.SetGallerySubMenuActive(true);
         m_deviceGallery.OpenAndroidGallery();

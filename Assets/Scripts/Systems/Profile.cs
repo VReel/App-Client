@@ -4,7 +4,8 @@ using System;                       // Datetime
 using System.Collections;           // IEnumerator
 using System.Collections.Generic;   // List
 using System.IO;                    // Stream
-using System.Net;                   // HttpWebRequest
+
+using System.Net;                   // HttpWebRequest -- only used in old LoadImageInternalUnity()
 
 public class Profile : MonoBehaviour 
 {   
@@ -14,6 +15,7 @@ public class Profile : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
+    [SerializeField] private CppPlugin m_cppPlugin;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private GameObject m_errorMessage;
@@ -71,7 +73,7 @@ public class Profile : MonoBehaviour
         m_coroutineQueue.EnqueueAction(LogoutInternal());
     }
         
-    public void InvalidatePostsLoading() // This function is called in order to stop any ongoing image loading 
+    public void InvalidateWork() // This function is called in order to stop any ongoing work
     {        
         m_currPostIndex = -1;
         if (m_coroutineQueue != null)
@@ -109,6 +111,7 @@ public class Profile : MonoBehaviour
 
         m_currPostIndex = Mathf.Clamp(m_currPostIndex + numImagesToLoad, 0, numPosts);
 
+        m_cppPlugin.InvalidateLoading();
         m_coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
         m_coroutineQueue.EnqueueAction(DownloadThumbnailsAndSetSpheres());
     }
@@ -122,6 +125,7 @@ public class Profile : MonoBehaviour
 
         m_currPostIndex = Mathf.Clamp(m_currPostIndex - numImagesToLoad, 0, numPosts);
 
+        m_cppPlugin.InvalidateLoading();
         m_coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
         m_coroutineQueue.EnqueueAction(DownloadThumbnailsAndSetSpheres());
     }
@@ -201,7 +205,7 @@ public class Profile : MonoBehaviour
             {                   
                 string id = m_posts[currPostIndex].id;
                 string thumbnailURL = m_posts[currPostIndex].thumbnailUrl;
-                m_coroutineQueue.EnqueueAction(DownloadImageInternal(id, thumbnailURL, sphereIndex)); //, currPostIndex, numImages));
+                LoadImageInternalPlugin(thumbnailURL, sphereIndex, id, false);
             }
             else
             {
@@ -220,54 +224,41 @@ public class Profile : MonoBehaviour
 
         yield return RefreshPostData(id);
 
-        yield return DownloadImageInternal(id, m_posts[ConvertIdToIndex(id)].originalUrl, -1); // a -1 sphereIndex maps to the SkyBox
-
-        m_staticLoadingIcon.SetActive(false);   
-    }
-
-    private IEnumerator DownloadImageInternal(string imageIdentifier, string url, int sphereIndex) // int thisThumbnailURLIndex, int numImages) - these were once used for validity checks
-    {
-        yield return m_appDirector.VerifyInternetConnection();
-                   
-        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading: " + imageIdentifier));
-
-        HttpWebRequest http = (HttpWebRequest)WebRequest.Create(url);
-        m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(http.GetResponse(), sphereIndex, imageIdentifier));
-
-        /*
-        using (WebClient webClient = new WebClient()) 
+        if (m_backEndAPI.IsLastAPICallSuccessful())
         {
-            byte [] data = webClient.DownloadData(url);
-            using (MemoryStream mem = new MemoryStream(data)) 
-            {
-                using (var yourImage = Image.FromStream(mem)) 
-                { 
-                }
-            }
+            LoadImageInternalPlugin(m_posts[ConvertIdToIndex(id)].originalUrl, -1, id, true); // a -1 sphereIndex maps to the SkyBox
         }
-        */
+
+        m_staticLoadingIcon.SetActive(false);
     }
 
     private IEnumerator RefreshPostData(string id) // NOTE: Since URL's have a lifetime, we need to refresh the data at certain points...
     {            
         yield return m_backEndAPI.Posts_Get(id);
 
-        int index = ConvertIdToIndex(id);
-        if (index <= m_posts.Count)
+        if (m_backEndAPI.IsLastAPICallSuccessful())
         {
-            m_posts[index].thumbnailUrl = m_backEndAPI.GetPostResult().data.attributes.thumbnail_url;
-            m_posts[index].originalUrl = m_backEndAPI.GetPostResult().data.attributes.original_url;
+            int index = ConvertIdToIndex(id);
+            if (index <= m_posts.Count)
+            {
+                m_posts[index].thumbnailUrl = m_backEndAPI.GetPostResult().data.attributes.thumbnail_url;
+                m_posts[index].originalUrl = m_backEndAPI.GetPostResult().data.attributes.original_url;
+            }
         }
     }
 
-    private IEnumerator LoadImageInternalPlugin(WebResponse response, int sphereIndex, string imageIdentifier)
+    private void LoadImageInternalPlugin(string url, int sphereIndex, string imageIdentifier, bool showLoading)
     {        
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: LoadImageInternal for " + imageIdentifier);
 
+        m_imageSphereController.LoadImageFromURLIntoImageSphere(url, sphereIndex, imageIdentifier, showLoading);
+
+        /*
         using (var stream = response.GetResponseStream())
         {
             yield return m_imageSphereController.LoadImageFromStreamIntoImageSphere(stream, sphereIndex, imageIdentifier);
         }
+        */
     }
         
     private IEnumerator LoadImageInternalUnity(WebResponse response, int sphereIndex, string imageIdentifier)

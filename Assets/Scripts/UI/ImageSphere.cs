@@ -14,6 +14,7 @@ public class ImageSphere : MonoBehaviour
 
     private int m_imageSphereIndex = -1; // ImageSphere's know their index - this is currently only for Debug!
     private int m_currTextureIndex = -1; // ImageSphere's track the index of the texture they are pointing to
+    private int m_nextTextureIndex = -1; // ImageSphere's also track the index of the next texture they will point to - necessary because we don't swap textures immediately
     private Texture2D m_imageSphereTexture;
     private string m_imageIdentifier; // This is either (1) A Local Path on the Device or (2) A PostID from the backend
     private CoroutineQueue m_coroutineQueue;
@@ -44,7 +45,9 @@ public class ImageSphere : MonoBehaviour
 
     public void SetImage(Texture2D texture, string imageIdentifier, int textureIndex)
     {
+        m_imageSphereController.SetTextureInUse(m_nextTextureIndex, false); // Textures that were going to be used can be thrown away
         m_imageSphereController.SetTextureInUse(textureIndex, true);
+        m_nextTextureIndex = textureIndex;
 
         m_imageIdentifier = imageIdentifier;
         m_imageSphereTexture = texture;
@@ -56,7 +59,7 @@ public class ImageSphere : MonoBehaviour
             " , Texture size = " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
 
         m_coroutineQueue.Clear();
-        m_coroutineQueue.EnqueueAction(AnimateSetTexture(textureIndex));
+        m_coroutineQueue.EnqueueAction(AnimateSetTexture());
     }
 
     public void Hide()
@@ -79,7 +82,7 @@ public class ImageSphere : MonoBehaviour
     // Private/Helper functions
     // **************************
 
-    private IEnumerator AnimateSetTexture(int textureIndex)
+    private IEnumerator AnimateSetTexture()
     {   
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateSetTexture() began on sphere: " + (m_imageSphereIndex+1) );
 
@@ -97,7 +100,8 @@ public class ImageSphere : MonoBehaviour
         gameObject.GetComponent<MeshRenderer>().material.mainTexture = m_imageSphereTexture;
 
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, false);
-        m_currTextureIndex = textureIndex;
+        m_currTextureIndex = m_nextTextureIndex;
+        m_nextTextureIndex = kLoadingTextureIndex;
 
         // Scale up
         while (transform.localScale.magnitude < defaultScale)

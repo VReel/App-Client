@@ -22,7 +22,7 @@ public class Analytics : MonoBehaviour
     // **************************
 
 
-    public void Start() 
+    public void Start() //TODO: Analytics keeps throwing out some error, figure out why!
     {                
         //TODO: Move this pool over to EUWest1!
         var credentials = new CognitoAWSCredentials(

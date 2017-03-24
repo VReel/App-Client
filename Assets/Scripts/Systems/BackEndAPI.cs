@@ -29,6 +29,7 @@ public class BackEndAPI
     private User m_user;
     private ThreadJob m_threadJob;
 
+    private HttpStatusCode m_lastStatusCode;
     private VReelJSON.Model_Posts m_postsJSONResult;
     private VReelJSON.Model_Post m_postJSONResult;
     private VReelJSON.Model_S3PresignedURL m_s3URLJSONResult;
@@ -55,6 +56,11 @@ public class BackEndAPI
     ~BackEndAPI()
     {
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: A BackEndAPI object was Destructed by = " + m_owner.name);
+    }
+
+    public bool IsLastAPICallSuccessful()
+    {
+        return IsSuccessCode(m_lastStatusCode);
     }
 
     public VReelJSON.Model_Posts GetAllPostsResult()
@@ -103,7 +109,8 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users' - Response: " + response.Content);
 
-        if (IsSuccessCode(response.StatusCode))
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
         {
             UpdateAccessToken(response);
             UpdateLoginTokens(response);
@@ -139,7 +146,8 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> PUT to '/users' - Response: " + response.Content);
 
-        if (IsSuccessCode(response.StatusCode))
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
         {
             UpdateAccessToken(response);
         }
@@ -169,7 +177,8 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/users' - Response: " + response.Content);
 
-        if (IsSuccessCode(response.StatusCode))
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
         {
             UpdateAccessToken(response);
             m_user.Clear();
@@ -201,7 +210,8 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users/password' - Response: " + response.Content);
 
-        if (IsSuccessCode(response.StatusCode))
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
         {
             UpdateAccessToken(response);
         }
@@ -232,7 +242,8 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users/sign_in' - Response: " + response.Content);
 
-        if (IsSuccessCode(response.StatusCode))
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
         {
             UpdateAccessToken(response);
             UpdateLoginTokens(response);
@@ -269,7 +280,8 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/users/sign_out' - Response: " + response.Content);
 
-        if (IsSuccessCode(response.StatusCode))
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
         {
             UpdateAccessToken(response);
             m_user.Clear();
@@ -301,7 +313,8 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/s3_presigned_url' - Response: " + response.Content);
 
-        if (IsSuccessCode(response.StatusCode))
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
         {
             UpdateAccessToken(response);
 
@@ -335,7 +348,8 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts' - Response: " + response.Content);
 
-        if (IsSuccessCode(response.StatusCode))
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
         {
             UpdateAccessToken(response);
 
@@ -373,7 +387,8 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/posts' - Response: " + response.Content);
 
-        if (IsSuccessCode(response.StatusCode))
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
         {
             UpdateAccessToken(response);
         }
@@ -408,7 +423,8 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts/" + _postId + "' - Response: " + response.Content);
 
-        if (IsSuccessCode(response.StatusCode))
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
         {
             UpdateAccessToken(response);
 
@@ -425,22 +441,7 @@ public class BackEndAPI
     // Private/Helper functions
     // **************************
 
-    private void UploadObjectInternal(string url, byte[] byteArray) //string filePath)
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploading Object called with url: " + url ); //+ ", and filePath: " + filePath);
-
-        HttpWebRequest httpRequest = WebRequest.Create(url) as HttpWebRequest;
-        httpRequest.Method = "PUT";
-
-        try
-        {
-            //byte[] byteArray = File.ReadAllBytes(filePath);
-            httpRequest.ContentLength = byteArray.Length;
-            Stream dataStream = httpRequest.GetRequestStream();
-            dataStream.Write(byteArray, 0, byteArray.Length);
-            dataStream.Close();
-
-            /*
+    /*
             using (Stream dataStream = httpRequest.GetRequestStream())
             {                
                 byte[] buffer = new byte[8000];
@@ -458,21 +459,39 @@ public class BackEndAPI
                 }
             }
             */
+
+    private void UploadObjectInternal(string url, byte[] byteArray) //string filePath)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploading Object with url: " + url ); //+ ", and filePath: " + filePath);
+
+        HttpWebRequest httpRequest = WebRequest.Create(url) as HttpWebRequest;
+        httpRequest.Method = "PUT";
+
+        try
+        {
+            //byte[] byteArray = File.ReadAllBytes(filePath);
+            httpRequest.ContentLength = byteArray.Length;
+            Stream dataStream = httpRequest.GetRequestStream();
+            dataStream.Write(byteArray, 0, byteArray.Length);
+            dataStream.Close();
         }
         catch (Exception e)
         {
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: Upload Exception caught: " + e);
+            m_lastStatusCode = HttpStatusCode.NotFound;
         }
 
         Debug.Log("------- VREEL: Finished Uploading FileStream...");
         try
         {
             HttpWebResponse response = httpRequest.GetResponse() as HttpWebResponse;
+            m_lastStatusCode = response.StatusCode;
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: Response Status Code: " + response.StatusCode);
         }
         catch (Exception e)
         {
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: Response Exception caught: " + e);
+            m_lastStatusCode = HttpStatusCode.NotFound;
         }
     }
 

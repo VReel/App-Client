@@ -21,6 +21,11 @@ public class CoroutineQueue
         m_owner = aCoroutineOwner;
     }
 
+    public bool IsActive()
+    {
+        return m_mainInternalCoroutine != null;
+    }
+
     public void StartLoop()
     {
         m_mainInternalCoroutine = m_owner.StartCoroutine(Process());
