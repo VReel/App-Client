@@ -128,7 +128,7 @@ public class Profile : MonoBehaviour
 
     public void DownloadOriginalImage(string imageIdentifier)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadFullImage() called");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadOriginalImage() called");
 
         m_coroutineQueue.EnqueueAction(DownloadOriginalImageInternal(imageIdentifier));
     }
@@ -214,9 +214,15 @@ public class Profile : MonoBehaviour
 
     public IEnumerator DownloadOriginalImageInternal(string id)
     {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        m_staticLoadingIcon.SetActive(true);
+
         yield return RefreshPostData(id);
 
         yield return DownloadImageInternal(id, m_posts[ConvertIdToIndex(id)].originalUrl, -1); // a -1 sphereIndex maps to the SkyBox
+
+        m_staticLoadingIcon.SetActive(false);   
     }
 
     private IEnumerator DownloadImageInternal(string imageIdentifier, string url, int sphereIndex) // int thisThumbnailURLIndex, int numImages) - these were once used for validity checks
@@ -226,7 +232,7 @@ public class Profile : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading: " + imageIdentifier));
 
         HttpWebRequest http = (HttpWebRequest)WebRequest.Create(url);
-        m_coroutineQueue.EnqueueAction(LoadImageInternalUnity(http.GetResponse(), sphereIndex, imageIdentifier));
+        m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(http.GetResponse(), sphereIndex, imageIdentifier));
 
         /*
         using (WebClient webClient = new WebClient()) 
@@ -254,13 +260,13 @@ public class Profile : MonoBehaviour
         }
     }
 
-    private IEnumerator LoadImageInternalPlugin(Amazon.S3.Model.GetObjectResponse response, int sphereIndex, string imageIdentifier)
+    private IEnumerator LoadImageInternalPlugin(WebResponse response, int sphereIndex, string imageIdentifier)
     {        
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: LoadImageInternal for " + imageIdentifier);
 
-        using (var stream = response.ResponseStream)
+        using (var stream = response.GetResponseStream())
         {
-            yield return m_imageSphereController.LoadImageFromStream(stream, sphereIndex, imageIdentifier);
+            yield return m_imageSphereController.LoadImageFromStreamIntoImageSphere(stream, sphereIndex, imageIdentifier);
         }
     }
         

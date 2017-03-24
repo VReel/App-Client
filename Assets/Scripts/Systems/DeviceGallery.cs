@@ -17,6 +17,7 @@ public class DeviceGallery : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
+    [SerializeField] private CppPlugin m_cppPlugin;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private GameObject m_errorMessage;
@@ -24,6 +25,7 @@ public class DeviceGallery : MonoBehaviour
     [SerializeField] private GameObject m_galleryMessage;
     [SerializeField] private GameObject m_staticLoadingIcon;
 
+    private string m_imagesTopLevelDirectory;
     private int m_currGalleryImageIndex = 0;
     private List<string> m_galleryImageFilePaths;
     private CoroutineQueue m_coroutineQueue;
@@ -85,11 +87,11 @@ public class DeviceGallery : MonoBehaviour
         m_galleryImageFilePaths.Clear();
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: About to call GetImagesPath function...");
-        string imagesTopLevelDirectory = m_javaPluginClass.CallStatic<string>("GetAndroidImagesPath"); //string path = "/storage/emulated/0/DCIM/Gear 360/";
-        m_imageSkybox.SetTopLevelDirectory(imagesTopLevelDirectory);
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Storing all FilePaths from directory: " + imagesTopLevelDirectory);
+        m_imagesTopLevelDirectory = m_javaPluginClass.CallStatic<string>("GetAndroidImagesPath"); //string path = "/storage/emulated/0/DCIM/Gear 360/";
+        m_imageSkybox.SetTopLevelDirectory(m_imagesTopLevelDirectory);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Storing all FilePaths from directory: " + m_imagesTopLevelDirectory);
 
-        m_coroutineQueue.EnqueueAction(StoreAllImageGalleryFilePaths(imagesTopLevelDirectory));
+        m_coroutineQueue.EnqueueAction(StoreAllImageGalleryFilePaths(m_imagesTopLevelDirectory));
 
         m_currGalleryImageIndex = 0;
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
@@ -127,33 +129,28 @@ public class DeviceGallery : MonoBehaviour
     // Private/Helper functions
     // **************************
 
+    //TODO: Add error handling!
     private IEnumerator UploadImageInternal()
     {
         yield return m_appDirector.VerifyInternetConnection();
 
         m_staticLoadingIcon.SetActive(true);
 
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Running UploadImageInternal() for image: " + m_imageSkybox.GetImageIdentifier());
+
         // 1) Get Original Image byte array
         string originalImageFilePath = m_imageSkybox.GetImageIdentifier();
         byte[] originalImageByteArray = File.ReadAllBytes(originalImageFilePath);
-            // File.ReadAllBytes(System.IO.Directory.GetCurrentDirectory() + "/Assets/Berlin_Original.jpg"); 
-        //var stream = new FileStream(originalFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
         yield return new WaitForEndOfFrame();
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Step 1 Complete");
-
-        // 2) Create Thumbnail - TODO Get CreateThumbnail() to work!
-        const int kStandardThumbnailWidth = 320;
-        byte[] thumbnailImageByteArray = CreateThumbnail(originalImageFilePath, kStandardThumbnailWidth);
-            //File.ReadAllBytes(System.IO.Directory.GetCurrentDirectory() + "/Assets/Berlin_Thumbnail.jpg"); 
+        // 2) Create Thumbnail
+        string tempThumnailPath = m_imagesTopLevelDirectory + "/tempThumbnailImage.png";
+        yield return CreateThumbnail(originalImageFilePath, tempThumnailPath);
+        byte[] thumbnailImageByteArray = File.ReadAllBytes(tempThumnailPath);            
         yield return new WaitForEndOfFrame();
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Step 2 Complete");
 
         // 3) Get PresignedURL
         yield return m_backEndAPI.S3_PresignedURL();
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Step 3 Complete");
 
         // 4) Upload Original
         yield return m_backEndAPI.UploadObject(
@@ -161,15 +158,11 @@ public class DeviceGallery : MonoBehaviour
             originalImageByteArray
         );
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Step 4 Complete");
-
         // 5) Upload Thumbnail
         yield return m_backEndAPI.UploadObject(
             m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.url.ToString(),
             thumbnailImageByteArray
         );
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Step 5 Complete");
 
         // 6) Register Post as Created
         yield return m_backEndAPI.Posts_Create(
@@ -177,7 +170,7 @@ public class DeviceGallery : MonoBehaviour
             m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.key.ToString()
         );
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Step 6 Complete");
+        File.Delete(tempThumnailPath);
 
         // 7) If there has been a successful upload -> Inform user that image has been uploaded      
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploaded image: " + originalImageFilePath);
@@ -235,8 +228,6 @@ public class DeviceGallery : MonoBehaviour
             ranSuccessfully = SortGalleryImageFilePaths()           
         );
         yield return m_threadJob.WaitFor();
-
-        //GC.Collect();
 
         bool noImagesInGallery = m_galleryImageFilePaths.Count <= 0;
         m_noGalleryImagesText.SetActive(noImagesInGallery); // If the user has yet take any 360-images then show them the NoGalleryImagesText!
@@ -361,9 +352,9 @@ public class DeviceGallery : MonoBehaviour
             {                       
                 string filePath = m_galleryImageFilePaths[currGalleryImageIndex];
 
-                bool filePathStillValid = filePath.CompareTo(m_imageSkybox.GetImageIdentifier()) != 0; // If file-path is the same then ignore request
-                if (Debug.isDebugBuild) Debug.Log("------- VREEL: Checking that filePath has changed has returned = " + filePathStillValid);
-                if (filePathStillValid)
+                bool identifierValid = filePath.CompareTo(m_imageSphereController.GetIdentifierAtIndex(sphereIndex)) != 0; // If file-path is the same then ignore request
+                if (Debug.isDebugBuild) Debug.Log("------- VREEL: Checking that filePath has changed has returned = " + identifierValid);
+                if (identifierValid)
                 {
                     m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(filePath, sphereIndex));
                 }
@@ -380,7 +371,7 @@ public class DeviceGallery : MonoBehaviour
 
     private IEnumerator LoadImageInternalPlugin(string filePath, int sphereIndex)
     {   
-        yield return m_imageSphereController.LoadImageFromPath(sphereIndex, filePath);
+        yield return m_imageSphereController.LoadImageFromPathIntoImageSphere(sphereIndex, filePath);
     }
 
     private IEnumerator LoadImageInternalUnity(string filePath, int sphereIndex)
@@ -404,16 +395,23 @@ public class DeviceGallery : MonoBehaviour
         Resources.UnloadUnusedAssets();
     }
 
-    //TODO: GET THIS FUNCTION WORKING SOMEHOW!
-    public byte[] CreateThumbnail(string originalImagePath, int thumbnailWidth)
-    {
-        MemoryStream outputStream = new MemoryStream();
+    //TODO: Improve this function's performance!
+    public IEnumerator CreateThumbnail(string originalImagePath, string thumbnailImagePath) //, int thumbnailWidth)
+    {                
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Call CreateThumbnail() with Thumbnail Path: " + thumbnailImagePath);
+        bool success = m_javaPluginClass.CallStatic<bool>("CreateThumbnail", originalImagePath, thumbnailImagePath);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Call CreateThumbnail() returned with: " + success);
+        yield break;
 
+        //yield return m_cppPlugin.LoadImageFromPath(originalImagePath);
 
+        //MemoryStream outputStream = new MemoryStream();
+
+        /*
         System.Drawing.Image image = System.Drawing.Image.FromFile(originalImagePath);
         System.Drawing.Image thumbnail = image.GetThumbnailImage(thumbnailWidth, thumbnailWidth/2, ()=>false, IntPtr.Zero);
         thumbnail.Save(outputStream, System.Drawing.Imaging.ImageFormat.Jpeg);
-
+        */
 
         /*
         Bitmap sourceBitmap = new Bitmap(originalImagePath);
@@ -432,6 +430,6 @@ public class DeviceGallery : MonoBehaviour
         }
         */
 
-        return outputStream.ToArray();
+        //return outputStream.ToArray();
     }
 }

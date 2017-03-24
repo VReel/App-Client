@@ -396,7 +396,7 @@ public class AWSS3Client : MonoBehaviour
 
         using (var stream = response.ResponseStream)
         {
-            yield return m_imageSphereController.LoadImageFromStream(stream, sphereIndex, fullFilePath);
+            yield return m_imageSphereController.LoadImageFromStreamIntoImageSphere(stream, sphereIndex, fullFilePath);
         }
     }
         

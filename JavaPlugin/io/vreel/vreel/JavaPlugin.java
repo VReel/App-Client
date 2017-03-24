@@ -2,7 +2,7 @@ package io.vreel.vreel;
  
 import com.unity3d.player.UnityPlayerActivity;
 import java.io.File;
-import java.nio.Buffer;
+import java.io.FileOutputStream;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -61,11 +61,40 @@ public class JavaPlugin extends UnityPlayerActivity
         return imageWidth/ (float) imageHeight; // casting to float in order to ensure float output
     }
     
-    public static void CreateThumbnail(String path, Buffer buf)
+    public static boolean CreateThumbnail(String originalPath, String thumbnailPath)
     {
     	final int kThumbnailWidth = 320;
-    	Bitmap thumbnailImage = 
-    			ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(path), kThumbnailWidth, kThumbnailWidth/2);    	
-    	thumbnailImage.copyPixelsToBuffer(buf);
+    	Bitmap thumbnailBitmap = 
+    			ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(originalPath), kThumbnailWidth, kThumbnailWidth/2);
+
+    	FileOutputStream out = null;
+    	try 
+    	{
+    		out = new FileOutputStream(thumbnailPath);
+    		thumbnailBitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+    	    // PNG is a lossless format, the compression factor (100) is ignored
+    	} 
+    	catch (Exception e) 
+    	{
+    	    e.printStackTrace();
+    	    return false;
+    	} 
+    	finally 
+    	{
+    	    try 
+    	    {
+    	        if (out != null) 
+    	        {
+    	            out.close();
+    	        }
+    	    } 
+    	    catch (Exception e) 
+    	    {
+    	        e.printStackTrace();
+    	        return false;
+    	    }
+    	}
+    	
+    	return true;
     }
 }
