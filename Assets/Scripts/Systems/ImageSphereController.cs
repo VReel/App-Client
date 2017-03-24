@@ -14,6 +14,7 @@ public class ImageSphereController : MonoBehaviour
 
     [SerializeField] private float m_defaultSphereScale = 1.0f;
     [SerializeField] private float m_scalingFactor = 0.88f;
+    [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private GameObject[] m_imageSpheres;
     [SerializeField] private Texture2D m_sphereLoadingTexture;
 
@@ -22,6 +23,7 @@ public class ImageSphereController : MonoBehaviour
 
     private const int kMaxNumTextures = 9; // 5 ImageSpheres + 1 Skybox + 3 spare textures
     private int[] m_textureIndexUsage;
+    private CoroutineQueue m_coroutineQueue;
     private CppPlugin m_cppPlugin;
 
     // **************************
@@ -33,18 +35,21 @@ public class ImageSphereController : MonoBehaviour
         m_cppPlugin = new CppPlugin(this, kMaxNumTextures);
         m_textureIndexUsage = new int[kMaxNumTextures];
 
+        m_coroutineQueue = new CoroutineQueue( this );
+        m_coroutineQueue.StartLoop();
+
         ForceHideAllImageSpheres();
         SetIndexOnAllImageSpheres();
     }
         
-    public IEnumerator LoadImageFromPath(int sphereIndex, string filePath)
+    public IEnumerator LoadImageFromPath(int sphereIndex, string filePathAndIdentifier)
     {
-        yield return m_cppPlugin.LoadImageFromPath(this, sphereIndex, filePath, GetAvailableTextureIndex());
+        yield return m_cppPlugin.LoadImageFromPath(this, sphereIndex, filePathAndIdentifier, GetAvailableTextureIndex());
     }
 
-    public IEnumerator LoadImageFromStream(Stream stream, int sphereIndex, string filePath)
+    public IEnumerator LoadImageFromStream(Stream stream, int sphereIndex, string imageIdentifier)
     {
-        yield return m_cppPlugin.LoadImageFromStream(this, sphereIndex, stream, filePath, GetAvailableTextureIndex());
+        yield return m_cppPlugin.LoadImageFromStream(this, sphereIndex, stream, imageIdentifier, GetAvailableTextureIndex());
     }
 
     public void SetTextureInUse(int textureID, bool inUse)
@@ -84,15 +89,19 @@ public class ImageSphereController : MonoBehaviour
     {
         for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
         {
-            SetImageAndFilePathAtIndex(sphereIndex, m_sphereLoadingTexture, kLoadingTextureFilePath, kLoadingTextureIndex);
+            SetImageAtIndex(sphereIndex, m_sphereLoadingTexture, kLoadingTextureFilePath, kLoadingTextureIndex);
         }
     }
 
-    public void SetImageAndFilePathAtIndex(int sphereIndex, Texture2D texture, string filePath, int pluginTextureIndex)
+    public void SetImageAtIndex(int sphereIndex, Texture2D texture, string imageIdentifier, int pluginTextureIndex)
     {
-        if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
+        if (sphereIndex == -1)
         {
-            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetImageAndFilePath(texture, filePath, pluginTextureIndex);
+            m_imageSkybox.SetImage(texture, imageIdentifier, pluginTextureIndex);
+        }
+        else if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
+        {
+            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetImage(texture, imageIdentifier, pluginTextureIndex);
         }
         else
         {
@@ -119,7 +128,7 @@ public class ImageSphereController : MonoBehaviour
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: Invalid request to HideSphereAtIndex: " + sphereIndex);
         }
     }
-
+    
     // **************************
     // Private/Helper functions
     // **************************

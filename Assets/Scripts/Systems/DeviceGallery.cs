@@ -134,8 +134,8 @@ public class DeviceGallery : MonoBehaviour
         m_staticLoadingIcon.SetActive(true);
 
         // 1) Get Original Image byte array
-        string originalImageFileName = m_imageSkybox.GetImageFilePath();
-        byte[] originalImageByteArray = File.ReadAllBytes(originalImageFileName);
+        string originalImageFilePath = m_imageSkybox.GetImageIdentifier();
+        byte[] originalImageByteArray = File.ReadAllBytes(originalImageFilePath);
             // File.ReadAllBytes(System.IO.Directory.GetCurrentDirectory() + "/Assets/Berlin_Original.jpg"); 
         //var stream = new FileStream(originalFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
         yield return new WaitForEndOfFrame();
@@ -144,7 +144,7 @@ public class DeviceGallery : MonoBehaviour
 
         // 2) Create Thumbnail - TODO Get CreateThumbnail() to work!
         const int kStandardThumbnailWidth = 320;
-        byte[] thumbnailImageByteArray = CreateThumbnail(originalImageFileName, kStandardThumbnailWidth);
+        byte[] thumbnailImageByteArray = CreateThumbnail(originalImageFilePath, kStandardThumbnailWidth);
             //File.ReadAllBytes(System.IO.Directory.GetCurrentDirectory() + "/Assets/Berlin_Thumbnail.jpg"); 
         yield return new WaitForEndOfFrame();
 
@@ -180,7 +180,7 @@ public class DeviceGallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Step 6 Complete");
 
         // 7) If there has been a successful upload -> Inform user that image has been uploaded      
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploaded image: " + originalImageFileName);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploaded image: " + originalImageFilePath);
         Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
         if (galleryTextComponent != null)
         {
@@ -361,7 +361,7 @@ public class DeviceGallery : MonoBehaviour
             {                       
                 string filePath = m_galleryImageFilePaths[currGalleryImageIndex];
 
-                bool filePathStillValid = filePath.CompareTo(m_imageSkybox.GetImageFilePath()) != 0; // If file-path is the same then ignore request
+                bool filePathStillValid = filePath.CompareTo(m_imageSkybox.GetImageIdentifier()) != 0; // If file-path is the same then ignore request
                 if (Debug.isDebugBuild) Debug.Log("------- VREEL: Checking that filePath has changed has returned = " + filePathStillValid);
                 if (filePathStillValid)
                 {
@@ -397,7 +397,7 @@ public class DeviceGallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadImageIntoTexture()");
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAndFilePath()");
-        m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, myNewTexture2D, filePath, -1);
+        m_imageSphereController.SetImageAtIndex(sphereIndex, myNewTexture2D, filePath, -1);
         yield return new WaitForEndOfFrame();
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAndFilePath()");
 

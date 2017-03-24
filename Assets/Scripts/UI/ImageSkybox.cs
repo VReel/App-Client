@@ -8,11 +8,12 @@ public class ImageSkybox : MonoBehaviour
     // **************************
 
     [SerializeField] private ImageSphereController m_imageSphereController;
+    [SerializeField] private Profile m_profile;
     [SerializeField] private GameObject m_uploadButton;
 
     private int m_currTextureIndex = -1; // ImageSkybox must track the index of the underlying texture it points to in C++ plugin
     private Texture2D m_skyboxTexture;
-    private string m_imageFilePath; // Points to where the Image came from (S3 Bucket, or Local Device)
+    private string m_imageIdentifier; // Points to where the Image came from (S3 Bucket, or Local Device)
     private string m_imagesTopLevelDirectory;   
 
     // **************************
@@ -22,7 +23,7 @@ public class ImageSkybox : MonoBehaviour
     public void Awake()
     {
         m_skyboxTexture = new Texture2D(2,2);
-        m_imageFilePath = "InvalidFilePath";
+        m_imageIdentifier = "Invalid";
         m_imagesTopLevelDirectory = "InvalidTopLevelDirectory";
     }
 
@@ -36,9 +37,9 @@ public class ImageSkybox : MonoBehaviour
         return m_skyboxTexture;
     }
 
-    public string GetImageFilePath()
+    public string GetImageIdentifier()
     {
-        return m_imageFilePath;
+        return m_imageIdentifier;
     }
 
     public void SetTopLevelDirectory(string imagesTopLevelDirectory)
@@ -46,31 +47,40 @@ public class ImageSkybox : MonoBehaviour
         m_imagesTopLevelDirectory = imagesTopLevelDirectory;
     }
 
-    public void SetImageAndPath(Texture2D texture, string filePath, int textureIndex)
+    public void SetImage(Texture2D texture, string imageIdentifier, int textureIndex)
     {        
-        if (filePath.Length <= 0)
+        if (imageIdentifier.Length <= 0)
         {
             m_uploadButton.SetActive(false);
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - attempting to set skybox to an empty filepath!");
             return;
         }
 
-        m_imageFilePath = filePath;
+        m_imageIdentifier = imageIdentifier;
         m_skyboxTexture = texture;
 
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, false);
         m_currTextureIndex = textureIndex;
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, true);
 
-        // Currently the ImageSkybox class is responsible for switching on the Upload button when its possible to select it
-        bool isImageFromDevice = m_imageFilePath.StartsWith(m_imagesTopLevelDirectory);
-        m_uploadButton.SetActive(isImageFromDevice);
+        bool isImageFromDevice = m_imageIdentifier.StartsWith(m_imagesTopLevelDirectory);
+        m_uploadButton.SetActive(isImageFromDevice); // Currently the ImageSkybox class is responsible for switching on the Upload button when its possible to select it
+
+        //TODO: Make it such that Downloading the Original Image replaces the Thumbnail on the ImageSphere!
+        if (!isImageFromDevice)
+        {
+            const int kStandardThumbnailWidth = 320; //TODO: This is also hardcoded in DeviceGallery, need to move this into a global variable...
+            bool isThumbnail = texture.width <= kStandardThumbnailWidth;
+            if (isThumbnail) // If its a thumbnail then we want to donwload the full image!
+            {
+                m_profile.DownloadOriginalImage(m_imageIdentifier);
+            }
+        }
 
         gameObject.GetComponent<MeshRenderer>().material.mainTexture = m_skyboxTexture;
 
         // TODO: have the skybox be used instead of just a sphere around the user
         // RenderSettings.skybox = texture; 
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Changed skybox to = " + m_imageFilePath + ", with TextureID = " + m_currTextureIndex);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Changed skybox to = " + m_imageIdentifier + ", with TextureID = " + m_currTextureIndex);
     }
 }

@@ -92,11 +92,11 @@ public class CppPlugin
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kTerminate);
     }
 
-    public IEnumerator LoadImageFromPath(ImageSphereController imageSphereController, int sphereIndex, string filePath, int textureIndex)
+    public IEnumerator LoadImageFromPath(ImageSphereController imageSphereController, int sphereIndex, string filePathAndIdentifier, int textureIndex)
     {
         yield return new WaitForEndOfFrame();
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromPath() from filePath: " + filePath + ", with TextureIndex: " + textureIndex);
-        StringBuilder filePathForCpp = new StringBuilder(filePath);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromPath() from filePath: " + filePathAndIdentifier + ", with TextureIndex: " + textureIndex);
+        StringBuilder filePathForCpp = new StringBuilder(filePathAndIdentifier);
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadIntoWorkingMemoryFromImagePath(), on background thread!");
         yield return m_threadJob.WaitFor();
@@ -141,18 +141,18 @@ public class CppPlugin
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateExternalTexture()!");
 
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAndFilePath()");
-        imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, newTexture, filePath, textureIndex);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAtIndex()");
+        imageSphereController.SetImageAtIndex(sphereIndex, newTexture, filePathAndIdentifier, textureIndex);
         yield return new WaitForEndOfFrame();
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAndFilePath()");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
 
         Resources.UnloadUnusedAssets();
     }   
 
-    public IEnumerator LoadImageFromStream(ImageSphereController imageSphereController, int sphereIndex, Stream imageStream, string filePath, int textureIndex)
+    public IEnumerator LoadImageFromStream(ImageSphereController imageSphereController, int sphereIndex, Stream imageStream, string imageIdentifier, int textureIndex)
     {        
         yield return new WaitForEndOfFrame();
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromStream() for " + filePath + ", with TextureIndex: " + textureIndex);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromStream() for image: " + imageIdentifier + ", with TextureIndex: " + textureIndex);
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling ToByteArray(), on background thread!");
         yield return m_threadJob.WaitFor();
@@ -210,10 +210,10 @@ public class CppPlugin
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateExternalTexture()!");
 
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAndFilePath()");
-        imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, newTexture, filePath, textureIndex);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAtIndex()");
+        imageSphereController.SetImageAtIndex(sphereIndex, newTexture, imageIdentifier, textureIndex);
         yield return new WaitForEndOfFrame();
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAndFilePath()");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
 
         Resources.UnloadUnusedAssets();
     }        

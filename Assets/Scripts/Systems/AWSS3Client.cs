@@ -197,7 +197,7 @@ public class AWSS3Client : MonoBehaviour
 
         m_staticLoadingIcon.SetActive(true);
 
-        string fileName =  m_imageSkybox.GetImageFilePath();
+        string fileName = m_imageSkybox.GetImageIdentifier();
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: UploadImage with FileName: " + fileName);
 
@@ -357,7 +357,7 @@ public class AWSS3Client : MonoBehaviour
                     (m_currS3ImageFilePathIndex != -1) && 
                     (m_currS3ImageFilePathIndex <= thisS3ImageIndex) &&  
                     (thisS3ImageIndex < m_currS3ImageFilePathIndex + numImages) && // Request no longer valid as user has moved on from this page
-                    (filePath.CompareTo(m_imageSkybox.GetImageFilePath()) != 0); // If file-path is the same then ignore request
+                    (filePath.CompareTo(m_imageSkybox.GetImageIdentifier()) != 0); // If file-path is the same then ignore request
                 
                 if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", imageRequestStillValid, m_currS3ImageFilePathIndex, thisS3ImageIndex, numImages) );
                 if (imageRequestStillValid)
@@ -434,7 +434,7 @@ public class AWSS3Client : MonoBehaviour
 
         Texture2D newImage = new Texture2D(2,2); 
         newImage.LoadImage(myBinary);
-        m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, newImage, fullFilePath, -1);
+        m_imageSphereController.SetImageAtIndex(sphereIndex, newImage, fullFilePath, -1);
         yield return new WaitForEndOfFrame();
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished Setting Image!");

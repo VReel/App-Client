@@ -74,7 +74,29 @@ namespace VReelJSON
 
     public class Model_Posts
     {     
-        public List<PostData> data { get; set; }
+        public List<PostsData> data { get; set; }
+    }
+
+    public class PostsData
+    {
+        public string id { get; set; }
+        public string type { get; set; }
+        public PostsAttributes attributes { get; set; }
+    }
+
+    public class PostsAttributes
+    {
+        public string thumbnail_url { get; set; }
+        public string caption { get; set; }
+        public string created_at { get; set; }
+        public bool edited { get; set; }
+    }       
+
+    //--------------------------------------------
+
+    public class Model_Post
+    {     
+        public PostData data { get; set; }
     }
 
     public class PostData
@@ -87,6 +109,7 @@ namespace VReelJSON
     public class PostAttributes
     {
         public string thumbnail_url { get; set; }
+        public string original_url { get; set; }
         public string caption { get; set; }
         public string created_at { get; set; }
         public bool edited { get; set; }

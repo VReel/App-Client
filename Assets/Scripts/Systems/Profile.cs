@@ -20,9 +20,16 @@ public class Profile : MonoBehaviour
     [SerializeField] private GameObject m_staticLoadingIcon;
     [SerializeField] private GameObject m_newUserText;   
 
+    public class Post
+    {
+        public string id { get; set; }
+        public string thumbnailUrl { get; set; }
+        public string originalUrl { get; set; }       
+    }
+
+    private List<Post> m_posts;
     private BackEndAPI m_backEndAPI;
-    private List<string> m_postThumbnailURLs;
-    private int m_currThumbnailURLIndex = -1;
+    private int m_currPostIndex = -1;
     private CoroutineQueue m_coroutineQueue;
 
     // **************************
@@ -31,7 +38,7 @@ public class Profile : MonoBehaviour
 
     public void Start() 
 	{
-        m_postThumbnailURLs = new List<string>();
+        m_posts = new List<Post>();
 
         m_coroutineQueue = new CoroutineQueue( this );
         m_coroutineQueue.StartLoop();
@@ -64,25 +71,25 @@ public class Profile : MonoBehaviour
         m_coroutineQueue.EnqueueAction(LogoutInternal());
     }
         
-    public void InvalidateThumbnailLoading() // This function is called in order to stop any ongoing image loading 
+    public void InvalidatePostsLoading() // This function is called in order to stop any ongoing image loading 
     {        
-        m_currThumbnailURLIndex = -1;
+        m_currPostIndex = -1;
         if (m_coroutineQueue != null)
         {
             m_coroutineQueue.Clear();
         }
     }
         
-    public bool IsThumbnailURLIndexAtStart()
+    public bool IsPostIndexAtStart()
     {
-        return m_currThumbnailURLIndex <= 0;
+        return m_currPostIndex <= 0;
     }
 
-    public bool IsThumbnailURLIndexAtEnd()
+    public bool IsPostIndexAtEnd()
     {
         int numImageSpheres = m_imageSphereController.GetNumSpheres();
-        int numFiles = m_postThumbnailURLs.Count; // m_s3ImageFilePaths.Count;
-        return m_currThumbnailURLIndex >= (numFiles - numImageSpheres);       
+        int numPosts = m_posts.Count; 
+        return m_currPostIndex >= (numPosts - numImageSpheres);       
     }        
 
     public void OpenProfile()
@@ -90,8 +97,7 @@ public class Profile : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenProfile() called");
 
         m_imageSphereController.SetAllImageSpheresToLoading();
-        m_coroutineQueue.EnqueueAction(StoreAllPostURLsAndSetSpheres());
-        //m_coroutineQueue.EnqueueAction(StoreAllS3ImagePathsAndSetSpheres());
+        m_coroutineQueue.EnqueueAction(StoreAllPostsAndSetSpheres());
     }       
 
     public void NextImages()
@@ -99,12 +105,12 @@ public class Profile : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: NextImages() called");
 
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
-        int numFilePaths = m_postThumbnailURLs.Count; // m_s3ImageFilePaths.Count;
+        int numPosts = m_posts.Count;
 
-        m_currThumbnailURLIndex = Mathf.Clamp(m_currThumbnailURLIndex + numImagesToLoad, 0, numFilePaths);
+        m_currPostIndex = Mathf.Clamp(m_currPostIndex + numImagesToLoad, 0, numPosts);
 
         m_coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
-        m_coroutineQueue.EnqueueAction(DownloadImagesAndSetSpheres());
+        m_coroutineQueue.EnqueueAction(DownloadThumbnailsAndSetSpheres());
     }
 
     public void PreviousImages()
@@ -112,12 +118,19 @@ public class Profile : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreviousImages() called");
 
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
-        int numFilePaths = m_postThumbnailURLs.Count; // m_s3ImageFilePaths.Count;
+        int numPosts = m_posts.Count;
 
-        m_currThumbnailURLIndex = Mathf.Clamp(m_currThumbnailURLIndex - numImagesToLoad, 0, numFilePaths);
+        m_currPostIndex = Mathf.Clamp(m_currPostIndex - numImagesToLoad, 0, numPosts);
 
         m_coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
-        m_coroutineQueue.EnqueueAction(DownloadImagesAndSetSpheres());
+        m_coroutineQueue.EnqueueAction(DownloadThumbnailsAndSetSpheres());
+    }
+
+    public void DownloadOriginalImage(string imageIdentifier)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadFullImage() called");
+
+        m_coroutineQueue.EnqueueAction(DownloadOriginalImageInternal(imageIdentifier));
     }
 
     // **************************
@@ -138,53 +151,57 @@ public class Profile : MonoBehaviour
     }
 
     // TODO: Handle users who have more than 20 posts!
-    private IEnumerator StoreAllPostURLsAndSetSpheres()
+    private IEnumerator StoreAllPostsAndSetSpheres()
     {
         yield return m_appDirector.VerifyInternetConnection();
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Getting all Posts for Logged in User");
 
-        m_postThumbnailURLs.Clear();
+        m_posts.Clear();
 
         yield return m_backEndAPI.Posts_GetAll();
 
         VReelJSON.Model_Posts posts = m_backEndAPI.GetAllPostsResult();
         if (posts != null)
         {
-            foreach (VReelJSON.PostData postData in posts.data)
-            {                
-                m_postThumbnailURLs.Add(postData.attributes.thumbnail_url.ToString());
+            foreach (VReelJSON.PostsData postData in posts.data)
+            {   
+                Post newPost = new Post();
+                newPost.id = postData.id.ToString();
+                newPost.thumbnailUrl = postData.attributes.thumbnail_url.ToString();
+                m_posts.Add(newPost);
             }
         }           
 
-        m_currThumbnailURLIndex = 0; // set to a valid Index
-        m_coroutineQueue.EnqueueAction(DownloadImagesAndSetSpheres());
+        m_currPostIndex = 0; // set to a valid Index
+        m_coroutineQueue.EnqueueAction(DownloadThumbnailsAndSetSpheres());
 
-        bool noImagesUploaded = m_postThumbnailURLs.Count <= 0;
+        bool noImagesUploaded = m_posts.Count <= 0;
         m_newUserText.SetActive(noImagesUploaded); // If the user has yet to upload any images then show them the New User Text!
     }
 
-    private IEnumerator DownloadImagesAndSetSpheres()
+    private IEnumerator DownloadThumbnailsAndSetSpheres()
     {
         yield return m_appDirector.VerifyInternetConnection();
 
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
-        DownloadImagesAndSetSpheresInternal(m_currThumbnailURLIndex, numImagesToLoad);
+        DownloadThumbnailsAndSetSpheresInternal(m_currPostIndex, numImagesToLoad);
     }
 
-    private void DownloadImagesAndSetSpheresInternal(int startingThumbnailURLIndex, int numImages)
+    private void DownloadThumbnailsAndSetSpheresInternal(int startingPostIndex, int numImages)
     {
-        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading {0} images beginning at index {1}. We've found {2} posts for the user!", numImages, startingThumbnailURLIndex, m_postThumbnailURLs.Count));
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading {0} images beginning at index {1}. We've found {2} posts for the user!", numImages, startingPostIndex, m_posts.Count));
 
         Resources.UnloadUnusedAssets();
 
-        int currThumbnailURLIndex = startingThumbnailURLIndex;
-        for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, currThumbnailURLIndex++)
+        int currPostIndex = startingPostIndex;
+        for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, currPostIndex++)
         {
-            if (currThumbnailURLIndex < m_postThumbnailURLs.Count)
+            if (currPostIndex < m_posts.Count)
             {                   
-                string thumbnailURL = m_postThumbnailURLs[currThumbnailURLIndex];
-                m_coroutineQueue.EnqueueAction(DownloadImage(thumbnailURL, sphereIndex, currThumbnailURLIndex, numImages));
+                string id = m_posts[currPostIndex].id;
+                string thumbnailURL = m_posts[currPostIndex].thumbnailUrl;
+                m_coroutineQueue.EnqueueAction(DownloadImageInternal(id, thumbnailURL, sphereIndex)); //, currPostIndex, numImages));
             }
             else
             {
@@ -195,14 +212,21 @@ public class Profile : MonoBehaviour
         Resources.UnloadUnusedAssets();
     }
 
-    private IEnumerator DownloadImage(string url, int sphereIndex, int thisThumbnailURLIndex, int numImages)
+    public IEnumerator DownloadOriginalImageInternal(string id)
+    {
+        yield return RefreshPostData(id);
+
+        yield return DownloadImageInternal(id, m_posts[ConvertIdToIndex(id)].originalUrl, -1); // a -1 sphereIndex maps to the SkyBox
+    }
+
+    private IEnumerator DownloadImageInternal(string imageIdentifier, string url, int sphereIndex) // int thisThumbnailURLIndex, int numImages) - these were once used for validity checks
     {
         yield return m_appDirector.VerifyInternetConnection();
                    
-        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading: " + url));
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading: " + imageIdentifier));
 
         HttpWebRequest http = (HttpWebRequest)WebRequest.Create(url);
-        m_coroutineQueue.EnqueueAction(LoadImageInternalUnity(http.GetResponse(), sphereIndex, url));
+        m_coroutineQueue.EnqueueAction(LoadImageInternalUnity(http.GetResponse(), sphereIndex, imageIdentifier));
 
         /*
         using (WebClient webClient = new WebClient()) 
@@ -218,19 +242,31 @@ public class Profile : MonoBehaviour
         */
     }
 
-    private IEnumerator LoadImageInternalPlugin(Amazon.S3.Model.GetObjectResponse response, int sphereIndex, string fullFilePath)
+    private IEnumerator RefreshPostData(string id) // NOTE: Since URL's have a lifetime, we need to refresh the data at certain points...
+    {            
+        yield return m_backEndAPI.Posts_Get(id);
+
+        int index = ConvertIdToIndex(id);
+        if (index <= m_posts.Count)
+        {
+            m_posts[index].thumbnailUrl = m_backEndAPI.GetPostResult().data.attributes.thumbnail_url;
+            m_posts[index].originalUrl = m_backEndAPI.GetPostResult().data.attributes.original_url;
+        }
+    }
+
+    private IEnumerator LoadImageInternalPlugin(Amazon.S3.Model.GetObjectResponse response, int sphereIndex, string imageIdentifier)
     {        
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: LoadImageInternal for " + fullFilePath);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: LoadImageInternal for " + imageIdentifier);
 
         using (var stream = response.ResponseStream)
         {
-            yield return m_imageSphereController.LoadImageFromStream(stream, sphereIndex, fullFilePath);
+            yield return m_imageSphereController.LoadImageFromStream(stream, sphereIndex, imageIdentifier);
         }
     }
         
-    private IEnumerator LoadImageInternalUnity(WebResponse response, int sphereIndex, string fullFilePath)
+    private IEnumerator LoadImageInternalUnity(WebResponse response, int sphereIndex, string imageIdentifier)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: ConvertStreamAndSetImage for " + fullFilePath);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: ConvertStreamAndSetImage for " + imageIdentifier);
 
         const int kNumIterationsPerFrame = 150;
         byte[] myBinary = null;
@@ -262,11 +298,31 @@ public class Profile : MonoBehaviour
 
         Texture2D newImage = new Texture2D(2,2); 
         newImage.LoadImage(myBinary);
-        m_imageSphereController.SetImageAndFilePathAtIndex(sphereIndex, newImage, fullFilePath, -1);
+        m_imageSphereController.SetImageAtIndex(sphereIndex, newImage, imageIdentifier, -1);
         yield return new WaitForEndOfFrame();
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished Setting Image!");
 
         Resources.UnloadUnusedAssets();
+    }
+
+    private int ConvertIdToIndex(string id) //TODO: To remove this all I need to do is turn m_posts into a Map<ID, PostAttributes>...
+    {
+        int index = 0;    
+        for (; index < m_posts.Count; index++)
+        {   
+            if (m_posts[index].id.CompareTo(id) == 0)
+            {
+                break;
+            }
+        }
+
+        if (index >= m_posts.Count)
+        {
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - Invalid ID being converted to Post Index!! -> " + id);
+            index = 0;
+        }
+
+        return index;
     }
 }

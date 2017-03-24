@@ -30,6 +30,7 @@ public class BackEndAPI
     private ThreadJob m_threadJob;
 
     private VReelJSON.Model_Posts m_postsJSONResult;
+    private VReelJSON.Model_Post m_postJSONResult;
     private VReelJSON.Model_S3PresignedURL m_s3URLJSONResult;
 
     // **************************
@@ -59,6 +60,11 @@ public class BackEndAPI
     public VReelJSON.Model_Posts GetAllPostsResult()
     {
         return m_postsJSONResult;
+    }
+
+    public VReelJSON.Model_Post GetPostResult()
+    {
+        return m_postJSONResult;
     }
 
     public VReelJSON.Model_S3PresignedURL GetS3PresignedURLResult()
@@ -273,8 +279,7 @@ public class BackEndAPI
             ShowErrors(response, "DELETE to '/users/sign_out'");
         }
     }
-
-    // ------ !CURRENTLY UNUSED! -------- //
+        
     public IEnumerator S3_PresignedURL()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/s3_presigned_url' - S3 Presigned URL");
@@ -342,8 +347,7 @@ public class BackEndAPI
             ShowErrors(response, "GET to '/posts'");
         }
     }
-
-    // ------ !CURRENTLY UNUSED! -------- //
+        
     public IEnumerator Posts_Create(string _thumbnailKey, string _originalKey)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/posts' - Create new post");
@@ -376,6 +380,44 @@ public class BackEndAPI
         else // Error Handling
         {            
             ShowErrors(response, "POST to '/posts'");
+        }
+    }
+
+    public IEnumerator Posts_Get(string _postId)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts/" + _postId + "' - Show a post");
+
+        var request = new RestRequest("/posts/" + _postId, Method.GET);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.m_client);
+        request.AddHeader("uid", m_user.m_uid);
+        request.AddHeader("access-token", m_user.m_accessToken);
+
+        /*
+        request.AddJsonBody(new { 
+            postId = _postId
+        });
+        */
+
+        yield return m_threadJob.WaitFor();
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts/" + _postId + "' - Response: " + response.Content);
+
+        if (IsSuccessCode(response.StatusCode))
+        {
+            UpdateAccessToken(response);
+
+            var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Post>(response.Content);
+            m_postJSONResult = result;
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "GET to '/posts/" + _postId + "'");
         }
     }
 
