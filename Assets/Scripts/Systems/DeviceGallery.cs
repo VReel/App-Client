@@ -417,7 +417,7 @@ public class DeviceGallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadImageIntoTexture()");
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAndFilePath()");
-        m_imageSphereController.SetImageAtIndex(sphereIndex, myNewTexture2D, filePath, -1);
+        m_imageSphereController.SetImageAtIndex(sphereIndex, myNewTexture2D, filePath, -1, true);
         yield return new WaitForEndOfFrame();
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAndFilePath()");
 

@@ -66,14 +66,17 @@ public class ImageSkybox : MonoBehaviour
         bool isImageFromDevice = m_imageIdentifier.StartsWith(m_imagesTopLevelDirectory);
         m_uploadButton.SetActive(isImageFromDevice); // Currently the ImageSkybox class is responsible for switching on the Upload button when its possible to select it
 
-        //TODO: Make it such that Downloading the Original Image replaces the Thumbnail on the ImageSphere!
-        if (!isImageFromDevice)
+        if (!isImageFromDevice) // This image is being set from the Profile, not the Gallery
         {
             const int kStandardThumbnailWidth = 320; //TODO: This is also hardcoded in DeviceGallery, need to move this into a global variable...
             bool isThumbnail = texture.width <= kStandardThumbnailWidth;
-            if (isThumbnail) // If its a thumbnail then we want to donwload the full image!
+            if (isThumbnail) // This image is a Thumbnail, so we want to download the full image!
             {
                 m_profile.DownloadOriginalImage(m_imageIdentifier);
+            }
+            else // TODO: This is the Original image, so we want to replace the Thumbnail on the ImageSphere!
+            {                
+                m_imageSphereController.SetImageWithId(imageIdentifier, texture, textureIndex);
             }
         }
 

@@ -147,7 +147,7 @@ public class CppPlugin
 
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAtIndex()");
-        imageSphereController.SetImageAtIndex(sphereIndex, m_lastTextureOperatedOn, filePathAndIdentifier, textureIndex);
+        imageSphereController.SetImageAtIndex(sphereIndex, m_lastTextureOperatedOn, filePathAndIdentifier, textureIndex, true);
         yield return new WaitForEndOfFrame();
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
 
@@ -216,7 +216,7 @@ public class CppPlugin
 
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAtIndex()");
-        imageSphereController.SetImageAtIndex(sphereIndex, m_lastTextureOperatedOn, imageIdentifier, textureIndex);
+        imageSphereController.SetImageAtIndex(sphereIndex, m_lastTextureOperatedOn, imageIdentifier, textureIndex, true);
         yield return new WaitForEndOfFrame();
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
 

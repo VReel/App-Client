@@ -93,6 +93,8 @@ public class ImageLoader : MonoBehaviour
     {
         yield return m_appDirector.VerifyInternetConnection();
 
+        m_staticLoadingIcon.SetActive(showLoading);
+
         /*
         using (WebClient webClient = new WebClient()) 
         {
@@ -104,8 +106,6 @@ public class ImageLoader : MonoBehaviour
             }
         }
         */
-
-        m_staticLoadingIcon.SetActive(showLoading);
 
         HttpWebRequest http = (HttpWebRequest)WebRequest.Create(url);
         using (var imageStream = http.GetResponse().GetResponseStream())

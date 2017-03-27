@@ -43,7 +43,7 @@ public class ImageSphere : MonoBehaviour
         return m_imageIdentifier;
     }
 
-    public void SetImage(Texture2D texture, string imageIdentifier, int textureIndex)
+    public void SetImage(Texture2D texture, string imageIdentifier, int textureIndex, bool animateOnSet)
     {
         m_imageSphereController.SetTextureInUse(m_nextTextureIndex, false); // Textures that were going to be used can be thrown away
         m_imageSphereController.SetTextureInUse(textureIndex, true);
@@ -54,12 +54,20 @@ public class ImageSphere : MonoBehaviour
 
         if (Debug.isDebugBuild) 
             Debug.Log("------- VREEL: Finished Loading Image from Texture2D, " +
-            "ImageIdentifier = " + imageIdentifier +
-            " , PluginTextureIndex = " + textureIndex +
-            " , Texture size = " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
+                "AnimateOnSet = " + animateOnSet +
+                "ImageIdentifier = " + imageIdentifier +
+                " , PluginTextureIndex = " + textureIndex +
+                " , Texture size = " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
 
         m_coroutineQueue.Clear();
-        m_coroutineQueue.EnqueueAction(AnimateSetTexture());
+        if (animateOnSet)
+        {
+            m_coroutineQueue.EnqueueAction(AnimateSetTexture());
+        }
+        else
+        {
+            SetTextureAndID();
+        }
     }
 
     public void Hide()
@@ -82,6 +90,17 @@ public class ImageSphere : MonoBehaviour
     // Private/Helper functions
     // **************************
 
+    private void SetTextureAndID()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: SetTextureAndID() called on sphere: " + (m_imageSphereIndex+1) );
+        
+        gameObject.GetComponent<MeshRenderer>().material.mainTexture = m_imageSphereTexture;
+
+        m_imageSphereController.SetTextureInUse(m_currTextureIndex, false);
+        m_currTextureIndex = m_nextTextureIndex;
+        m_nextTextureIndex = kLoadingTextureIndex;
+    }
+
     private IEnumerator AnimateSetTexture()
     {   
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateSetTexture() began on sphere: " + (m_imageSphereIndex+1) );
@@ -97,11 +116,7 @@ public class ImageSphere : MonoBehaviour
         }
 
         // Set texture and textureID
-        gameObject.GetComponent<MeshRenderer>().material.mainTexture = m_imageSphereTexture;
-
-        m_imageSphereController.SetTextureInUse(m_currTextureIndex, false);
-        m_currTextureIndex = m_nextTextureIndex;
-        m_nextTextureIndex = kLoadingTextureIndex;
+        SetTextureAndID();
 
         // Scale up
         while (transform.localScale.magnitude < defaultScale)

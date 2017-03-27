@@ -80,11 +80,17 @@ public class ImageSphereController : MonoBehaviour
     {
         for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
         {
-            SetImageAtIndex(sphereIndex, m_sphereLoadingTexture, kLoadingTextureFilePath, m_imageLoader.GetLoadingTextureIndex());
+            SetImageAtIndex(sphereIndex, m_sphereLoadingTexture, kLoadingTextureFilePath, m_imageLoader.GetLoadingTextureIndex(), true);
         }
     }
 
-    public void SetImageAtIndex(int sphereIndex, Texture2D texture, string imageIdentifier, int pluginTextureIndex)
+    public void SetImageWithId(string imageIdentifier, Texture2D texture, int pluginTextureIndex)
+    {
+        int sphereIndex = ConvertIdToIndex(imageIdentifier);
+        SetImageAtIndex(sphereIndex, texture, imageIdentifier, pluginTextureIndex, false);
+    }
+
+    public void SetImageAtIndex(int sphereIndex, Texture2D texture, string imageIdentifier, int pluginTextureIndex, bool animateOnSet)
     {
         if (sphereIndex == -1)
         {
@@ -92,13 +98,13 @@ public class ImageSphereController : MonoBehaviour
         }
         else if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
         {
-            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetImage(texture, imageIdentifier, pluginTextureIndex);
+            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetImage(texture, imageIdentifier, pluginTextureIndex, animateOnSet);
         }
         else
         {
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: Invalid request to SetImageAndFilePathAtIndex: " + sphereIndex);
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: Invalid request to SetImageAtIndex: " + sphereIndex);
         }
-    }
+    }        
 
     public void HideAllImageSpheres()
     {
@@ -139,4 +145,18 @@ public class ImageSphereController : MonoBehaviour
             m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().ForceHide();
         }
     }        
+
+    private int ConvertIdToIndex(string imageIdentifier)
+    {
+        int sphereIndex = 0;
+        for (; sphereIndex < GetNumSpheres(); sphereIndex++)
+        {
+            if (m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().GetImageIdentifier().CompareTo(imageIdentifier) == 0)
+            {
+                break;
+            }
+        }
+
+        return sphereIndex;
+    }
 }

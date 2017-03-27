@@ -354,7 +354,7 @@ public class Profile : MonoBehaviour
 
         Texture2D newImage = new Texture2D(2,2); 
         newImage.LoadImage(myBinary);
-        m_imageSphereController.SetImageAtIndex(sphereIndex, newImage, imageIdentifier, -1);
+        m_imageSphereController.SetImageAtIndex(sphereIndex, newImage, imageIdentifier, -1 , true);
         yield return new WaitForEndOfFrame();
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished Setting Image!");
