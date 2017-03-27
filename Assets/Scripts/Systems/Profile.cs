@@ -15,7 +15,7 @@ public class Profile : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
-    [SerializeField] private CppPlugin m_cppPlugin;
+    [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private GameObject m_errorMessage;
@@ -112,7 +112,7 @@ public class Profile : MonoBehaviour
 
         m_currPostIndex = Mathf.Clamp(m_currPostIndex + numImagesToLoad, 0, numPosts);
 
-        m_cppPlugin.InvalidateLoading(); // Stop anything we may have already been loading
+        m_imageLoader.InvalidateLoading(); // Stop anything we may have already been loading
         m_coroutineQueue.Clear(); // Ensures we don't repeat operations
 
         if (m_nextPageOfPosts != null)
@@ -133,7 +133,7 @@ public class Profile : MonoBehaviour
 
         m_currPostIndex = Mathf.Clamp(m_currPostIndex - numImagesToLoad, 0, numPosts);
 
-        m_cppPlugin.InvalidateLoading(); // Stop anything we may have already been loading
+        m_imageLoader.InvalidateLoading(); // Stop anything we may have already been loading
         m_coroutineQueue.Clear(); // Ensures we don't repeat operations
         m_coroutineQueue.EnqueueAction(RefreshPostsAtCurrIndex());
         m_coroutineQueue.EnqueueAction(DownloadThumbnailsAndSetSpheres());
@@ -310,7 +310,7 @@ public class Profile : MonoBehaviour
     {        
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: LoadImageInternal for " + imageIdentifier);
 
-        m_imageSphereController.LoadImageFromURLIntoImageSphere(url, sphereIndex, imageIdentifier, showLoading);
+        m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, sphereIndex, url, imageIdentifier, showLoading);
 
         /*
         using (var stream = response.GetResponseStream())

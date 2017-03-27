@@ -4,11 +4,8 @@ using System.Text;                    // StringBuilder
 using System.IO;                      // Stream
 using System.Collections;             // IEnumerator
 using System.Runtime.InteropServices; // DllImport
-using System.Net;                     // HttpWebRequest
 
-//TODO: Split this into a ImageLoader Component and the original CppPlugin wrapper class...
-//   -> I don't like having CppPlugin as the name of a Component, it seems wrong!
-public class CppPlugin : MonoBehaviour 
+public class CppPlugin
 {
     // The C++ Plugin is predominantly used for Asynchronous Texture loading as Texture2D's only load Synchronously.
     //
@@ -58,18 +55,11 @@ public class CppPlugin : MonoBehaviour
     // Member Variables
     // **************************
 
-    [SerializeField] private AppDirector m_appDirector;
-    [SerializeField] private GameObject m_staticLoadingIcon;
-
     private const int kMaxPixelsUploadedPerFrame = 1 * 1024 * 1024;
     private const float kWaitForGLRenderCall = 2.0f/60.0f; // Wait 2 frames
 
-    private const int kMaxNumTextures = 10; // 5 ImageSpheres + 1 Skybox + 4 spare textures
-    private const int kLoadingTextureIndex = -1;
-    private int[] m_textureIndexUsage;
-
+    private MonoBehaviour m_owner;
     private Texture2D m_lastTextureOperatedOn;
-    private CoroutineQueue m_coroutineQueue;
     private ThreadJob m_threadJob;   
 
     // These are functions that use OpenGL and hence must be run from the Render Thread!
@@ -85,78 +75,30 @@ public class CppPlugin : MonoBehaviour
     // Public functions
     // *************************
 
-    public void Start() // NOTE: Due to current underlying C++ implementation being single threaded, there can only be one of these
+    // NOTE: Due to current underlying C++ implementation being single threaded, there can only be one of these
+    public CppPlugin(MonoBehaviour owner, int maxNumTextures)
     {
+        m_owner = owner;
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: A CppPlugin object was Created by = " + m_owner.name);
+
         m_lastTextureOperatedOn = new Texture2D(2,2);
 
-        m_textureIndexUsage = new int[kMaxNumTextures];
-
         SetMaxPixelsUploadedPerFrame(kMaxPixelsUploadedPerFrame);
-        SetInitMaxNumTextures(kMaxNumTextures);
+        SetInitMaxNumTextures(maxNumTextures);
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kInit);
 
-        m_coroutineQueue = new CoroutineQueue( this );
-        m_coroutineQueue.StartLoop();
-        m_threadJob = new ThreadJob(this);
+        m_threadJob = new ThreadJob(owner);
     }
 
-    public void OnDestroy()
+    ~CppPlugin()
     {
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: A CppPlugin object was Destructed by = " + m_owner.name);
+
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kTerminate);
     }
-
-    public int GetMaxNumTextures()
+        
+    public IEnumerator LoadImageFromPathIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, string filePathAndIdentifier, int textureIndex)
     {
-        return kMaxNumTextures;
-    }
-
-    public int GetLoadingTextureIndex()
-    {
-        return kLoadingTextureIndex;
-    }
-
-    public void SetTextureInUse(int textureID, bool inUse)
-    {
-        if (textureID != -1) // -1 is the textureID for the loadingTexture!
-        {
-            if (inUse)
-            {
-                ++m_textureIndexUsage[textureID];
-            }
-            else
-            {
-                --m_textureIndexUsage[textureID];
-            }
-
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: TextureID = " + textureID + ", InUse = " + inUse);
-            DebugPrintTextureIndexUsage();
-        }
-    }
-
-    public void InvalidateLoading()
-    {
-        m_coroutineQueue.Clear();
-    }
-
-    public void LoadImageFromPathIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, string filePathAndIdentifier, bool showLoading)
-    {
-        m_coroutineQueue.EnqueueAction(LoadImageFromPathIntoImageSphereInternal(imageSphereController, sphereIndex, filePathAndIdentifier, showLoading));
-    }
-
-    public void LoadImageFromURLIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, string url, string filePathAndIdentifier, bool showLoading)
-    {
-        m_coroutineQueue.EnqueueAction(LoadImageFromURLIntoImageSphereInternal(imageSphereController, sphereIndex, url, filePathAndIdentifier, showLoading));
-    }
-
-    // **************************
-    // Private/Helper functions
-    // **************************
-
-    private IEnumerator LoadImageFromPathIntoImageSphereInternal(ImageSphereController imageSphereController, int sphereIndex, string filePathAndIdentifier, bool showLoading)
-    {
-        m_staticLoadingIcon.SetActive(showLoading);
-
-        int textureIndex = GetAvailableTextureIndex();
         StringBuilder filePathForCpp = new StringBuilder(filePathAndIdentifier);
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromPathIntoImageSphere() from filePath: " + filePathAndIdentifier + ", with TextureIndex: " + textureIndex);
         yield return new WaitForEndOfFrame();
@@ -209,42 +151,11 @@ public class CppPlugin : MonoBehaviour
         yield return new WaitForEndOfFrame();
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
 
-        m_staticLoadingIcon.SetActive(false);
         Resources.UnloadUnusedAssets();
     }   
-
-    private IEnumerator LoadImageFromURLIntoImageSphereInternal(ImageSphereController imageSphereController, int sphereIndex, string url, string imageIdentifier, bool showLoading)
-    {
-        yield return m_appDirector.VerifyInternetConnection();
-
-        /*
-        using (WebClient webClient = new WebClient()) 
-        {
-            byte [] data = webClient
-            using (var stream = new MemoryStream(data)) 
-            {
-                yield return LoadImageInternalPlugin(stream, sphereIndex, imageIdentifier);
-                //m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(stream, sphereIndex, imageIdentifier));
-            }
-        }
-        */
-
-        m_staticLoadingIcon.SetActive(showLoading);
-
-        HttpWebRequest http = (HttpWebRequest)WebRequest.Create(url);
-        using (var imageStream = http.GetResponse().GetResponseStream())
-        {
-            yield return LoadImageFromStreamIntoImageSphereInternal(imageSphereController, sphereIndex, imageStream, imageIdentifier, showLoading);
-        }
-
-        m_staticLoadingIcon.SetActive(false);
-    }
            
-    private IEnumerator LoadImageFromStreamIntoImageSphereInternal(ImageSphereController imageSphereController, int sphereIndex, Stream imageStream, string imageIdentifier, bool showLoading)
-    {        
-        m_staticLoadingIcon.SetActive(showLoading);
-
-        int textureIndex = GetAvailableTextureIndex();
+    public IEnumerator LoadImageFromStreamIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, Stream imageStream, string imageIdentifier, int textureIndex)
+    {
         yield return new WaitForEndOfFrame();
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromStreamIntoImageSphere() for image: " + imageIdentifier + ", with TextureIndex: " + textureIndex);
 
@@ -309,9 +220,12 @@ public class CppPlugin : MonoBehaviour
         yield return new WaitForEndOfFrame();
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
 
-        m_staticLoadingIcon.SetActive(false);
         Resources.UnloadUnusedAssets();
-    }                
+    }     
+
+    // **************************
+    // Private/Helper functions
+    // **************************
 
     private bool ToByteArray(Stream stream, ref byte[] outBinary)
     {                
@@ -331,30 +245,5 @@ public class CppPlugin : MonoBehaviour
         }
 
         return true;
-    }
-
-    private int GetAvailableTextureIndex()
-    {
-        for (int i = 0; i < kMaxNumTextures; i++)
-        {            
-            if (m_textureIndexUsage[i] == 0)
-            {
-                return i;
-            }
-        }
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - We have no more textures available!!!");
-        DebugPrintTextureIndexUsage();
-
-        return -1;
-    }
-
-    private void DebugPrintTextureIndexUsage()
-    {
-        if (Debug.isDebugBuild) 
-            Debug.Log("------- VREEL: " + m_textureIndexUsage[0] + ", " + m_textureIndexUsage[1] + ", " + m_textureIndexUsage[2] 
-                + ", " + m_textureIndexUsage[3] + ", " + m_textureIndexUsage[4] + ", " + m_textureIndexUsage[5] 
-                + ", " + m_textureIndexUsage[6] + ", " + m_textureIndexUsage[7] 
-                + ", " + m_textureIndexUsage[8] + ", " + m_textureIndexUsage[9]);
     }
 }

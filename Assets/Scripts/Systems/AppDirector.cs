@@ -27,7 +27,7 @@ public class AppDirector : MonoBehaviour
     [SerializeField] private Profile m_profile;
     [SerializeField] private DeviceGallery m_deviceGallery;
     [SerializeField] private LoginFlow m_loginFlow;
-    [SerializeField] private CppPlugin m_cppPlugin;
+    [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private InternetReachabilityVerifier m_internetReachabilityVerifier;
     [SerializeField] private GameObject m_lostConnectionIcon;
 
@@ -110,7 +110,7 @@ public class AppDirector : MonoBehaviour
         m_imageSphereController.HideAllImageSpheres();
         SetMenuBar(false);
 
-        m_cppPlugin.InvalidateLoading();
+        m_imageLoader.InvalidateLoading();
         m_deviceGallery.InvalidateWork();
         m_profile.InvalidateWork();
         m_loginFlow.SetLoginFlowPage(0);
@@ -133,7 +133,7 @@ public class AppDirector : MonoBehaviour
             m_menuController.ShowWelcomeText();
         }
 
-        m_cppPlugin.InvalidateLoading();
+        m_imageLoader.InvalidateLoading();
         m_deviceGallery.InvalidateWork();
 
         m_menuController.SetProfileSubMenuActive(true);
@@ -150,7 +150,7 @@ public class AppDirector : MonoBehaviour
         m_imageSphereController.HideAllImageSpheres();
         SetMenuBar(true);
 
-        m_cppPlugin.InvalidateLoading();
+        m_imageLoader.InvalidateLoading();
         m_profile.InvalidateWork();
 
         m_menuController.SetGallerySubMenuActive(true);

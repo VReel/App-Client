@@ -17,7 +17,7 @@ public class DeviceGallery : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
-    [SerializeField] private CppPlugin m_cppPlugin;
+    [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private GameObject m_errorMessage;
@@ -108,7 +108,7 @@ public class DeviceGallery : MonoBehaviour
 
         m_currGalleryImageIndex = Mathf.Clamp(m_currGalleryImageIndex + numImagesToLoad, 0, numFilePaths);
 
-        m_cppPlugin.InvalidateLoading();
+        m_imageLoader.InvalidateLoading();
         m_coroutineQueue.Clear(); // Throw away previous operations
         m_coroutineQueue.EnqueueAction(LoadImages(m_currGalleryImageIndex, numImagesToLoad));
     }
@@ -122,7 +122,7 @@ public class DeviceGallery : MonoBehaviour
 
         m_currGalleryImageIndex = Mathf.Clamp(m_currGalleryImageIndex - numImagesToLoad, 0, numFilePaths);
 
-        m_cppPlugin.InvalidateLoading();
+        m_imageLoader.InvalidateLoading();
         m_coroutineQueue.Clear(); // Throw away previous operations
         m_coroutineQueue.EnqueueAction(LoadImages(m_currGalleryImageIndex, numImagesToLoad));
     }
@@ -399,7 +399,7 @@ public class DeviceGallery : MonoBehaviour
 
     private IEnumerator LoadImageInternalPlugin(string filePath, int sphereIndex,bool showLoading)
     {   
-        m_imageSphereController.LoadImageFromPathIntoImageSphere(sphereIndex, filePath, showLoading);
+        m_imageLoader.LoadImageFromPathIntoImageSphere(m_imageSphereController, sphereIndex, filePath, showLoading);
         yield break;
     }
 

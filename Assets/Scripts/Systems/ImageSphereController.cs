@@ -15,7 +15,7 @@ public class ImageSphereController : MonoBehaviour
 
     [SerializeField] private float m_defaultSphereScale = 1.0f;
     [SerializeField] private float m_scalingFactor = 0.88f;
-    [SerializeField] private CppPlugin m_cppPlugin;
+    [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private GameObject[] m_imageSpheres;
     [SerializeField] private Texture2D m_sphereLoadingTexture;
@@ -36,20 +36,10 @@ public class ImageSphereController : MonoBehaviour
         ForceHideAllImageSpheres();
         SetIndexOnAllImageSpheres();
     }
-        
-    public void LoadImageFromPathIntoImageSphere(int sphereIndex, string filePathAndIdentifier, bool showLoading)
-    {
-        m_cppPlugin.LoadImageFromPathIntoImageSphere(this, sphereIndex, filePathAndIdentifier, showLoading);
-    }
-
-    public void LoadImageFromURLIntoImageSphere(string url, int sphereIndex, string imageIdentifier, bool showLoading)
-    {
-        m_cppPlugin.LoadImageFromURLIntoImageSphere(this, sphereIndex, url, imageIdentifier, showLoading);
-    }
 
     public void SetTextureInUse(int textureID, bool inUse)
     {
-        m_cppPlugin.SetTextureInUse(textureID, inUse);
+        m_imageLoader.SetTextureInUse(textureID, inUse);
     }
         
     public float GetDefaultSphereScale()
@@ -90,7 +80,7 @@ public class ImageSphereController : MonoBehaviour
     {
         for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
         {
-            SetImageAtIndex(sphereIndex, m_sphereLoadingTexture, kLoadingTextureFilePath, m_cppPlugin.GetLoadingTextureIndex());
+            SetImageAtIndex(sphereIndex, m_sphereLoadingTexture, kLoadingTextureFilePath, m_imageLoader.GetLoadingTextureIndex());
         }
     }
 
