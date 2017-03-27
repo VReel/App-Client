@@ -1,21 +1,30 @@
 ﻿using UnityEngine;
+using System;                                           //Serializable
+using System.Runtime.Serialization.Formatters.Binary;   //BinaryFormatter
+using System.IO;                                        //Filestream, File
 
 // This class holds a blackboard of user variables that are updated depending on the user logged in
-
 public class User : MonoBehaviour
 {
     // **************************
     // Member Variables
     // **************************
 
-    public string m_client {get; set;}
-    public string m_uid {get; set;}
-    public string m_accessToken {get; set;}
-
+    [Serializable]
+    public class LoginData
+    {
+        public string m_client {get; set;}
+        public string m_uid {get; set;}
+        public string m_accessToken {get; set;}
+    }
+        
     public string m_handle {get; set;}
     public string m_email {get; set;}
     public string m_name {get; set;}
     public string m_profileDescription {get; set;}
+
+    private string m_dataFilePath;
+    private LoginData m_loginData;
 
     // **************************
     // Public functions
@@ -23,17 +32,90 @@ public class User : MonoBehaviour
 
     public void Start()
     {
-        Clear();
+        m_dataFilePath = Application.persistentDataPath + "vreelLogin.dat";
+
+        LoadLoginData();
     }
 
     public bool IsLoggedIn()
     {
-        return (m_client.Length + m_uid.Length > 0);
+        return (m_loginData.m_client.Length + m_loginData.m_uid.Length > 0);
     }
 
     public void Clear()
     {
-        m_client = m_uid = "";
+        m_loginData.m_client = m_loginData.m_uid = "";
         m_handle = m_email = m_name = m_profileDescription = "";
+
+        if (File.Exists(m_dataFilePath))
+        {
+            File.Delete(m_dataFilePath);
+        }
+    }
+
+    public string GetClient()
+    {
+        return m_loginData.m_client;
+    }
+
+    public void SetClient(string client)
+    {
+        m_loginData.m_client = client;
+        SaveLoginData();
+    }
+
+    public string GetUID()
+    {
+        return m_loginData.m_uid;
+    }
+
+    public void SetUID(string uid)
+    {
+        m_loginData.m_uid = uid;
+        SaveLoginData();
+    }
+
+    public string GetAcceessToken()
+    {
+        return m_loginData.m_accessToken;
+    }
+
+    public void SetAcceessToken(string acceessToken)
+    {
+        m_loginData.m_accessToken = acceessToken;
+        SaveLoginData();
+    }
+
+    // **************************
+    // Private/Helper functions
+    // **************************
+
+    private void SaveLoginData()
+    {
+        BinaryFormatter binaryFormatter = new BinaryFormatter();
+        using (FileStream fileStream = File.Create(m_dataFilePath)) // We call Create() to ensure we always overwrite the file
+        {
+            binaryFormatter.Serialize(fileStream, m_loginData);
+        }
+    }
+
+    private void LoadLoginData()
+    {
+        if (File.Exists(m_dataFilePath))
+        {
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+            using (FileStream fileStream = File.Open(m_dataFilePath, FileMode.Open))
+            {
+                m_loginData = (LoginData) binaryFormatter.Deserialize(fileStream);
+            }
+
+            // TODO: Make sure this also sets: m_handle, m_email, m_name, m_profileDescription 
+        }
+        else
+        {
+            m_loginData = new LoginData();
+            m_loginData.m_client = m_loginData.m_uid = m_loginData.m_accessToken = "";
+            m_handle = m_email = m_name = m_profileDescription = "";
+        }
     }
 }

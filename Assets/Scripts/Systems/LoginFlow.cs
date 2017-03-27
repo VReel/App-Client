@@ -94,19 +94,10 @@ public class LoginFlow : MonoBehaviour
 
         m_staticLoadingIcon.SetActive(true);
 
-        // ----------------------------------------------------
-        // TEMPORARY HACK!!!
-        yield return m_backEndAPI.Session_SignIn(
-            "arthur", "BWM0SLA5"
-        );            
-        // ----------------------------------------------------
-
-        /*
         yield return m_backEndAPI.Session_SignIn(
             m_loginUsernameEmailInput.text, 
             m_loginPasswordInput.GetComponent<PasswordText>().GetString()
         );
-        */
 
         m_staticLoadingIcon.SetActive(false);
     }

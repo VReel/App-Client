@@ -133,9 +133,9 @@ public class BackEndAPI
         
         var request = new RestRequest("/users", Method.PUT);
         request.AddHeader("vreel-application-id", m_applicationID);
-        request.AddHeader("client", m_user.m_client);
-        request.AddHeader("uid", m_user.m_uid);
-        request.AddHeader("access-token", m_user.m_accessToken);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
 
         yield return m_threadJob.WaitFor();
         IRestResponse response = new RestResponse();
@@ -164,9 +164,9 @@ public class BackEndAPI
 
         var request = new RestRequest("/users", Method.DELETE);
         request.AddHeader("vreel-application-id", m_applicationID);
-        request.AddHeader("client", m_user.m_client);
-        request.AddHeader("uid", m_user.m_uid);
-        request.AddHeader("access-token", m_user.m_accessToken);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
 
         yield return m_threadJob.WaitFor();
         IRestResponse response = new RestResponse();
@@ -267,9 +267,9 @@ public class BackEndAPI
         
         var request = new RestRequest("/users/sign_out", Method.DELETE);
         request.AddHeader("vreel-application-id", m_applicationID);
-        request.AddHeader("client", m_user.m_client);
-        request.AddHeader("uid", m_user.m_uid);
-        request.AddHeader("access-token", m_user.m_accessToken);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
 
         yield return m_threadJob.WaitFor();
         IRestResponse response = new RestResponse();
@@ -298,9 +298,9 @@ public class BackEndAPI
         
         var request = new RestRequest("/s3_presigned_url", Method.GET);
         request.AddHeader("vreel-application-id", m_applicationID);
-        request.AddHeader("client", m_user.m_client);
-        request.AddHeader("uid", m_user.m_uid);
-        request.AddHeader("access-token", m_user.m_accessToken);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
 
         m_s3URLJSONResult = null;
 
@@ -333,9 +333,9 @@ public class BackEndAPI
                     
         var request = new RestRequest("/posts?page=" + page, Method.GET);
         request.AddHeader("vreel-application-id", m_applicationID);
-        request.AddHeader("client", m_user.m_client);
-        request.AddHeader("uid", m_user.m_uid);
-        request.AddHeader("access-token", m_user.m_accessToken);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
 
         m_postsJSONResult = null;
 
@@ -368,9 +368,9 @@ public class BackEndAPI
         
         var request = new RestRequest("/posts", Method.POST);
         request.AddHeader("vreel-application-id", m_applicationID);
-        request.AddHeader("client", m_user.m_client);
-        request.AddHeader("uid", m_user.m_uid);
-        request.AddHeader("access-token", m_user.m_accessToken);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
 
         request.AddJsonBody(new { 
             thumbnail_key = _thumbnailKey, 
@@ -404,9 +404,9 @@ public class BackEndAPI
 
         var request = new RestRequest("/posts/" + postId, Method.GET);
         request.AddHeader("vreel-application-id", m_applicationID);
-        request.AddHeader("client", m_user.m_client);
-        request.AddHeader("uid", m_user.m_uid);
-        request.AddHeader("access-token", m_user.m_accessToken);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
 
         yield return m_threadJob.WaitFor();
         IRestResponse response = new RestResponse();
@@ -437,9 +437,9 @@ public class BackEndAPI
 
         var request = new RestRequest("/posts/" + postId, Method.DELETE);
         request.AddHeader("vreel-application-id", m_applicationID);
-        request.AddHeader("client", m_user.m_client);
-        request.AddHeader("uid", m_user.m_uid);
-        request.AddHeader("access-token", m_user.m_accessToken);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
 
         yield return m_threadJob.WaitFor();
         IRestResponse response = new RestResponse();
@@ -530,7 +530,7 @@ public class BackEndAPI
         {
             if (parameter.Name == "Access-Token")
             {
-                m_user.m_accessToken = parameter.Value.ToString();
+                m_user.SetAcceessToken(parameter.Value.ToString());
             }               
         }
     }
@@ -541,12 +541,12 @@ public class BackEndAPI
         {
             if (parameter.Name == "Client")
             {
-                m_user.m_client = parameter.Value.ToString();
+                m_user.SetClient(parameter.Value.ToString());
             }
 
             if (parameter.Name == "Uid")
             {
-                m_user.m_uid = parameter.Value.ToString();
+                m_user.SetUID(parameter.Value.ToString());
             }
         }
     }

@@ -50,25 +50,7 @@ public class Profile : MonoBehaviour
         m_backEndAPI = new BackEndAPI(this, m_errorMessage, m_user);
 
         m_staticLoadingIcon.SetActive(false);
-	}
-
-    public void Update()
-    {        
-        if (m_appDirector.GetState() == AppDirector.AppState.kLogin)
-        {
-            if (m_user.IsLoggedIn())
-            {
-                m_appDirector.RequestProfileState();
-            }
-        }
-        else if (m_appDirector.GetState() != AppDirector.AppState.kLogin)
-        {
-            if (!m_user.IsLoggedIn())
-            {
-                m_appDirector.RequestLoginState();
-            }
-        }
-    }
+	}       
 
     public void LogOut()
     {

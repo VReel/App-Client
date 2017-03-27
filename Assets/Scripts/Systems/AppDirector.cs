@@ -16,11 +16,13 @@ public class AppDirector : MonoBehaviour
 
     public enum AppState
     {
+        kInit,          // This should only be the state at the very start and never again!
         kLogin,         // User is not yet logged in, they are going through the login flow
-        kProfile,       // User is viewing their profile, hence accessing their own folder in the S3 Bucket
+        kProfile,       // User is viewing the pictures in their own profile
         kGallery        // User is viewing their 360 photo gallery, they can scroll through all the 360 photos on their phone
     }
 
+    [SerializeField] private User m_user;
     [SerializeField] private GameObject m_menuBar;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private ImageSphereController m_imageSphereController;
@@ -32,7 +34,7 @@ public class AppDirector : MonoBehaviour
     [SerializeField] private GameObject m_lostConnectionIcon;
 
     private AppState m_appState;
-    private CoroutineQueue m_coroutineQueue;
+    //private CoroutineQueue m_coroutineQueue;
 
     // **************************
     // Public functions
@@ -42,10 +44,10 @@ public class AppDirector : MonoBehaviour
     {
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
-        m_coroutineQueue = new CoroutineQueue(this);
-        m_coroutineQueue.StartLoop();
+        //m_coroutineQueue = new CoroutineQueue(this);
+        //m_coroutineQueue.StartLoop();
 
-        m_coroutineQueue.EnqueueAction(SetLoginState());
+        m_appState = AppState.kInit;
 
         m_lostConnectionIcon.SetActive(false);
     }
@@ -55,12 +57,24 @@ public class AppDirector : MonoBehaviour
         return m_appState;
     }
 
+    public void Update()
+    {    
+        if (m_appState != AppDirector.AppState.kLogin && !m_user.IsLoggedIn())
+        {
+            RequestLoginState();
+        }
+        else if ( (m_appState == AppDirector.AppState.kLogin || m_appState == AppDirector.AppState.kInit) && m_user.IsLoggedIn())
+        {
+            RequestProfileState();
+        }
+    }
+        
     public void RequestLoginState()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestLoginState() called");
         if (m_appState != AppState.kLogin)
         {
-            m_coroutineQueue.EnqueueAction(SetLoginState());
+            SetLoginState();
         }
     }
 
@@ -69,7 +83,7 @@ public class AppDirector : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestProfileState() called");
         if (m_appState != AppState.kProfile)
         {
-            m_coroutineQueue.EnqueueAction(SetProfileState());
+            SetProfileState();
         }
     }
 
@@ -78,7 +92,7 @@ public class AppDirector : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestGalleryState() called");
         if (m_appState != AppState.kGallery)
         {
-            m_coroutineQueue.EnqueueAction(SetGalleryState());
+            SetGalleryState();
         }
     }
 
@@ -104,7 +118,7 @@ public class AppDirector : MonoBehaviour
     // Private/Helper functions
     // **************************
 
-    private IEnumerator SetLoginState()
+    private void SetLoginState()
     {        
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
@@ -118,11 +132,9 @@ public class AppDirector : MonoBehaviour
         m_menuController.SetLoginSubMenuActive(true);
         m_loginFlow.Restart(); // This kicks off the coroutine queue again so LoginFlow works...
         m_appState = AppState.kLogin;
-
-        yield break;
     }
 
-    private IEnumerator SetProfileState()
+    private void SetProfileState()
     {
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
@@ -140,11 +152,9 @@ public class AppDirector : MonoBehaviour
 
         m_profile.OpenProfile();
         m_appState = AppState.kProfile;
-
-        yield break;
     }
 
-    private IEnumerator SetGalleryState()
+    private void SetGalleryState()
     {
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
@@ -156,8 +166,6 @@ public class AppDirector : MonoBehaviour
         m_menuController.SetGallerySubMenuActive(true);
         m_deviceGallery.OpenAndroidGallery();
         m_appState = AppState.kGallery;
-
-        yield break;
     }
 
     private void DisableAllOptions()
