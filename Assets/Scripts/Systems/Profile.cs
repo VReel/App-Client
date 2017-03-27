@@ -5,7 +5,7 @@ using System.Collections;           // IEnumerator
 using System.Collections.Generic;   // List
 using System.IO;                    // Stream
 
-using System.Net;                   // HttpWebRequest -- only used in old LoadImageInternalUnity()
+using System.Net;                   // HttpWebRequest -- only used in old function LoadImageInternalUnity()
 
 public class Profile : MonoBehaviour 
 {   
@@ -30,6 +30,7 @@ public class Profile : MonoBehaviour
     }
 
     private List<Post> m_posts;
+    private string m_nextPageOfPosts = null;
     private BackEndAPI m_backEndAPI;
     private int m_currPostIndex = -1;
     private CoroutineQueue m_coroutineQueue;
@@ -99,7 +100,7 @@ public class Profile : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenProfile() called");
 
         m_imageSphereController.SetAllImageSpheresToLoading();
-        m_coroutineQueue.EnqueueAction(StoreAllPostsAndSetSpheres());
+        m_coroutineQueue.EnqueueAction(StoreFirstPostsAndSetSpheres());
     }       
 
     public void NextImages()
@@ -111,8 +112,15 @@ public class Profile : MonoBehaviour
 
         m_currPostIndex = Mathf.Clamp(m_currPostIndex + numImagesToLoad, 0, numPosts);
 
-        m_cppPlugin.InvalidateLoading();
-        m_coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
+        m_cppPlugin.InvalidateLoading(); // Stop anything we may have already been loading
+        m_coroutineQueue.Clear(); // Ensures we don't repeat operations
+
+        if (m_nextPageOfPosts != null)
+        { // By calling this every time a user presses the next button, we ensure he can never miss out on posts and don't overload the API            
+            m_coroutineQueue.EnqueueAction(StorePostsFromNextPage());
+        }
+
+        m_coroutineQueue.EnqueueAction(RefreshPostsAtCurrIndex());
         m_coroutineQueue.EnqueueAction(DownloadThumbnailsAndSetSpheres());
     }
 
@@ -125,8 +133,9 @@ public class Profile : MonoBehaviour
 
         m_currPostIndex = Mathf.Clamp(m_currPostIndex - numImagesToLoad, 0, numPosts);
 
-        m_cppPlugin.InvalidateLoading();
-        m_coroutineQueue.Clear(); // Ensure we stop loading something that we may be loading
+        m_cppPlugin.InvalidateLoading(); // Stop anything we may have already been loading
+        m_coroutineQueue.Clear(); // Ensures we don't repeat operations
+        m_coroutineQueue.EnqueueAction(RefreshPostsAtCurrIndex());
         m_coroutineQueue.EnqueueAction(DownloadThumbnailsAndSetSpheres());
     }
 
@@ -153,17 +162,55 @@ public class Profile : MonoBehaviour
 
         m_staticLoadingIcon.SetActive(false);
     }
-
-    // TODO: Handle users who have more than 20 posts!
-    private IEnumerator StoreAllPostsAndSetSpheres()
+      
+    private IEnumerator StoreFirstPostsAndSetSpheres()
     {
         yield return m_appDirector.VerifyInternetConnection();
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Getting all Posts for Logged in User");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Getting First set of Posts for Logged in User");
+
+        m_staticLoadingIcon.SetActive(true); //NOTE: This should stop the following operation from ever being cut half-way through
 
         m_posts.Clear();
 
-        yield return m_backEndAPI.Posts_GetAll();
+        yield return m_backEndAPI.Posts_GetPage();
+
+        VReelJSON.Model_Posts posts = m_backEndAPI.GetAllPostsResult();
+        if (posts != null)
+        {
+            foreach (VReelJSON.PostsData postData in posts.data)
+            {   
+                Post newPost = new Post();
+                newPost.id = postData.id.ToString();
+                newPost.thumbnailUrl = postData.attributes.thumbnail_url.ToString();
+                m_posts.Add(newPost);
+            }         
+
+            m_nextPageOfPosts = null;
+            if (posts.meta.next_page) // Handle users with over 20 posts - if we have another page, then loop back around... 
+            {
+                m_nextPageOfPosts = posts.meta.next_page_id;
+            }
+        }
+
+        m_currPostIndex = 0; // set to a valid Index
+        m_coroutineQueue.EnqueueAction(DownloadThumbnailsAndSetSpheres());
+
+        bool noImagesUploaded = m_posts.Count <= 0;
+        m_newUserText.SetActive(noImagesUploaded); // If the user has yet to upload any images then show them the New User Text!
+
+        m_staticLoadingIcon.SetActive(false);
+    }
+
+    private IEnumerator StorePostsFromNextPage()
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Getting Posts for Logged in User from page: " + m_nextPageOfPosts);       
+
+        m_staticLoadingIcon.SetActive(true); //NOTE: This should stop the following operation from ever being cut half-way through
+
+        yield return m_backEndAPI.Posts_GetPage(m_nextPageOfPosts);
 
         VReelJSON.Model_Posts posts = m_backEndAPI.GetAllPostsResult();
         if (posts != null)
@@ -175,36 +222,32 @@ public class Profile : MonoBehaviour
                 newPost.thumbnailUrl = postData.attributes.thumbnail_url.ToString();
                 m_posts.Add(newPost);
             }
-        }           
 
-        m_currPostIndex = 0; // set to a valid Index
-        m_coroutineQueue.EnqueueAction(DownloadThumbnailsAndSetSpheres());
+            m_nextPageOfPosts = null;
+            if (posts.meta.next_page) // Handle users with over 20 posts - if we have another page, then loop back around... 
+            {
+                m_nextPageOfPosts = posts.meta.next_page_id;
+            }
+        }
 
-        bool noImagesUploaded = m_posts.Count <= 0;
-        m_newUserText.SetActive(noImagesUploaded); // If the user has yet to upload any images then show them the New User Text!
+        m_staticLoadingIcon.SetActive(false);
     }
 
     private IEnumerator DownloadThumbnailsAndSetSpheres()
     {
         yield return m_appDirector.VerifyInternetConnection();
 
-        int numImagesToLoad = m_imageSphereController.GetNumSpheres();
-        DownloadThumbnailsAndSetSpheresInternal(m_currPostIndex, numImagesToLoad);
-    }
-
-    private void DownloadThumbnailsAndSetSpheresInternal(int startingPostIndex, int numImages)
-    {
+        int startingPostIndex = m_currPostIndex;
+        int numImages = m_imageSphereController.GetNumSpheres();
         if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading {0} images beginning at index {1}. We've found {2} posts for the user!", numImages, startingPostIndex, m_posts.Count));
 
-        Resources.UnloadUnusedAssets();
-
-        int currPostIndex = startingPostIndex;
-        for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, currPostIndex++)
+        int postIndex = startingPostIndex;
+        for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, postIndex++)
         {
-            if (currPostIndex < m_posts.Count)
+            if (postIndex < m_posts.Count)
             {                   
-                string id = m_posts[currPostIndex].id;
-                string thumbnailURL = m_posts[currPostIndex].thumbnailUrl;
+                string id = m_posts[postIndex].id;
+                string thumbnailURL = m_posts[postIndex].thumbnailUrl;
                 LoadImageInternalPlugin(thumbnailURL, sphereIndex, id, false);
             }
             else
@@ -212,8 +255,6 @@ public class Profile : MonoBehaviour
                 m_imageSphereController.HideSphereAtIndex(sphereIndex);
             }
         }
-
-        Resources.UnloadUnusedAssets();
     }
 
     public IEnumerator DownloadOriginalImageInternal(string id)
@@ -230,6 +271,24 @@ public class Profile : MonoBehaviour
         }
 
         m_staticLoadingIcon.SetActive(false);
+    }
+
+    private IEnumerator RefreshPostsAtCurrIndex()
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        int startingPostIndex = m_currPostIndex;
+        int numImages = m_imageSphereController.GetNumSpheres();
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Refreshing {0} posts beginning at index {1}. We've found {2} posts for the user!", numImages, startingPostIndex, m_posts.Count));
+
+        int postIndex = startingPostIndex;
+        for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, postIndex++)
+        {
+            if (postIndex < m_posts.Count)
+            {                   
+                yield return RefreshPostData(m_posts[postIndex].id);
+            }
+        }
     }
 
     private IEnumerator RefreshPostData(string id) // NOTE: Since URL's have a lifetime, we need to refresh the data at certain points...

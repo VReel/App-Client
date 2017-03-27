@@ -327,11 +327,11 @@ public class BackEndAPI
         }
     }
         
-    public IEnumerator Posts_GetAll()
+    public IEnumerator Posts_GetPage(string page = "")
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts' - Get all posts");
-
-        var request = new RestRequest("/posts", Method.GET);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts' - Get a page of posts");
+                    
+        var request = new RestRequest("/posts?page=" + page, Method.GET);
         request.AddHeader("vreel-application-id", m_applicationID);
         request.AddHeader("client", m_user.m_client);
         request.AddHeader("uid", m_user.m_uid);

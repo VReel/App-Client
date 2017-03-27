@@ -75,6 +75,8 @@ namespace VReelJSON
     public class Model_Posts
     {     
         public List<PostsData> data { get; set; }
+        public PostsLinks links { get; set; }
+        public PostsMeta meta { get; set; }
     }
 
     public class PostsData
@@ -91,6 +93,17 @@ namespace VReelJSON
         public string created_at { get; set; }
         public bool edited { get; set; }
     }       
+
+    public class PostsLinks
+    {
+        public string next { get; set; }
+    }
+
+    public class PostsMeta
+    {
+        public bool next_page { get; set; }
+        public string next_page_id { get; set; }
+    }
 
     //--------------------------------------------
 
