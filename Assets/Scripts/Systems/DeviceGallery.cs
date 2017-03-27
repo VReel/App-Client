@@ -21,8 +21,8 @@ public class DeviceGallery : MonoBehaviour
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private GameObject m_errorMessage;
-    [SerializeField] private GameObject m_noGalleryImagesText;   
     [SerializeField] private GameObject m_galleryMessage;
+    [SerializeField] private GameObject m_noGalleryImagesText;   
     [SerializeField] private GameObject m_staticLoadingIcon;
 
     private string m_imagesTopLevelDirectory;
@@ -190,9 +190,8 @@ public class DeviceGallery : MonoBehaviour
             if (galleryTextComponent != null)
             {
                 galleryTextComponent.text = "Succesful Upload!";
-                galleryTextComponent.color = UnityEngine.Color.black;
+                galleryTextComponent.color = Color.black;
             }
-            m_galleryMessage.SetActive(true);
         }
         else
         {
@@ -201,10 +200,10 @@ public class DeviceGallery : MonoBehaviour
             if (galleryTextComponent != null)
             {
                 galleryTextComponent.text = "Oh no! We failed to Upload! =(\n Please try again!";
-                galleryTextComponent.color = UnityEngine.Color.red;
+                galleryTextComponent.color = Color.red;
             }
-            m_galleryMessage.SetActive(true);
         }
+        m_galleryMessage.SetActive(true);
 
         m_staticLoadingIcon.SetActive(false);
     }

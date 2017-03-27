@@ -10,6 +10,7 @@ public class ImageSkybox : MonoBehaviour
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private Profile m_profile;
     [SerializeField] private GameObject m_uploadButton;
+    [SerializeField] private GameObject m_deleteButton;
 
     private int m_currTextureIndex = -1; // ImageSkybox must track the index of the underlying texture it points to in C++ plugin
     private Texture2D m_skyboxTexture;
@@ -64,7 +65,8 @@ public class ImageSkybox : MonoBehaviour
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, true);
 
         bool isImageFromDevice = m_imageIdentifier.StartsWith(m_imagesTopLevelDirectory);
-        m_uploadButton.SetActive(isImageFromDevice); // Currently the ImageSkybox class is responsible for switching on the Upload button when its possible to select it
+        m_uploadButton.SetActive(isImageFromDevice);  // Currently the ImageSkybox class is responsible for switching on the Upload button
+        m_deleteButton.SetActive(!isImageFromDevice); // and the Delete button, when its possible to select either
 
         if (!isImageFromDevice) // This image is being set from the Profile, not the Gallery
         {

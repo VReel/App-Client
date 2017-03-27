@@ -398,21 +398,15 @@ public class BackEndAPI
         }
     }
 
-    public IEnumerator Posts_Get(string _postId)
+    public IEnumerator Posts_Get(string postId)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts/" + _postId + "' - Show a post");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts/" + postId + "' - Show a post");
 
-        var request = new RestRequest("/posts/" + _postId, Method.GET);
+        var request = new RestRequest("/posts/" + postId, Method.GET);
         request.AddHeader("vreel-application-id", m_applicationID);
         request.AddHeader("client", m_user.m_client);
         request.AddHeader("uid", m_user.m_uid);
         request.AddHeader("access-token", m_user.m_accessToken);
-
-        /*
-        request.AddJsonBody(new { 
-            postId = _postId
-        });
-        */
 
         yield return m_threadJob.WaitFor();
         IRestResponse response = new RestResponse();
@@ -421,7 +415,7 @@ public class BackEndAPI
         );
         yield return m_threadJob.WaitFor();
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts/" + _postId + "' - Response: " + response.Content);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts/" + postId + "' - Response: " + response.Content);
 
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
@@ -433,7 +427,37 @@ public class BackEndAPI
         }
         else // Error Handling
         {            
-            ShowErrors(response, "GET to '/posts/" + _postId + "'");
+            ShowErrors(response, "GET to '/posts/" + postId + "'");
+        }
+    }
+
+    public IEnumerator Posts_Delete(string postId)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/posts/" + postId + "' - Delete a post");
+
+        var request = new RestRequest("/posts/" + postId, Method.DELETE);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.m_client);
+        request.AddHeader("uid", m_user.m_uid);
+        request.AddHeader("access-token", m_user.m_accessToken);
+
+        yield return m_threadJob.WaitFor();
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/posts/" + postId + "' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            UpdateAccessToken(response);
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "DELETE to '/posts/" + postId + "'");
         }
     }
 

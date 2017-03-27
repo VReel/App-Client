@@ -130,7 +130,7 @@ public class AppDirector : MonoBehaviour
 
         if (m_appState == AppState.kLogin) // If we are coming from the login screen, set the welcome message
         {
-            m_menuController.ShowWelcomeText();
+            m_profile.ShowWelcomeText();
         }
 
         m_imageLoader.InvalidateLoading();

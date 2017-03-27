@@ -19,8 +19,9 @@ public class Profile : MonoBehaviour
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private GameObject m_errorMessage;
-    [SerializeField] private GameObject m_staticLoadingIcon;
+    [SerializeField] private GameObject m_profileMessage;
     [SerializeField] private GameObject m_newUserText;   
+    [SerializeField] private GameObject m_staticLoadingIcon;
 
     public class Post
     {
@@ -72,6 +73,16 @@ public class Profile : MonoBehaviour
     public void LogOut()
     {
         m_coroutineQueue.EnqueueAction(LogoutInternal());
+    }
+
+    public void Delete()
+    {
+        m_coroutineQueue.EnqueueAction(DeleteInternal(m_imageSkybox.GetImageIdentifier()));
+    }
+
+    public void ShowWelcomeText()
+    {
+        m_coroutineQueue.EnqueueAction(ShowWelcomeTextInternal());
     }
         
     public void InvalidateWork() // This function is called in order to stop any ongoing work
@@ -161,6 +172,58 @@ public class Profile : MonoBehaviour
         yield return m_backEndAPI.Session_SignOut();
 
         m_staticLoadingIcon.SetActive(false);
+    }
+
+    private IEnumerator DeleteInternal(string id)
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Delete() called on post: " + id);
+
+        m_staticLoadingIcon.SetActive(true);
+
+        yield return m_backEndAPI.Posts_Delete(id);
+
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {            
+            // Report Success in Profile
+            Text profileTextComponent = m_profileMessage.GetComponentInChildren<Text>();
+            if (profileTextComponent != null)
+            {
+                profileTextComponent.text = "Post Deleted Successfully!";
+                profileTextComponent.color = Color.black;
+            }
+        }
+        else
+        {
+            // Report Failure in Profile
+            Text profileTextComponent = m_profileMessage.GetComponentInChildren<Text>();
+            if (profileTextComponent != null)
+            {
+                profileTextComponent.text = "Deleting failed =(\n Please try again!";
+                profileTextComponent.color = Color.red;
+            }
+        }
+        m_profileMessage.SetActive(true);
+
+        m_staticLoadingIcon.SetActive(false);
+    }
+
+    private IEnumerator ShowWelcomeTextInternal()
+    {
+        while (!m_user.IsLoggedIn())
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Welcome Text!");
+        Text profileTextComponent = m_profileMessage.GetComponentInChildren<Text>();
+        if (profileTextComponent != null)
+        {
+            profileTextComponent.text = "Welcome " + m_user.m_handle + "!";
+            profileTextComponent.color = Color.black;
+        }
+        m_profileMessage.SetActive(true);
     }
       
     private IEnumerator StoreFirstPostsAndSetSpheres()

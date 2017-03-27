@@ -15,9 +15,7 @@ public class MenuController : MonoBehaviour
     [SerializeField] private GameObject m_loginSubMenu;
     [SerializeField] private GameObject m_profileSubMenu;
     [SerializeField] private GameObject m_gallerySubMenu;
-    [SerializeField] private GameObject m_profileMessage;
     [SerializeField] private User m_user;
-    //[SerializeField] private UserLogin m_userLogin;
     [SerializeField] private VRStandardAssets.Utils.Reticle m_reticle;
     [SerializeField] private VRStandardAssets.Utils.VRInput m_input;
     [SerializeField] private GameObject[] m_menuBarButtons;
@@ -57,31 +55,9 @@ public class MenuController : MonoBehaviour
         m_gallerySubMenu.SetActive(active);
     }
 
-    public void ShowWelcomeText()
-    {
-        StartCoroutine(InternalShowWelcomeText());
-    }
-
     // **************************
     // Private/Helper functions
     // **************************
-
-    private IEnumerator InternalShowWelcomeText()
-    {
-        while (!m_user.IsLoggedIn())
-        {
-            yield return new WaitForEndOfFrame();
-        }
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Welcome Text!");
-        Text profileTextComponent = m_profileMessage.GetComponentInChildren<Text>();
-        if (profileTextComponent != null)
-        {
-            profileTextComponent.text = "Welcome " + m_user.m_handle + "!";
-            profileTextComponent.color = Color.black;
-        }
-        m_profileMessage.SetActive(true);
-    }
 
     private void OnEnable ()
     {

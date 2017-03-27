@@ -124,8 +124,6 @@ public class Analytics : MonoBehaviour
 
     public void ImageUploaded()
     {
-        //TODO: Split this into request and success/failure
-        
         CustomEvent customEvent = new CustomEvent("ImageUploaded");
         customEvent.AddAttribute("UserEmail", m_user.m_email);
 
@@ -137,6 +135,15 @@ public class Analytics : MonoBehaviour
 
         m_analyticsManager.RecordEvent(customEvent);
     }
+
+    public void ImageDeleted()
+    {
+        CustomEvent customEvent = new CustomEvent("ImageDeleted");
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
+
 
     // **************************
     // Private/Helper functions
