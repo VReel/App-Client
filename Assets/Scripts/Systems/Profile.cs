@@ -18,10 +18,12 @@ public class Profile : MonoBehaviour
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
+    [SerializeField] private GameObject m_userMessage;
     [SerializeField] private GameObject m_errorMessage;
-    [SerializeField] private GameObject m_profileMessage;
     [SerializeField] private GameObject m_newUserText;   
     [SerializeField] private GameObject m_staticLoadingIcon;
+    [SerializeField] private GameObject m_confirmDeleteButton;
+    [SerializeField] private GameObject m_cancelDeleteButton;
 
     public class Post
     {
@@ -50,21 +52,48 @@ public class Profile : MonoBehaviour
         m_backEndAPI = new BackEndAPI(this, m_errorMessage, m_user);
 
         m_staticLoadingIcon.SetActive(false);
-	}       
+	}              
 
-    public void LogOut()
+    public void Logout()
     {
         m_coroutineQueue.EnqueueAction(LogoutInternal());
     }
 
+    public void PreDelete()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreDelete() called on post: " + m_imageSkybox.GetImageIdentifier());
+
+        m_confirmDeleteButton.SetActive(true);
+        m_cancelDeleteButton.SetActive(true);
+
+        Text profileTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        profileTextComponent.text = "Definitely want to delete this post? =(";
+        profileTextComponent.color = Color.red;
+    }
+
+    public void CancelDelete()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelDelete() called");
+
+        m_confirmDeleteButton.SetActive(false);
+        m_cancelDeleteButton.SetActive(false);
+
+        Text profileTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        profileTextComponent.text = "Delete Cancelled =)";
+        profileTextComponent.color = Color.black;
+    }
+
     public void Delete()
     {
+        m_confirmDeleteButton.SetActive(false);
+        m_cancelDeleteButton.SetActive(false);
+
         m_coroutineQueue.EnqueueAction(DeleteInternal(m_imageSkybox.GetImageIdentifier()));
     }
 
-    public void ShowWelcomeText()
+    public void ShowProfileText()
     {
-        m_coroutineQueue.EnqueueAction(ShowWelcomeTextInternal());
+        m_coroutineQueue.EnqueueAction(ShowProfileTextInternal());
     }
         
     public void InvalidateWork() // This function is called in order to stop any ongoing work
@@ -154,7 +183,7 @@ public class Profile : MonoBehaviour
         yield return m_backEndAPI.Session_SignOut();
 
         m_staticLoadingIcon.SetActive(false);
-    }
+    }       
 
     private IEnumerator DeleteInternal(string id)
     {
@@ -166,46 +195,34 @@ public class Profile : MonoBehaviour
 
         yield return m_backEndAPI.Posts_DeletePost(id);
 
+        Text profileTextComponent = m_userMessage.GetComponentInChildren<Text>();
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {            
             // Report Success in Profile
-            Text profileTextComponent = m_profileMessage.GetComponentInChildren<Text>();
-            if (profileTextComponent != null)
-            {
-                profileTextComponent.text = "Post Deleted Successfully!";
-                profileTextComponent.color = Color.black;
-            }
+            profileTextComponent.text = "Post Deleted Successfully! =)";
+            profileTextComponent.color = Color.black;
         }
         else
         {
             // Report Failure in Profile
-            Text profileTextComponent = m_profileMessage.GetComponentInChildren<Text>();
-            if (profileTextComponent != null)
-            {
-                profileTextComponent.text = "Deleting failed =(\n Please try again!";
-                profileTextComponent.color = Color.red;
-            }
+            profileTextComponent.text = "Deleting failed =(\n Please try again!";
+            profileTextComponent.color = Color.red;
         }
-        m_profileMessage.SetActive(true);
 
         m_staticLoadingIcon.SetActive(false);
     }
 
-    private IEnumerator ShowWelcomeTextInternal()
+    private IEnumerator ShowProfileTextInternal()
     {
         while (!m_user.IsLoggedIn() || !m_user.IsUserDataStored())
         {
             yield return new WaitForEndOfFrame();
         }
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Welcome Text!");
-        Text profileTextComponent = m_profileMessage.GetComponentInChildren<Text>();
-        if (profileTextComponent != null)
-        {
-            profileTextComponent.text = "Welcome " + m_user.m_handle + "!";
-            profileTextComponent.color = Color.black;
-        }
-        m_profileMessage.SetActive(true);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Profile Text!");
+        Text profileTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        profileTextComponent.text = "Hi " + m_user.m_handle + "! =D";
+        profileTextComponent.color = Color.black;
     }
       
     private IEnumerator StoreFirstPostsAndSetSpheres()

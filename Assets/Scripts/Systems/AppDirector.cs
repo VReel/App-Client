@@ -45,7 +45,7 @@ public class AppDirector : MonoBehaviour
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
         //m_coroutineQueue = new CoroutineQueue(this);
-        //m_coroutineQueue.StartLoop();
+        //m_coroutineQueue.StartLoop();       
 
         m_appState = AppState.kInit;
 
@@ -140,10 +140,7 @@ public class AppDirector : MonoBehaviour
         m_imageSphereController.HideAllImageSpheres();
         SetMenuBar(true);
 
-        if (m_appState == AppState.kLogin || m_appState == AppState.kInit) // If we are coming from the login screen, set the welcome message
-        {
-            m_profile.ShowWelcomeText();
-        }
+        m_profile.ShowProfileText();
 
         m_imageLoader.InvalidateLoading();
         m_deviceGallery.InvalidateWork();
@@ -159,6 +156,8 @@ public class AppDirector : MonoBehaviour
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
         SetMenuBar(true);
+
+        m_deviceGallery.ShowGalleryText();
 
         m_imageLoader.InvalidateLoading();
         m_profile.InvalidateWork();

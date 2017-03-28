@@ -20,8 +20,8 @@ public class DeviceGallery : MonoBehaviour
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
+    [SerializeField] private GameObject m_userMessage;
     [SerializeField] private GameObject m_errorMessage;
-    [SerializeField] private GameObject m_galleryMessage;
     [SerializeField] private GameObject m_noGalleryImagesText;   
     [SerializeField] private GameObject m_staticLoadingIcon;
 
@@ -49,6 +49,14 @@ public class DeviceGallery : MonoBehaviour
         m_threadJob = new ThreadJob(this);
 
         m_backEndAPI = new BackEndAPI(this, m_errorMessage, m_user);
+    }
+
+    public void ShowGalleryText()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Gallery Text!");
+        Text profileTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        profileTextComponent.text = "Gallery";
+        profileTextComponent.color = Color.black;
     }
 
     public void InvalidateWork() // This function is called in order to stop any ongoing work
@@ -184,26 +192,17 @@ public class DeviceGallery : MonoBehaviour
 
         // 7) If there has been a successful upload -> Inform user that image has been uploaded      
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploaded image: " + originalImageFilePath + ", with Success: " + m_backEndAPI.IsLastAPICallSuccessful());
+        Text galleryTextComponent = m_userMessage.GetComponentInChildren<Text>();
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
-            Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
-            if (galleryTextComponent != null)
-            {
-                galleryTextComponent.text = "Succesful Upload!";
-                galleryTextComponent.color = Color.black;
-            }
+            galleryTextComponent.text = "Succesful Upload!";
+            galleryTextComponent.color = Color.black;
         }
         else
-        {
-            // Report Failure in Gallery
-            Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
-            if (galleryTextComponent != null)
-            {
-                galleryTextComponent.text = "Oh no! We failed to Upload! =(\n Please try again!";
-                galleryTextComponent.color = Color.red;
-            }
+        {           
+            galleryTextComponent.text = "Oh no! We failed to Upload! =(\n Please try again!";
+            galleryTextComponent.color = Color.red;
         }
-        m_galleryMessage.SetActive(true);
 
         m_staticLoadingIcon.SetActive(false);
     }
@@ -216,7 +215,7 @@ public class DeviceGallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling GetAllFileNamesRecursively()");
         List<string> files = new List<string>();
         bool isDebugBuild = Debug.isDebugBuild;
-        Text galleryTextComponent = m_galleryMessage.GetComponentInChildren<Text>();
+        Text galleryTextComponent = m_userMessage.GetComponentInChildren<Text>();
         m_threadJob.Start( () => 
             files = GetAllFileNamesRecursively(imagesTopLevelDirectory, isDebugBuild, galleryTextComponent)
         );
@@ -281,12 +280,8 @@ public class DeviceGallery : MonoBehaviour
             if (isDebugBuild) Debug.Log("------- VREEL: Call to GetFiles() failed for: " + baseDirectory);
 
             // Report Failure in Gallery
-            if (galleryTextComponent != null)
-            {
-                galleryTextComponent.text = "Reading files Failed!\n Check permissions!";
-                galleryTextComponent.color = UnityEngine.Color.red;
-            }
-            m_galleryMessage.SetActive(true);
+            galleryTextComponent.text = "Reading files Failed!\n Check permissions!";
+            galleryTextComponent.color = UnityEngine.Color.red;
         }
 
         try
@@ -305,12 +300,8 @@ public class DeviceGallery : MonoBehaviour
             if (isDebugBuild) Debug.Log("------- VREEL: Call to GetDirectories() failed for: " + baseDirectory);
 
             // Report Failure in Gallery
-            if (galleryTextComponent != null)
-            {
-                galleryTextComponent.text = "Reading files Failed!\n Check permissions!";
-                galleryTextComponent.color = UnityEngine.Color.red;
-            }
-            m_galleryMessage.SetActive(true);
+            galleryTextComponent.text = "Reading files Failed!\n Check VReel's permissions!";
+            galleryTextComponent.color = UnityEngine.Color.red;
         }
 
         return files;
