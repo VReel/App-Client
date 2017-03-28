@@ -16,12 +16,15 @@ public class LoginFlow : MonoBehaviour
     [SerializeField] private Text m_signUpEmailInput;
     [SerializeField] private Text m_signUpPasswordInput;
     [SerializeField] private Text m_signUpPasswordConfirmationInput;
+    [SerializeField] private Text m_resetPasswordEmailInput;
+    [SerializeField] private GameObject m_resetConfirmedText;
     [SerializeField] private GameObject m_errorMessage;
     [SerializeField] private User m_user;
 
     [SerializeField] private GameObject m_loginPage;
     [SerializeField] private GameObject m_signUpPage1;
     [SerializeField] private GameObject m_signUpPage2;
+    [SerializeField] private GameObject m_resetPassword;
 
     private CoroutineQueue m_coroutineQueue;
     private BackEndAPI m_backEndAPI;
@@ -57,18 +60,28 @@ public class LoginFlow : MonoBehaviour
             m_loginPage.SetActive(true);
             m_signUpPage1.SetActive(false);
             m_signUpPage2.SetActive(false);
+            m_resetPassword.SetActive(false);
         }
         else if (pageNumber == 1)
         {
             m_loginPage.SetActive(false);
             m_signUpPage1.SetActive(true);
             m_signUpPage2.SetActive(false);
+            m_resetPassword.SetActive(false);
         }
         else if (pageNumber == 2)
         {
             m_loginPage.SetActive(false);
             m_signUpPage1.SetActive(false);
             m_signUpPage2.SetActive(true);
+            m_resetPassword.SetActive(false);
+        }
+        else if (pageNumber == 3)
+        {
+            m_loginPage.SetActive(false);
+            m_signUpPage1.SetActive(false);
+            m_signUpPage2.SetActive(false);
+            m_resetPassword.SetActive(true);
         }
     }
 
@@ -80,7 +93,12 @@ public class LoginFlow : MonoBehaviour
     public void SignUp()
     {
         m_coroutineQueue.EnqueueAction(SignUpInternal());
-    }     
+    } 
+
+    public void ResetPassword()
+    {
+        m_coroutineQueue.EnqueueAction(ResetPasswordInternal());
+    } 
 
     // **************************
     // Private/Helper functions
@@ -118,5 +136,25 @@ public class LoginFlow : MonoBehaviour
         );
 
         m_staticLoadingIcon.SetActive(false);
-    }        
+    } 
+
+    private IEnumerator ResetPasswordInternal()
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: ResetPassword() called");
+
+        m_staticLoadingIcon.SetActive(true);
+
+        yield return m_backEndAPI.Passwords_PasswordReset(
+            m_resetPasswordEmailInput.text
+        );
+
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            m_resetConfirmedText.SetActive(true);
+        }
+
+        m_staticLoadingIcon.SetActive(false);
+    } 
 }

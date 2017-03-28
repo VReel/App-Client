@@ -54,9 +54,9 @@ public class DeviceGallery : MonoBehaviour
     public void ShowGalleryText()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Gallery Text!");
-        Text profileTextComponent = m_userMessage.GetComponentInChildren<Text>();
-        profileTextComponent.text = "Gallery";
-        profileTextComponent.color = Color.black;
+        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        userTextComponent.text = "Gallery";
+        userTextComponent.color = Color.black;
     }
 
     public void InvalidateWork() // This function is called in order to stop any ongoing work
@@ -192,16 +192,16 @@ public class DeviceGallery : MonoBehaviour
 
         // 7) If there has been a successful upload -> Inform user that image has been uploaded      
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploaded image: " + originalImageFilePath + ", with Success: " + m_backEndAPI.IsLastAPICallSuccessful());
-        Text galleryTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
-            galleryTextComponent.text = "Succesful Upload!";
-            galleryTextComponent.color = Color.black;
+            userTextComponent.text = "Succesful Upload!";
+            userTextComponent.color = Color.black;
         }
         else
         {           
-            galleryTextComponent.text = "Oh no! We failed to Upload! =(\n Please try again!";
-            galleryTextComponent.color = Color.red;
+            userTextComponent.text = "Oh no! We failed to Upload! =(\n Please try again!";
+            userTextComponent.color = Color.red;
         }
 
         m_staticLoadingIcon.SetActive(false);
@@ -215,9 +215,9 @@ public class DeviceGallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling GetAllFileNamesRecursively()");
         List<string> files = new List<string>();
         bool isDebugBuild = Debug.isDebugBuild;
-        Text galleryTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
         m_threadJob.Start( () => 
-            files = GetAllFileNamesRecursively(imagesTopLevelDirectory, isDebugBuild, galleryTextComponent)
+            files = GetAllFileNamesRecursively(imagesTopLevelDirectory, isDebugBuild, userTextComponent)
         );
         yield return m_threadJob.WaitFor();
 
@@ -258,7 +258,7 @@ public class DeviceGallery : MonoBehaviour
         m_noGalleryImagesText.SetActive(noImagesInGallery); // If the user has yet take any 360-images then show them the NoGalleryImagesText!
     }
     
-    private List<string> GetAllFileNamesRecursively(string baseDirectory, bool isDebugBuild, Text galleryTextComponent)
+    private List<string> GetAllFileNamesRecursively(string baseDirectory, bool isDebugBuild, Text userTextComponent)
     {
         // We iterate over all files in the given top level directory, recursively searching through all the subdirectories
         var files = new List<string>();
@@ -280,8 +280,8 @@ public class DeviceGallery : MonoBehaviour
             if (isDebugBuild) Debug.Log("------- VREEL: Call to GetFiles() failed for: " + baseDirectory);
 
             // Report Failure in Gallery
-            galleryTextComponent.text = "Reading files Failed!\n Check permissions!";
-            galleryTextComponent.color = UnityEngine.Color.red;
+            userTextComponent.text = "Reading files Failed!\n Check permissions!";
+            userTextComponent.color = UnityEngine.Color.red;
         }
 
         try
@@ -291,7 +291,7 @@ public class DeviceGallery : MonoBehaviour
                 FileAttributes checkedFolderAttributes = (new DirectoryInfo(dirName).Attributes) & undesiredAttributes;
                 if (checkedFolderAttributes == 0)
                 {
-                    files.AddRange(GetAllFileNamesRecursively(dirName, isDebugBuild, galleryTextComponent));
+                    files.AddRange(GetAllFileNamesRecursively(dirName, isDebugBuild, userTextComponent));
                 }
             }
         }
@@ -300,8 +300,8 @@ public class DeviceGallery : MonoBehaviour
             if (isDebugBuild) Debug.Log("------- VREEL: Call to GetDirectories() failed for: " + baseDirectory);
 
             // Report Failure in Gallery
-            galleryTextComponent.text = "Reading files Failed!\n Check VReel's permissions!";
-            galleryTextComponent.color = UnityEngine.Color.red;
+            userTextComponent.text = "Reading files Failed!\n Check VReel's permissions!";
+            userTextComponent.color = UnityEngine.Color.red;
         }
 
         return files;

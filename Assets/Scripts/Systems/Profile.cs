@@ -66,9 +66,9 @@ public class Profile : MonoBehaviour
         m_confirmDeleteButton.SetActive(true);
         m_cancelDeleteButton.SetActive(true);
 
-        Text profileTextComponent = m_userMessage.GetComponentInChildren<Text>();
-        profileTextComponent.text = "Definitely want to delete this post? =(";
-        profileTextComponent.color = Color.red;
+        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        userTextComponent.text = "Definitely want to delete this post? =(";
+        userTextComponent.color = Color.red;
     }
 
     public void CancelDelete()
@@ -78,9 +78,9 @@ public class Profile : MonoBehaviour
         m_confirmDeleteButton.SetActive(false);
         m_cancelDeleteButton.SetActive(false);
 
-        Text profileTextComponent = m_userMessage.GetComponentInChildren<Text>();
-        profileTextComponent.text = "Delete Cancelled =)";
-        profileTextComponent.color = Color.black;
+        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        userTextComponent.text = "Delete Cancelled =)";
+        userTextComponent.color = Color.black;
     }
 
     public void Delete()
@@ -195,18 +195,18 @@ public class Profile : MonoBehaviour
 
         yield return m_backEndAPI.Posts_DeletePost(id);
 
-        Text profileTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {            
             // Report Success in Profile
-            profileTextComponent.text = "Post Deleted Successfully! =)";
-            profileTextComponent.color = Color.black;
+            userTextComponent.text = "Post Deleted Successfully! =)";
+            userTextComponent.color = Color.black;
         }
         else
         {
             // Report Failure in Profile
-            profileTextComponent.text = "Deleting failed =(\n Please try again!";
-            profileTextComponent.color = Color.red;
+            userTextComponent.text = "Deleting failed =(\n Please try again!";
+            userTextComponent.color = Color.red;
         }
 
         m_staticLoadingIcon.SetActive(false);
@@ -220,9 +220,9 @@ public class Profile : MonoBehaviour
         }
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Profile Text!");
-        Text profileTextComponent = m_userMessage.GetComponentInChildren<Text>();
-        profileTextComponent.text = "Hi " + m_user.m_handle + "! =D";
-        profileTextComponent.color = Color.black;
+        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        userTextComponent.text = "Hi " + m_user.m_handle + "! =D";
+        userTextComponent.color = Color.black;
     }
       
     private IEnumerator StoreFirstPostsAndSetSpheres()

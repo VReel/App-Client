@@ -225,11 +225,10 @@ public class BackEndAPI
             ShowErrors(response, "DELETE to '/users'");
         }
     }
-
-    // ------ !CURRENTLY UNUSED! -------- //
-    public IEnumerator Passwords_Password(string _email)
+        
+    public IEnumerator Passwords_PasswordReset(string _email)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users/password' - New Password Reset");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users/password' - New Password Reset Email");
 
         var request = new RestRequest("/users/password", Method.POST);
         request.AddHeader("vreel-application-id", m_applicationID);
