@@ -54,11 +54,6 @@ public class Profile : MonoBehaviour
         m_staticLoadingIcon.SetActive(false);
 	}              
 
-    public void Logout()
-    {
-        m_coroutineQueue.EnqueueAction(LogoutInternal());
-    }
-
     public void PreDelete()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreDelete() called on post: " + m_imageSkybox.GetImageIdentifier());
@@ -88,7 +83,7 @@ public class Profile : MonoBehaviour
         m_confirmDeleteButton.SetActive(false);
         m_cancelDeleteButton.SetActive(false);
 
-        m_coroutineQueue.EnqueueAction(DeleteInternal(m_imageSkybox.GetImageIdentifier()));
+        m_coroutineQueue.EnqueueAction(DeletePostInternal(m_imageSkybox.GetImageIdentifier()));
     }
 
     public void ShowProfileText()
@@ -172,20 +167,7 @@ public class Profile : MonoBehaviour
     // Private/Helper functions
     // **************************
 
-    private IEnumerator LogoutInternal()
-    {
-        yield return m_appDirector.VerifyInternetConnection();
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: LogOut() called");
-
-        m_staticLoadingIcon.SetActive(true);
-
-        yield return m_backEndAPI.Session_SignOut();
-
-        m_staticLoadingIcon.SetActive(false);
-    }       
-
-    private IEnumerator DeleteInternal(string id)
+    private IEnumerator DeletePostInternal(string id)
     {
         yield return m_appDirector.VerifyInternetConnection();
 

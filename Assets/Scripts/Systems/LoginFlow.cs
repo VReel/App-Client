@@ -24,7 +24,7 @@ public class LoginFlow : MonoBehaviour
     [SerializeField] private GameObject m_loginPage;
     [SerializeField] private GameObject m_signUpPage1;
     [SerializeField] private GameObject m_signUpPage2;
-    [SerializeField] private GameObject m_resetPassword;
+    [SerializeField] private GameObject m_resetPasswordPage;
 
     private CoroutineQueue m_coroutineQueue;
     private BackEndAPI m_backEndAPI;
@@ -60,28 +60,28 @@ public class LoginFlow : MonoBehaviour
             m_loginPage.SetActive(true);
             m_signUpPage1.SetActive(false);
             m_signUpPage2.SetActive(false);
-            m_resetPassword.SetActive(false);
+            m_resetPasswordPage.SetActive(false);
         }
         else if (pageNumber == 1)
         {
             m_loginPage.SetActive(false);
             m_signUpPage1.SetActive(true);
             m_signUpPage2.SetActive(false);
-            m_resetPassword.SetActive(false);
+            m_resetPasswordPage.SetActive(false);
         }
         else if (pageNumber == 2)
         {
             m_loginPage.SetActive(false);
             m_signUpPage1.SetActive(false);
             m_signUpPage2.SetActive(true);
-            m_resetPassword.SetActive(false);
+            m_resetPasswordPage.SetActive(false);
         }
         else if (pageNumber == 3)
         {
             m_loginPage.SetActive(false);
             m_signUpPage1.SetActive(false);
             m_signUpPage2.SetActive(false);
-            m_resetPassword.SetActive(true);
+            m_resetPasswordPage.SetActive(true);
         }
     }
 

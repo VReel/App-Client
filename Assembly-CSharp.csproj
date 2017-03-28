@@ -86,6 +86,7 @@
      <Compile Include="Assets\Scripts\Systems\KeyBoard.cs" />
      <Compile Include="Assets\Scripts\Systems\LoginFlow.cs" />
      <Compile Include="Assets\Scripts\Systems\MenuController.cs" />
+     <Compile Include="Assets\Scripts\Systems\OptionsFlow.cs" />
      <Compile Include="Assets\Scripts\Systems\Profile.cs" />
      <Compile Include="Assets\Scripts\Systems\ThreadJob.cs" />
      <Compile Include="Assets\Scripts\Systems\User.cs" />

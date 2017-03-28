@@ -84,7 +84,7 @@ public class BackEndAPI
         yield break;
     }
         
-    public IEnumerator Register_CreateUser(string _handle, string _email, string _password, string _passwordConfirmation)
+    public IEnumerator Register_CreateUser(string _handle, string _email, string _password, string _password_confirmation)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users' - Create New User");
 
@@ -95,7 +95,7 @@ public class BackEndAPI
             handle = _handle, 
             email = _email,
             password = _password,
-            password_confirmation = _passwordConfirmation,
+            password_confirmation = _password_confirmation,
             name = "",
             profile = ""
         });
@@ -164,7 +164,7 @@ public class BackEndAPI
     }
 
     // ------ !CURRENTLY UNUSED! -------- //
-    public IEnumerator Register_UpdateUser()
+    public IEnumerator Register_UpdateUser(string _handle, string _password, string _password_confirmation, string _current_password)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> PUT to '/users' - Update User");
         
@@ -173,6 +173,15 @@ public class BackEndAPI
         request.AddHeader("client", m_user.GetClient());
         request.AddHeader("uid", m_user.GetUID());
         request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        request.AddJsonBody(new { 
+            handle = _handle,
+            password = _password,
+            password_confirmation = _password_confirmation,
+            current_password = _current_password,
+            name = "",
+            profile = ""
+        });
 
         yield return m_threadJob.WaitFor();
         IRestResponse response = new RestResponse();

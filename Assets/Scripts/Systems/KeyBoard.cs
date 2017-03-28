@@ -14,8 +14,8 @@ public class KeyBoard : MonoBehaviour
     public GameObject m_mainCanvas;
     public bool m_conserveText = false;
 
-    private string m_previousText;      // Text before selecting inputform
-    private string m_defaultText;       // Default value for inputform text
+    private string m_previousText = "";      // Text before selecting inputform
+    private string m_defaultText = "";       // Default value for inputform text
     private float m_elapsedTime;
     private bool m_capitalLeters, m_symbolMode, m_blink;
     private int m_numLetters;
@@ -183,9 +183,13 @@ public class KeyBoard : MonoBehaviour
 
 	public void CancelText()
 	{		
-        m_objectiveTextObject.text = m_previousText;
-        m_mainCanvas.SetActive(false);
+        if (m_objectiveTextObject != null)
+        {
+            m_objectiveTextObject.text = m_previousText;
+        }
         m_objectiveTextObject = null;
+
+        m_mainCanvas.SetActive(false);
 	}
         
 	public void UperLowerCase()
