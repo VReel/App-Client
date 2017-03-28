@@ -160,11 +160,11 @@
  <Reference Include="Facebook.Unity.Settings">
  <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/FacebookSDK/Plugins/Settings/Facebook.Unity.Settings.dll</HintPath>
  </Reference>
- <Reference Include="RestSharp">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/Plugins/Android/RestSharp.dll</HintPath>
- </Reference>
  <Reference Include="system.drawing">
  <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/Plugins/system.drawing.dll</HintPath>
+ </Reference>
+ <Reference Include="RestSharp">
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/Plugins/Android/RestSharp.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
