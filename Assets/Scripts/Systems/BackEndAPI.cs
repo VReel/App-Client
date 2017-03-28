@@ -126,6 +126,43 @@ public class BackEndAPI
         }
     }
 
+    public IEnumerator Register_GetUser()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/users' - Get user details");
+
+        var request = new RestRequest("/users", Method.GET);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        yield return m_threadJob.WaitFor();
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/users' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            UpdateAccessToken(response);
+
+            var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_User>(response.Content);
+
+            m_user.m_handle = result.data.attributes.handle;
+            m_user.m_email = result.data.attributes.email;
+            m_user.m_name = result.data.attributes.name;
+            m_user.m_profileDescription = result.data.attributes.profile;
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "GET to '/users'");
+        }
+    }
+
     // ------ !CURRENTLY UNUSED! -------- //
     public IEnumerator Register_UpdateUser()
     {
@@ -248,7 +285,7 @@ public class BackEndAPI
             UpdateAccessToken(response);
             UpdateLoginTokens(response);
 
-            var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_SignIn>(response.Content);
+            var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_User>(response.Content);
 
             m_user.m_handle = result.data.attributes.handle;
             m_user.m_email = result.data.attributes.email;
@@ -362,7 +399,7 @@ public class BackEndAPI
         }
     }
         
-    public IEnumerator Posts_Create(string _thumbnailKey, string _originalKey)
+    public IEnumerator Posts_CreatePost(string _thumbnailKey, string _originalKey)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/posts' - Create new post");
         
@@ -398,7 +435,7 @@ public class BackEndAPI
         }
     }
 
-    public IEnumerator Posts_Get(string postId)
+    public IEnumerator Posts_GetPost(string postId)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts/" + postId + "' - Show a post");
 
@@ -431,7 +468,7 @@ public class BackEndAPI
         }
     }
 
-    public IEnumerator Posts_Delete(string postId)
+    public IEnumerator Posts_DeletePost(string postId)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/posts/" + postId + "' - Delete a post");
 

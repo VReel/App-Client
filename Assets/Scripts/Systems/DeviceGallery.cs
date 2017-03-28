@@ -174,7 +174,7 @@ public class DeviceGallery : MonoBehaviour
         // 6) Register Post as Created
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
-            yield return m_backEndAPI.Posts_Create(
+            yield return m_backEndAPI.Posts_CreatePost(
                 m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.key.ToString(), 
                 m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.key.ToString()
             );

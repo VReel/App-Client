@@ -140,7 +140,7 @@ public class AppDirector : MonoBehaviour
         m_imageSphereController.HideAllImageSpheres();
         SetMenuBar(true);
 
-        if (m_appState == AppState.kLogin) // If we are coming from the login screen, set the welcome message
+        if (m_appState == AppState.kLogin || m_appState == AppState.kInit) // If we are coming from the login screen, set the welcome message
         {
             m_profile.ShowWelcomeText();
         }

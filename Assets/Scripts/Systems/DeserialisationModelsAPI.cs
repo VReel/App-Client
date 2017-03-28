@@ -50,19 +50,19 @@ namespace VReelJSON
 
     //--------------------------------------------
 
-    public class Model_SignIn
+    public class Model_User
     {
-        public SignInData data { get; set; }
+        public UserData data { get; set; }
     }
 
-    public class SignInData
+    public class UserData
     {
         public string id { get; set; }
         public string type { get; set; }
-        public SignInAttributes attributes { get; set; }
+        public UserAttributes attributes { get; set; }
     }
 
-    public class SignInAttributes
+    public class UserAttributes
     {
         public string email { get; set; }
         public string handle { get; set; }

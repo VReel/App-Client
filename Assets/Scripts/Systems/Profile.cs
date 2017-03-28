@@ -164,7 +164,7 @@ public class Profile : MonoBehaviour
 
         m_staticLoadingIcon.SetActive(true);
 
-        yield return m_backEndAPI.Posts_Delete(id);
+        yield return m_backEndAPI.Posts_DeletePost(id);
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {            
@@ -193,7 +193,7 @@ public class Profile : MonoBehaviour
 
     private IEnumerator ShowWelcomeTextInternal()
     {
-        while (!m_user.IsLoggedIn())
+        while (!m_user.IsLoggedIn() || !m_user.IsUserDataStored())
         {
             yield return new WaitForEndOfFrame();
         }
@@ -338,7 +338,7 @@ public class Profile : MonoBehaviour
 
     private IEnumerator RefreshPostData(string id) // NOTE: Since URL's have a lifetime, we need to refresh the data at certain points...
     {            
-        yield return m_backEndAPI.Posts_Get(id);
+        yield return m_backEndAPI.Posts_GetPost(id);
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {

@@ -2,6 +2,7 @@
 using System;                                           //Serializable
 using System.Runtime.Serialization.Formatters.Binary;   //BinaryFormatter
 using System.IO;                                        //Filestream, File
+using System.Collections;                               // IEnumerator
 
 // This class holds a blackboard of user variables that are updated depending on the user logged in
 public class User : MonoBehaviour
@@ -9,6 +10,8 @@ public class User : MonoBehaviour
     // **************************
     // Member Variables
     // **************************
+
+    [SerializeField] private GameObject m_errorMessage;
 
     [Serializable]
     public class LoginData
@@ -26,6 +29,8 @@ public class User : MonoBehaviour
     private string m_dataFilePath;
     private LoginData m_loginData;
 
+    private BackEndAPI m_backEndAPI;
+
     // **************************
     // Public functions
     // **************************
@@ -34,12 +39,23 @@ public class User : MonoBehaviour
     {
         m_dataFilePath = Application.persistentDataPath + "vreelLogin.dat";
 
+        m_loginData = new LoginData();
+        m_loginData.m_client = m_loginData.m_uid = m_loginData.m_accessToken = "";
+        m_handle = m_email = m_name = m_profileDescription = "";
+
+        m_backEndAPI = new BackEndAPI(this, m_errorMessage, this);
+
         LoadLoginData();
     }
 
     public bool IsLoggedIn()
     {
         return (m_loginData.m_client.Length + m_loginData.m_uid.Length > 0);
+    }
+
+    public bool IsUserDataStored()
+    {
+        return (m_handle.Length > 0);
     }
 
     public void Clear()
@@ -109,13 +125,7 @@ public class User : MonoBehaviour
                 m_loginData = (LoginData) binaryFormatter.Deserialize(fileStream);
             }
 
-            // TODO: Make sure this also sets: m_handle, m_email, m_name, m_profileDescription 
-        }
-        else
-        {
-            m_loginData = new LoginData();
-            m_loginData.m_client = m_loginData.m_uid = m_loginData.m_accessToken = "";
-            m_handle = m_email = m_name = m_profileDescription = "";
+            StartCoroutine(m_backEndAPI.Register_GetUser());
         }
     }
 }
