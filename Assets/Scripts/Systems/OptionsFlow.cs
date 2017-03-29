@@ -13,7 +13,8 @@ public class OptionsFlow : MonoBehaviour
     [SerializeField] private Text m_passwordInput;
     [SerializeField] private Text m_confirmPasswordInput;
     [SerializeField] private Text m_newPasswordInput;
-    [SerializeField] private GameObject m_deleteConfirmedText;
+    [SerializeField] private GameObject m_setPasswordConfirmedMessage;
+    [SerializeField] private GameObject m_deleteConfirmedMessage;
     [SerializeField] private GameObject m_errorMessage;
     [SerializeField] private User m_user;
     [SerializeField] private KeyBoard m_keyboard;
@@ -95,6 +96,12 @@ public class OptionsFlow : MonoBehaviour
         m_coroutineQueue.EnqueueAction(DeleteAccountInternal());
     } 
 
+    public void EndDeleteAccount()
+    {
+        CloseMenu();
+        m_user.Clear();
+    }
+
     // **************************
     // Private/Helper functions
     // **************************
@@ -129,43 +136,42 @@ public class OptionsFlow : MonoBehaviour
 
     private IEnumerator SetPasswordInternal()
     {
-        yield break;
-        /*
         yield return m_appDirector.VerifyInternetConnection();
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: LogIn() called");
 
         m_staticLoadingIcon.SetActive(true);
 
-        yield return m_backEndAPI.Session_SignIn(
-            m_loginUsernameEmailInput.text, 
-            m_loginPasswordInput.GetComponent<PasswordText>().GetString()
+        yield return m_backEndAPI.Register_UpdateUser(
+            m_user.m_handle,
+            m_passwordInput.GetComponent<PasswordText>().GetString(),
+            m_confirmPasswordInput.GetComponent<PasswordText>().GetString(),
+            m_newPasswordInput.GetComponent<PasswordText>().GetString()
         );
 
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            m_setPasswordConfirmedMessage.SetActive(true);
+        }
+
         m_staticLoadingIcon.SetActive(false);
-        */
     }
         
     private IEnumerator DeleteAccountInternal()
     {
-        yield break;
-        /*
         yield return m_appDirector.VerifyInternetConnection();
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: ResetPassword() called");
 
         m_staticLoadingIcon.SetActive(true);
 
-        yield return m_backEndAPI.Passwords_PasswordReset(
-            m_resetPasswordEmailInput.text
-        );
+        yield return m_backEndAPI.Register_DeleteUser();
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
-            m_resetConfirmedText.SetActive(true);
+            m_deleteConfirmedMessage.SetActive(true);
         }
 
         m_staticLoadingIcon.SetActive(false);
-        */
     } 
 }

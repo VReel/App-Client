@@ -163,7 +163,6 @@ public class BackEndAPI
         }
     }
 
-    // ------ !CURRENTLY UNUSED! -------- //
     public IEnumerator Register_UpdateUser(string _handle, string _password, string _password_confirmation, string _current_password)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> PUT to '/users' - Update User");
@@ -203,7 +202,6 @@ public class BackEndAPI
         }
     }
 
-    // ------ !CURRENTLY UNUSED! -------- //
     public IEnumerator Register_DeleteUser()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/users' - Delete User");
@@ -227,7 +225,6 @@ public class BackEndAPI
         if (IsSuccessCode(m_lastStatusCode))
         {
             UpdateAccessToken(response);
-            m_user.Clear();
         }
         else // Error Handling
         {            

@@ -23,10 +23,12 @@ public class PasswordText : MonoBehaviour
 
     public void SetString (string newText) 
     {
-        if (m_myText.text.CompareTo(m_defaultString) != 0)
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: SetString() called with: " + newText);
+
+        if (newText.CompareTo(m_defaultString) != 0)
         {
-            m_myString = m_myText.text;
-            m_myText.text = ReplaceStringWithAsterixes(m_myText.text);
+            m_myString = newText;
+            m_myText.text = ReplaceStringWithAsterixes(newText);
         }
         else
         {

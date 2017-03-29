@@ -22,7 +22,8 @@ public class KeyBoard : MonoBehaviour
 
     private Text[] m_allTextChars;
     private Text[] m_allSymbolChars;
-    private string m_blinkText, m_actualText;
+    private string m_actualText;
+    private string m_blinkText;
 
     // **************************
     // Public functions
