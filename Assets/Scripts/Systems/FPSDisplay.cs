@@ -8,9 +8,10 @@ public class FPSDisplay : MonoBehaviour
     // **************************
 
     public bool m_isVisible = false;
+    public bool m_isDebugOn = false;
     public float m_fontSize = 2 / 50;
 
-    private const float kFrameOutThreshold = 55.0f;
+    private const float kFrameOutThreshold = 54.0f;
     private float m_deltaTime = 0.0f;
 
     // **************************
@@ -24,7 +25,7 @@ public class FPSDisplay : MonoBehaviour
         float fps = 1.0f / m_deltaTime;
         if (fps < kFrameOutThreshold)
         {
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: We are Framing out at FPS = " + fps);
+            if (m_isDebugOn && Debug.isDebugBuild) Debug.Log("------- VREEL: We are Framing out at FPS = " + fps);
         }
     }
 

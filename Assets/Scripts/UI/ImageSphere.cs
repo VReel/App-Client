@@ -54,8 +54,8 @@ public class ImageSphere : MonoBehaviour
 
         if (Debug.isDebugBuild) 
             Debug.Log("------- VREEL: Finished Loading Image from Texture2D, " +
-                "AnimateOnSet = " + animateOnSet +
-                "ImageIdentifier = " + imageIdentifier +
+                " AnimateOnSet = " + animateOnSet +
+                " , ImageIdentifier = " + imageIdentifier +
                 " , PluginTextureIndex = " + textureIndex +
                 " , Texture size = " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
 

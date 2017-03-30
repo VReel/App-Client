@@ -10,9 +10,9 @@ public class OptionsFlow : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;  
     [SerializeField] private GameObject m_staticLoadingIcon;
-    [SerializeField] private Text m_passwordInput;
-    [SerializeField] private Text m_confirmPasswordInput;
+    [SerializeField] private Text m_currentPasswordInput;
     [SerializeField] private Text m_newPasswordInput;
+    [SerializeField] private Text m_confirmPasswordInput;
     [SerializeField] private GameObject m_setPasswordConfirmedMessage;
     [SerializeField] private GameObject m_deleteConfirmedMessage;
     [SerializeField] private GameObject m_errorMessage;
@@ -144,9 +144,9 @@ public class OptionsFlow : MonoBehaviour
 
         yield return m_backEndAPI.Register_UpdateUser(
             m_user.m_handle,
-            m_passwordInput.GetComponent<PasswordText>().GetString(),
+            m_newPasswordInput.GetComponent<PasswordText>().GetString(),
             m_confirmPasswordInput.GetComponent<PasswordText>().GetString(),
-            m_newPasswordInput.GetComponent<PasswordText>().GetString()
+            m_currentPasswordInput.GetComponent<PasswordText>().GetString()
         );
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
