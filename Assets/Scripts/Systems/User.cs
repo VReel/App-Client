@@ -30,6 +30,8 @@ public class User : MonoBehaviour
     private LoginData m_loginData;
 
     private BackEndAPI m_backEndAPI;
+    private CoroutineQueue m_coroutineQueue;
+    private ThreadJob m_threadJob;
 
     // **************************
     // Public functions
@@ -44,6 +46,11 @@ public class User : MonoBehaviour
         m_handle = m_email = m_name = m_profileDescription = "";
 
         m_backEndAPI = new BackEndAPI(this, m_errorMessage, this);
+
+        m_coroutineQueue = new CoroutineQueue( this );
+        m_coroutineQueue.StartLoop();
+
+        m_threadJob = new ThreadJob(this);
 
         LoadLoginData();
     }
@@ -77,7 +84,7 @@ public class User : MonoBehaviour
     public void SetClient(string client)
     {
         m_loginData.m_client = client;
-        SaveLoginData();
+        m_coroutineQueue.EnqueueAction(SaveLoginData());
     }
 
     public string GetUID()
@@ -88,7 +95,7 @@ public class User : MonoBehaviour
     public void SetUID(string uid)
     {
         m_loginData.m_uid = uid;
-        SaveLoginData();
+        m_coroutineQueue.EnqueueAction(SaveLoginData());
     }
 
     public string GetAcceessToken()
@@ -99,21 +106,12 @@ public class User : MonoBehaviour
     public void SetAcceessToken(string acceessToken)
     {
         m_loginData.m_accessToken = acceessToken;
-        SaveLoginData();
+        m_coroutineQueue.EnqueueAction(SaveLoginData());
     }
 
     // **************************
     // Private/Helper functions
     // **************************
-
-    private void SaveLoginData()
-    {
-        BinaryFormatter binaryFormatter = new BinaryFormatter();
-        using (FileStream fileStream = File.Create(m_dataFilePath)) // We call Create() to ensure we always overwrite the file
-        {
-            binaryFormatter.Serialize(fileStream, m_loginData);
-        }
-    }
 
     private void LoadLoginData()
     {
@@ -127,5 +125,26 @@ public class User : MonoBehaviour
 
             StartCoroutine(m_backEndAPI.Register_GetUser());
         }
+    }
+
+    private IEnumerator SaveLoginData()
+    {
+        yield return m_threadJob.WaitFor();
+        bool result = false;
+        m_threadJob.Start( () => 
+            result = SaveLoginDataToFile()
+        );
+        yield return m_threadJob.WaitFor(); 
+    }
+
+    private bool SaveLoginDataToFile()
+    {
+        BinaryFormatter binaryFormatter = new BinaryFormatter();
+        using (FileStream fileStream = File.Create(m_dataFilePath)) // We call Create() to ensure we always overwrite the file
+        {
+            binaryFormatter.Serialize(fileStream, m_loginData);
+        }
+
+        return true;
     }
 }

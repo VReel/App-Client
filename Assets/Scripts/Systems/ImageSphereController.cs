@@ -70,7 +70,7 @@ public class ImageSphereController : MonoBehaviour
         }
         else
         {
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: Invalid request to     public string GetIdentifierAtIndex(int sphereIndex)\n: " + sphereIndex);
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: Invalid request to GetIdentifierAtIndex(int sphereIndex): " + sphereIndex);
         }
 
         return identifier;
@@ -78,6 +78,7 @@ public class ImageSphereController : MonoBehaviour
 
     public void SetAllImageSpheresToLoading()
     {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetAllImageSpheresToLoading()");        
         for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
         {
             SetImageAtIndex(sphereIndex, m_sphereLoadingTexture, kLoadingTextureFilePath, m_imageLoader.GetLoadingTextureIndex(), true);
@@ -108,6 +109,7 @@ public class ImageSphereController : MonoBehaviour
 
     public void HideAllImageSpheres()
     {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling HideAllImageSpheres()");
         for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
         {
             HideSphereAtIndex(sphereIndex);

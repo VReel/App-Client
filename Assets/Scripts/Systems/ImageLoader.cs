@@ -18,6 +18,7 @@ public class ImageLoader : MonoBehaviour
 
     private CppPlugin m_cppPlugin;
     private CoroutineQueue m_coroutineQueue;
+    private ThreadJob m_threadJob;
 
     // **************************
     // Public functions
@@ -30,6 +31,8 @@ public class ImageLoader : MonoBehaviour
         m_textureIndexUsage = new int[kMaxNumTextures];
         m_coroutineQueue = new CoroutineQueue(this);
         m_coroutineQueue.StartLoop();
+
+        m_threadJob = new ThreadJob(this);
     }
 
     public int GetMaxNumTextures()
@@ -95,26 +98,34 @@ public class ImageLoader : MonoBehaviour
 
         m_staticLoadingIcon.SetActive(showLoading);
 
-        /*
-        using (WebClient webClient = new WebClient()) 
-        {
-            byte [] data = webClient
-            using (var stream = new MemoryStream(data)) 
-            {
-                yield return LoadImageInternalPlugin(stream, sphereIndex, imageIdentifier);
-                //m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(stream, sphereIndex, imageIdentifier));
-            }
-        }
-        */
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Downloading image and getting stream through GetImageStreamFromURL() with url: " + url);
+        yield return m_threadJob.WaitFor();
+        Stream imageStream = null;
+        m_threadJob.Start( () => 
+            imageStream = GetImageStreamFromURL(url)
+        );
+        yield return m_threadJob.WaitFor();
 
-        HttpWebRequest http = (HttpWebRequest)WebRequest.Create(url);
-        using (var imageStream = http.GetResponse().GetResponseStream())
+        if (imageStream != null)
         {
             int textureIndex = GetAvailableTextureIndex();
             yield return m_cppPlugin.LoadImageFromStreamIntoImageSphere(imageSphereController, sphereIndex, imageStream, imageIdentifier, textureIndex);
-        }
 
+            imageStream.Close();
+        }
+        else
+        {
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - WebRequest go a null stream for url: " + url);
+        }
+            
         m_staticLoadingIcon.SetActive(false);
+    }        
+
+    private Stream GetImageStreamFromURL(string url)
+    {
+        HttpWebRequest http = (HttpWebRequest)WebRequest.Create(url);
+        Stream imageStream = http.GetResponse().GetResponseStream();
+        return imageStream;
     }
 
     private int GetAvailableTextureIndex()

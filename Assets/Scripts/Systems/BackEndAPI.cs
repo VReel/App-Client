@@ -141,7 +141,7 @@ public class BackEndAPI
         m_threadJob.Start( () => 
             response = m_vreelClient.Execute(request)
         );
-        yield return m_threadJob.WaitFor();
+        yield return m_threadJob.WaitFor();      
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/users' - Response: " + response.Content);
 
@@ -150,7 +150,12 @@ public class BackEndAPI
         {
             UpdateAccessToken(response);
 
-            var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_User>(response.Content);
+            yield return m_threadJob.WaitFor();
+            VReelJSON.Model_User result = null;
+            m_threadJob.Start( () => 
+                result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_User>(response.Content)
+            );
+            yield return m_threadJob.WaitFor();
 
             m_user.m_handle = result.data.attributes.handle;
             m_user.m_email = result.data.attributes.email;
@@ -290,7 +295,12 @@ public class BackEndAPI
             UpdateAccessToken(response);
             UpdateLoginTokens(response);
 
-            var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_User>(response.Content);
+            yield return m_threadJob.WaitFor();
+            VReelJSON.Model_User result = null;
+            m_threadJob.Start( () => 
+                result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_User>(response.Content)
+            );
+            yield return m_threadJob.WaitFor();
 
             m_user.m_handle = result.data.attributes.handle;
             m_user.m_email = result.data.attributes.email;
@@ -360,7 +370,13 @@ public class BackEndAPI
         {
             UpdateAccessToken(response);
 
-            var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_S3PresignedURL>(response.Content);
+            yield return m_threadJob.WaitFor();
+            VReelJSON.Model_S3PresignedURL result = null;
+            m_threadJob.Start( () => 
+                result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_S3PresignedURL>(response.Content)
+            );
+            yield return m_threadJob.WaitFor();
+
             m_s3URLJSONResult = result;          
         }
         else // Error Handling
@@ -395,7 +411,13 @@ public class BackEndAPI
         {
             UpdateAccessToken(response);
 
-            var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Posts>(response.Content);
+            yield return m_threadJob.WaitFor();
+            VReelJSON.Model_Posts result = null;
+            m_threadJob.Start( () => 
+                result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Posts>(response.Content)
+            );
+            yield return m_threadJob.WaitFor();
+
             m_postsJSONResult = result;
         }
         else // Error Handling
@@ -464,7 +486,13 @@ public class BackEndAPI
         {
             UpdateAccessToken(response);
 
-            var result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Post>(response.Content);
+            yield return m_threadJob.WaitFor();
+            VReelJSON.Model_Post result = null;
+            m_threadJob.Start( () => 
+                result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Post>(response.Content)
+            );
+            yield return m_threadJob.WaitFor();
+
             m_postJSONResult = result;
         }
         else // Error Handling

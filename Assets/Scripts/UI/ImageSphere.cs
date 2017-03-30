@@ -60,13 +60,13 @@ public class ImageSphere : MonoBehaviour
                 " , Texture size = " + m_imageSphereTexture.width + " x " + m_imageSphereTexture.height);
 
         m_coroutineQueue.Clear();
-        if (animateOnSet)
+        if (!animateOnSet)
         {
-            m_coroutineQueue.EnqueueAction(AnimateSetTexture());
+            SetTextureAndID();
         }
         else
         {
-            SetTextureAndID();
+            m_coroutineQueue.EnqueueAction(AnimateSetTexture());
         }
     }
 
@@ -93,7 +93,7 @@ public class ImageSphere : MonoBehaviour
     private void SetTextureAndID()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: SetTextureAndID() called on sphere: " + (m_imageSphereIndex+1) );
-        
+
         gameObject.GetComponent<MeshRenderer>().material.mainTexture = m_imageSphereTexture;
 
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, false);
@@ -143,7 +143,7 @@ public class ImageSphere : MonoBehaviour
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, false);
         m_currTextureIndex = kLoadingTextureIndex;
     }
-
+        
     private void OnEnable ()
     {
         m_menuButton.OnButtonSelected += OnButtonSelected;
