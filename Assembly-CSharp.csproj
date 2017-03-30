@@ -79,7 +79,7 @@
      <Compile Include="Assets\Scripts\Systems\CppPlugin.cs" />
      <Compile Include="Assets\Scripts\Systems\DeserialisationModelsAPI.cs" />
      <Compile Include="Assets\Scripts\Systems\DeviceGallery.cs" />
-     <Compile Include="Assets\Scripts\Systems\FPSDisplay.cs" />
+     <Compile Include="Assets\Scripts\Systems\FPSSystem.cs" />
      <Compile Include="Assets\Scripts\Systems\ImageLoader.cs" />
      <Compile Include="Assets\Scripts\Systems\ImageSphereController.cs" />
      <Compile Include="Assets\Scripts\Systems\InternetReachabilityVerifier.cs" />

@@ -363,7 +363,8 @@ public class Profile : MonoBehaviour
         }
         */
     }
-        
+     
+    /*
     private IEnumerator LoadImageInternalUnity(WebResponse response, int sphereIndex, string imageIdentifier)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: ConvertStreamAndSetImage for " + imageIdentifier);
@@ -405,6 +406,7 @@ public class Profile : MonoBehaviour
 
         Resources.UnloadUnusedAssets();
     }
+    */
 
     private int ConvertIdToIndex(string id) //TODO: To remove this all I need to do is turn m_posts into a Map<ID, PostAttributes>...
     {
