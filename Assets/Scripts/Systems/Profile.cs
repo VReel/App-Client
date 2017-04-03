@@ -183,6 +183,8 @@ public class Profile : MonoBehaviour
             // Report Success in Profile
             userTextComponent.text = "Post Deleted Successfully! =)";
             userTextComponent.color = Color.black;
+
+            m_posts.RemoveAt(ConvertIdToIndex(id));
         }
         else
         {
