@@ -10,11 +10,11 @@ public class FPSSystem : MonoBehaviour
     public bool m_isFPSTextVisible = false;
     public bool m_isDebugMessagesOn = false;
     public float m_fpsTextFontSize = 2.0f / 50.0f;
-    public float m_garbageCollectionTimeFreq = 2.0f; // Frequency of which Garbage Collection occurs - only occurs if we are in frame!
+    //public float m_garbageCollectionTimeFreq = 2.0f; // Frequency of which Garbage Collection occurs - only occurs if we are in frame!
 
     private const float kFrameOutThreshold = 55.0f;
     private float m_deltaTime = 0.0f;
-    private float m_garbageCollectionTimeSinceLast = 0.0f;
+    //private float m_garbageCollectionTimeSinceLast = 0.0f;
 
     // **************************
     // Public functions
@@ -23,18 +23,20 @@ public class FPSSystem : MonoBehaviour
     void Update()
     {
         m_deltaTime += (Time.deltaTime - m_deltaTime) * 0.1f;
-        m_garbageCollectionTimeSinceLast += Time.deltaTime;
+        //m_garbageCollectionTimeSinceLast += Time.deltaTime;
 
         float fps = 1.0f / m_deltaTime;
         if (fps < kFrameOutThreshold)
         {
             if (m_isDebugMessagesOn && Debug.isDebugBuild) Debug.Log("------- VREEL: We are Framing out at FPS = " + fps);
         }
-        else if (m_garbageCollectionTimeSinceLast < m_garbageCollectionTimeFreq)
+        /*
+        else if (m_garbageCollectionTimeSinceLast > m_garbageCollectionTimeFreq)
         {            
             Resources.UnloadUnusedAssets();
             m_garbageCollectionTimeSinceLast = 0.0f;
         }
+        */
     }
 
     void OnGUI()

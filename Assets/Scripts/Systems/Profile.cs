@@ -198,7 +198,7 @@ public class Profile : MonoBehaviour
     {
         while (!m_user.IsLoggedIn() || !m_user.IsUserDataStored())
         {
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Profile Text!");
@@ -385,7 +385,7 @@ public class Profile : MonoBehaviour
                     iterations++;
                     if (iterations % kNumIterationsPerFrame == 0)
                     {                        
-                        yield return new WaitForEndOfFrame();
+                        yield return null;
                     }
                 } 
                 while(stream.CanRead && byteCount > 0);
@@ -400,7 +400,7 @@ public class Profile : MonoBehaviour
         Texture2D newImage = new Texture2D(2,2); 
         newImage.LoadImage(myBinary);
         m_imageSphereController.SetImageAtIndex(sphereIndex, newImage, imageIdentifier, -1 , true);
-        yield return new WaitForEndOfFrame();
+        yield return null;
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished Setting Image!");
 

@@ -22,8 +22,10 @@ public class Analytics : MonoBehaviour
     // **************************
 
 
-    public void Start() //TODO: Analytics keeps throwing out some error, figure out why!
+    public void Start()
     {                
+        UnityInitializer.AttachToGameObject(this.gameObject);
+
         //TODO: Move this pool over to EUWest1!
         var credentials = new CognitoAWSCredentials(
             "us-east-1:76e86965-28da-4906-bf7d-ed48c4e50477", // Amazon Cognito Identity Pool ID
@@ -51,6 +53,14 @@ public class Analytics : MonoBehaviour
     public void GallerySelected()
     {
         CustomEvent customEvent = new CustomEvent("GallerySelected");
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
+
+    public void OptionsSelected()
+    {
+        CustomEvent customEvent = new CustomEvent("OptionsSelected");
         customEvent.AddAttribute("UserEmail", m_user.m_email);
 
         m_analyticsManager.RecordEvent(customEvent);

@@ -220,7 +220,7 @@ public class UserLogin : MonoBehaviour
         float timeoutTimer = m_maxTimeoutForLogin;
         while (!m_AWSS3Client.IsS3ClientValid()) // This moves the App Director to the profile state when the S3 Client has been initialised
         {
-            yield return new WaitForEndOfFrame();
+            yield return null;
             
             timeoutTimer -= Time.deltaTime;
             if (timeoutTimer <= 0)
