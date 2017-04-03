@@ -150,6 +150,8 @@ public class CppPlugin
         imageSphereController.SetImageAtIndex(sphereIndex, m_lastTextureOperatedOn, filePathAndIdentifier, textureIndex, true);
         yield return new WaitForEndOfFrame();
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
+
+        Resources.UnloadUnusedAssets();
     }   
            
     public IEnumerator LoadImageFromStreamIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, Stream imageStream, string imageIdentifier, int textureIndex)
@@ -217,6 +219,8 @@ public class CppPlugin
         imageSphereController.SetImageAtIndex(sphereIndex, m_lastTextureOperatedOn, imageIdentifier, textureIndex, true);
         yield return new WaitForEndOfFrame();
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
+
+        Resources.UnloadUnusedAssets();
     }     
 
     // **************************

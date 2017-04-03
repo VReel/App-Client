@@ -345,7 +345,9 @@ public class DeviceGallery : MonoBehaviour
     private IEnumerator LoadImages(int startingGalleryImageIndex, int numImagesToLoad)
     {
         if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Loading {0} images beginning at index {1}. There are {2} images in the gallery!", 
-            numImagesToLoad, startingGalleryImageIndex, m_galleryImageFilePaths.Count));        
+            numImagesToLoad, startingGalleryImageIndex, m_galleryImageFilePaths.Count));
+
+        Resources.UnloadUnusedAssets();
 
         bool imageRequestStillValid = 
             (m_currGalleryImageIndex != -1) && 
@@ -381,6 +383,7 @@ public class DeviceGallery : MonoBehaviour
             }
         }
 
+        Resources.UnloadUnusedAssets();
         yield return null;
     }
 
@@ -390,7 +393,6 @@ public class DeviceGallery : MonoBehaviour
         yield break;
     }
 
-    /*
     private IEnumerator LoadImageInternalUnity(string filePath, int sphereIndex)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadPicturesInternalUnity() from filePath: " + filePath);
@@ -411,7 +413,6 @@ public class DeviceGallery : MonoBehaviour
 
         Resources.UnloadUnusedAssets();
     }
-    */
 
     //TODO: Improve this function's performance!
     public IEnumerator CreateThumbnail(string originalImagePath, string thumbnailImagePath) //, int thumbnailWidth)

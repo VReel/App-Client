@@ -85,10 +85,10 @@ public class ImageSphereController : MonoBehaviour
         }
     }
 
-    public void SetImageWithId(string imageId, Texture2D texture, int pluginTextureIndex)
+    public void SetImageWithId(string imageIdentifier, Texture2D texture, int pluginTextureIndex)
     {
-        int sphereIndex = ConvertIdToIndex(imageId);
-        SetImageAtIndex(sphereIndex, texture, imageId, pluginTextureIndex, false);
+        int sphereIndex = ConvertIdToIndex(imageIdentifier);
+        SetImageAtIndex(sphereIndex, texture, imageIdentifier, pluginTextureIndex, false);
     }
 
     public void SetImageAtIndex(int sphereIndex, Texture2D texture, string imageIdentifier, int pluginTextureIndex, bool animateOnSet)

@@ -401,7 +401,6 @@ public class AWSS3Client : MonoBehaviour
         }
     }
         
-    /*
     private IEnumerator LoadImageInternalUnity(Amazon.S3.Model.GetObjectResponse response, int sphereIndex, string fullFilePath)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: ConvertStreamAndSetImage for " + fullFilePath);
@@ -443,5 +442,4 @@ public class AWSS3Client : MonoBehaviour
 
         Resources.UnloadUnusedAssets();
     }
-    */
 }
