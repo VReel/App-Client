@@ -106,6 +106,7 @@
      <Compile Include="Assets\Scripts\VR\VRTrackingReset.cs" />
      <None Include="Assets\AWSSDK\Examples\License.txt" />
      <None Include="Assets\Art\Shader\UIOverlay.shader" />
+     <None Include="Assets\Examples\License.txt" />
      <None Include="Assets\InternetReachabilityVerifier\Examples\internetreachabilityverifier.txt" />
      <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
      <None Include="Assets\FacebookSDK\link.xml" />

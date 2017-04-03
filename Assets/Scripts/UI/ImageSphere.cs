@@ -112,7 +112,7 @@ public class ImageSphere : MonoBehaviour
         while (transform.localScale.magnitude > kMinShrink)
         {
             transform.localScale = transform.localScale * scalingFactor;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         // Set texture and textureID
@@ -122,7 +122,7 @@ public class ImageSphere : MonoBehaviour
         while (transform.localScale.magnitude < defaultScale)
         {
             transform.localScale = transform.localScale / scalingFactor;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         transform.localScale = new Vector3(defaultScale, defaultScale, defaultScale);
@@ -137,7 +137,7 @@ public class ImageSphere : MonoBehaviour
         while (transform.localScale.magnitude > kMinShrink)
         {
             transform.localScale = transform.localScale * scalingFactor;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, false);

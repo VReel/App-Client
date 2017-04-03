@@ -8,7 +8,7 @@
 #include "stb_image.h"
 
 #define  LOG_TAG    "----------------- VREEL: CppPlugin - "
-#define  LOGI(...) //__android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
+#define  LOGI(...) __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 
 // **************************
 // Member Variables
@@ -81,7 +81,9 @@ enum RenderFunctions
     kInit = 0,
     kCreateEmptyTexture = 1,
     kLoadScanlinesIntoTextureFromWorkingMemory = 2,
-    kTerminate = 3
+    kTerminate = 3,
+
+    kFBO = 4
 };
 
 void Init()
@@ -177,6 +179,53 @@ void LoadScanlinesIntoTextureFromWorkingMemory()
     LOGI("Finished LoadScanlinesIntoTextureFromWorkingMemory()! Loading in progress = %d", m_isLoadingIntoTexture);
 }
 
+
+
+
+void MyFBO()
+{
+    LOGI("Calling MyFBO()!");
+
+    LOGI("Setup FBO");
+    GLuint textureId = m_textureIDs[m_currTextureIndex];
+    GLuint FFrameBuffer = 0;
+    glGenFramebuffers( 1, &FFrameBuffer );
+    glBindFramebuffer( GL_FRAMEBUFFER, FFrameBuffer );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureId, 0 );
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    PrintAllGlError();
+
+    LOGI("Render to FBO");
+    glBindFramebuffer( GL_FRAMEBUFFER, FFrameBuffer );
+    glViewport( 0, 0, m_currImageWidth, m_currImageHeight );
+    //your rendering code goes here - it will draw directly into the texture
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    PrintAllGlError();
+
+    LOGI("Cleanup FBO");
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 ); // Render to screen? If so I don't need it
+    glDeleteFramebuffers( 1, &FFrameBuffer );
+    PrintAllGlError();
+
+    /*
+    // The depth buffer
+    GLuint depthrenderbuffer;
+    glGenRenderbuffers(1, &depthrenderbuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 1024, 768);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
+
+
+
+     // Set the list of draw buffers.
+    GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+    glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
+     */
+}
+
+
+
+
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
 {
     if (eventID == kInit)
@@ -194,6 +243,11 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
     else if (eventID == kTerminate)
     {
         Terminate();
+    }
+
+    else if (eventID == kFBO)
+    {
+        MyFBO();
     }
 }
 

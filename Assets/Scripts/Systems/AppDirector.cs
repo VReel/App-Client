@@ -120,6 +120,7 @@ public class AppDirector : MonoBehaviour
 
     private void SetLoginState()
     {        
+        Resources.UnloadUnusedAssets();
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
         SetMenuBar(false);
@@ -136,6 +137,7 @@ public class AppDirector : MonoBehaviour
 
     private void SetProfileState()
     {
+        Resources.UnloadUnusedAssets();
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
         SetMenuBar(true);
@@ -153,6 +155,7 @@ public class AppDirector : MonoBehaviour
 
     private void SetGalleryState()
     {
+        Resources.UnloadUnusedAssets();
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
         SetMenuBar(true);

@@ -78,15 +78,21 @@ public class ImageSphereController : MonoBehaviour
 
     public void SetAllImageSpheresToLoading()
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetAllImageSpheresToLoading()");        
-        for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
-        {
-            SetImageAtIndex(sphereIndex, m_sphereLoadingTexture, kLoadingTextureFilePath, m_imageLoader.GetLoadingTextureIndex(), true);
-        }
+        m_coroutineQueue.EnqueueAction(SetAllImageSpheresToLoadingInternal());
+    }
+
+<<<<<<< HEAD
+    public void SetImageWithId(string imageIdentifier, Texture2D texture, int pluginTextureIndex)
+    {
+=======
+    public void HideAllImageSpheres()
+    {
+        m_coroutineQueue.EnqueueAction(HideAllImageSpheresInternal());
     }
 
     public void SetImageWithId(string imageIdentifier, Texture2D texture, int pluginTextureIndex)
     {
+>>>>>>> WIP
         int sphereIndex = ConvertIdToIndex(imageIdentifier);
         SetImageAtIndex(sphereIndex, texture, imageIdentifier, pluginTextureIndex, false);
     }
@@ -107,15 +113,6 @@ public class ImageSphereController : MonoBehaviour
         }
     }        
 
-    public void HideAllImageSpheres()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling HideAllImageSpheres()");
-        for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
-        {
-            HideSphereAtIndex(sphereIndex);
-        }
-    }
-
     public void HideSphereAtIndex(int sphereIndex)
     {
         if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
@@ -131,6 +128,28 @@ public class ImageSphereController : MonoBehaviour
     // **************************
     // Private/Helper functions
     // **************************
+
+    public IEnumerator SetAllImageSpheresToLoadingInternal()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetAllImageSpheresToLoading()");
+
+        for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
+        {            
+            SetImageAtIndex(sphereIndex, m_sphereLoadingTexture, kLoadingTextureFilePath, m_imageLoader.GetLoadingTextureIndex(), true);
+            yield return null; // Only calling SetImageAtIndex() once per frame
+        }
+    }
+
+    public IEnumerator HideAllImageSpheresInternal()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling HideAllImageSpheres()");
+
+        for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
+        {
+            HideSphereAtIndex(sphereIndex);
+            yield return null; // Only calling HideSphereAtIndex() once per frame
+        }
+    }
 
     private void SetIndexOnAllImageSpheres()
     {

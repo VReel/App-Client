@@ -58,6 +58,9 @@ public class CppPlugin
     private const int kMaxPixelsUploadedPerFrame = 1 * 1024 * 1024;
     private const float kWaitForGLRenderCall = 2.0f/60.0f; // Wait 2 frames
 
+    private WaitForEndOfFrame m_waitForEndOfFrame;
+    private WaitForSeconds m_waitForSeconds;
+
     private MonoBehaviour m_owner;
     private Texture2D m_lastTextureOperatedOn;
     private ThreadJob m_threadJob;   
@@ -87,6 +90,9 @@ public class CppPlugin
         SetInitMaxNumTextures(maxNumTextures);
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kInit);
 
+        m_waitForEndOfFrame = new WaitForEndOfFrame();
+        m_waitForSeconds = new WaitForSeconds(kWaitForGLRenderCall);
+
         m_threadJob = new ThreadJob(owner);
     }
 
@@ -101,7 +107,7 @@ public class CppPlugin
     {
         StringBuilder filePathForCpp = new StringBuilder(filePathAndIdentifier);
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromPathIntoImageSphere() from filePath: " + filePathAndIdentifier + ", with TextureIndex: " + textureIndex);
-        yield return new WaitForEndOfFrame();
+        yield return null;
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadIntoWorkingMemoryFromImagePath(), on background thread!");
         yield return m_threadJob.WaitFor();
@@ -113,26 +119,28 @@ public class CppPlugin
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadIntoWorkingMemoryFromImagePath(), ran Job Successully = " + ranJobSuccessfully); 
 
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateEmptyTexture()");
-        yield return new WaitForEndOfFrame();
+        //TODO: Make CreateEmptyTexture() more efficient - the problem is simply that a glTexImage2D() call is slow with large textures!
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateEmptyTexture() over textureIndex = " + textureIndex);
+        yield return null;
         SetCurrTextureIndex(textureIndex);
-        yield return new WaitForEndOfFrame();
+        yield return m_waitForEndOfFrame;
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kCreateEmptyTexture);
-        yield return new WaitForSeconds(kWaitForGLRenderCall); // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
+        yield return m_waitForSeconds; // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateEmptyTexture(), Texture Handle = " + GetCurrStoredTexturePtr() );
 
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadScanlinesIntoTextureFromWorkingMemory()");
         while (IsLoadingIntoTexture())
         {            
+            yield return m_waitForEndOfFrame;
             GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kLoadScanlinesIntoTextureFromWorkingMemory);
-            yield return new WaitForSeconds(kWaitForGLRenderCall);
+            yield return m_waitForSeconds;
         }
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadScanlinesIntoTextureFromWorkingMemory()");
 
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateExternalTexture(), size of Texture is Width x Height = " + GetCurrStoredImageWidth() + " x " + GetCurrStoredImageHeight());
-        yield return new WaitForEndOfFrame();
+        yield return m_waitForEndOfFrame;
         m_lastTextureOperatedOn =
             Texture2D.CreateExternalTexture(
                 GetCurrStoredImageWidth(), 
@@ -142,21 +150,24 @@ public class CppPlugin
                 false,
                 GetCurrStoredTexturePtr()
             );
-        yield return new WaitForEndOfFrame();
+        yield return null;
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateExternalTexture()!");
 
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAtIndex()");
         imageSphereController.SetImageAtIndex(sphereIndex, m_lastTextureOperatedOn, filePathAndIdentifier, textureIndex, true);
-        yield return new WaitForEndOfFrame();
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
 
+<<<<<<< HEAD
         Resources.UnloadUnusedAssets();
+=======
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Completed LoadImageFromPathIntoImageSphere() from filePath: " + filePathAndIdentifier + ", with TextureIndex: " + textureIndex);
+>>>>>>> WIP
     }   
            
     public IEnumerator LoadImageFromStreamIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, Stream imageStream, string imageIdentifier, int textureIndex)
     {
-        yield return new WaitForEndOfFrame();
+        yield return null;
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromStreamIntoImageSphere() for image: " + imageIdentifier + ", with TextureIndex: " + textureIndex);
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling ToByteArray(), on background thread!");
@@ -182,26 +193,28 @@ public class CppPlugin
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadIntoWorkingMemoryFromImagePath(), ran Job Successully = " + ranJobSuccessfully); 
 
 
+        //TODO: Make CreateEmptyTexture() more efficient - the problem is simply that a glTexImage2D() call is slow with large textures!
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateEmptyTexture()");
-        yield return new WaitForEndOfFrame();
+        yield return null;
         SetCurrTextureIndex(textureIndex);
-        yield return new WaitForEndOfFrame();
+        yield return m_waitForEndOfFrame;
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kCreateEmptyTexture);
-        yield return new WaitForSeconds(kWaitForGLRenderCall); // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
+        yield return m_waitForSeconds; // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateEmptyTexture(), Texture Handle = " + GetCurrStoredTexturePtr() );
 
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadScanlinesIntoTextureFromWorkingMemory()");
         while (IsLoadingIntoTexture())
         {            
+            yield return m_waitForEndOfFrame;
             GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kLoadScanlinesIntoTextureFromWorkingMemory);
-            yield return new WaitForSeconds(kWaitForGLRenderCall); // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
+            yield return m_waitForSeconds; // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
         }
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadScanlinesIntoTextureFromWorkingMemory()");
 
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateExternalTexture(), size of Texture is Width x Height = " + GetCurrStoredImageWidth() + " x " + GetCurrStoredImageHeight());
-        yield return new WaitForEndOfFrame();
+        yield return m_waitForEndOfFrame;
         m_lastTextureOperatedOn =
             Texture2D.CreateExternalTexture(
                 GetCurrStoredImageWidth(), 
@@ -211,16 +224,19 @@ public class CppPlugin
                 false,
                 GetCurrStoredTexturePtr()
             );
-        yield return new WaitForEndOfFrame();
+        yield return null;
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateExternalTexture()!");
 
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAtIndex()");
         imageSphereController.SetImageAtIndex(sphereIndex, m_lastTextureOperatedOn, imageIdentifier, textureIndex, true);
-        yield return new WaitForEndOfFrame();
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
 
+<<<<<<< HEAD
         Resources.UnloadUnusedAssets();
+=======
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Completed LoadImageFromStreamIntoImageSphere() for image: " + imageIdentifier + ", with TextureIndex: " + textureIndex);
+>>>>>>> WIP
     }     
 
     // **************************

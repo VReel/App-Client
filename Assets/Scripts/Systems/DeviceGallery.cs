@@ -88,6 +88,11 @@ public class DeviceGallery : MonoBehaviour
     }
 
     public void OpenAndroidGallery()
+    {
+        m_coroutineQueue.EnqueueAction(OpenAndroidGalleryInternal());
+    }
+
+    private IEnumerator OpenAndroidGalleryInternal()
     {        
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenAndroidGallery() called");
 
@@ -96,15 +101,17 @@ public class DeviceGallery : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: About to call GetImagesPath function...");
         m_imagesTopLevelDirectory = m_javaPluginClass.CallStatic<string>("GetAndroidImagesPath"); //string path = "/storage/emulated/0/DCIM/Gear 360/";
+
         m_imageSkybox.SetTopLevelDirectory(m_imagesTopLevelDirectory);
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Storing all FilePaths from directory: " + m_imagesTopLevelDirectory);
 
-        m_coroutineQueue.EnqueueAction(StoreAllImageGalleryFilePaths(m_imagesTopLevelDirectory));
+        yield return StoreAllImageGalleryFilePaths(m_imagesTopLevelDirectory);
 
         m_currGalleryImageIndex = 0;
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
         m_imageSphereController.SetAllImageSpheresToLoading();
-        m_coroutineQueue.EnqueueAction(LoadImages(m_currGalleryImageIndex, numImagesToLoad));
+
+        yield return LoadImages(m_currGalleryImageIndex, numImagesToLoad);
     }
 
     public void NextImages()
@@ -150,13 +157,13 @@ public class DeviceGallery : MonoBehaviour
         // 1) Get Original Image byte array
         string originalImageFilePath = m_imageSkybox.GetImageIdentifier();
         byte[] originalImageByteArray = File.ReadAllBytes(originalImageFilePath);
-        yield return new WaitForEndOfFrame();
+        yield return null;
 
         // 2) Create Thumbnail
         string tempThumnailPath = m_imagesTopLevelDirectory + "/tempThumbnailImage.png";
         yield return CreateThumbnail(originalImageFilePath, tempThumnailPath);
         byte[] thumbnailImageByteArray = File.ReadAllBytes(tempThumnailPath);            
-        yield return new WaitForEndOfFrame();
+        yield return null;
 
         // 3) Get PresignedURL
         yield return m_backEndAPI.S3_PresignedURL();
@@ -207,8 +214,9 @@ public class DeviceGallery : MonoBehaviour
         m_staticLoadingIcon.SetActive(false);
     }
 
+    // TODO: Only download 10 images at a time!
     private IEnumerator StoreAllImageGalleryFilePaths(string imagesTopLevelDirectory)
-    {                
+    {  
         m_staticLoadingIcon.SetActive(true);
 
         // 1) Find all files that could potentially be 360 images.
@@ -221,6 +229,7 @@ public class DeviceGallery : MonoBehaviour
         );
         yield return m_threadJob.WaitFor();
 
+        // TODO: FIND A WAY TO THREAD THIS OUT...
         // TODO: Add CalcAspectRatio() to C++ Plugin, which should then allow me to thread this function out...
         //      the only reason its not currently threaded is because of the Android Plugin needing to be called...
         // 2) Add the files that are actually 360 images to "m_galleryImageFilePaths"
@@ -237,7 +246,7 @@ public class DeviceGallery : MonoBehaviour
             numFilesSearched++;
             if (numFilesSearched % kNumFilesPerIteration == 0)
             {                
-                yield return new WaitForEndOfFrame();
+                yield return null;
             }
         }
 
@@ -245,7 +254,7 @@ public class DeviceGallery : MonoBehaviour
             " files, and found " + m_galleryImageFilePaths.Count + " 360-image files!");
 
         // 3) Sort files in order of newest first, so that users see their most recent gallery images!
-        yield return new WaitForEndOfFrame();
+        yield return null;
         bool ranSuccessfully = false;
         m_threadJob.Start( () => 
             ranSuccessfully = SortGalleryImageFilePaths()           
@@ -354,8 +363,7 @@ public class DeviceGallery : MonoBehaviour
             (m_currGalleryImageIndex <= startingGalleryImageIndex) &&  
             (startingGalleryImageIndex < m_currGalleryImageIndex + numImagesToLoad); // Request no longer valid as user has moved on from this page
 
-        string logString = string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", imageRequestStillValid, startingGalleryImageIndex, m_currGalleryImageIndex, numImagesToLoad); 
-        if (Debug.isDebugBuild) Debug.Log(logString);
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", imageRequestStillValid, startingGalleryImageIndex, m_currGalleryImageIndex, numImagesToLoad));
         if (!imageRequestStillValid)
         {
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: LoadImages() with index = " + startingGalleryImageIndex + " has failed");
@@ -365,8 +373,10 @@ public class DeviceGallery : MonoBehaviour
         int currGalleryImageIndex = startingGalleryImageIndex;
         for (int sphereIndex = 0; sphereIndex < numImagesToLoad; sphereIndex++, currGalleryImageIndex++)
         {
+            yield return null; // Space out the work that's going on... 
+            
             if (currGalleryImageIndex < m_galleryImageFilePaths.Count)
-            {                       
+            {                      
                 string filePath = m_galleryImageFilePaths[currGalleryImageIndex];
 
                 bool identifierValid = filePath.CompareTo(m_imageSphereController.GetIdentifierAtIndex(sphereIndex)) != 0; // If file-path is the same then ignore request
@@ -382,9 +392,12 @@ public class DeviceGallery : MonoBehaviour
                 m_imageSphereController.HideSphereAtIndex(sphereIndex);
             }
         }
+<<<<<<< HEAD
 
         Resources.UnloadUnusedAssets();
         yield return null;
+=======
+>>>>>>> WIP
     }
 
     private IEnumerator LoadImageInternalPlugin(string filePath, int sphereIndex,bool showLoading)
@@ -403,12 +416,12 @@ public class DeviceGallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageIntoTexture()");
         Texture2D myNewTexture2D = new Texture2D(2,2);
         www.LoadImageIntoTexture(myNewTexture2D);
-        yield return new WaitForEndOfFrame();
+        yield return null;
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadImageIntoTexture()");
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAndFilePath()");
         m_imageSphereController.SetImageAtIndex(sphereIndex, myNewTexture2D, filePath, -1, true);
-        yield return new WaitForEndOfFrame();
+        yield return null;
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAndFilePath()");
 
         Resources.UnloadUnusedAssets();

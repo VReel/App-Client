@@ -7,12 +7,23 @@ public class FPSDisplay : MonoBehaviour
     // Member Variables
     // **************************
 
+<<<<<<< HEAD:Assets/Scripts/Systems/FPSDisplay.cs
     public bool m_isVisible = false;
     public bool m_isDebugOn = false;
     public float m_fontSize = 2 / 50;
+=======
+    public bool m_isFPSTextVisible = false;
+    public bool m_isDebugMessagesOn = false;
+    public float m_fpsTextFontSize = 2.0f / 50.0f;
+    //public float m_garbageCollectionTimeFreq = 2.0f; // Frequency of which Garbage Collection occurs - only occurs if we are in frame!
+>>>>>>> WIP:Assets/Scripts/Systems/FPSSystem.cs
 
     private const float kFrameOutThreshold = 54.0f;
     private float m_deltaTime = 0.0f;
+<<<<<<< HEAD:Assets/Scripts/Systems/FPSDisplay.cs
+=======
+    //private float m_garbageCollectionTimeSinceLast = 0.0f;
+>>>>>>> WIP:Assets/Scripts/Systems/FPSSystem.cs
 
     // **************************
     // Public functions
@@ -21,12 +32,27 @@ public class FPSDisplay : MonoBehaviour
     void Update()
     {
         m_deltaTime += (Time.deltaTime - m_deltaTime) * 0.1f;
+<<<<<<< HEAD:Assets/Scripts/Systems/FPSDisplay.cs
+=======
+        //m_garbageCollectionTimeSinceLast += Time.deltaTime;
+>>>>>>> WIP:Assets/Scripts/Systems/FPSSystem.cs
 
         float fps = 1.0f / m_deltaTime;
         if (fps < kFrameOutThreshold)
         {
+<<<<<<< HEAD:Assets/Scripts/Systems/FPSDisplay.cs
             if (m_isDebugOn && Debug.isDebugBuild) Debug.Log("------- VREEL: We are Framing out at FPS = " + fps);
+=======
+            if (m_isDebugMessagesOn && Debug.isDebugBuild) Debug.Log("------- VREEL: We are Framing out at FPS = " + fps);
         }
+        /*
+        else if (m_garbageCollectionTimeSinceLast > m_garbageCollectionTimeFreq)
+        {            
+            Resources.UnloadUnusedAssets();
+            m_garbageCollectionTimeSinceLast = 0.0f;
+>>>>>>> WIP:Assets/Scripts/Systems/FPSSystem.cs
+        }
+        */
     }
 
     void OnGUI()
