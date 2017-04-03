@@ -18,6 +18,7 @@ public class KeyBoard : MonoBehaviour
     private string m_defaultText = "";       // Default value for inputform text
     private float m_elapsedTime;
     private bool m_capitalLeters, m_symbolMode, m_blink;
+    private bool m_shouldBeShowing = false;
     private int m_numLetters;
 
     private Text[] m_allTextChars;
@@ -74,7 +75,8 @@ public class KeyBoard : MonoBehaviour
         m_elapsedTime = 0;
         m_objectiveTextObject = null;
 
-        m_mainCanvas.SetActive(false);
+        Hide();
+        m_shouldBeShowing = false;
         m_symbolMode = false;
         m_capitalLeters = false;
 	}
@@ -124,6 +126,21 @@ public class KeyBoard : MonoBehaviour
         m_blinkText = m_objectiveTextObject.text + " |";
 	}
 
+    public bool ShouldBeShowing()
+    {
+        return m_shouldBeShowing;
+    }
+
+    public void Show()
+    {
+        m_mainCanvas.SetActive(true);
+    }
+
+    public void Hide()
+    {
+        m_mainCanvas.SetActive(false);
+    }
+
 	// this function gets new input forms and stores temp string values
     public void SelectTextInput(Text clickedTextObject)
 	{
@@ -144,7 +161,8 @@ public class KeyBoard : MonoBehaviour
         m_actualText = m_objectiveTextObject.text;
         m_blinkText = m_objectiveTextObject.text + " |";
 
-        m_mainCanvas.SetActive(true);
+        m_shouldBeShowing = true;
+        Show();
 	}
 
     public void SelectTextInputDefaultText(string defaultText)
@@ -178,7 +196,8 @@ public class KeyBoard : MonoBehaviour
             m_objectiveTextObject.text = m_defaultText;
         }
 
-        m_mainCanvas.SetActive(false);
+        m_shouldBeShowing = false;
+        Hide();
         m_objectiveTextObject = null;	
 	}
 
@@ -190,7 +209,8 @@ public class KeyBoard : MonoBehaviour
         }
         m_objectiveTextObject = null;
 
-        m_mainCanvas.SetActive(false);
+        m_shouldBeShowing = false;
+        Hide();
 	}
         
 	public void UperLowerCase()

@@ -16,6 +16,7 @@ public class MenuController : MonoBehaviour
     [SerializeField] private GameObject m_profileSubMenu;
     [SerializeField] private GameObject m_gallerySubMenu;
     [SerializeField] private User m_user;
+    [SerializeField] private KeyBoard m_keyboard;
     [SerializeField] private VRStandardAssets.Utils.Reticle m_reticle;
     [SerializeField] private VRStandardAssets.Utils.VRInput m_input;
     [SerializeField] private GameObject[] m_menuBarButtons;
@@ -140,6 +141,18 @@ public class MenuController : MonoBehaviour
             {
                 m_reticle.Hide();
             }
+        }
+
+        if (m_keyboard != null)
+        {
+            if (visible && m_keyboard.ShouldBeShowing())
+            {
+                m_keyboard.Show();
+            }
+            else
+            {
+                m_keyboard.Hide();
+            }                
         }
 
         m_isMenuActive = visible;

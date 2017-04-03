@@ -63,7 +63,7 @@ public class JavaPlugin extends UnityPlayerActivity
     
     public static boolean CreateThumbnail(String originalPath, String thumbnailPath)
     {
-    	final int kThumbnailWidth = 320;
+    	final int kThumbnailWidth = 640;
     	Bitmap thumbnailBitmap = 
     			ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(originalPath), kThumbnailWidth, kThumbnailWidth/2);
 

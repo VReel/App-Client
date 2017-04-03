@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.VR;       //VRSettings
 using UnityEngine.Events;   //UnityEvent
 using System;
 
@@ -132,22 +133,34 @@ namespace VRStandardAssets.Menu
         // ------------------------------------------
         private void OnMouseOver()
         {            
-            HandleOver();
+            if (!VRSettings.enabled)
+            {
+                HandleOver();
+            }
         }
 
         private void OnMouseExit()
         {            
-            HandleOut();
+            if (!VRSettings.enabled)
+            {
+                HandleOut();
+            }
         }
 
         private void OnMouseDown()
-        {            
-            HandleDown();
+        {          
+            if (!VRSettings.enabled)
+            {
+                HandleDown();
+            }
         }
 
         private void OnMouseUp()
         {
-            HandleUp();
+            if (!VRSettings.enabled)
+            {
+                HandleUp();
+            }
         }
     }
 }   

@@ -70,7 +70,7 @@ public class ImageSkybox : MonoBehaviour
 
         if (!isImageFromDevice) // This image is being set from the Profile, not the Gallery
         {
-            const int kStandardThumbnailWidth = 320; //TODO: This is also hardcoded in DeviceGallery, need to move this into a global variable...
+            const int kStandardThumbnailWidth = 640; //TODO: This is also hardcoded in DeviceGallery, need to move this into a global variable...
             bool isThumbnail = texture.width <= kStandardThumbnailWidth;
             if (isThumbnail) // This image is a Thumbnail, so we want to download the full image!
             {
