@@ -234,36 +234,21 @@ public class DeviceGallery : MonoBehaviour
         bool isDebugBuild = Debug.isDebugBuild;
         Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
         m_threadJob.Start( () => 
-            files = GetAllFileNamesRecursively(imagesTopLevelDirectory, isDebugBuild, userTextComponent)
+            files = GetAllFileNamesRecursively(imagesTopLevelDirectory, userTextComponent, isDebugBuild)
         );
         yield return m_threadJob.WaitFor();
 
-        // TODO: FIND A WAY TO THREAD THIS OUT...
-        // TODO: Add CalcAspectRatio() to C++ Plugin, which should then allow me to thread this function out...
-        //      the only reason its not currently threaded is because of the Android Plugin needing to be called...
         // 2) Add the files that are actually 360 images to "m_galleryImageFilePaths"
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling FilterAndAdd360Images()");
-        const int kNumFilesPerIteration = 1;
         int numFilesSearched = 0;
-        foreach (string filePath in files)
-        { 
-            if (Is360Image(filePath))
-            {   
-                m_galleryImageFilePaths.Add(filePath);
-            }
-
-            numFilesSearched++;
-            if (numFilesSearched % kNumFilesPerIteration == 0)
-            {                
-                yield return null;
-            }
-        }
-
+        m_threadJob.Start( () => 
+            numFilesSearched = FilterAndAdd360Images(ref files, isDebugBuild)           
+        );
+        yield return m_threadJob.WaitFor();
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Searched the directory " + imagesTopLevelDirectory + ", through " + numFilesSearched +
             " files, and found " + m_galleryImageFilePaths.Count + " 360-image files!");
 
         // 3) Sort files in order of newest first, so that users see their most recent gallery images!
-        yield return null;
         bool ranSuccessfully = false;
         m_threadJob.Start( () => 
             ranSuccessfully = SortGalleryImageFilePaths()           
@@ -276,7 +261,7 @@ public class DeviceGallery : MonoBehaviour
         m_noGalleryImagesText.SetActive(noImagesInGallery); // If the user has yet take any 360-images then show them the NoGalleryImagesText!
     }
     
-    private List<string> GetAllFileNamesRecursively(string baseDirectory, bool isDebugBuild, Text userTextComponent)
+    private List<string> GetAllFileNamesRecursively(string baseDirectory, Text userTextComponent, bool isDebugBuild)
     {
         // We iterate over all files in the given top level directory, recursively searching through all the subdirectories
         var files = new List<string>();
@@ -309,7 +294,7 @@ public class DeviceGallery : MonoBehaviour
                 FileAttributes checkedFolderAttributes = (new DirectoryInfo(dirName).Attributes) & undesiredAttributes;
                 if (checkedFolderAttributes == 0)
                 {
-                    files.AddRange(GetAllFileNamesRecursively(dirName, isDebugBuild, userTextComponent));
+                    files.AddRange(GetAllFileNamesRecursively(dirName, userTextComponent, isDebugBuild));
                 }
             }
         }
@@ -324,14 +309,33 @@ public class DeviceGallery : MonoBehaviour
 
         return files;
     }
+
+    private int FilterAndAdd360Images(ref List<string> files, bool isDebugBuild)
+    {
+        AndroidJNI.AttachCurrentThread();
+
+        int numFilesSearched = 0;
+        foreach (string filePath in files)
+        { 
+            if (Is360Image(filePath, isDebugBuild))
+            {   
+                m_galleryImageFilePaths.Add(filePath);
+            }
+            numFilesSearched++;
+        }
+
+        AndroidJNI.DetachCurrentThread();
+
+        return numFilesSearched;
+    }
         
     private static readonly List<string> s_imageExtensions = new List<string> { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG" };
-    private bool Is360Image(string filePath)
+    private bool Is360Image(string filePath, bool isDebugBuild)
     {            
         // Check that it has an image file extension 
         if (!s_imageExtensions.Contains(Path.GetExtension(filePath).ToUpperInvariant()))
         {
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: File: " + filePath + " is not an image!");
+            if (isDebugBuild) Debug.Log("------- VREEL: File: " + filePath + " is not an image!");
             return false;
         }
 
@@ -339,13 +343,13 @@ public class DeviceGallery : MonoBehaviour
         // This works the majority of the time because all 360 images have a 2:1 ratio,
         // and its not a standard aspect ratio for any other type of image!
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: About to call Aspect Ratio function for file: " + filePath);
+        if (isDebugBuild) Debug.Log("------- VREEL: About to call Aspect Ratio function for file: " + filePath);
         float aspectRatio = m_javaPluginClass.CallStatic<float>("CalcAspectRatio", filePath);
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Aspect Ratio: " + aspectRatio);
+        if (isDebugBuild) Debug.Log("------- VREEL: Aspect Ratio: " + aspectRatio);
 
         const float kDesiredAspectRatio = 2.0f;
         bool isImage360 = Mathf.Abs(aspectRatio - kDesiredAspectRatio) < Mathf.Epsilon;
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Image: " + filePath + " is 360: " + isImage360);
+        if (isDebugBuild) Debug.Log("------- VREEL: Image: " + filePath + " is 360: " + isImage360);
 
         return isImage360;
     }        
