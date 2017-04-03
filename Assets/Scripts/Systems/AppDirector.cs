@@ -155,7 +155,7 @@ public class AppDirector : MonoBehaviour
 
     private void SetGalleryState()
     {
-        //Resources.UnloadUnusedAssets();
+        Resources.UnloadUnusedAssets();
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
         SetMenuBar(true);

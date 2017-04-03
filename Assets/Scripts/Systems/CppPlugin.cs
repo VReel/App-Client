@@ -56,7 +56,7 @@ public class CppPlugin
     // **************************
 
     private const int kMaxPixelsUploadedPerFrame = 1 * 1024 * 1024;
-    private const float kWaitForGLRenderCall = 2.0f/60.0f; // Wait 4 frames
+    private const float kWaitForGLRenderCall = 2.0f/60.0f; // Wait 2 frames
 
     private WaitForEndOfFrame m_waitForEndOfFrame;
     private WaitForSeconds m_waitForSeconds;
@@ -71,9 +71,7 @@ public class CppPlugin
         kInit = 0,
         kCreateEmptyTexture = 1,
         kLoadScanlinesIntoTextureFromWorkingMemory = 2,
-        kTerminate = 3,
-
-        kFBO = 4
+        kTerminate = 3
     };
 
     // **************************
@@ -121,7 +119,7 @@ public class CppPlugin
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadIntoWorkingMemoryFromImagePath(), ran Job Successully = " + ranJobSuccessfully); 
 
 
-        //TODO: Make CreateEmptyTexture() more efficient - I think the problem is related to overwriting old small textures with new large ones..
+        //TODO: Make CreateEmptyTexture() more efficient - the problem is simply that a glTexImage2D() call is slow with large textures!
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateEmptyTexture() over textureIndex = " + textureIndex);
         yield return null;
         SetCurrTextureIndex(textureIndex);
@@ -129,11 +127,6 @@ public class CppPlugin
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kCreateEmptyTexture);
         yield return m_waitForSeconds; // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateEmptyTexture(), Texture Handle = " + GetCurrStoredTexturePtr() );
-
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: WAIT 0");
-        yield return new WaitForSeconds(3);
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: END WAIT 0");
 
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadScanlinesIntoTextureFromWorkingMemory()");
@@ -144,11 +137,6 @@ public class CppPlugin
             yield return m_waitForSeconds;
         }
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadScanlinesIntoTextureFromWorkingMemory()");
-
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: WAIT 1");
-        yield return new WaitForSeconds(3);
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: END WAIT 1");
 
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateExternalTexture(), size of Texture is Width x Height = " + GetCurrStoredImageWidth() + " x " + GetCurrStoredImageHeight());
@@ -169,6 +157,8 @@ public class CppPlugin
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAtIndex()");
         imageSphereController.SetImageAtIndex(sphereIndex, m_lastTextureOperatedOn, filePathAndIdentifier, textureIndex, true);
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Completed LoadImageFromPathIntoImageSphere() from filePath: " + filePathAndIdentifier + ", with TextureIndex: " + textureIndex);
     }   
            
     public IEnumerator LoadImageFromStreamIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, Stream imageStream, string imageIdentifier, int textureIndex)
@@ -199,9 +189,7 @@ public class CppPlugin
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadIntoWorkingMemoryFromImagePath(), ran Job Successully = " + ranJobSuccessfully); 
 
 
-        //TODO: Make CreateEmptyTexture() more efficient - I think the problem is related to overwriting old small textures with new large ones..
-        // I think the proble is calling glTexImage2D() on a used textureID - maybe I need to free up used ones...
-        // Need to look into using FBO's
+        //TODO: Make CreateEmptyTexture() more efficient - the problem is simply that a glTexImage2D() call is slow with large textures!
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateEmptyTexture()");
         yield return null;
         SetCurrTextureIndex(textureIndex);
@@ -209,11 +197,6 @@ public class CppPlugin
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kCreateEmptyTexture);
         yield return m_waitForSeconds; // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateEmptyTexture(), Texture Handle = " + GetCurrStoredTexturePtr() );
-
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: WAIT 0");
-        yield return new WaitForSeconds(3);
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: END WAIT 0");
 
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadScanlinesIntoTextureFromWorkingMemory()");
@@ -224,11 +207,6 @@ public class CppPlugin
             yield return m_waitForSeconds; // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
         }
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadScanlinesIntoTextureFromWorkingMemory()");
-
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: WAIT 1");
-        yield return new WaitForSeconds(3);
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: END WAIT 1");
 
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateExternalTexture(), size of Texture is Width x Height = " + GetCurrStoredImageWidth() + " x " + GetCurrStoredImageHeight());
@@ -249,6 +227,8 @@ public class CppPlugin
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAtIndex()");
         imageSphereController.SetImageAtIndex(sphereIndex, m_lastTextureOperatedOn, imageIdentifier, textureIndex, true);
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Completed LoadImageFromStreamIntoImageSphere() for image: " + imageIdentifier + ", with TextureIndex: " + textureIndex);
     }     
 
     // **************************

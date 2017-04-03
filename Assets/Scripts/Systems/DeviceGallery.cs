@@ -261,11 +261,6 @@ public class DeviceGallery : MonoBehaviour
         );
         yield return m_threadJob.WaitFor();
 
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: WAIT 4");
-        yield return new WaitForSeconds(5);
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: END WAIT 4");
-
         m_staticLoadingIcon.SetActive(false);
 
         bool noImagesInGallery = m_galleryImageFilePaths.Count <= 0;
