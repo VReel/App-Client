@@ -80,11 +80,7 @@ public class ImageSphereController : MonoBehaviour
     {
         m_coroutineQueue.EnqueueAction(SetAllImageSpheresToLoadingInternal());
     }
-
-<<<<<<< HEAD
-    public void SetImageWithId(string imageIdentifier, Texture2D texture, int pluginTextureIndex)
-    {
-=======
+        
     public void HideAllImageSpheres()
     {
         m_coroutineQueue.EnqueueAction(HideAllImageSpheresInternal());
@@ -92,7 +88,6 @@ public class ImageSphereController : MonoBehaviour
 
     public void SetImageWithId(string imageIdentifier, Texture2D texture, int pluginTextureIndex)
     {
->>>>>>> WIP
         int sphereIndex = ConvertIdToIndex(imageIdentifier);
         SetImageAtIndex(sphereIndex, texture, imageIdentifier, pluginTextureIndex, false);
     }

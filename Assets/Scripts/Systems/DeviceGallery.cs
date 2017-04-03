@@ -146,48 +146,53 @@ public class DeviceGallery : MonoBehaviour
     // Private/Helper functions
     // **************************
 
-    private IEnumerator UploadImageInternal() //NOTE: This function cannot be stopped midway because the LoadingIcon blocks UI interactions
+    private IEnumerator UploadImageInternal() //NOTE: Ensured that this function cannot be stopped midway because the LoadingIcon blocks UI
     {
         yield return m_appDirector.VerifyInternetConnection();
 
         m_staticLoadingIcon.SetActive(true);
+        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        userTextComponent.text = "Began Uploading!";
+        userTextComponent.color = Color.black;
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Running UploadImageInternal() for image: " + m_imageSkybox.GetImageIdentifier());
 
-        // 1) Get Original Image byte array
-        string originalImageFilePath = m_imageSkybox.GetImageIdentifier();
-        byte[] originalImageByteArray = File.ReadAllBytes(originalImageFilePath);
-        yield return null;
-
-        // 2) Create Thumbnail
-        string tempThumnailPath = m_imagesTopLevelDirectory + "/tempThumbnailImage.png";
-        yield return CreateThumbnail(originalImageFilePath, tempThumnailPath);
-        byte[] thumbnailImageByteArray = File.ReadAllBytes(tempThumnailPath);            
-        yield return null;
-
-        // 3) Get PresignedURL
+        // 1) Get PresignedURL
         yield return m_backEndAPI.S3_PresignedURL();
 
-        // 4) Upload Original
+        // 2) Create Thumbnail from Original image
+        string originalImageFilePath = m_imageSkybox.GetImageIdentifier();
+        string tempThumbnailPath = m_imagesTopLevelDirectory + "/tempThumbnailImage.png";
+        bool successfullyCreatedThumbnail = false;
         if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            bool isDebugBuild = Debug.isDebugBuild;
+            m_threadJob.Start( () => 
+                successfullyCreatedThumbnail = CreateThumbnail(originalImageFilePath, tempThumbnailPath, isDebugBuild)
+            );
+            yield return m_threadJob.WaitFor();       
+        }
+
+        // 3) Upload Original
+        if (m_backEndAPI.IsLastAPICallSuccessful() && successfullyCreatedThumbnail)
         {
             yield return m_backEndAPI.UploadObject(
                 m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.url.ToString(),
-                originalImageByteArray
+                originalImageFilePath
             );
         }
 
-        // 5) Upload Thumbnail
-        if (m_backEndAPI.IsLastAPICallSuccessful())
+        // 4) Upload Thumbnail
+        if (m_backEndAPI.IsLastAPICallSuccessful() && successfullyCreatedThumbnail)
         {
             yield return m_backEndAPI.UploadObject(
                 m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.url.ToString(),
-                thumbnailImageByteArray
+                tempThumbnailPath
             );
         }
 
-        // 6) Register Post as Created
-        if (m_backEndAPI.IsLastAPICallSuccessful())
+        // 5) Register Post as Created
+        if (m_backEndAPI.IsLastAPICallSuccessful() && successfullyCreatedThumbnail)
         {
             yield return m_backEndAPI.Posts_CreatePost(
                 m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.key.ToString(), 
@@ -195,14 +200,18 @@ public class DeviceGallery : MonoBehaviour
             );
         }
 
-        File.Delete(tempThumnailPath);
+        //6) Delete temporary thumbnail file
+        if (successfullyCreatedThumbnail)
+        {
+            File.Delete(tempThumbnailPath);
+        }
+        yield return null;
 
         // 7) If there has been a successful upload -> Inform user that image has been uploaded      
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploaded image: " + originalImageFilePath + ", with Success: " + m_backEndAPI.IsLastAPICallSuccessful());
-        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploaded image: " + originalImageFilePath + ", with Success: " + (m_backEndAPI.IsLastAPICallSuccessful() && successfullyCreatedThumbnail) );
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
-            userTextComponent.text = "Succesful Upload!";
+            userTextComponent.text = "Succesful Upload! =)";
             userTextComponent.color = Color.black;
         }
         else
@@ -392,12 +401,7 @@ public class DeviceGallery : MonoBehaviour
                 m_imageSphereController.HideSphereAtIndex(sphereIndex);
             }
         }
-<<<<<<< HEAD
 
-        Resources.UnloadUnusedAssets();
-        yield return null;
-=======
->>>>>>> WIP
     }
 
     private IEnumerator LoadImageInternalPlugin(string filePath, int sphereIndex,bool showLoading)
@@ -406,6 +410,7 @@ public class DeviceGallery : MonoBehaviour
         yield break;
     }
 
+    /*
     private IEnumerator LoadImageInternalUnity(string filePath, int sphereIndex)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadPicturesInternalUnity() from filePath: " + filePath);
@@ -426,14 +431,19 @@ public class DeviceGallery : MonoBehaviour
 
         Resources.UnloadUnusedAssets();
     }
+    */
 
-    //TODO: Improve this function's performance!
-    public IEnumerator CreateThumbnail(string originalImagePath, string thumbnailImagePath) //, int thumbnailWidth)
-    {                
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Call CreateThumbnail() with Thumbnail Path: " + thumbnailImagePath);
+    public bool CreateThumbnail(string originalImagePath, string thumbnailImagePath, bool debugOn)
+    {
+        if (debugOn) Debug.Log("------- VREEL: Called CreateThumbnail() with Thumbnail Path: " + thumbnailImagePath);
+        AndroidJNI.AttachCurrentThread();
+
         bool success = m_javaPluginClass.CallStatic<bool>("CreateThumbnail", originalImagePath, thumbnailImagePath);
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Call CreateThumbnail() returned with: " + success);
-        yield break;
+
+        AndroidJNI.DetachCurrentThread();
+        if (debugOn) Debug.Log("------- VREEL: Call CreateThumbnail() returned with: " + success);
+
+        return success;
 
         //yield return m_cppPlugin.LoadImageFromPath(originalImagePath);
 
@@ -463,5 +473,5 @@ public class DeviceGallery : MonoBehaviour
         */
 
         //return outputStream.ToArray();
-    }
+    }        
 }

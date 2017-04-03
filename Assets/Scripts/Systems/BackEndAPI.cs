@@ -78,10 +78,14 @@ public class BackEndAPI
         return m_s3URLJSONResult;
     }
 
-    public IEnumerator UploadObject(string url, byte[] byteArray) // string filePath)
+    public IEnumerator UploadObject(string url, string filePath)
     {
-        UploadObjectInternal(url, byteArray);
-        yield break;
+        bool success = false;
+        bool isDebugBuild = Debug.isDebugBuild;
+        m_threadJob.Start( () => 
+            success = UploadObjectInternal(url, filePath, isDebugBuild)
+        );
+        yield return m_threadJob.WaitFor();
     }
         
     public IEnumerator Register_CreateUser(string _handle, string _email, string _password, string _password_confirmation)
@@ -554,16 +558,16 @@ public class BackEndAPI
             }
             */
 
-    private void UploadObjectInternal(string url, byte[] byteArray) //string filePath)
+    private bool UploadObjectInternal(string url, string filePath, bool isDebugBuild)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploading Object with url: " + url ); //+ ", and filePath: " + filePath);
+        if (isDebugBuild) Debug.Log("------- VREEL: Uploading Object with url: " + url ); //+ ", and filePath: " + filePath);
 
-        HttpWebRequest httpRequest = WebRequest.Create(url) as HttpWebRequest;
+        HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(url);
         httpRequest.Method = "PUT";
 
         try
         {
-            //byte[] byteArray = File.ReadAllBytes(filePath);
+            byte[] byteArray = File.ReadAllBytes(filePath);
             httpRequest.ContentLength = byteArray.Length;
             Stream dataStream = httpRequest.GetRequestStream();
             dataStream.Write(byteArray, 0, byteArray.Length);
@@ -571,22 +575,24 @@ public class BackEndAPI
         }
         catch (Exception e)
         {
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: Upload Exception caught: " + e);
+            if (isDebugBuild) Debug.Log("------- VREEL: Upload Exception caught: " + e);
             m_lastStatusCode = HttpStatusCode.NotFound;
         }
 
-        Debug.Log("------- VREEL: Finished Uploading FileStream...");
+        if (isDebugBuild) Debug.Log("------- VREEL: Finished Uploading FileStream...");
         try
         {
             HttpWebResponse response = httpRequest.GetResponse() as HttpWebResponse;
             m_lastStatusCode = response.StatusCode;
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: Response Status Code: " + response.StatusCode);
+            if (isDebugBuild) Debug.Log("------- VREEL: Response Status Code: " + response.StatusCode);
         }
         catch (Exception e)
         {
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: Response Exception caught: " + e);
+            if (isDebugBuild) Debug.Log("------- VREEL: Response Exception caught: " + e);
             m_lastStatusCode = HttpStatusCode.NotFound;
         }
+
+        return true;
     }
 
     private bool IsSuccessCode(HttpStatusCode statusCode)
