@@ -76,7 +76,7 @@ public class CppPlugin
 
     // **************************
     // Public functions
-    // *************************
+    // **************************
 
     // NOTE: Due to current underlying C++ implementation being single threaded, there can only be one of these
     public CppPlugin(MonoBehaviour owner, int maxNumTextures)

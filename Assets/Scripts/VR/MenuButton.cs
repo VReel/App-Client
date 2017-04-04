@@ -8,6 +8,10 @@ namespace VRStandardAssets.Menu
 {
     public class MenuButton : MonoBehaviour
     {        
+        // **************************
+        // Member Variables
+        // **************************
+
         [SerializeField] private Image m_buttonImage;
         [SerializeField] private Sprite m_spriteButtonUp;       // Button's default sprite
         [SerializeField] private Sprite m_spriteButtonOver;     // Button's sprite when the icon is over it
@@ -20,6 +24,10 @@ namespace VRStandardAssets.Menu
 
         private bool m_gazeOver = false;                     // Whether the user is looking at the VRInteractiveItem currently.
         private bool m_buttonDown = false;                   // Whether the user is pushing the VRInteractiveItem down.
+
+        // **************************
+        // Public functions
+        // **************************
 
         public bool GetGazeOver()
         {
@@ -72,6 +80,10 @@ namespace VRStandardAssets.Menu
             }
         }
 
+        // **************************
+        // Private/Helper functions
+        // **************************
+
         private void OnEnable ()
         {
             m_InteractiveItem.OnOver += HandleOver;
@@ -98,6 +110,7 @@ namespace VRStandardAssets.Menu
         private void HandleOut()
         {
             m_gazeOver = false;
+            m_buttonDown = false;
 
             RefreshButtonSprite();
         }
@@ -110,12 +123,8 @@ namespace VRStandardAssets.Menu
         }
 
         private void HandleUp()
-        {
-            m_buttonDown = false;
-
-            RefreshButtonSprite();
-
-            if (m_gazeOver)
+        {                        
+            if (m_gazeOver && m_buttonDown)
             {
                 if (OnButtonSelected != null)
                 {
@@ -126,7 +135,11 @@ namespace VRStandardAssets.Menu
                 {
                     OnButtonSelectedFunc.Invoke();
                 }
-            }           
+            }
+
+            m_buttonDown = false;
+
+            RefreshButtonSprite();
         }
 
         // NOTE: The following functions is for making debugging without a headset easier...
