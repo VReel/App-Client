@@ -9,7 +9,7 @@ public class OptionsFlow : MonoBehaviour
     // **************************
 
     [SerializeField] private AppDirector m_appDirector;  
-    [SerializeField] private GameObject m_staticLoadingIcon;
+    [SerializeField] private LoadingIcon m_loadingIcon;
     [SerializeField] private Text m_currentPasswordInput;
     [SerializeField] private Text m_newPasswordInput;
     [SerializeField] private Text m_confirmPasswordInput;
@@ -37,8 +37,6 @@ public class OptionsFlow : MonoBehaviour
         m_coroutineQueue.StartLoop();
 
         m_backEndAPI = new BackEndAPI(this, m_errorMessage, m_user);
-
-        m_staticLoadingIcon.SetActive(false);
     }
 
     public void OpenCloseSwitch()
@@ -125,11 +123,11 @@ public class OptionsFlow : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: LogOut() called");
 
-        m_staticLoadingIcon.SetActive(true);
+        m_loadingIcon.Display();
 
         yield return m_backEndAPI.Session_SignOut();
 
-        m_staticLoadingIcon.SetActive(false);
+        m_loadingIcon.Hide();
 
         CloseMenu();
     }   
@@ -140,7 +138,7 @@ public class OptionsFlow : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: LogIn() called");
 
-        m_staticLoadingIcon.SetActive(true);
+        m_loadingIcon.Display();
 
         yield return m_backEndAPI.Register_UpdateUser(
             m_user.m_handle,
@@ -154,7 +152,7 @@ public class OptionsFlow : MonoBehaviour
             m_setPasswordConfirmedMessage.SetActive(true);
         }
 
-        m_staticLoadingIcon.SetActive(false);
+        m_loadingIcon.Hide();
     }
         
     private IEnumerator DeleteAccountInternal()
@@ -163,7 +161,7 @@ public class OptionsFlow : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: ResetPassword() called");
 
-        m_staticLoadingIcon.SetActive(true);
+        m_loadingIcon.Display();
 
         yield return m_backEndAPI.Register_DeleteUser();
 
@@ -172,6 +170,6 @@ public class OptionsFlow : MonoBehaviour
             m_deleteConfirmedMessage.SetActive(true);
         }
 
-        m_staticLoadingIcon.SetActive(false);
+        m_loadingIcon.Hide();
     } 
 }

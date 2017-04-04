@@ -9,7 +9,7 @@ public class LoginFlow : MonoBehaviour
     // **************************
 
     [SerializeField] private AppDirector m_appDirector;  
-    [SerializeField] private GameObject m_staticLoadingIcon;
+    [SerializeField] private LoadingIcon m_loadingIcon;
     [SerializeField] private Text m_loginUsernameEmailInput;
     [SerializeField] private Text m_loginPasswordInput;
     [SerializeField] private Text m_signUpUsernameInput;
@@ -39,8 +39,6 @@ public class LoginFlow : MonoBehaviour
         m_coroutineQueue.StartLoop();
 
         m_backEndAPI = new BackEndAPI(this, m_errorMessage, m_user);
-
-        m_staticLoadingIcon.SetActive(false);
     }
 
     public void Restart()
@@ -110,14 +108,14 @@ public class LoginFlow : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: LogIn() called");
 
-        m_staticLoadingIcon.SetActive(true);
+        m_loadingIcon.Display();
 
         yield return m_backEndAPI.Session_SignIn(
             m_loginUsernameEmailInput.text, 
             m_loginPasswordInput.GetComponent<PasswordText>().GetString()
         );
 
-        m_staticLoadingIcon.SetActive(false);
+        m_loadingIcon.Hide();
     }
 
     private IEnumerator SignUpInternal()
@@ -126,7 +124,7 @@ public class LoginFlow : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: SignUp() called");
 
-        m_staticLoadingIcon.SetActive(true);
+        m_loadingIcon.Display();
 
         yield return m_backEndAPI.Register_CreateUser(
             m_signUpUsernameInput.text, 
@@ -135,7 +133,7 @@ public class LoginFlow : MonoBehaviour
             m_signUpPasswordConfirmationInput.GetComponent<PasswordText>().GetString()
         );
 
-        m_staticLoadingIcon.SetActive(false);
+        m_loadingIcon.Hide();
     } 
 
     private IEnumerator ResetPasswordInternal()
@@ -144,7 +142,7 @@ public class LoginFlow : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: ResetPassword() called");
 
-        m_staticLoadingIcon.SetActive(true);
+        m_loadingIcon.Display();
 
         yield return m_backEndAPI.Passwords_PasswordReset(
             m_resetPasswordEmailInput.text
@@ -155,6 +153,6 @@ public class LoginFlow : MonoBehaviour
             m_resetConfirmedText.SetActive(true);
         }
 
-        m_staticLoadingIcon.SetActive(false);
+        m_loadingIcon.Hide();
     } 
 }

@@ -10,7 +10,7 @@ public class ImageLoader : MonoBehaviour
     // **************************
 
     [SerializeField] private AppDirector m_appDirector;
-    [SerializeField] private GameObject m_staticLoadingIcon;
+    [SerializeField] private LoadingIcon m_loadingIcon;
 
     private const int kMaxNumTextures = 10; // 5 ImageSpheres + 1 Skybox + 4 spare textures
     private const int kLoadingTextureIndex = -1;
@@ -84,19 +84,28 @@ public class ImageLoader : MonoBehaviour
 
     private IEnumerator LoadImageFromPathIntoImageSphereInternal(ImageSphereController imageSphereController, int sphereIndex, string filePathAndIdentifier, bool showLoading)
     {
-        m_staticLoadingIcon.SetActive(showLoading);
+        if (showLoading)
+        {
+            m_loadingIcon.Display();
+        }
 
         int textureIndex = GetAvailableTextureIndex();
         yield return m_cppPlugin.LoadImageFromPathIntoImageSphere(imageSphereController, sphereIndex, filePathAndIdentifier, textureIndex);
 
-        m_staticLoadingIcon.SetActive(false);
+        if (showLoading)
+        {
+            m_loadingIcon.Hide();
+        }
     }
 
     private IEnumerator LoadImageFromURLIntoImageSphereInternal(ImageSphereController imageSphereController, int sphereIndex, string url, string imageIdentifier, bool showLoading)
     {
         yield return m_appDirector.VerifyInternetConnection();
 
-        m_staticLoadingIcon.SetActive(showLoading);
+        if (showLoading)
+        {
+            m_loadingIcon.Display();
+        }
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Downloading image and getting stream through GetImageStreamFromURL() with url: " + url);
         yield return m_threadJob.WaitFor();
@@ -118,7 +127,10 @@ public class ImageLoader : MonoBehaviour
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - WebRequest go a null stream for url: " + url);
         }
             
-        m_staticLoadingIcon.SetActive(false);
+        if (showLoading)
+        {
+            m_loadingIcon.Hide();
+        }
     }        
 
     private Stream GetImageStreamFromURL(string url)

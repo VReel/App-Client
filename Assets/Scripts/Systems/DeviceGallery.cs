@@ -20,10 +20,10 @@ public class DeviceGallery : MonoBehaviour
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
+    [SerializeField] private LoadingIcon m_loadingIcon;
     [SerializeField] private GameObject m_userMessage;
     [SerializeField] private GameObject m_errorMessage;
-    [SerializeField] private GameObject m_noGalleryImagesText;   
-    [SerializeField] private GameObject m_staticLoadingIcon;
+    [SerializeField] private GameObject m_noGalleryImagesText;
 
     private string m_imagesTopLevelDirectory;
     private int m_currGalleryImageIndex = 0;
@@ -150,7 +150,7 @@ public class DeviceGallery : MonoBehaviour
     {
         yield return m_appDirector.VerifyInternetConnection();
 
-        m_staticLoadingIcon.SetActive(true);
+        m_loadingIcon.Display();
         Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
         userTextComponent.text = "Began Uploading!";
         userTextComponent.color = Color.black;
@@ -220,13 +220,13 @@ public class DeviceGallery : MonoBehaviour
             userTextComponent.color = Color.red;
         }
 
-        m_staticLoadingIcon.SetActive(false);
+        m_loadingIcon.Hide();
     }
 
     // TODO: Only download 10 images at a time!
     private IEnumerator StoreAllImageGalleryFilePaths(string imagesTopLevelDirectory)
     {  
-        m_staticLoadingIcon.SetActive(true);
+        m_loadingIcon.Display();
 
         // 1) Find all files that could potentially be 360 images.
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling GetAllFileNamesRecursively()");
@@ -255,7 +255,7 @@ public class DeviceGallery : MonoBehaviour
         );
         yield return m_threadJob.WaitFor();
 
-        m_staticLoadingIcon.SetActive(false);
+        m_loadingIcon.Hide();
 
         bool noImagesInGallery = m_galleryImageFilePaths.Count <= 0;
         m_noGalleryImagesText.SetActive(noImagesInGallery); // If the user has yet take any 360-images then show them the NoGalleryImagesText!

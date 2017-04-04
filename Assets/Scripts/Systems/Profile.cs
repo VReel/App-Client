@@ -18,10 +18,10 @@ public class Profile : MonoBehaviour
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
+    [SerializeField] private LoadingIcon m_loadingIcon;
     [SerializeField] private GameObject m_userMessage;
     [SerializeField] private GameObject m_errorMessage;
     [SerializeField] private GameObject m_newUserText;   
-    [SerializeField] private GameObject m_staticLoadingIcon;
     [SerializeField] private GameObject m_confirmDeleteButton;
     [SerializeField] private GameObject m_cancelDeleteButton;
 
@@ -50,8 +50,6 @@ public class Profile : MonoBehaviour
         m_coroutineQueue.StartLoop();
 
         m_backEndAPI = new BackEndAPI(this, m_errorMessage, m_user);
-
-        m_staticLoadingIcon.SetActive(false);
 	}              
 
     public void PreDelete()
@@ -173,7 +171,7 @@ public class Profile : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Delete() called on post: " + id);
 
-        m_staticLoadingIcon.SetActive(true);
+        m_loadingIcon.Display();
 
         yield return m_backEndAPI.Posts_DeletePost(id);
 
@@ -193,7 +191,7 @@ public class Profile : MonoBehaviour
             userTextComponent.color = Color.red;
         }
 
-        m_staticLoadingIcon.SetActive(false);
+        m_loadingIcon.Hide();
     }
 
     private IEnumerator ShowProfileTextInternal()
@@ -215,7 +213,7 @@ public class Profile : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Getting First set of Posts for Logged in User");
 
-        m_staticLoadingIcon.SetActive(true); //NOTE: This should stop the following operation from ever being cut half-way through
+        m_loadingIcon.Display(); //NOTE: This should stop the following operation from ever being cut half-way through
 
         m_posts.Clear();
 
@@ -245,7 +243,7 @@ public class Profile : MonoBehaviour
         bool noImagesUploaded = m_posts.Count <= 0;
         m_newUserText.SetActive(noImagesUploaded); // If the user has yet to upload any images then show them the New User Text!
 
-        m_staticLoadingIcon.SetActive(false);
+        m_loadingIcon.Hide();
     }
 
     private IEnumerator StorePostsFromNextPage()
@@ -254,7 +252,7 @@ public class Profile : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Getting Posts for Logged in User from page: " + m_nextPageOfPosts);       
 
-        m_staticLoadingIcon.SetActive(true); //NOTE: This should stop the following operation from ever being cut half-way through
+        m_loadingIcon.Display(); //NOTE: This should stop the following operation from ever being cut half-way through
 
         yield return m_backEndAPI.Posts_GetPage(m_nextPageOfPosts);
 
@@ -276,7 +274,7 @@ public class Profile : MonoBehaviour
             }
         }
 
-        m_staticLoadingIcon.SetActive(false);
+        m_loadingIcon.Hide();
     }
 
     private IEnumerator DownloadThumbnailsAndSetSpheres()
@@ -294,7 +292,8 @@ public class Profile : MonoBehaviour
             {                   
                 string id = m_posts[postIndex].id;
                 string thumbnailURL = m_posts[postIndex].thumbnailUrl;
-                LoadImageInternalPlugin(thumbnailURL, sphereIndex, id, false);
+                bool showLoading = sphereIndex == 0; // The first one in the profile should do some loading to let the user know things are happening
+                LoadImageInternalPlugin(thumbnailURL, sphereIndex, id, showLoading);
             }
             else
             {
@@ -307,7 +306,7 @@ public class Profile : MonoBehaviour
     {
         yield return m_appDirector.VerifyInternetConnection();
 
-        m_staticLoadingIcon.SetActive(true);
+        m_loadingIcon.Display();
 
         yield return RefreshPostData(id);
 
@@ -316,7 +315,7 @@ public class Profile : MonoBehaviour
             LoadImageInternalPlugin(m_posts[ConvertIdToIndex(id)].originalUrl, -1, id, true); // a -1 sphereIndex maps to the SkyBox
         }
 
-        m_staticLoadingIcon.SetActive(false);
+        m_loadingIcon.Hide();
     }
 
     private IEnumerator RefreshPostsAtCurrIndex()
