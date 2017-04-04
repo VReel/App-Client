@@ -71,7 +71,6 @@
      <Compile Include="Assets\InternetReachabilityVerifier\Examples\CustomIRVExample.cs" />
      <Compile Include="Assets\InternetReachabilityVerifier\Examples\IRVExample.cs" />
      <Compile Include="Assets\InternetReachabilityVerifier\Examples\SkeletonIRVExample.cs" />
-     <Compile Include="Assets\Scripts\Systems\AWSS3Client.cs" />
      <Compile Include="Assets\Scripts\Systems\Analytics.cs" />
      <Compile Include="Assets\Scripts\Systems\AppDirector.cs" />
      <Compile Include="Assets\Scripts\Systems\BackEndAPI.cs" />
@@ -90,7 +89,6 @@
      <Compile Include="Assets\Scripts\Systems\Profile.cs" />
      <Compile Include="Assets\Scripts\Systems\ThreadJob.cs" />
      <Compile Include="Assets\Scripts\Systems\User.cs" />
-     <Compile Include="Assets\Scripts\Systems\UserLogin.cs" />
      <Compile Include="Assets\Scripts\UI\ImageSkybox.cs" />
      <Compile Include="Assets\Scripts\UI\ImageSphere.cs" />
      <Compile Include="Assets\Scripts\UI\LoadingIcon.cs" />
