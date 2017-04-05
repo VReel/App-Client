@@ -47,7 +47,7 @@ public class ThreadJob
 
     public void Start(Func<object> threadFunc)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Start on Thread has been called!");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Start on Thread has been called by = " + m_owner.name);
 
         //TODO: Make the ThreadFunc have its own "IsDone" flag, 
         //      because the current method means that only one ThreadFunc is allowed to run at a time...

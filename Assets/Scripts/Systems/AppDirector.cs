@@ -131,7 +131,6 @@ public class AppDirector : MonoBehaviour
         m_loginFlow.SetLoginFlowPage(0);
 
         m_menuController.SetLoginSubMenuActive(true);
-        m_loginFlow.Restart(); // This kicks off the coroutine queue again so LoginFlow works...
         m_appState = AppState.kLogin;
     }
 
@@ -142,13 +141,13 @@ public class AppDirector : MonoBehaviour
         m_imageSphereController.HideAllImageSpheres();
         SetMenuBar(true);
 
-        m_profile.ShowProfileText();
-
         m_imageLoader.InvalidateLoading();
         m_deviceGallery.InvalidateWork();
+        m_profile.InvalidateWork();
+
+        m_profile.ShowProfileText();
 
         m_menuController.SetProfileSubMenuActive(true);
-
         m_profile.OpenProfile();
         m_appState = AppState.kProfile;
     }
@@ -160,10 +159,11 @@ public class AppDirector : MonoBehaviour
         m_imageSphereController.HideAllImageSpheres();
         SetMenuBar(true);
 
-        m_deviceGallery.ShowGalleryText();
-
         m_imageLoader.InvalidateLoading();
+        m_deviceGallery.InvalidateWork();
         m_profile.InvalidateWork();
+
+        m_deviceGallery.ShowGalleryText();
 
         m_menuController.SetGallerySubMenuActive(true);
         m_deviceGallery.OpenAndroidGallery();

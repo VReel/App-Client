@@ -41,6 +41,7 @@ public class LoginFlow : MonoBehaviour
         m_backEndAPI = new BackEndAPI(this, m_errorMessage, m_user);
     }
 
+    /*
     public void Restart()
     {
         if (m_coroutineQueue == null)
@@ -50,6 +51,7 @@ public class LoginFlow : MonoBehaviour
 
         m_coroutineQueue.StartLoop();
     }
+    */
         
     public void SetLoginFlowPage(int pageNumber)
     {

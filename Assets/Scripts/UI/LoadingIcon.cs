@@ -38,6 +38,8 @@ public class LoadingIcon : MonoBehaviour
 
     private void UpdateIconVisibility()
     {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: LoadingIcon DisplayCount = " + m_iconDisplayCount);
+
         bool displayIcon = m_iconDisplayCount > 0;
         m_loadingIcon.SetActive(displayIcon);
 
