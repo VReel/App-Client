@@ -47,8 +47,8 @@ public class BackEndAPI
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: A BackEndAPI object was Created by = " + m_owner.name);
 
         // Version dependent code
-        m_vreelURL = m_vreelProductionURL; //m_vreelStagingURL; m_vreelProductionURL;
-        m_applicationID = m_vreelProductionApplicationID; //m_vreelStagingApplicationID; m_vreelProductionApplicationID;
+        m_vreelURL = m_vreelStagingURL; //m_vreelStagingURL; m_vreelProductionURL;
+        m_applicationID = m_vreelStagingApplicationID; //m_vreelStagingApplicationID; m_vreelProductionApplicationID;
 
         m_vreelClient = new RestClient(m_vreelURL);
         m_threadJob = new ThreadJob(owner);
