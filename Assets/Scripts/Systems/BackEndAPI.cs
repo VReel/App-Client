@@ -36,7 +36,7 @@ public class BackEndAPI
     private VReelJSON.Model_S3PresignedURL m_s3URLJSONResult;
 
     // **************************
-    // Public functions
+    // Public functions 
     // **************************
 
     public BackEndAPI(MonoBehaviour owner, GameObject errorMessage, User user)
