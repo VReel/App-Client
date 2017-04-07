@@ -29,7 +29,8 @@ public class Profile : MonoBehaviour
     {
         public string id { get; set; }
         public string thumbnailUrl { get; set; }
-        public string originalUrl { get; set; }       
+        public string originalUrl { get; set; }
+        public string caption { get; set; }
     }
 
     private List<Post> m_posts;
@@ -227,6 +228,7 @@ public class Profile : MonoBehaviour
                 Post newPost = new Post();
                 newPost.id = postData.id.ToString();
                 newPost.thumbnailUrl = postData.attributes.thumbnail_url.ToString();
+                newPost.caption = postData.attributes.caption.ToString();
                 m_posts.Add(newPost);
             }         
 
@@ -264,6 +266,7 @@ public class Profile : MonoBehaviour
                 Post newPost = new Post();
                 newPost.id = postData.id.ToString();
                 newPost.thumbnailUrl = postData.attributes.thumbnail_url.ToString();
+                newPost.caption = postData.attributes.caption.ToString();
                 m_posts.Add(newPost);
             }
 
@@ -347,6 +350,7 @@ public class Profile : MonoBehaviour
             {
                 m_posts[index].thumbnailUrl = m_backEndAPI.GetPostResult().data.attributes.thumbnail_url;
                 m_posts[index].originalUrl = m_backEndAPI.GetPostResult().data.attributes.original_url;
+                m_posts[index].caption = m_backEndAPI.GetPostResult().data.attributes.caption.ToString();
             }
         }
     }

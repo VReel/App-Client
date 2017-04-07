@@ -470,7 +470,7 @@ public class BackEndAPI
         if (Debug.isDebugBuild) LogRequest(request, response, (timeBeforeRequest - timeAfterRequest));
     }
         
-    public IEnumerator Posts_CreatePost(string _thumbnailKey, string _originalKey)
+    public IEnumerator Posts_CreatePost(string _thumbnailKey, string _originalKey, string _caption)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/posts' - Create new post");
         
@@ -483,7 +483,7 @@ public class BackEndAPI
         request.AddJsonBody(new { 
             thumbnail_key = _thumbnailKey, 
             original_key = _originalKey,
-            caption = ""
+            caption = _caption
         });
 
         yield return m_threadJob.WaitFor();

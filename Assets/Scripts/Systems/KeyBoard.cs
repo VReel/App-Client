@@ -169,7 +169,8 @@ public class KeyBoard : MonoBehaviour
     {
         m_defaultText = defaultText;
 
-        if (m_defaultText.CompareTo(m_objectiveTextObject.text) == 0)
+        var passwordText = m_objectiveTextObject.GetComponent<PasswordText>();
+        if (m_defaultText.CompareTo(m_objectiveTextObject.text) == 0 || passwordText != null)
         {
             m_objectiveTextObject.text = "";
             m_actualText = m_objectiveTextObject.text;
