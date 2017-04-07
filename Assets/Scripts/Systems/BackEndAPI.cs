@@ -16,8 +16,10 @@ public class BackEndAPI
     // Member Variables
     // **************************
 
+    const string m_vreelDevelopmentURL = "https://vreel-development.herokuapp.com/v1";
     const string m_vreelStagingURL = "https://vreel-staging.herokuapp.com/v1";
     const string m_vreelProductionURL = "https://api.vreel.io/v1";
+    const string m_vreelDevelopmentApplicationID = "6ziuhyy8teraucg8vjq5zigx45mqd1qzexmezewy1wuq44kk7eyitjkjz8qj9rcs";
     const string m_vreelStagingApplicationID = "366vapr5iwscaicaswycf8lvwetzmkj1r6loby9nc3uq26flimxpbqnadbt6vam3";
     const string m_vreelProductionApplicationID = "55z96ha833gxes1s1yf80bf1ckcq9ofdf6mm9n365f33bgvcf6n41usdaorya0pu";
 
@@ -47,14 +49,13 @@ public class BackEndAPI
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: A BackEndAPI object was Created by = " + m_owner.name);
 
         // Version dependent code
-        m_vreelURL = m_vreelStagingURL; //m_vreelStagingURL; m_vreelProductionURL;
-        m_applicationID = m_vreelStagingApplicationID; //m_vreelStagingApplicationID; m_vreelProductionApplicationID;
+        m_vreelURL = m_vreelDevelopmentURL; //m_vreelDevelopmentURL; m_vreelStagingURL; m_vreelProductionURL;
+        m_applicationID = m_vreelDevelopmentApplicationID; //m_vreelDevelopmentApplicationID; m_vreelStagingApplicationID; m_vreelProductionApplicationID;
 
         m_vreelClient = new RestClient(m_vreelURL);
         m_threadJob = new ThreadJob(owner);
 
-
-        ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) => true;
+        //ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) => true;
     }
 
     ~BackEndAPI()
@@ -135,7 +136,7 @@ public class BackEndAPI
             ShowErrors(response, "POST to '/users/'");
         }
 
-        if (Debug.isDebugBuild) LogRequest(request, response, (timeBeforeRequest - timeAfterRequest));
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
 
     public IEnumerator Register_GetUser()
@@ -181,7 +182,7 @@ public class BackEndAPI
             ShowErrors(response, "GET to '/users'");
         }
 
-        if (Debug.isDebugBuild) LogRequest(request, response, (timeBeforeRequest - timeAfterRequest));
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
 
     public IEnumerator Register_UpdateUser(string _handle, string _password, string _password_confirmation, string _current_password)
@@ -224,7 +225,7 @@ public class BackEndAPI
             ShowErrors(response, "PUT to '/users'");
         }
 
-        if (Debug.isDebugBuild) LogRequest(request, response, (timeBeforeRequest - timeAfterRequest));
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
 
     public IEnumerator Register_DeleteUser()
@@ -258,7 +259,7 @@ public class BackEndAPI
             ShowErrors(response, "DELETE to '/users'");
         }
 
-        if (Debug.isDebugBuild) LogRequest(request, response, (timeBeforeRequest - timeAfterRequest));
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
         
     public IEnumerator Passwords_PasswordReset(string _email)
@@ -293,7 +294,7 @@ public class BackEndAPI
             ShowErrors(response, "POST to '/users/password'");
         }
 
-        if (Debug.isDebugBuild) LogRequest(request, response, (timeBeforeRequest - timeAfterRequest));
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
         
     public IEnumerator Session_SignIn(string _login, string _password)
@@ -342,7 +343,7 @@ public class BackEndAPI
             ShowErrors(response, "POST to '/users/sign_in'");
         }
 
-        if (Debug.isDebugBuild) LogRequest(request, response, (timeBeforeRequest - timeAfterRequest));
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
         
     public IEnumerator Session_SignOut()
@@ -377,7 +378,7 @@ public class BackEndAPI
             ShowErrors(response, "DELETE to '/users/sign_out'");
         }
 
-        if (Debug.isDebugBuild) LogRequest(request, response, (timeBeforeRequest - timeAfterRequest));
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
         
     public IEnumerator S3_PresignedURL()
@@ -422,7 +423,7 @@ public class BackEndAPI
             ShowErrors(response, "GET to '/s3_presigned_url'");
         }
 
-        if (Debug.isDebugBuild) LogRequest(request, response, (timeBeforeRequest - timeAfterRequest));
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
         
     public IEnumerator Posts_GetPage(string page = "")
@@ -467,7 +468,7 @@ public class BackEndAPI
             ShowErrors(response, "GET to '/posts'");
         }
 
-        if (Debug.isDebugBuild) LogRequest(request, response, (timeBeforeRequest - timeAfterRequest));
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
         
     public IEnumerator Posts_CreatePost(string _thumbnailKey, string _originalKey, string _caption)
@@ -507,7 +508,7 @@ public class BackEndAPI
             ShowErrors(response, "POST to '/posts'");
         }
 
-        if (Debug.isDebugBuild) LogRequest(request, response, (timeBeforeRequest - timeAfterRequest));
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
 
     public IEnumerator Posts_GetPost(string postId)
@@ -550,7 +551,7 @@ public class BackEndAPI
             ShowErrors(response, "GET to '/posts/" + postId + "'");
         }
 
-        if (Debug.isDebugBuild) LogRequest(request, response, (timeBeforeRequest - timeAfterRequest));
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
 
     public IEnumerator Posts_DeletePost(string postId)
@@ -584,7 +585,7 @@ public class BackEndAPI
             ShowErrors(response, "DELETE to '/posts/" + postId + "'");
         }
 
-        if (Debug.isDebugBuild) LogRequest(request, response, (timeBeforeRequest - timeAfterRequest));
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
 
     // **************************
@@ -608,7 +609,7 @@ public class BackEndAPI
                     Debug.Log("Total Bytes Read = " + totalBytesRead);
                 }
             }
-            */
+    */
 
     private bool UploadObjectInternal(string url, string filePath, bool isDebugBuild)
     {
@@ -722,10 +723,9 @@ public class BackEndAPI
                 value = parameter.Value,
                 type = parameter.Type.ToString()
             }),
-            // ToString() here to have the method as a nice string otherwise it will just show the enum value
-            method = request.Method.ToString(),
-            // This will generate the actual Uri used in the request
-            uri = m_vreelClient.BuildUri(request),
+
+            method = request.Method.ToString(), // ToString() here to have the method as a nice string otherwise it will just show the enum value
+            uri = m_vreelClient.BuildUri(request), // This will generate the actual Uri used in the request
         };
 
         var responseToLog = new
@@ -733,8 +733,7 @@ public class BackEndAPI
             statusCode = response.StatusCode,
             content = response.Content,
             headers = response.Headers,
-            // The Uri that actually responded (could be different from the requestUri if a redirection occurred)
-            responseUri = response.ResponseUri,
+            responseUri = response.ResponseUri, // The Uri that actually responded (could be different from the requestUri if a redirection occurred)
             errorMessage = response.ErrorMessage,
         };
 

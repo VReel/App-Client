@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;                //Text
 using System;                        //IntPtrs
 using System.Collections;            //IEnumerator
 
@@ -11,16 +12,23 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
-
-    private int m_imageSphereIndex = -1; // ImageSphere's know their index - this is currently only for Debug!
-    private int m_currTextureIndex = -1; // ImageSphere's track the index of the texture they are pointing to
-    private int m_nextTextureIndex = -1; // ImageSphere's also track the index of the next texture they will point to - necessary because we don't swap textures immediately
-    private Texture2D m_imageSphereTexture;
-    private string m_imageIdentifier; // This is either (1) A Local Path on the Device or (2) A PostID from the backend
-    private CoroutineQueue m_coroutineQueue;
+    [SerializeField] private GameObject m_handleObject;
+    [SerializeField] private GameObject m_likesObject;
+    [SerializeField] private GameObject m_captionObject;
 
     private const float kMinShrink = 0.0005f; // Minimum value the sphere will shrink to...
     private const int kLoadingTextureIndex = -1;
+
+    private string m_imageIdentifier; // This is either (1) A Local Path on the Device or (2) A PostID from the backend
+    private Texture2D m_imageSphereTexture;
+    private string m_handle;
+    private string m_caption;
+    private int m_likes;
+
+    private int m_imageSphereIndex = -1; // ImageSphere's know their index into the ImageSphereController - this is currently only for Debug!
+    private int m_currTextureIndex = -1; // ImageSphere's track the index of the texture they are pointing to
+    private int m_nextTextureIndex = -1; // ImageSphere's also track the index of the next texture they will point to - necessary because we don't swap textures immediately
+    private CoroutineQueue m_coroutineQueue;   
 
     // **************************
     // Public functions
@@ -62,7 +70,7 @@ public class ImageSphere : MonoBehaviour
         m_coroutineQueue.Clear();
         if (!animateOnSet)
         {
-            SetTextureAndID();
+            UpdateTextureAndID();
         }
         else
         {
@@ -70,9 +78,19 @@ public class ImageSphere : MonoBehaviour
         }
     }
 
+    public void SetMetadata(string handle, string caption, int likes) 
+    { //NOTE: These are only set onto their UI elements when the Animation has ended!
+        m_handle = handle;
+        m_caption = caption;
+        m_likes = likes;
+    }
+
     public void Hide()
     {        
         m_imageIdentifier = "";
+        m_handle = "";
+        m_caption = "";
+        m_likes = -1;
 
         m_coroutineQueue.Clear();
         m_coroutineQueue.EnqueueAction(AnimateHide());
@@ -81,6 +99,11 @@ public class ImageSphere : MonoBehaviour
     public void ForceHide()
     {        
         m_imageIdentifier = "";
+        m_handle = "";
+        m_caption = "";
+        m_likes = -1;
+
+        UpdateMetadata();
 
         m_coroutineQueue.Clear();
         transform.localScale = new Vector3(kMinShrink, kMinShrink, kMinShrink);
@@ -90,15 +113,29 @@ public class ImageSphere : MonoBehaviour
     // Private/Helper functions
     // **************************
 
-    private void SetTextureAndID()
+    private void UpdateTextureAndID()
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: SetTextureAndID() called on sphere: " + (m_imageSphereIndex+1) );
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateTextureAndID() called on sphere: " + (m_imageSphereIndex+1) );
 
         gameObject.GetComponent<MeshRenderer>().material.mainTexture = m_imageSphereTexture;
 
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, false);
         m_currTextureIndex = m_nextTextureIndex;
         m_nextTextureIndex = kLoadingTextureIndex;
+    }
+
+    private void UpdateMetadata()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateMetada() called on sphere: " + (m_imageSphereIndex+1) );
+
+        m_handleObject.SetActive(m_handle.Length > 0);
+        m_handleObject.GetComponentInChildren<Text>().text = m_handle;
+
+        m_captionObject.SetActive(m_caption.Length > 0);
+        m_captionObject.GetComponentInChildren<Text>().text = m_caption;
+
+        m_likesObject.SetActive(m_likes >= 0);
+        m_likesObject.GetComponentInChildren<Text>().text = m_likes.ToString();
     }
 
     private IEnumerator AnimateSetTexture()
@@ -116,7 +153,7 @@ public class ImageSphere : MonoBehaviour
         }
 
         // Set texture and textureID
-        SetTextureAndID();
+        UpdateTextureAndID();
 
         // Scale up
         while (transform.localScale.magnitude < defaultScale)
@@ -124,6 +161,8 @@ public class ImageSphere : MonoBehaviour
             transform.localScale = transform.localScale / scalingFactor;
             yield return null;
         }
+
+        UpdateMetadata();
 
         transform.localScale = new Vector3(defaultScale, defaultScale, defaultScale);
     }
@@ -139,6 +178,8 @@ public class ImageSphere : MonoBehaviour
             transform.localScale = transform.localScale * scalingFactor;
             yield return null;
         }
+
+        UpdateMetadata();
 
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, false);
         m_currTextureIndex = kLoadingTextureIndex;

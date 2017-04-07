@@ -106,7 +106,23 @@ public class ImageSphereController : MonoBehaviour
         {
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: Invalid request to SetImageAtIndex: " + sphereIndex);
         }
-    }        
+    }    
+
+    public void SetMetadataAtIndex(int sphereIndex, string handle, string caption, int likes)
+    {
+        if (sphereIndex == -1)
+        {
+            //m_imageSkybox.SetMetadata(handle, caption, likes);
+        }
+        else if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
+        {
+            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetMetadata(handle, caption, likes);
+        }
+        else
+        {
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: Invalid request to SetMetadataAtIndex: " + sphereIndex);
+        }
+    }    
 
     public void HideSphereAtIndex(int sphereIndex)
     {

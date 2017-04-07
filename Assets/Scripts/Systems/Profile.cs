@@ -295,8 +295,11 @@ public class Profile : MonoBehaviour
             {                   
                 string id = m_posts[postIndex].id;
                 string thumbnailURL = m_posts[postIndex].thumbnailUrl;
+                string captionText = m_posts[postIndex].caption;
+
                 bool showLoading = sphereIndex == 0; // The first one in the profile should do some loading to let the user know things are happening
                 LoadImageInternalPlugin(thumbnailURL, sphereIndex, id, showLoading);
+                m_imageSphereController.SetMetadataAtIndex(sphereIndex, "", captionText, -1);
             }
             else
             {
@@ -315,7 +318,13 @@ public class Profile : MonoBehaviour
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
-            LoadImageInternalPlugin(m_posts[ConvertIdToIndex(id)].originalUrl, -1, id, true); // a -1 sphereIndex maps to the SkyBox
+            int sphereIndex = ConvertIdToIndex(id);
+            string originalURL = m_posts[sphereIndex].originalUrl;
+            string captionText = m_posts[sphereIndex].caption;
+
+            bool showLoading = true;
+            LoadImageInternalPlugin(originalURL, -1, id, showLoading); // a -1 sphereIndex maps to the SkyBox
+            m_imageSphereController.SetMetadataAtIndex(sphereIndex, "", captionText, -1);
         }
 
         m_loadingIcon.Hide();
@@ -369,6 +378,7 @@ public class Profile : MonoBehaviour
         */
     }
         
+    /*
     private IEnumerator LoadImageInternalUnity(WebResponse response, int sphereIndex, string imageIdentifier)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: ConvertStreamAndSetImage for " + imageIdentifier);
@@ -410,6 +420,7 @@ public class Profile : MonoBehaviour
 
         Resources.UnloadUnusedAssets();
     }
+    */
 
     private int ConvertIdToIndex(string id) //TODO: To remove this all I need to do is turn m_posts into a Map<ID, PostAttributes>...
     {

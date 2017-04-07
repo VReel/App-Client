@@ -27,6 +27,8 @@ public class DeviceGallery : MonoBehaviour
     [SerializeField] private GameObject m_captionText;
     [SerializeField] private GameObject m_uploadConfirmation;
 
+    private const int kMaxCaptionLength = 200; //NOTE: In API its 500 but in UI its currently 200
+
     private string m_imagesTopLevelDirectory;
     private int m_currGalleryImageIndex = 0;
     private List<string> m_galleryImageFilePaths;
@@ -217,11 +219,14 @@ public class DeviceGallery : MonoBehaviour
 
         // 5) Register Post as Created
         if (m_backEndAPI.IsLastAPICallSuccessful() && successfullyCreatedThumbnail)
-        {
+        {            
+            string captionText = m_captionText.GetComponentInChildren<Text>().text;
+            TruncateString(ref captionText, kMaxCaptionLength);
+
             yield return m_backEndAPI.Posts_CreatePost(
                 m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.key.ToString(), 
                 m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.key.ToString(),
-                m_captionText.GetComponentInChildren<Text>().text
+                captionText
             );
         }
 
@@ -424,6 +429,7 @@ public class DeviceGallery : MonoBehaviour
                 {
                     bool showLoading = sphereIndex == 0; // The first one in the gallery should do some loading to let the user know things are happening
                     m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(filePath, sphereIndex, showLoading));
+                    m_imageSphereController.SetMetadataAtIndex(sphereIndex, "", "", -1);
                 }
             }
             else
@@ -463,7 +469,7 @@ public class DeviceGallery : MonoBehaviour
     }
     */
 
-    public bool CreateThumbnail(string originalImagePath, string thumbnailImagePath, bool debugOn)
+    private bool CreateThumbnail(string originalImagePath, string thumbnailImagePath, bool debugOn)
     {
         if (debugOn) Debug.Log("------- VREEL: Called CreateThumbnail() with Thumbnail Path: " + thumbnailImagePath);
         AndroidJNI.AttachCurrentThread();
@@ -474,34 +480,13 @@ public class DeviceGallery : MonoBehaviour
         if (debugOn) Debug.Log("------- VREEL: Call CreateThumbnail() returned with: " + success);
 
         return success;
+    }
 
-        //yield return m_cppPlugin.LoadImageFromPath(originalImagePath);
-
-        //MemoryStream outputStream = new MemoryStream();
-
-        /*
-        System.Drawing.Image image = System.Drawing.Image.FromFile(originalImagePath);
-        System.Drawing.Image thumbnail = image.GetThumbnailImage(thumbnailWidth, thumbnailWidth/2, ()=>false, IntPtr.Zero);
-        thumbnail.Save(outputStream, System.Drawing.Imaging.ImageFormat.Jpeg);
-        */
-
-        /*
-        Bitmap sourceBitmap = new Bitmap(originalImagePath);
-        float heightRatio = sourceBitmap.Height / sourceBitmap.Width;
-        SizeF newSize = new SizeF(thumbnailWidth, thumbnailWidth * heightRatio);
-        Bitmap targetBitmap = new Bitmap((int) newSize.Width,(int) newSize.Height);
-
-        using (System.Drawing.Graphics graphics = System.Drawing.Graphics.FromImage(targetBitmap))
+    private void TruncateString(ref string value, int maxLength)
+    {
+        if (!string.IsNullOrEmpty(value) && value.Length > maxLength ) 
         {
-            graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-            graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-            graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
-            graphics.DrawImage(sourceBitmap, 0, 0, newSize.Width, newSize.Height);
-
-            targetBitmap.Save(outputStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+            value.Substring(0, maxLength); 
         }
-        */
-
-        //return outputStream.ToArray();
-    }        
+    }
 }

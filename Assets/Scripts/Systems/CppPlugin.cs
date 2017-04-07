@@ -109,37 +109,37 @@ public class CppPlugin
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromPathIntoImageSphere() from filePath: " + filePathAndIdentifier + ", with TextureIndex: " + textureIndex);
         yield return null;
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadIntoWorkingMemoryFromImagePath(), on background thread!");
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadIntoWorkingMemoryFromImagePath(), on background thread!");
         yield return m_threadJob.WaitFor();
         bool ranJobSuccessfully = false;
         m_threadJob.Start( () => 
             ranJobSuccessfully = LoadIntoWorkingMemoryFromImagePath(filePathForCpp)
         );
         yield return m_threadJob.WaitFor();
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadIntoWorkingMemoryFromImagePath(), ran Job Successully = " + ranJobSuccessfully); 
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadIntoWorkingMemoryFromImagePath(), ran Job Successully = " + ranJobSuccessfully); 
 
 
         //TODO: Make CreateEmptyTexture() more efficient - the problem is simply that a glTexImage2D() call is slow with large textures!
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateEmptyTexture() over textureIndex = " + textureIndex);
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateEmptyTexture() over textureIndex = " + textureIndex);
         yield return null;
         SetCurrTextureIndex(textureIndex);
         yield return m_waitForEndOfFrame;
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kCreateEmptyTexture);
         yield return m_waitForSeconds; // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateEmptyTexture(), Texture Handle = " + GetCurrStoredTexturePtr() );
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateEmptyTexture(), Texture Handle = " + GetCurrStoredTexturePtr() );
 
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadScanlinesIntoTextureFromWorkingMemory()");
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadScanlinesIntoTextureFromWorkingMemory()");
         while (IsLoadingIntoTexture())
         {            
             yield return m_waitForEndOfFrame;
             GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kLoadScanlinesIntoTextureFromWorkingMemory);
             yield return m_waitForSeconds;
         }
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadScanlinesIntoTextureFromWorkingMemory()");
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadScanlinesIntoTextureFromWorkingMemory()");
 
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateExternalTexture(), size of Texture is Width x Height = " + GetCurrStoredImageWidth() + " x " + GetCurrStoredImageHeight());
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateExternalTexture(), size of Texture is Width x Height = " + GetCurrStoredImageWidth() + " x " + GetCurrStoredImageHeight());
         yield return m_waitForEndOfFrame;
         m_lastTextureOperatedOn =
             Texture2D.CreateExternalTexture(
@@ -151,12 +151,12 @@ public class CppPlugin
                 GetCurrStoredTexturePtr()
             );
         yield return null;
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateExternalTexture()!");
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateExternalTexture()!");
 
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAtIndex()");
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAtIndex()");
         imageSphereController.SetImageAtIndex(sphereIndex, m_lastTextureOperatedOn, filePathAndIdentifier, textureIndex, true);
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Completed LoadImageFromPathIntoImageSphere() from filePath: " + filePathAndIdentifier + ", with TextureIndex: " + textureIndex);
     }   
@@ -166,7 +166,7 @@ public class CppPlugin
         yield return null;
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromStreamIntoImageSphere() for image: " + imageIdentifier + ", with TextureIndex: " + textureIndex);
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling ToByteArray(), on background thread!");
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling ToByteArray(), on background thread!");
         yield return m_threadJob.WaitFor();
         bool ranJobSuccessfully = false;
         byte[] myBinary = null;
@@ -174,9 +174,9 @@ public class CppPlugin
             ranJobSuccessfully = ToByteArray(imageStream, ref myBinary)
         );
         yield return m_threadJob.WaitFor();
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished ToByteArray(), ran Job Successully = " + ranJobSuccessfully);
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished ToByteArray(), ran Job Successully = " + ranJobSuccessfully);
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadIntoWorkingMemoryFromImagePath(), on background thread!");
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadIntoWorkingMemoryFromImagePath(), on background thread!");
         GCHandle rawDataHandle = GCHandle.Alloc(myBinary, GCHandleType.Pinned);
         IntPtr rawDataPtr = rawDataHandle.AddrOfPinnedObject();
         yield return m_threadJob.WaitFor();
@@ -186,30 +186,30 @@ public class CppPlugin
         );
         yield return m_threadJob.WaitFor();
         rawDataHandle.Free();
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadIntoWorkingMemoryFromImagePath(), ran Job Successully = " + ranJobSuccessfully); 
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadIntoWorkingMemoryFromImagePath(), ran Job Successully = " + ranJobSuccessfully); 
 
 
         //TODO: Make CreateEmptyTexture() more efficient - the problem is simply that a glTexImage2D() call is slow with large textures!
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateEmptyTexture()");
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateEmptyTexture()");
         yield return null;
         SetCurrTextureIndex(textureIndex);
         yield return m_waitForEndOfFrame;
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kCreateEmptyTexture);
         yield return m_waitForSeconds; // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateEmptyTexture(), Texture Handle = " + GetCurrStoredTexturePtr() );
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateEmptyTexture(), Texture Handle = " + GetCurrStoredTexturePtr() );
 
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadScanlinesIntoTextureFromWorkingMemory()");
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadScanlinesIntoTextureFromWorkingMemory()");
         while (IsLoadingIntoTexture())
         {            
             yield return m_waitForEndOfFrame;
             GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kLoadScanlinesIntoTextureFromWorkingMemory);
             yield return m_waitForSeconds; // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
         }
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadScanlinesIntoTextureFromWorkingMemory()");
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadScanlinesIntoTextureFromWorkingMemory()");
 
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateExternalTexture(), size of Texture is Width x Height = " + GetCurrStoredImageWidth() + " x " + GetCurrStoredImageHeight());
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateExternalTexture(), size of Texture is Width x Height = " + GetCurrStoredImageWidth() + " x " + GetCurrStoredImageHeight());
         yield return m_waitForEndOfFrame;
         m_lastTextureOperatedOn =
             Texture2D.CreateExternalTexture(
@@ -221,12 +221,12 @@ public class CppPlugin
                 GetCurrStoredTexturePtr()
             );
         yield return null;
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateExternalTexture()!");
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateExternalTexture()!");
 
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAtIndex()");
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAtIndex()");
         imageSphereController.SetImageAtIndex(sphereIndex, m_lastTextureOperatedOn, imageIdentifier, textureIndex, true);
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Completed LoadImageFromStreamIntoImageSphere() for image: " + imageIdentifier + ", with TextureIndex: " + textureIndex);
     }     
