@@ -50,6 +50,14 @@ public class Analytics : MonoBehaviour
         m_analyticsManager.RecordEvent(customEvent);
     }
 
+    public void SearchSelected()
+    {
+        CustomEvent customEvent = new CustomEvent("SearchSelected");
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
+
     public void GallerySelected()
     {
         CustomEvent customEvent = new CustomEvent("GallerySelected");

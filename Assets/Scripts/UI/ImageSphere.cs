@@ -138,9 +138,20 @@ public class ImageSphere : MonoBehaviour
         m_likesObject.GetComponentInChildren<Text>().text = m_likes.ToString();
     }
 
+    private void HideMetadata()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: HideMetadata() called on sphere");
+
+        m_handleObject.SetActive(false);
+        m_captionObject.SetActive(false);
+        m_likesObject.SetActive(false);
+    }
+
     private IEnumerator AnimateSetTexture()
     {   
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateSetTexture() began on sphere: " + (m_imageSphereIndex+1) );
+
+        HideMetadata();
 
         float scalingFactor = m_imageSphereController.GetScalingFactor();
         float defaultScale = m_imageSphereController.GetDefaultSphereScale();
@@ -170,6 +181,8 @@ public class ImageSphere : MonoBehaviour
     private IEnumerator AnimateHide()
     {        
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateHide() called on sphere: " + (m_imageSphereIndex+1));
+
+        HideMetadata();
 
         float scalingFactor = m_imageSphereController.GetScalingFactor();
 

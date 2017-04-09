@@ -6,7 +6,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{21994056-71B4-7107-13DD-CEB7317720FC}</ProjectGuid>
+    <ProjectGuid>{F7B72E6A-A8B1-B52E-0C79-8FBA2EDCA045}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -114,34 +114,34 @@
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityVR/RuntimeEditor/UnityEngine.VR.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.CognitoIdentity">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/AWSSDK/AWSSDK.CognitoIdentity.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/AWSSDK/AWSSDK.CognitoIdentity.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.CognitoSync">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/AWSSDK/AWSSDK.CognitoSync.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/AWSSDK/AWSSDK.CognitoSync.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.Core">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/AWSSDK/AWSSDK.Core.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/AWSSDK/AWSSDK.Core.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.DynamoDBv2">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/AWSSDK/AWSSDK.DynamoDBv2.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/AWSSDK/AWSSDK.DynamoDBv2.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.IdentityManagement">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/AWSSDK/AWSSDK.IdentityManagement.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/AWSSDK/AWSSDK.IdentityManagement.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.MobileAnalytics">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/AWSSDK/AWSSDK.MobileAnalytics.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/AWSSDK/AWSSDK.MobileAnalytics.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.S3">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/AWSSDK/AWSSDK.S3.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/AWSSDK/AWSSDK.S3.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.SecurityToken">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/AWSSDK/AWSSDK.SecurityToken.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/AWSSDK/AWSSDK.SecurityToken.dll</HintPath>
  </Reference>
  <Reference Include="AWSSDK.SQS">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/AWSSDK/AWSSDK.SQS.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/AWSSDK/AWSSDK.SQS.dll</HintPath>
  </Reference>
  <Reference Include="RestSharp">
- <HintPath>/Users/FoxBookAir/Documents/Unity/VR/VReelApp/Assets/Plugins/Android/RestSharp.dll</HintPath>
+ <HintPath>/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/Plugins/Android/RestSharp.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
