@@ -28,7 +28,8 @@ public class AppDirector : MonoBehaviour
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private Profile m_profile;
-    [SerializeField] private DeviceGallery m_deviceGallery;
+    [SerializeField] private Search m_search;
+    [SerializeField] private Gallery m_gallery;
     [SerializeField] private LoginFlow m_loginFlow;
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private InternetReachabilityVerifier m_internetReachabilityVerifier;
@@ -136,8 +137,9 @@ public class AppDirector : MonoBehaviour
         SetMenuBar(false);
 
         m_imageLoader.InvalidateLoading();
-        m_deviceGallery.InvalidateWork();
+        m_gallery.InvalidateWork();
         m_profile.InvalidateWork();
+        m_search.InvalidateWork();
         m_loginFlow.SetLoginFlowPage(0);
 
         m_menuController.SetLoginSubMenuActive(true);
@@ -152,8 +154,9 @@ public class AppDirector : MonoBehaviour
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
-        m_deviceGallery.InvalidateWork();
+        m_gallery.InvalidateWork();
         m_profile.InvalidateWork();
+        m_search.InvalidateWork();
 
         m_profile.ShowProfileText();
 
@@ -170,13 +173,14 @@ public class AppDirector : MonoBehaviour
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
-        m_deviceGallery.InvalidateWork();
+        m_gallery.InvalidateWork();
         m_profile.InvalidateWork();
+        m_search.InvalidateWork();
 
-        //m_search.ShowProfileText();
+        m_search.ShowSearchText();
 
         m_menuController.SetSearchSubMenuActive(true);
-        //m_search.OpenProfile();
+        m_search.OpenSearch();
         m_appState = AppState.kSearch;
     }
 
@@ -188,13 +192,13 @@ public class AppDirector : MonoBehaviour
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
-        m_deviceGallery.InvalidateWork();
+        m_gallery.InvalidateWork();
         m_profile.InvalidateWork();
 
-        m_deviceGallery.ShowGalleryText();
+        m_gallery.ShowGalleryText();
 
         m_menuController.SetGallerySubMenuActive(true);
-        m_deviceGallery.OpenAndroidGallery();
+        m_gallery.OpenAndroidGallery();
         m_appState = AppState.kGallery;
     }
 

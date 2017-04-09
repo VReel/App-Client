@@ -9,7 +9,7 @@ using System.Threading;             //Threading
 
 //using System.Drawing;
 
-public class DeviceGallery : MonoBehaviour 
+public class Gallery : MonoBehaviour 
 {    
     // **************************
     // Member Variables
@@ -21,8 +21,6 @@ public class DeviceGallery : MonoBehaviour
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private LoadingIcon m_loadingIcon;
-    [SerializeField] private GameObject m_userMessage;
-    [SerializeField] private GameObject m_errorMessage;
     [SerializeField] private GameObject m_noGalleryImagesText;
     [SerializeField] private GameObject m_captionText;
     [SerializeField] private GameObject m_uploadConfirmation;
@@ -52,13 +50,13 @@ public class DeviceGallery : MonoBehaviour
 
         m_threadJob = new ThreadJob(this);
 
-        m_backEndAPI = new BackEndAPI(this, m_errorMessage, m_user);
+        m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
     }
 
     public void ShowGalleryText()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Gallery Text!");
-        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
         userTextComponent.text = "Gallery";
         userTextComponent.color = Color.black;
     }
@@ -90,7 +88,7 @@ public class DeviceGallery : MonoBehaviour
 
         m_uploadConfirmation.SetActive(true);
 
-        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
         userTextComponent.text = "Great choice! Write a comment and Share your post! =)";
         userTextComponent.color = Color.black;
     }
@@ -101,7 +99,7 @@ public class DeviceGallery : MonoBehaviour
 
         m_uploadConfirmation.SetActive(false);
 
-        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
         userTextComponent.text = "Upload Cancelled =/";
         userTextComponent.color = Color.black;
     }
@@ -177,7 +175,7 @@ public class DeviceGallery : MonoBehaviour
         yield return m_appDirector.VerifyInternetConnection();
 
         m_loadingIcon.Display();
-        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
         userTextComponent.text = "Began Uploading!";
         userTextComponent.color = Color.black;
 
@@ -263,7 +261,7 @@ public class DeviceGallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling GetAllFileNamesRecursively()");
         List<string> files = new List<string>();
         bool isDebugBuild = Debug.isDebugBuild;
-        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
         m_threadJob.Start( () => 
             files = GetAllFileNamesRecursively(imagesTopLevelDirectory, userTextComponent, isDebugBuild)
         );

@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;               // Text
-using System;                       // Datetime
-using System.Collections;           // IEnumerator
-using System.Collections.Generic;   // List
-using System.IO;                    // Stream
+
+//using System;                       // Datetime
+//using System.Collections;           // IEnumerator
+//using System.Collections.Generic;   // List
+//using System.IO;                    // Stream
 
 //using System.Net;                   // HttpWebRequest -- only used in old function LoadImageInternalUnity()
 
-public class Profile : MonoBehaviour 
+public class Search : MonoBehaviour 
 {   
     // **************************
     // Member Variables
@@ -19,6 +20,9 @@ public class Profile : MonoBehaviour
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private LoadingIcon m_loadingIcon;
+    [SerializeField] private GameObject[] m_results;
+
+    /*
     [SerializeField] private GameObject m_newUserText;   
     [SerializeField] private GameObject m_confirmDeleteButton;
     [SerializeField] private GameObject m_cancelDeleteButton;
@@ -35,6 +39,9 @@ public class Profile : MonoBehaviour
     private string m_nextPageOfPosts = null;
     private BackEndAPI m_backEndAPI;
     private int m_currPostIndex = -1;
+    */
+
+    private BackEndAPI m_backEndAPI;
     private CoroutineQueue m_coroutineQueue;
 
     // **************************
@@ -43,14 +50,22 @@ public class Profile : MonoBehaviour
 
     public void Start() 
 	{
-        m_posts = new List<Post>();
+        //m_posts = new List<Post>();
 
         m_coroutineQueue = new CoroutineQueue( this );
         m_coroutineQueue.StartLoop();
 
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
+
+        HideAllResults();
 	}              
 
+    public int GetNumResults()
+    {
+        return m_results.GetLength(0);
+    }        
+
+    /*
     public void PreDelete()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreDelete() called on post: " + m_imageSkybox.GetImageIdentifier());
@@ -58,7 +73,7 @@ public class Profile : MonoBehaviour
         m_confirmDeleteButton.SetActive(true);
         m_cancelDeleteButton.SetActive(true);
 
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
+        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
         userTextComponent.text = "Definitely want to delete this post? =(";
         userTextComponent.color = Color.red;
     }
@@ -70,7 +85,7 @@ public class Profile : MonoBehaviour
         m_confirmDeleteButton.SetActive(false);
         m_cancelDeleteButton.SetActive(false);
 
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
+        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
         userTextComponent.text = "Delete Cancelled =)";
         userTextComponent.color = Color.black;
     }
@@ -82,21 +97,26 @@ public class Profile : MonoBehaviour
 
         m_coroutineQueue.EnqueueAction(DeletePostInternal(m_imageSkybox.GetImageIdentifier()));
     }
+    */
 
-    public void ShowProfileText()
+    public void ShowSearchText()
     {
-        m_coroutineQueue.EnqueueAction(ShowProfileTextInternal());
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Search Text!");
+        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
+        userTextComponent.text = "Search!";
+        userTextComponent.color = Color.black;
     }
         
     public void InvalidateWork() // This function is called in order to stop any ongoing work
     {        
-        m_currPostIndex = -1;
+        //m_currPostIndex = -1;
         if (m_coroutineQueue != null)
         {
             m_coroutineQueue.Clear();
         }
     }
         
+    /*
     public bool IsPostIndexAtStart()
     {
         return m_currPostIndex <= 0;
@@ -107,16 +127,18 @@ public class Profile : MonoBehaviour
         int numImageSpheres = m_imageSphereController.GetNumSpheres();
         int numPosts = m_posts.Count; 
         return m_currPostIndex >= (numPosts - numImageSpheres);       
-    }        
+    }      
+    */
 
-    public void OpenProfile()
+    public void OpenSearch()
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenProfile() called");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenSearch() called");
 
-        m_imageSphereController.SetAllImageSpheresToLoading();
-        m_coroutineQueue.EnqueueAction(StoreFirstPostsAndSetSpheres());
+        //m_imageSphereController.SetAllImageSpheresToLoading();
+        //m_coroutineQueue.EnqueueAction(StoreFirstPostsAndSetSpheres());
     }       
 
+    /*
     public void NextImages()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: NextImages() called");
@@ -159,11 +181,23 @@ public class Profile : MonoBehaviour
 
         m_coroutineQueue.EnqueueAction(DownloadOriginalImageInternal(imageIdentifier));
     }
+    */
 
     // **************************
     // Private/Helper functions
     // **************************
 
+    private void HideAllResults()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling HideAllResults()");
+
+        for (int resultIndex = 0; resultIndex < GetNumResults(); resultIndex++)
+        {
+            m_results[resultIndex].SetActive(false);
+        }
+    }
+
+    /*
     private IEnumerator DeletePostInternal(string id)
     {
         yield return m_appDirector.VerifyInternetConnection();
@@ -174,7 +208,7 @@ public class Profile : MonoBehaviour
 
         yield return m_backEndAPI.Posts_DeletePost(id);
 
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
+        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {            
             // Report Success in Profile
@@ -192,20 +226,9 @@ public class Profile : MonoBehaviour
 
         m_loadingIcon.Hide();
     }
+    */
 
-    private IEnumerator ShowProfileTextInternal()
-    {
-        while (!m_user.IsLoggedIn() || !m_user.IsUserDataStored())
-        {
-            yield return null;
-        }
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Profile Text!");
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
-        userTextComponent.text = "Hi " + m_user.m_handle + "! =D";
-        userTextComponent.color = Color.black;
-    }
-      
+    /*
     private IEnumerator StoreFirstPostsAndSetSpheres()
     {
         yield return m_appDirector.VerifyInternetConnection();
@@ -327,7 +350,9 @@ public class Profile : MonoBehaviour
 
         m_loadingIcon.Hide();
     }
+    */
 
+    /*
     private IEnumerator RefreshPostsAtCurrIndex()
     {
         yield return m_appDirector.VerifyInternetConnection();
@@ -361,6 +386,7 @@ public class Profile : MonoBehaviour
             }
         }
     }
+    */
 
     private void LoadImageInternalPlugin(string url, int sphereIndex, string imageIdentifier, bool showLoading)
     {        
@@ -375,51 +401,8 @@ public class Profile : MonoBehaviour
         }
         */
     }
-        
+
     /*
-    private IEnumerator LoadImageInternalUnity(WebResponse response, int sphereIndex, string imageIdentifier)
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: ConvertStreamAndSetImage for " + imageIdentifier);
-
-        const int kNumIterationsPerFrame = 150;
-        byte[] myBinary = null;
-        using (var stream = response.GetResponseStream())
-        {            
-            using( MemoryStream ms = new MemoryStream() )
-            {
-                int iterations = 0;
-                int byteCount = 0;
-                do
-                {
-                    byte[] buf = new byte[1024];
-                    byteCount = stream.Read(buf, 0, 1024);
-                    ms.Write(buf, 0, byteCount);
-                    iterations++;
-                    if (iterations % kNumIterationsPerFrame == 0)
-                    {                        
-                        yield return null;
-                    }
-                } 
-                while(stream.CanRead && byteCount > 0);
-
-                myBinary = ms.ToArray();
-            }
-        }
-
-        // The following is generally coming out to around 6-7MB in size...
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished iterating, length of byte[] is " + myBinary.Length);
-
-        Texture2D newImage = new Texture2D(2,2); 
-        newImage.LoadImage(myBinary);
-        m_imageSphereController.SetImageAtIndex(sphereIndex, newImage, imageIdentifier, -1 , true);
-        yield return null;
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished Setting Image!");
-
-        Resources.UnloadUnusedAssets();
-    }
-    */
-
     private int ConvertIdToIndex(string id) //TODO: To remove this all I need to do is turn m_posts into a Map<ID, PostAttributes>...
     {
         int index = 0;    
@@ -439,4 +422,5 @@ public class Profile : MonoBehaviour
 
         return index;
     }
+    */
 }

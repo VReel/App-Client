@@ -11,6 +11,7 @@ public class User : MonoBehaviour
     // Member Variables
     // **************************
 
+    [SerializeField] private GameObject m_userMessage;
     [SerializeField] private GameObject m_errorMessage;
 
     [Serializable]
@@ -81,6 +82,16 @@ public class User : MonoBehaviour
         {
             File.Delete(m_dataFilePath);
         }
+    }
+
+    public GameObject GetUserMessage()
+    {
+        return m_userMessage;
+    }
+
+    public GameObject GetErrorMessage()
+    {
+        return m_errorMessage;
     }
 
     public string GetClient()

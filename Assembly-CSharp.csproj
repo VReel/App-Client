@@ -64,8 +64,8 @@
      <Compile Include="Assets\Scripts\Systems\CoroutineQueue.cs" />
      <Compile Include="Assets\Scripts\Systems\CppPlugin.cs" />
      <Compile Include="Assets\Scripts\Systems\DeserialisationModelsAPI.cs" />
-     <Compile Include="Assets\Scripts\Systems\DeviceGallery.cs" />
      <Compile Include="Assets\Scripts\Systems\FPSDisplay.cs" />
+     <Compile Include="Assets\Scripts\Systems\Gallery.cs" />
      <Compile Include="Assets\Scripts\Systems\ImageLoader.cs" />
      <Compile Include="Assets\Scripts\Systems\ImageSphereController.cs" />
      <Compile Include="Assets\Scripts\Systems\InternetReachabilityVerifier.cs" />
@@ -74,6 +74,7 @@
      <Compile Include="Assets\Scripts\Systems\MenuController.cs" />
      <Compile Include="Assets\Scripts\Systems\OptionsFlow.cs" />
      <Compile Include="Assets\Scripts\Systems\Profile.cs" />
+     <Compile Include="Assets\Scripts\Systems\Search.cs" />
      <Compile Include="Assets\Scripts\Systems\ThreadJob.cs" />
      <Compile Include="Assets\Scripts\Systems\User.cs" />
      <Compile Include="Assets\Scripts\UI\ImageSkybox.cs" />

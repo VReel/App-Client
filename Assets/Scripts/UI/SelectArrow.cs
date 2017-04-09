@@ -18,7 +18,7 @@ public class SelectArrow : MonoBehaviour
     [SerializeField] private Image m_transparentBackgroundImage;
     [SerializeField] private ArrowType m_arrowType = ArrowType.kNext;
     [SerializeField] private MenuController m_menuController;
-    [SerializeField] private DeviceGallery m_deviceGallery;
+    [SerializeField] private Gallery m_deviceGallery;
     [SerializeField] private Profile m_profile;
 
     // **************************
