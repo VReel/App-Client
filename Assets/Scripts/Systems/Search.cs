@@ -134,6 +134,8 @@ public class Search : MonoBehaviour
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenSearch() called");
 
+        //TODO: Open a place to search for text and link that to the API!
+
         //m_imageSphereController.SetAllImageSpheresToLoading();
         //m_coroutineQueue.EnqueueAction(StoreFirstPostsAndSetSpheres());
     }       

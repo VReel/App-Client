@@ -216,9 +216,9 @@ public class Profile : MonoBehaviour
 
         m_posts.Clear();
 
-        yield return m_backEndAPI.Posts_GetPage();
+        yield return m_backEndAPI.Posts_GetMyPage();
 
-        VReelJSON.Model_Posts posts = m_backEndAPI.GetAllPostsResult();
+        VReelJSON.Model_Posts posts = m_backEndAPI.GetPostsResult();
         if (posts != null)
         {
             foreach (VReelJSON.PostsData postData in posts.data)
@@ -254,9 +254,9 @@ public class Profile : MonoBehaviour
 
         m_loadingIcon.Display(); //NOTE: This should stop the following operation from ever being cut half-way through
 
-        yield return m_backEndAPI.Posts_GetPage(m_nextPageOfPosts);
+        yield return m_backEndAPI.Posts_GetMyPage(m_nextPageOfPosts);
 
-        VReelJSON.Model_Posts posts = m_backEndAPI.GetAllPostsResult();
+        VReelJSON.Model_Posts posts = m_backEndAPI.GetPostsResult();
         if (posts != null)
         {
             foreach (VReelJSON.PostsData postData in posts.data)

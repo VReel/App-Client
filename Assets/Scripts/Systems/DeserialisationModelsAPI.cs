@@ -64,11 +64,72 @@ namespace VReelJSON
 
     public class UserAttributes
     {
-        public string email { get; set; }
         public string handle { get; set; }
         public string name { get; set; }
+        public string thumbnail_url { get; set; }
+        public int follower_count { get; set; }
+        public int following_count { get; set; }
+        public int post_count { get; set; }
+        public string email { get; set; }
         public string profile { get; set; }
+        public string original_url { get; set; }
+    }
+
+    //--------------------------------------------
+
+    public class Model_Users
+    {
+        public List<UserData> data { get; set; }
+    }
+
+    //--------------------------------------------
+
+    public class Model_Tag
+    {
+        public TagData data { get; set; }
+    }
+
+    public class TagData
+    {
+        public string id { get; set; }
+        public string type { get; set; }
+        public UserAttributes attributes { get; set; }
+    }
+
+    public class TagAttributes
+    {
+        public string tag { get; set; }
     }       
+
+    //--------------------------------------------
+
+    public class Model_Tags
+    {
+        public List<TagData> data { get; set; }
+    }
+
+    //--------------------------------------------
+
+    public class Model_Post
+    {     
+        public PostData data { get; set; }
+    }
+
+    public class PostData
+    {
+        public string id { get; set; }
+        public string type { get; set; }
+        public PostAttributes attributes { get; set; }
+    }
+
+    public class PostAttributes
+    {
+        public string thumbnail_url { get; set; }
+        public string original_url { get; set; }
+        public string caption { get; set; }
+        public string created_at { get; set; }
+        public bool edited { get; set; }
+    }     
 
     //--------------------------------------------
 
@@ -104,29 +165,6 @@ namespace VReelJSON
         public bool next_page { get; set; }
         public string next_page_id { get; set; }
     }
-
-    //--------------------------------------------
-
-    public class Model_Post
-    {     
-        public PostData data { get; set; }
-    }
-
-    public class PostData
-    {
-        public string id { get; set; }
-        public string type { get; set; }
-        public PostAttributes attributes { get; set; }
-    }
-
-    public class PostAttributes
-    {
-        public string thumbnail_url { get; set; }
-        public string original_url { get; set; }
-        public string caption { get; set; }
-        public string created_at { get; set; }
-        public bool edited { get; set; }
-    }       
 
     //--------------------------------------------
 }
