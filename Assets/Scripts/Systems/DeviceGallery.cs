@@ -24,6 +24,10 @@ public class DeviceGallery : MonoBehaviour
     [SerializeField] private GameObject m_userMessage;
     [SerializeField] private GameObject m_errorMessage;
     [SerializeField] private GameObject m_noGalleryImagesText;
+    [SerializeField] private GameObject m_captionText;
+    [SerializeField] private GameObject m_uploadConfirmation;
+
+    private const int kMaxCaptionLength = 200; //NOTE: In API its 500 but in UI its currently 200
 
     private string m_imagesTopLevelDirectory;
     private int m_currGalleryImageIndex = 0;
@@ -79,12 +83,34 @@ public class DeviceGallery : MonoBehaviour
         int numFiles = m_galleryImageFilePaths.Count;
         return m_currGalleryImageIndex >= (numFiles - numImageSpheres);       
     }
+
+    public void PreUpload()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreUpload() called on post: " + m_imageSkybox.GetImageIdentifier());
+
+        m_uploadConfirmation.SetActive(true);
+
+        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        userTextComponent.text = "Great choice! Write a comment and Share your post! =)";
+        userTextComponent.color = Color.black;
+    }
+
+    public void CancelUpload()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelUpload() called");
+
+        m_uploadConfirmation.SetActive(false);
+
+        Text userTextComponent = m_userMessage.GetComponentInChildren<Text>();
+        userTextComponent.text = "Upload Cancelled =/";
+        userTextComponent.color = Color.black;
+    }
         
     public void UploadImage()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: UploadImage() called");
+    {        
+        m_uploadConfirmation.SetActive(true);
 
-        m_coroutineQueue.EnqueueAction(UploadImageInternal());
+        m_coroutineQueue.EnqueueAction(UploadImageInternal(m_imageSkybox.GetImageIdentifier()));
     }
 
     public void OpenAndroidGallery()
@@ -146,7 +172,7 @@ public class DeviceGallery : MonoBehaviour
     // Private/Helper functions
     // **************************
 
-    private IEnumerator UploadImageInternal() //NOTE: Ensured that this function cannot be stopped midway because the LoadingIcon blocks UI
+    private IEnumerator UploadImageInternal(string filePath) //NOTE: Ensured that this function cannot be stopped midway because the LoadingIcon blocks UI
     {
         yield return m_appDirector.VerifyInternetConnection();
 
@@ -155,13 +181,13 @@ public class DeviceGallery : MonoBehaviour
         userTextComponent.text = "Began Uploading!";
         userTextComponent.color = Color.black;
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Running UploadImageInternal() for image: " + m_imageSkybox.GetImageIdentifier());
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Running UploadImageInternal() for image with path: " + filePath);
 
         // 1) Get PresignedURL
         yield return m_backEndAPI.S3_PresignedURL();
 
         // 2) Create Thumbnail from Original image
-        string originalImageFilePath = m_imageSkybox.GetImageIdentifier();
+        string originalImageFilePath = filePath;
         string tempThumbnailPath = m_imagesTopLevelDirectory + "/tempThumbnailImage.png";
         bool successfullyCreatedThumbnail = false;
         if (m_backEndAPI.IsLastAPICallSuccessful())
@@ -193,10 +219,14 @@ public class DeviceGallery : MonoBehaviour
 
         // 5) Register Post as Created
         if (m_backEndAPI.IsLastAPICallSuccessful() && successfullyCreatedThumbnail)
-        {
+        {            
+            string captionText = m_captionText.GetComponentInChildren<Text>().text;
+            TruncateString(ref captionText, kMaxCaptionLength);
+
             yield return m_backEndAPI.Posts_CreatePost(
                 m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.key.ToString(), 
-                m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.key.ToString()
+                m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.key.ToString(),
+                captionText
             );
         }
 
@@ -220,6 +250,7 @@ public class DeviceGallery : MonoBehaviour
             userTextComponent.color = Color.red;
         }
 
+        m_uploadConfirmation.SetActive(false);
         m_loadingIcon.Hide();
     }
 
@@ -398,6 +429,7 @@ public class DeviceGallery : MonoBehaviour
                 {
                     bool showLoading = sphereIndex == 0; // The first one in the gallery should do some loading to let the user know things are happening
                     m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(filePath, sphereIndex, showLoading));
+                    m_imageSphereController.SetMetadataAtIndex(sphereIndex, "", "", -1);
                 }
             }
             else
@@ -437,7 +469,7 @@ public class DeviceGallery : MonoBehaviour
     }
     */
 
-    public bool CreateThumbnail(string originalImagePath, string thumbnailImagePath, bool debugOn)
+    private bool CreateThumbnail(string originalImagePath, string thumbnailImagePath, bool debugOn)
     {
         if (debugOn) Debug.Log("------- VREEL: Called CreateThumbnail() with Thumbnail Path: " + thumbnailImagePath);
         AndroidJNI.AttachCurrentThread();
@@ -448,34 +480,13 @@ public class DeviceGallery : MonoBehaviour
         if (debugOn) Debug.Log("------- VREEL: Call CreateThumbnail() returned with: " + success);
 
         return success;
+    }
 
-        //yield return m_cppPlugin.LoadImageFromPath(originalImagePath);
-
-        //MemoryStream outputStream = new MemoryStream();
-
-        /*
-        System.Drawing.Image image = System.Drawing.Image.FromFile(originalImagePath);
-        System.Drawing.Image thumbnail = image.GetThumbnailImage(thumbnailWidth, thumbnailWidth/2, ()=>false, IntPtr.Zero);
-        thumbnail.Save(outputStream, System.Drawing.Imaging.ImageFormat.Jpeg);
-        */
-
-        /*
-        Bitmap sourceBitmap = new Bitmap(originalImagePath);
-        float heightRatio = sourceBitmap.Height / sourceBitmap.Width;
-        SizeF newSize = new SizeF(thumbnailWidth, thumbnailWidth * heightRatio);
-        Bitmap targetBitmap = new Bitmap((int) newSize.Width,(int) newSize.Height);
-
-        using (System.Drawing.Graphics graphics = System.Drawing.Graphics.FromImage(targetBitmap))
+    private void TruncateString(ref string value, int maxLength)
+    {
+        if (!string.IsNullOrEmpty(value) && value.Length > maxLength ) 
         {
-            graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-            graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-            graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
-            graphics.DrawImage(sourceBitmap, 0, 0, newSize.Width, newSize.Height);
-
-            targetBitmap.Save(outputStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+            value.Substring(0, maxLength); 
         }
-        */
-
-        //return outputStream.ToArray();
-    }        
+    }
 }

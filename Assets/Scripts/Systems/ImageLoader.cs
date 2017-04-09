@@ -124,7 +124,7 @@ public class ImageLoader : MonoBehaviour
         }
         else
         {
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - WebRequest go a null stream for url: " + url);
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - WebRequest got a null stream for url: " + url);
         }
             
         if (showLoading)

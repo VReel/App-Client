@@ -26,6 +26,7 @@ public class User : MonoBehaviour
     public string m_name {get; set;}
     public string m_profileDescription {get; set;}
 
+    const string m_vreelDevelopmentSaveFile = "vreelDevelopmentSave.dat";
     const string m_vreelStagingSaveFile = "vreelStagingSave.dat";
     const string m_vreelProductionSaveFile = "vreelProductionSave.dat";
     private string m_vreelSaveFile = "";
@@ -44,7 +45,7 @@ public class User : MonoBehaviour
     public void Start()
     {
         // Version dependent code
-        m_vreelSaveFile = m_vreelProductionSaveFile; //m_vreelStagingSaveFile; m_vreelProductionSaveFile;
+        m_vreelSaveFile = m_vreelDevelopmentSaveFile; //m_vreelDevelopmentSaveFile; m_vreelStagingSaveFile; m_vreelProductionSaveFile;
         m_dataFilePath = Application.persistentDataPath + m_vreelSaveFile;
 
         m_loginData = new LoginData();
