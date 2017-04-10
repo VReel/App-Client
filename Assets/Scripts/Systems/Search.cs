@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;               // Text
+using UnityEngine.UI;                 // Text
+using System;                         // StringComparer
+using System.Collections;             // IEnumerator
+using System.Globalization;           // CompareOptions
+using System.Text.RegularExpressions; // Regex
 
 //using System;                       // Datetime
-//using System.Collections;           // IEnumerator
 //using System.Collections.Generic;   // List
 //using System.IO;                    // Stream
 
@@ -14,13 +17,27 @@ public class Search : MonoBehaviour
     // Member Variables
     // **************************
 
+    public enum SearchState
+    {
+        kNone = -1,     // This should only be the state at the start when opening the Search menu
+        kUser =  0,     // Searching for a User
+        kTag =  1       // Searching for a HashTag
+    }
+
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private LoadingIcon m_loadingIcon;
+    [SerializeField] private GameObject[] m_searchTypes;
     [SerializeField] private GameObject[] m_results;
+    [SerializeField] private GameObject m_searchInput;
+
+    private Text m_searchInputText;
+    private SearchState m_searchState;
+    private string m_currSearchString;
+    private string m_workingString; //This is an attempt to stop new'ing strings every frame!
 
     /*
     [SerializeField] private GameObject m_newUserText;   
@@ -57,8 +74,37 @@ public class Search : MonoBehaviour
 
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
 
+        m_searchInputText = m_searchInput.GetComponentInChildren<Text>();
+        m_searchState = SearchState.kNone;
+        m_currSearchString = "";
+
         HideAllResults();
-	}              
+	}      
+
+    public void Update()
+    {
+        if (m_searchState != SearchState.kNone)
+        {
+            Text searchTextComponent = m_searchInput.GetComponentInChildren<Text>();
+            m_workingString = Regex.Replace(searchTextComponent.text, @"\s+[|]", String.Empty);
+            bool stringChanged = !String.Equals(m_currSearchString, m_workingString, StringComparison.OrdinalIgnoreCase);
+            if (stringChanged)
+            {
+                m_currSearchString = searchTextComponent.text;
+                if (m_currSearchString.Length > 0)
+                {
+                    if (m_searchState == SearchState.kUser)
+                    {
+                        m_coroutineQueue.EnqueueAction(UpdateUserSearch());
+                    }
+                    else if (m_searchState == SearchState.kTag)
+                    {
+                        m_coroutineQueue.EnqueueAction(UpdateTagSearch());
+                    }
+                }
+            }
+        }
+    }
 
     public int GetNumResults()
     {
@@ -114,6 +160,8 @@ public class Search : MonoBehaviour
         {
             m_coroutineQueue.Clear();
         }
+
+        ClearSearch();
     }
         
     /*
@@ -134,24 +182,27 @@ public class Search : MonoBehaviour
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenSearch() called");
 
-        //TODO: Open a place to search for text and link that to the API!
-
-        //m_imageSphereController.SetAllImageSpheresToLoading();
-        //m_coroutineQueue.EnqueueAction(StoreFirstPostsAndSetSpheres());
+        ClearSearch();
     }       
 
-    public void OpenProfileSearch()
+    public void OpenUserSearch()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenProfileSearch() called");
 
-
+        m_searchState = SearchState.kUser;
+        OnButtonSelected(m_searchTypes[(int)m_searchState]);  // button 0 = Profile search button
+        m_searchInputText.text = "";
+        m_searchInput.SetActive(true);
     }
 
     public void OpenTagSearch()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenTagSearch() called");
 
-
+        m_searchState = SearchState.kTag;
+        OnButtonSelected(m_searchTypes[(int)m_searchState]);  // button 1 = Tag search button
+        m_searchInputText.text = "";
+        m_searchInput.SetActive(true);
     }
 
     /*
@@ -203,6 +254,14 @@ public class Search : MonoBehaviour
     // Private/Helper functions
     // **************************
 
+    private void ClearSearch()
+    {
+        m_searchState = SearchState.kNone;
+        OnButtonSelected(null); // Deselect all buttons
+        m_searchInput.SetActive(false);
+        m_currSearchString = "";
+    }
+
     private void HideAllResults()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling HideAllResults()");
@@ -210,6 +269,92 @@ public class Search : MonoBehaviour
         for (int resultIndex = 0; resultIndex < GetNumResults(); resultIndex++)
         {
             m_results[resultIndex].SetActive(false);
+        }
+    }
+
+    private void OnButtonSelected(GameObject button)
+    {
+        foreach(GameObject currButton in m_searchTypes)
+        {       
+            var searchTypeButton = currButton.GetComponent<SelectedButton>();
+            if (button == currButton)
+            {
+                searchTypeButton.OnButtonSelected();
+            }
+            else 
+            {
+                searchTypeButton.OnButtonDeselected();
+            }
+        }
+    }
+
+    private IEnumerator UpdateUserSearch()
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateUserSearch() called");
+
+        yield return m_backEndAPI.Search_SearchForUsers(
+            m_currSearchString
+        );
+
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            SetUserResults();
+        }
+    }
+
+    private IEnumerator UpdateTagSearch()
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateTagSearch() called");
+
+        yield return m_backEndAPI.Search_SearchForHashTags(
+            m_currSearchString
+        );
+
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            SetTagResults();
+        }
+    }
+
+    private void SetUserResults()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetUserResults()");
+
+        int numUsers = m_backEndAPI.GetUsersResult().data.Count;
+        for (int resultIndex = 0, userIndex = 0; resultIndex < GetNumResults(); resultIndex++, userIndex++)
+        {            
+            if (userIndex < numUsers)
+            {
+                m_results[resultIndex].GetComponentInChildren<Text>().text = m_backEndAPI.GetUsersResult().data[userIndex].attributes.handle;
+                m_results[resultIndex].SetActive(true);
+            }
+            else
+            {
+                m_results[resultIndex].SetActive(false);
+            }
+        }
+    }
+
+    private void SetTagResults()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetTagResults()");
+
+        int numTags = m_backEndAPI.GetTagsResult().data.Count;
+        for (int resultIndex = 0, tagIndex = 0; resultIndex < GetNumResults(); resultIndex++, tagIndex++)
+        {
+            if (tagIndex < numTags)
+            {
+                m_results[resultIndex].GetComponentInChildren<Text>().text = m_backEndAPI.GetTagsResult().data[tagIndex].attributes.tag;
+                m_results[resultIndex].SetActive(true);
+            }
+            else
+            {
+                m_results[resultIndex].SetActive(false);
+            }
         }
     }
 

@@ -4,12 +4,6 @@ using UnityEngine.VR;       //VRSettings
 using UnityEngine.Events;   //UnityEvent
 using System;
 
-
-/* Up - 333333
- * Over - b9b9b9
- * Down - dbdbdb
- */
-
 namespace VRStandardAssets.Menu
 {
     public class MenuButton : MonoBehaviour

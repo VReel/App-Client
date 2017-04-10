@@ -745,13 +745,12 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
-
-    // ----- CURRENTLY UNUSED ----- //
-    public IEnumerator Search_SearchForUser(string user)
+        
+    public IEnumerator Search_SearchForUsers(string user)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/search/users/" + user + "' - Search for user");
 
-        var request = new RestRequest("'/search/users/" + user, Method.GET);
+        var request = new RestRequest("/search/users/" + user, Method.GET);
         request.AddHeader("vreel-application-id", m_applicationID);
         request.AddHeader("client", m_user.GetClient());
         request.AddHeader("uid", m_user.GetUID());
@@ -789,8 +788,7 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
-
-    // ----- CURRENTLY UNUSED ----- //
+        
     public IEnumerator Search_SearchForHashTags(string hashTag)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/search/hash_tags/" + hashTag + "' - Search for hash tags");

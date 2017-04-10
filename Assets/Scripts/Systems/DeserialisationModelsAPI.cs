@@ -93,7 +93,7 @@ namespace VReelJSON
     {
         public string id { get; set; }
         public string type { get; set; }
-        public UserAttributes attributes { get; set; }
+        public TagAttributes attributes { get; set; }
     }
 
     public class TagAttributes

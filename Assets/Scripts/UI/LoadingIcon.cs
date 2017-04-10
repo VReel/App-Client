@@ -42,9 +42,11 @@ public class LoadingIcon : MonoBehaviour
 
         bool displayIcon = m_iconDisplayCount > 0;
         m_loadingIcon.SetActive(displayIcon);
-        m_loadingIcon.GetComponent<Renderer>().enabled = displayIcon;
         m_loadingIcon.GetComponent<Collider>().enabled = displayIcon;
-        m_loadingIcon.GetComponentsInChildren<UnityEngine.UI.Graphic>()[0].enabled = displayIcon;
+        foreach (var renderer in m_loadingIcon.GetComponentsInChildren<Renderer>())
+        {
+            renderer.enabled = displayIcon;
+        }
 
         if (m_iconDisplayCount < 0)
         {

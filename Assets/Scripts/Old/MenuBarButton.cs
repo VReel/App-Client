@@ -1,7 +1,11 @@
 ﻿using UnityEngine;
 
-// This class is a helper for the MenuController, all the functions in it are called from MenuController
+/* Up - 333333
+ * Over - b9b9b9
+ * Down - dbdbdb
+ */
 
+// This class is a helper for the MenuController, all the functions in it are called from MenuController
 public class MenuBarButton : MonoBehaviour
 {
     [SerializeField] private GameObject m_menuSection;      // This Section of the menu is only visible when this object is Selected!

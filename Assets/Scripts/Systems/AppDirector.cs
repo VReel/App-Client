@@ -32,6 +32,7 @@ public class AppDirector : MonoBehaviour
     [SerializeField] private Gallery m_gallery;
     [SerializeField] private LoginFlow m_loginFlow;
     [SerializeField] private ImageLoader m_imageLoader;
+    [SerializeField] private KeyBoard m_keyboard;
     [SerializeField] private InternetReachabilityVerifier m_internetReachabilityVerifier;
     [SerializeField] private GameObject m_lostConnectionIcon;
 
@@ -134,6 +135,7 @@ public class AppDirector : MonoBehaviour
         Resources.UnloadUnusedAssets();
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
+        m_keyboard.CancelText();
         SetMenuBar(false);
 
         m_imageLoader.InvalidateLoading();
@@ -151,6 +153,7 @@ public class AppDirector : MonoBehaviour
         Resources.UnloadUnusedAssets();
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
+        m_keyboard.CancelText();
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
@@ -170,6 +173,7 @@ public class AppDirector : MonoBehaviour
         Resources.UnloadUnusedAssets();
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
+        m_keyboard.CancelText();
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
@@ -189,6 +193,7 @@ public class AppDirector : MonoBehaviour
         Resources.UnloadUnusedAssets();
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
+        m_keyboard.CancelText();
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
