@@ -140,6 +140,20 @@ public class Search : MonoBehaviour
         //m_coroutineQueue.EnqueueAction(StoreFirstPostsAndSetSpheres());
     }       
 
+    public void OpenProfileSearch()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenProfileSearch() called");
+
+
+    }
+
+    public void OpenTagSearch()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenTagSearch() called");
+
+
+    }
+
     /*
     public void NextImages()
     {

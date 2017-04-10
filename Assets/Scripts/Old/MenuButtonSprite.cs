@@ -4,35 +4,26 @@ using UnityEngine.VR;       //VRSettings
 using UnityEngine.Events;   //UnityEvent
 using System;
 
-
-/* Up - 333333
- * Over - b9b9b9
- * Down - dbdbdb
- */
-
 namespace VRStandardAssets.Menu
 {
-    public class MenuButton : MonoBehaviour
+    public class MenuButtonSprite : MonoBehaviour
     {        
         // **************************
         // Member Variables
         // **************************
 
         [SerializeField] private Image m_buttonImage;
-        [SerializeField] private Color m_buttonColourUp;     // Button's default sprite
-        [SerializeField] private Color m_buttonColourOver;   // Button's sprite when the icon is over it
-        [SerializeField] private Color m_buttonColourDown;   // Button's sprite when user presses on it
+        [SerializeField] private Sprite m_spriteButtonUp;       // Button's default sprite
+        [SerializeField] private Sprite m_spriteButtonOver;     // Button's sprite when the icon is over it
+        [SerializeField] private Sprite m_spriteButtonDown;     // Button's sprite when user presses on it
         [SerializeField] private VRStandardAssets.Utils.VRInteractiveItem m_InteractiveItem;       // The interactive item used to know how the user is interacting with the button
 
         // TODO: Make this into a single event...
         public UnityEvent OnButtonSelectedFunc;              // This event is triggered when the selection of the button has finished.
-        public event Action<MenuButton> OnButtonSelected;    // This event is triggered when the selection of the button has finished.
+        public event Action<MenuButtonSprite> OnButtonSelected;    // This event is triggered when the selection of the button has finished.
 
         private bool m_gazeOver = false;                     // Whether the user is looking at the VRInteractiveItem currently.
         private bool m_buttonDown = false;                   // Whether the user is pushing the VRInteractiveItem down.
-
-        private Color m_buttonForcedColour;  
-        private bool m_forceColour = false;
 
         // **************************
         // Public functions
@@ -48,34 +39,44 @@ namespace VRStandardAssets.Menu
             return m_buttonDown;
         }
 
-        public void SetForceColour(bool forceColour, Color buttonForcedColour)
+        public Sprite GetSpriteButtonUp()
         {
-            m_forceColour = forceColour;
-            m_buttonForcedColour = buttonForcedColour;
+            return m_spriteButtonUp;
         }
 
-        public void RefreshButtonColor()
+        public Sprite GetSpriteButtonOver()
+        {
+            return m_spriteButtonOver;
+        }
+
+        public Sprite GetSpriteButtonDown()
+        {
+            return m_spriteButtonDown;
+        }
+
+        public void SetSpriteButtonUp(Sprite spriteButtonUp)
+        {
+            m_spriteButtonUp = spriteButtonUp;
+        }
+
+        public void RefreshButtonSprite()
         {
             if (m_buttonImage == null)
             {
                 return;
             }
 
-            if (m_forceColour)
+            if (m_buttonDown && m_spriteButtonDown != null)
             {
-                m_buttonImage.color = m_buttonForcedColour;
+                m_buttonImage.sprite = m_spriteButtonDown;
             }
-            else if (m_buttonDown)
+            else if (m_gazeOver && m_spriteButtonOver != null)
             {
-                m_buttonImage.color = m_buttonColourDown;
+                m_buttonImage.sprite = m_spriteButtonOver;
             }
-            else if (m_gazeOver)
+            else if (m_spriteButtonUp != null)
             {
-                m_buttonImage.color = m_buttonColourOver;
-            }
-            else
-            {
-                m_buttonImage.color = m_buttonColourUp;
+                m_buttonImage.sprite = m_spriteButtonUp;
             }
         }
 
@@ -103,7 +104,7 @@ namespace VRStandardAssets.Menu
         {
             m_gazeOver = true;
 
-            RefreshButtonColor();
+            RefreshButtonSprite();
         }
             
         private void HandleOut()
@@ -111,14 +112,14 @@ namespace VRStandardAssets.Menu
             m_gazeOver = false;
             m_buttonDown = false;
 
-            RefreshButtonColor();
+            RefreshButtonSprite();
         }
 
         private void HandleDown()
         {
             m_buttonDown = true;
 
-            RefreshButtonColor();
+            RefreshButtonSprite();
         }
 
         private void HandleUp()
@@ -138,7 +139,7 @@ namespace VRStandardAssets.Menu
 
             m_buttonDown = false;
 
-            RefreshButtonColor();
+            RefreshButtonSprite();
         }
 
         // NOTE: The following functions is for making debugging without a headset easier...

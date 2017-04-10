@@ -87,6 +87,22 @@ public class Analytics : MonoBehaviour
         m_analyticsManager.RecordEvent(customEvent);
     }
 
+    public void SearchForProfileSelected()
+    {
+        CustomEvent customEvent = new CustomEvent("SearchForProfileSelected");
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
+
+    public void SearchForTagSelected()
+    {
+        CustomEvent customEvent = new CustomEvent("SearchForTagSelected");
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
+
     public void ImageSphereSelected(int sphereNumber)
     {
         CustomEvent customEvent = new CustomEvent("ImageSphereSelected");

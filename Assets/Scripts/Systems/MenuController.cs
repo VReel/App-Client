@@ -80,16 +80,16 @@ public class MenuController : MonoBehaviour
     {
         foreach(GameObject currButton in m_menuBarButtons)
         {       
-            var menuBarButton = currButton.GetComponent<MenuBarButton>();
+            var menuBarButton = currButton.GetComponent<SelectedButton>();
             if (button == currButton)
             {
                 menuBarButton.OnButtonSelected();
-                menuBarButton.SetMenuSectionActive(true);
+                menuBarButton.GetAdditionalReference().SetActive(true); // Set's MenuSection to Active
             }
             else 
             {
                 menuBarButton.OnButtonDeselected();
-                menuBarButton.SetMenuSectionActive(false);
+                menuBarButton.GetAdditionalReference().SetActive(false); // Set's MenuSection to not Active
             }
         }
     }

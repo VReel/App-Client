@@ -58,6 +58,9 @@
      <Compile Include="Assets\InternetReachabilityVerifier\Examples\CustomIRVExample.cs" />
      <Compile Include="Assets\InternetReachabilityVerifier\Examples\IRVExample.cs" />
      <Compile Include="Assets\InternetReachabilityVerifier\Examples\SkeletonIRVExample.cs" />
+     <Compile Include="Assets\Scripts\Old\MenuBarButton.cs" />
+     <Compile Include="Assets\Scripts\Old\MenuButtonSprite.cs" />
+     <Compile Include="Assets\Scripts\SelectedButton.cs" />
      <Compile Include="Assets\Scripts\Systems\Analytics.cs" />
      <Compile Include="Assets\Scripts\Systems\AppDirector.cs" />
      <Compile Include="Assets\Scripts\Systems\BackEndAPI.cs" />
@@ -80,7 +83,6 @@
      <Compile Include="Assets\Scripts\UI\ImageSkybox.cs" />
      <Compile Include="Assets\Scripts\UI\ImageSphere.cs" />
      <Compile Include="Assets\Scripts\UI\LoadingIcon.cs" />
-     <Compile Include="Assets\Scripts\UI\MenuBarButton.cs" />
      <Compile Include="Assets\Scripts\UI\PasswordText.cs" />
      <Compile Include="Assets\Scripts\UI\SelectArrow.cs" />
      <Compile Include="Assets\Scripts\VR\MenuButton.cs" />
