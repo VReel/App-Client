@@ -125,10 +125,11 @@ namespace VReelJSON
     public class PostAttributes
     {
         public string thumbnail_url { get; set; }
-        public string original_url { get; set; }
         public string caption { get; set; }
+        public int like_count { get; set; }
         public string created_at { get; set; }
         public bool edited { get; set; }
+        public string original_url { get; set; }
     }     
 
     //--------------------------------------------
@@ -145,15 +146,22 @@ namespace VReelJSON
         public string id { get; set; }
         public string type { get; set; }
         public PostsAttributes attributes { get; set; }
+        public PostsRelationships relationships { get; set; }
     }
 
     public class PostsAttributes
     {
         public string thumbnail_url { get; set; }
         public string caption { get; set; }
+        public int like_count { get; set; }
         public string created_at { get; set; }
         public bool edited { get; set; }
-    }       
+    }   
+
+    public class PostsRelationships
+    {
+        public Model_User user { get; set; }
+    }   
 
     public class PostsLinks
     {

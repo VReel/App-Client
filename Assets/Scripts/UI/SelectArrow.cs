@@ -6,22 +6,22 @@ public class SelectArrow : MonoBehaviour
     // **************************
     // Member Variables
     // **************************
-    
-    public enum ArrowType
-    {
-        kPrev,
-        kNext
-    };
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private MenuController m_menuController;
-    [SerializeField] private Profile m_profile;
+    [SerializeField] private Posts m_posts;
     [SerializeField] private Gallery m_gallery;
     [SerializeField] private Search m_search;
     [SerializeField] private MeshCollider m_meshCollider;
     [SerializeField] private Image m_arrowImage;
     [SerializeField] private Image m_transparentBackgroundImage;
     [SerializeField] private ArrowType m_arrowType = ArrowType.kNext;
+
+    public enum ArrowType
+    {
+        kPrev,
+        kNext
+    };
 
     // **************************
     // Public functions
@@ -69,11 +69,11 @@ public class SelectArrow : MonoBehaviour
         {
             if (m_arrowType == ArrowType.kNext)
             {
-                return !m_profile.IsPostIndexAtEnd();
+                return !m_posts.IsPostIndexAtEnd();
             }
             else if (m_arrowType == ArrowType.kPrev)
             {
-                return !m_profile.IsPostIndexAtStart();
+                return !m_posts.IsPostIndexAtStart();
             }      
         }
 
@@ -95,11 +95,11 @@ public class SelectArrow : MonoBehaviour
             {
                 if (m_arrowType == ArrowType.kNext)
                 {
-                    return !m_profile.IsPostIndexAtEnd();
+                    return !m_posts.IsPostIndexAtEnd();
                 }
                 else if (m_arrowType == ArrowType.kPrev)
                 {
-                    return !m_profile.IsPostIndexAtStart();
+                    return !m_posts.IsPostIndexAtStart();
                 }   
             }
             else
@@ -119,11 +119,11 @@ public class SelectArrow : MonoBehaviour
         {
             if (m_arrowType == ArrowType.kNext)
             {
-                m_profile.NextImages();
+                m_posts.NextPosts();
             }
             else if (m_arrowType == ArrowType.kPrev)
             {
-                m_profile.PreviousImages();
+                m_posts.PreviousPosts();
             }      
         }
 

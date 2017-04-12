@@ -24,7 +24,7 @@ public class Search : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
-    [SerializeField] private Profile m_profile;
+    [SerializeField] private Posts m_posts;
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
@@ -174,12 +174,12 @@ public class Search : MonoBehaviour
         if (m_searchState == SearchState.kUserSearch)
         {
             m_searchState = SearchState.kUserDisplay;
-            m_profile.OpenProfileForID(m_results[resultNumber].id);
+            m_posts.OpenProfileWithID(m_results[resultNumber].id);
         }
         else if (m_searchState == SearchState.kTagSearch)
         {
             m_searchState = SearchState.kTagDisplay;
-            //TODO
+            m_posts.OpenHashTag(m_results[resultNumber].id);
         }            
     }
 
