@@ -163,7 +163,7 @@ public class BackEndAPI
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
 
-    public IEnumerator Register_GetMyUser()
+    public IEnumerator Register_GetUser()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/users' - Get my user details");
 
@@ -285,7 +285,7 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
-
+        
     // ----- CURRENTLY UNUSED ----- //
     public IEnumerator User_GetUser(string userId)
     {
@@ -325,6 +325,49 @@ public class BackEndAPI
         else // Error Handling
         {            
             ShowErrors(response, "GET to '/users/" + userId + "'");
+        }
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }
+
+    public IEnumerator User_GetUserPosts(string userId, string page = "")
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/users/" + userId + "/posts?page=" + page + "' - Get user details");
+
+        var request = new RestRequest("/users/" + userId + "/posts?page=" + page, Method.GET);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/users/" + userId + "/posts?page=" + page + "' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            UpdateAccessToken(response);
+
+            yield return m_threadJob.WaitFor();
+            VReelJSON.Model_Posts result = null;
+            m_threadJob.Start( () => 
+                result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Posts>(response.Content)
+            );
+            yield return m_threadJob.WaitFor();
+
+            m_postsJSONResult = result;
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "GET to '/users/" + userId + "/posts?page=" + page + "'");
         }
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
@@ -401,6 +444,7 @@ public class BackEndAPI
             );
             yield return m_threadJob.WaitFor();
 
+            m_user.m_id = result.data.id;
             m_user.m_handle = result.data.attributes.handle;
             m_user.m_email = result.data.attributes.email;
             m_user.m_name = result.data.attributes.name;
@@ -494,9 +538,9 @@ public class BackEndAPI
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
         
-    public IEnumerator Posts_GetMyPage(string page = "")
+    public IEnumerator Posts_GetPage(string page = "")
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts?page='" + page + " - Get a page of posts");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts?page=" + page + "' - Get a page of posts");
                     
         var request = new RestRequest("/posts?page=" + page, Method.GET);
         request.AddHeader("vreel-application-id", m_applicationID);
@@ -513,7 +557,7 @@ public class BackEndAPI
         yield return m_threadJob.WaitFor();
         float timeAfterRequest = Time.realtimeSinceStartup;
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts?page='" + page + " - Response: " + response.Content);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts?page=" + page + "' - Response: " + response.Content);
 
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
@@ -531,7 +575,7 @@ public class BackEndAPI
         }
         else // Error Handling
         {            
-            ShowErrors(response, "GET to '/posts?page='" + page + "'");
+            ShowErrors(response, "GET to '/posts?page=" + page + "'");
         }
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));

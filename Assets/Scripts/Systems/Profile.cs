@@ -31,6 +31,8 @@ public class Profile : MonoBehaviour
         public string caption { get; set; }
     }
 
+    private string m_currUserId;
+
     private List<Post> m_posts;
     private string m_nextPageOfPosts = null;
     private BackEndAPI m_backEndAPI;
@@ -113,9 +115,18 @@ public class Profile : MonoBehaviour
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenProfile() called");
 
+        OpenProfileForID(); // Opening the profile without an ID, means just get yourself
+    }    
+
+    public void OpenProfileForID(string userID = "")
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenProfileForID() called with ID: " + userID);
+
+        m_currUserId = userID;
+
         m_imageSphereController.SetAllImageSpheresToLoading();
         m_coroutineQueue.EnqueueAction(StoreFirstPostsAndSetSpheres());
-    }       
+    }    
 
     public void NextImages()
     {
@@ -205,7 +216,7 @@ public class Profile : MonoBehaviour
         userTextComponent.text = "Hi " + m_user.m_handle + "! =D";
         userTextComponent.color = Color.black;
     }
-      
+
     private IEnumerator StoreFirstPostsAndSetSpheres()
     {
         yield return m_appDirector.VerifyInternetConnection();
@@ -216,7 +227,14 @@ public class Profile : MonoBehaviour
 
         m_posts.Clear();
 
-        yield return m_backEndAPI.Posts_GetMyPage();
+        if (m_currUserId.Length <= 0)
+        {
+            yield return m_backEndAPI.Posts_GetPage();
+        }
+        else
+        {
+            yield return m_backEndAPI.User_GetUserPosts(m_currUserId);
+        }
 
         VReelJSON.Model_Posts posts = m_backEndAPI.GetPostsResult();
         if (posts != null)
@@ -254,7 +272,14 @@ public class Profile : MonoBehaviour
 
         m_loadingIcon.Display(); //NOTE: This should stop the following operation from ever being cut half-way through
 
-        yield return m_backEndAPI.Posts_GetMyPage(m_nextPageOfPosts);
+        if (m_currUserId.Length <= 0)
+        {
+            yield return m_backEndAPI.Posts_GetPage(m_nextPageOfPosts);
+        }
+        else
+        {
+            yield return m_backEndAPI.User_GetUserPosts(m_currUserId, m_nextPageOfPosts);
+        }
 
         VReelJSON.Model_Posts posts = m_backEndAPI.GetPostsResult();
         if (posts != null)

@@ -21,7 +21,8 @@ public class User : MonoBehaviour
         public string m_uid {get; set;}
         public string m_accessToken {get; set;}
     }
-        
+
+    public string m_id {get; set;}
     public string m_handle {get; set;}
     public string m_email {get; set;}
     public string m_name {get; set;}
@@ -141,7 +142,7 @@ public class User : MonoBehaviour
                 m_loginData = (LoginData) binaryFormatter.Deserialize(fileStream);
             }
 
-            StartCoroutine(m_backEndAPI.Register_GetMyUser());
+            StartCoroutine(m_backEndAPI.Register_GetUser());
         }
     }
 
