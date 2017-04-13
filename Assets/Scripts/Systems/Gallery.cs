@@ -221,7 +221,7 @@ public class Gallery : MonoBehaviour
             string captionText = m_captionText.GetComponentInChildren<Text>().text;
             TruncateString(ref captionText, kMaxCaptionLength);
 
-            yield return m_backEndAPI.Posts_CreatePost(
+            yield return m_backEndAPI.Post_CreatePost(
                 m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.key.ToString(), 
                 m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.key.ToString(),
                 captionText

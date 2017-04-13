@@ -28,8 +28,9 @@ public class AppDirector : MonoBehaviour
     [SerializeField] private GameObject m_menuBar;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private ImageSphereController m_imageSphereController;
-    [SerializeField] private Profile m_profile;
+    [SerializeField] private Home m_home;
     [SerializeField] private Search m_search;
+    [SerializeField] private Profile m_profile;
     [SerializeField] private Gallery m_gallery;
     [SerializeField] private LoginFlow m_loginFlow;
     [SerializeField] private ImageLoader m_imageLoader;
@@ -69,7 +70,7 @@ public class AppDirector : MonoBehaviour
         }
         else if ( (m_appState == AppDirector.AppState.kLogin || m_appState == AppDirector.AppState.kInit) && m_user.IsLoggedIn())
         {
-            RequestProfileState();
+            RequestHomeState();
         }
     }
         
@@ -167,14 +168,15 @@ public class AppDirector : MonoBehaviour
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
-        m_gallery.InvalidateWork();
-        m_profile.InvalidateWork();
+        m_home.InvalidateWork();
         m_search.InvalidateWork();
+        m_profile.InvalidateWork();
+        m_gallery.InvalidateWork();
 
-        //m_profile.ShowProfileText();
+        m_home.ShowHomeText();
 
         m_menuController.SetHomeSubMenuActive(true);
-        //m_profile.OpenProfile();
+        m_home.OpenHome();
         m_appState = AppState.kHome;
     }
 
@@ -187,9 +189,10 @@ public class AppDirector : MonoBehaviour
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
-        m_gallery.InvalidateWork();
-        m_profile.InvalidateWork();
+        m_home.InvalidateWork();
         m_search.InvalidateWork();
+        m_profile.InvalidateWork();
+        m_gallery.InvalidateWork();
 
         m_profile.ShowProfileText();
 
@@ -207,9 +210,10 @@ public class AppDirector : MonoBehaviour
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
-        m_gallery.InvalidateWork();
-        m_profile.InvalidateWork();
+        m_home.InvalidateWork();
         m_search.InvalidateWork();
+        m_profile.InvalidateWork();
+        m_gallery.InvalidateWork();
 
         m_search.ShowSearchText();
 
@@ -227,8 +231,10 @@ public class AppDirector : MonoBehaviour
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
-        m_gallery.InvalidateWork();
+        m_home.InvalidateWork();
+        m_search.InvalidateWork();
         m_profile.InvalidateWork();
+        m_gallery.InvalidateWork();
 
         m_gallery.ShowGalleryText();
 

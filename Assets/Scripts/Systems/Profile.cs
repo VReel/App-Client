@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;               // Text
 using System.Collections;           // IEnumerator
-using System.Collections.Generic;   // List
 
 public class Profile : MonoBehaviour 
 {   
@@ -102,7 +101,7 @@ public class Profile : MonoBehaviour
 
         m_loadingIcon.Display();
 
-        yield return m_backEndAPI.Posts_DeletePost(id);
+        yield return m_backEndAPI.Post_DeletePost(id);
 
         Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
         if (m_backEndAPI.IsLastAPICallSuccessful())
@@ -132,7 +131,7 @@ public class Profile : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Profile Text!");
         Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
-        userTextComponent.text = "Hi " + m_user.m_handle + "! =D";
+        userTextComponent.text = m_user.m_handle + "'s Profile";
         userTextComponent.color = Color.black;
     }
 }

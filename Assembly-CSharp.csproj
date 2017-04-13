@@ -68,6 +68,7 @@
      <Compile Include="Assets\Scripts\Systems\DeserialisationModelsAPI.cs" />
      <Compile Include="Assets\Scripts\Systems\FPSDisplay.cs" />
      <Compile Include="Assets\Scripts\Systems\Gallery.cs" />
+     <Compile Include="Assets\Scripts\Systems\Home.cs" />
      <Compile Include="Assets\Scripts\Systems\ImageLoader.cs" />
      <Compile Include="Assets\Scripts\Systems\ImageSphereController.cs" />
      <Compile Include="Assets\Scripts\Systems\InternetReachabilityVerifier.cs" />

@@ -95,6 +95,22 @@ public class Analytics : MonoBehaviour
         m_analyticsManager.RecordEvent(customEvent);
     }
 
+    public void PublicTimelineSelected()
+    {
+        CustomEvent customEvent = new CustomEvent("PublicTimelineSelected");
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
+
+    public void PersonalTimelineSelected()
+    {
+        CustomEvent customEvent = new CustomEvent("PersonalTimelineSelected");
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
+
     public void SearchForProfileSelected()
     {
         CustomEvent customEvent = new CustomEvent("SearchForProfileSelected");
@@ -109,7 +125,7 @@ public class Analytics : MonoBehaviour
         customEvent.AddAttribute("UserEmail", m_user.m_email);
 
         m_analyticsManager.RecordEvent(customEvent);
-    }
+    }       
 
     public void ImageSphereSelected(int sphereNumber)
     {
