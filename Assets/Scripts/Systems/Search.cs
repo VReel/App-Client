@@ -25,11 +25,8 @@ public class Search : MonoBehaviour
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
     [SerializeField] private Posts m_posts;
-    [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
-    [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private KeyBoard m_keyboard;
-    [SerializeField] private LoadingIcon m_loadingIcon;
     [SerializeField] private GameObject[] m_searchTypes;
     [SerializeField] private GameObject[] m_resultObjects;
     [SerializeField] private GameObject m_searchInput;
@@ -183,6 +180,24 @@ public class Search : MonoBehaviour
         }            
     }
 
+    public void OpenSearchAndProfileWithId(string userId)
+    {
+        m_appDirector.RequestSearchState();
+        OpenUserSearch();
+        m_searchState = SearchState.kUserDisplay;
+        m_posts.OpenProfileWithID(userId);
+    }
+
+    /*
+    public void OpenSearchAndTagWithId(string hashTagId)
+    {
+        m_appDirector.RequestSearchState();
+        OpenTagSearch();
+        m_searchState = SearchState.kTagDisplay;
+        m_posts.OpenHashTag(hashTagId);
+    }
+    */
+
     public void HideProfileOrTag()
     {
         m_imageSphereController.HideAllImageSpheres();
@@ -194,7 +209,6 @@ public class Search : MonoBehaviour
         else if (m_searchState == SearchState.kTagDisplay)
         {
             m_searchState = SearchState.kTagSearch;
-            //TODO
         }     
     }
 
@@ -242,7 +256,7 @@ public class Search : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateUserSearch() called");
 
-        yield return m_backEndAPI.Search_SearchForUsers(
+        yield return m_backEndAPI.User_SearchForUsers(
             m_currSearchString
         );
 
@@ -258,7 +272,7 @@ public class Search : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateTagSearch() called");
 
-        yield return m_backEndAPI.Search_SearchForHashTags(
+        yield return m_backEndAPI.HashTag_SearchForHashTags(
             m_currSearchString
         );
 

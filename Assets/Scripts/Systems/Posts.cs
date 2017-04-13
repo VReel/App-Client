@@ -31,6 +31,8 @@ public class Posts : MonoBehaviour
 
     public enum PostsType
     {
+        kPublicTimeline,
+        kPersonalTimeline,
         kUserProfile,
         kOtherProfile,
         kHashTag
@@ -85,6 +87,24 @@ public class Posts : MonoBehaviour
         int numPosts = m_posts.Count; 
         return m_currPostIndex >= (numPosts - numImageSpheres);       
     }        
+
+    public void OpenPublicTimeline()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenPublicTimeline() called");
+
+        m_postsType = PostsType.kPublicTimeline;
+        m_currIdOrTag = "";
+        OpenPosts();
+    }    
+
+    public void OpenPersonalTimeline()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenPersonalTimeline() called");
+
+        m_postsType = PostsType.kPersonalTimeline;
+        m_currIdOrTag = "";
+        OpenPosts();
+    }    
 
     public void OpenUserProfile()
     {
@@ -184,18 +204,7 @@ public class Posts : MonoBehaviour
 
         m_posts.Clear();
 
-        if (m_postsType == PostsType.kUserProfile)
-        {
-            yield return m_backEndAPI.Posts_GetPosts();
-        }
-        else if (m_postsType == PostsType.kOtherProfile)
-        {
-            yield return m_backEndAPI.User_GetUserPosts(m_currIdOrTag);
-        }
-        else if (m_postsType == PostsType.kHashTag)
-        {            
-            yield return m_backEndAPI.HashTag_GetHashTagPosts(m_currIdOrTag);
-        }
+        yield return GetPosts();
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
@@ -216,18 +225,7 @@ public class Posts : MonoBehaviour
 
         m_loadingIcon.Display(); //NOTE: This should stop the following operation from ever being cut half-way through
 
-        if (m_postsType == PostsType.kUserProfile)
-        {
-            yield return m_backEndAPI.Posts_GetPosts(m_nextPageOfPosts);
-        }
-        else if (m_postsType == PostsType.kOtherProfile)
-        {
-            yield return m_backEndAPI.User_GetUserPosts(m_currIdOrTag, m_nextPageOfPosts);
-        }
-        else if (m_postsType == PostsType.kHashTag)
-        {
-            yield return m_backEndAPI.HashTag_GetHashTagPosts(m_currIdOrTag);
-        }
+        yield return GetPosts(m_nextPageOfPosts);
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
@@ -235,6 +233,30 @@ public class Posts : MonoBehaviour
         }
 
         m_loadingIcon.Hide();
+    }
+
+    private IEnumerator GetPosts(string nextPageOfPosts = "")
+    {
+        if (m_postsType == PostsType.kPublicTimeline)
+        {
+            yield return m_backEndAPI.Timeline_GetPublicTimeline(nextPageOfPosts);
+        }
+        else if (m_postsType == PostsType.kPersonalTimeline)
+        {
+            yield return m_backEndAPI.Timeline_GetPersonalTimeline(nextPageOfPosts);
+        }
+        else if (m_postsType == PostsType.kOtherProfile)
+        {
+            yield return m_backEndAPI.User_GetUserPosts(m_currIdOrTag, nextPageOfPosts);
+        }
+        else if (m_postsType == PostsType.kHashTag)
+        {            
+            yield return m_backEndAPI.HashTag_GetHashTagPosts(m_currIdOrTag, nextPageOfPosts);
+        }
+        else if (m_postsType == PostsType.kUserProfile)
+        {
+            yield return m_backEndAPI.Post_GetPosts(nextPageOfPosts);
+        }
     }
 
     private void StoreNewPosts()
@@ -302,6 +324,7 @@ public class Posts : MonoBehaviour
 
                 m_imageSphereController.SetMetadataAtIndex(
                     sphereIndex, 
+                    (m_postsType == PostsType.kUserProfile) ? "" : m_posts[postIndex].userId, 
                     (m_postsType == PostsType.kUserProfile) ? "" : m_posts[postIndex].userHandle, 
                     m_posts[postIndex].caption, 
                     m_posts[postIndex].likeCount
@@ -359,7 +382,7 @@ public class Posts : MonoBehaviour
 
     private IEnumerator RefreshPostData(string postId) // NOTE: Since URL's have a lifetime, we need to refresh the data at certain points...
     {            
-        yield return m_backEndAPI.Posts_GetPost(postId);
+        yield return m_backEndAPI.Post_GetPost(postId);
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {

@@ -221,7 +221,7 @@ public class Gallery : MonoBehaviour
             string captionText = m_captionText.GetComponentInChildren<Text>().text;
             TruncateString(ref captionText, kMaxCaptionLength);
 
-            yield return m_backEndAPI.Posts_CreatePost(
+            yield return m_backEndAPI.Post_CreatePost(
                 m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.key.ToString(), 
                 m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.key.ToString(),
                 captionText
@@ -427,7 +427,7 @@ public class Gallery : MonoBehaviour
                 {
                     bool showLoading = sphereIndex == 0; // The first one in the gallery should do some loading to let the user know things are happening
                     m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(filePath, sphereIndex, showLoading));
-                    m_imageSphereController.SetMetadataAtIndex(sphereIndex, "", "", -1);
+                    m_imageSphereController.SetMetadataAtIndex(sphereIndex, "", "", "", -1);
                 }
             }
             else

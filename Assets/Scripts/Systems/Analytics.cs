@@ -42,9 +42,9 @@ public class Analytics : MonoBehaviour
         m_coroutineQueue.StartLoop();
     }
 
-    public void ProfileSelected()
+    public void HomeSelected()
     {
-        CustomEvent customEvent = new CustomEvent("ProfileSelected");
+        CustomEvent customEvent = new CustomEvent("HomeSelected");
         customEvent.AddAttribute("UserEmail", m_user.m_email);
 
         m_analyticsManager.RecordEvent(customEvent);
@@ -57,6 +57,14 @@ public class Analytics : MonoBehaviour
 
         m_analyticsManager.RecordEvent(customEvent);
     }
+
+    public void ProfileSelected()
+    {
+        CustomEvent customEvent = new CustomEvent("ProfileSelected");
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }        
 
     public void GallerySelected()
     {
@@ -87,6 +95,22 @@ public class Analytics : MonoBehaviour
         m_analyticsManager.RecordEvent(customEvent);
     }
 
+    public void PublicTimelineSelected()
+    {
+        CustomEvent customEvent = new CustomEvent("PublicTimelineSelected");
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
+
+    public void PersonalTimelineSelected()
+    {
+        CustomEvent customEvent = new CustomEvent("PersonalTimelineSelected");
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
+
     public void SearchForProfileSelected()
     {
         CustomEvent customEvent = new CustomEvent("SearchForProfileSelected");
@@ -101,22 +125,27 @@ public class Analytics : MonoBehaviour
         customEvent.AddAttribute("UserEmail", m_user.m_email);
 
         m_analyticsManager.RecordEvent(customEvent);
-    }
+    }       
 
     public void ImageSphereSelected(int sphereNumber)
     {
         CustomEvent customEvent = new CustomEvent("ImageSphereSelected");
         customEvent.AddAttribute("UserEmail", m_user.m_email);
 
-        if (m_appDirector.GetState() == AppDirector.AppState.kProfile)
-        {
-            customEvent.AddAttribute("AppState", "Profile");
-        }
-        else if (m_appDirector.GetState() == AppDirector.AppState.kGallery)
-        {
-            customEvent.AddAttribute("AppState", "Gallery");
-        }
-            
+        SetAppState(ref customEvent);
+
+        customEvent.AddAttribute("SphereNumber", sphereNumber.ToString());
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
+
+    public void HandleSelected(int sphereNumber)
+    {
+        CustomEvent customEvent = new CustomEvent("HandleSelected");
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
+
+        SetAppState(ref customEvent);
+
         customEvent.AddAttribute("SphereNumber", sphereNumber.ToString());
 
         m_analyticsManager.RecordEvent(customEvent);
@@ -127,14 +156,7 @@ public class Analytics : MonoBehaviour
         CustomEvent customEvent = new CustomEvent("PreviousArrowSelected");
         customEvent.AddAttribute("UserEmail", m_user.m_email);
 
-        if (m_appDirector.GetState() == AppDirector.AppState.kProfile)
-        {
-            customEvent.AddAttribute("AppState", "Profile");
-        }
-        else if (m_appDirector.GetState() == AppDirector.AppState.kGallery)
-        {
-            customEvent.AddAttribute("AppState", "Gallery");
-        }
+        SetAppState(ref customEvent);
 
         m_analyticsManager.RecordEvent(customEvent);
     }
@@ -144,14 +166,7 @@ public class Analytics : MonoBehaviour
         CustomEvent customEvent = new CustomEvent("NextArrowSelected");
         customEvent.AddAttribute("UserEmail", m_user.m_email);
 
-        if (m_appDirector.GetState() == AppDirector.AppState.kProfile)
-        {
-            customEvent.AddAttribute("AppState", "Profile");
-        }
-        else if (m_appDirector.GetState() == AppDirector.AppState.kGallery)
-        {
-            customEvent.AddAttribute("AppState", "Gallery");
-        }
+        SetAppState(ref customEvent);
 
         m_analyticsManager.RecordEvent(customEvent);
     }
@@ -210,6 +225,26 @@ public class Analytics : MonoBehaviour
             {    
                 m_analyticsManager.PauseSession();
             }
+        }
+    }
+
+    private void SetAppState(ref CustomEvent customEvent)
+    {
+        if (m_appDirector.GetState() == AppDirector.AppState.kHome)
+        {
+            customEvent.AddAttribute("AppState", "Home");
+        }
+        else if (m_appDirector.GetState() == AppDirector.AppState.kSearch)
+        {
+            customEvent.AddAttribute("AppState", "Search");
+        }
+        else if (m_appDirector.GetState() == AppDirector.AppState.kGallery)
+        {
+            customEvent.AddAttribute("AppState", "Profile");
+        }
+        else if (m_appDirector.GetState() == AppDirector.AppState.kGallery)
+        {
+            customEvent.AddAttribute("AppState", "Gallery");
         }
     }
 }

@@ -18,6 +18,7 @@ public class AppDirector : MonoBehaviour
     {
         kInit,          // This should only be the state at the very start and never again!
         kLogin,         // User is not yet logged in, they are going through the login flow
+        kHome,          // User is viewing their home (ie. public or personal timeline)
         kProfile,       // User is viewing the pictures in their own profile
         kSearch,        // User is searching profiles or tags
         kGallery        // User is viewing their 360 photo gallery, they can scroll through all the 360 photos on their phone
@@ -27,8 +28,9 @@ public class AppDirector : MonoBehaviour
     [SerializeField] private GameObject m_menuBar;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private ImageSphereController m_imageSphereController;
-    [SerializeField] private Profile m_profile;
+    [SerializeField] private Home m_home;
     [SerializeField] private Search m_search;
+    [SerializeField] private Profile m_profile;
     [SerializeField] private Gallery m_gallery;
     [SerializeField] private LoginFlow m_loginFlow;
     [SerializeField] private ImageLoader m_imageLoader;
@@ -68,7 +70,7 @@ public class AppDirector : MonoBehaviour
         }
         else if ( (m_appState == AppDirector.AppState.kLogin || m_appState == AppDirector.AppState.kInit) && m_user.IsLoggedIn())
         {
-            RequestProfileState();
+            RequestHomeState();
         }
     }
         
@@ -81,12 +83,12 @@ public class AppDirector : MonoBehaviour
         }
     }
 
-    public void RequestProfileState()
+    public void RequestHomeState()
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestProfileState() called");
-        if (m_appState != AppState.kProfile)
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestHomeState() called");
+        if (m_appState != AppState.kHome)
         {
-            SetProfileState();
+            SetHomeState();
         }
     }
 
@@ -98,6 +100,15 @@ public class AppDirector : MonoBehaviour
             SetSearchState();
         }
     }
+
+    public void RequestProfileState()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestProfileState() called");
+        if (m_appState != AppState.kProfile)
+        {
+            SetProfileState();
+        }
+    }       
 
     public void RequestGalleryState()
     {
@@ -148,7 +159,7 @@ public class AppDirector : MonoBehaviour
         m_appState = AppState.kLogin;
     }
 
-    private void SetProfileState()
+    private void SetHomeState()
     {
         Resources.UnloadUnusedAssets();
         DisableAllOptions();
@@ -157,15 +168,16 @@ public class AppDirector : MonoBehaviour
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
-        m_gallery.InvalidateWork();
-        m_profile.InvalidateWork();
+        m_home.InvalidateWork();
         m_search.InvalidateWork();
+        m_profile.InvalidateWork();
+        m_gallery.InvalidateWork();
 
-        m_profile.ShowProfileText();
+        m_home.ShowHomeText();
 
-        m_menuController.SetProfileSubMenuActive(true);
-        m_profile.OpenProfile();
-        m_appState = AppState.kProfile;
+        m_menuController.SetHomeSubMenuActive(true);
+        m_home.OpenHome();
+        m_appState = AppState.kHome;
     }
 
     private void SetSearchState()
@@ -177,9 +189,10 @@ public class AppDirector : MonoBehaviour
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
-        m_gallery.InvalidateWork();
-        m_profile.InvalidateWork();
+        m_home.InvalidateWork();
         m_search.InvalidateWork();
+        m_profile.InvalidateWork();
+        m_gallery.InvalidateWork();
 
         m_search.ShowSearchText();
 
@@ -187,6 +200,27 @@ public class AppDirector : MonoBehaviour
         m_search.OpenSearch();
         m_appState = AppState.kSearch;
     }
+
+    private void SetProfileState()
+    {
+        Resources.UnloadUnusedAssets();
+        DisableAllOptions();
+        m_imageSphereController.HideAllImageSpheres();
+        m_keyboard.CancelText();
+        SetMenuBar(true);
+
+        m_imageLoader.InvalidateLoading();
+        m_home.InvalidateWork();
+        m_search.InvalidateWork();
+        m_profile.InvalidateWork();
+        m_gallery.InvalidateWork();
+
+        m_profile.ShowProfileText();
+
+        m_menuController.SetProfileSubMenuActive(true);
+        m_profile.OpenProfile();
+        m_appState = AppState.kProfile;
+    }        
 
     private void SetGalleryState()
     {
@@ -197,8 +231,10 @@ public class AppDirector : MonoBehaviour
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
-        m_gallery.InvalidateWork();
+        m_home.InvalidateWork();
+        m_search.InvalidateWork();
         m_profile.InvalidateWork();
+        m_gallery.InvalidateWork();
 
         m_gallery.ShowGalleryText();
 

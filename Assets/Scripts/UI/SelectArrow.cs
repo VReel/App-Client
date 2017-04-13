@@ -65,7 +65,7 @@ public class SelectArrow : MonoBehaviour
             return false;
         }
 
-        if (m_appDirector.GetState() == AppDirector.AppState.kProfile)
+        if (IsPostsActive())
         {
             if (m_arrowType == ArrowType.kNext)
             {
@@ -88,34 +88,13 @@ public class SelectArrow : MonoBehaviour
                 return !m_gallery.IsGalleryIndexAtStart();
             }
         }
-
-        if (m_appDirector.GetState() == AppDirector.AppState.kSearch)
-        {
-            if (m_search.GetSearchState() == Search.SearchState.kUserDisplay)
-            {
-                if (m_arrowType == ArrowType.kNext)
-                {
-                    return !m_posts.IsPostIndexAtEnd();
-                }
-                else if (m_arrowType == ArrowType.kPrev)
-                {
-                    return !m_posts.IsPostIndexAtStart();
-                }   
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        return true;
+            
+        return false;
     }
 
-    public void OnButtonSelectedInternal()
+    private void OnButtonSelectedInternal()
     {
-        if (m_appDirector.GetState() == AppDirector.AppState.kProfile ||
-            (m_appDirector.GetState() == AppDirector.AppState.kSearch && 
-                m_search.GetSearchState() == Search.SearchState.kUserDisplay))
+        if (IsPostsActive())
         {
             if (m_arrowType == ArrowType.kNext)
             {
@@ -138,5 +117,13 @@ public class SelectArrow : MonoBehaviour
                 m_gallery.PreviousImages();
             }
         }  
+    }
+
+    private bool IsPostsActive()
+    {
+        return (m_appDirector.GetState() == AppDirector.AppState.kHome ||
+                m_appDirector.GetState() == AppDirector.AppState.kProfile ||
+               (m_appDirector.GetState() == AppDirector.AppState.kSearch && m_search.GetSearchState() == Search.SearchState.kUserDisplay) ||
+               (m_appDirector.GetState() == AppDirector.AppState.kSearch && m_search.GetSearchState() == Search.SearchState.kTagDisplay));
     }
 }
