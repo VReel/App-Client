@@ -398,12 +398,13 @@ public class BackEndAPI
         if (IsSuccessCode(m_lastStatusCode))
         {
             UpdateAccessToken(response);
-            m_user.Clear();
         }
         else // Error Handling
         {            
             ShowErrors(response, "DELETE to '/users/sign_out'");
         }
+
+        m_user.Clear();
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
