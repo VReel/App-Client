@@ -19,6 +19,7 @@ public class AppDirector : MonoBehaviour
         kInit,          // This should only be the state at the very start and never again!
         kLogin,         // User is not yet logged in, they are going through the login flow
         kProfile,       // User is viewing the pictures in their own profile
+        kSearch,        // User is searching profiles or tags
         kGallery        // User is viewing their 360 photo gallery, they can scroll through all the 360 photos on their phone
     }
 
@@ -27,9 +28,11 @@ public class AppDirector : MonoBehaviour
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private Profile m_profile;
-    [SerializeField] private DeviceGallery m_deviceGallery;
+    [SerializeField] private Search m_search;
+    [SerializeField] private Gallery m_gallery;
     [SerializeField] private LoginFlow m_loginFlow;
     [SerializeField] private ImageLoader m_imageLoader;
+    [SerializeField] private KeyBoard m_keyboard;
     [SerializeField] private InternetReachabilityVerifier m_internetReachabilityVerifier;
     [SerializeField] private GameObject m_lostConnectionIcon;
 
@@ -87,6 +90,15 @@ public class AppDirector : MonoBehaviour
         }
     }
 
+    public void RequestSearchState()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestSearchState() called");
+        if (m_appState != AppState.kSearch)
+        {
+            SetSearchState();
+        }
+    }
+
     public void RequestGalleryState()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestGalleryState() called");
@@ -123,11 +135,13 @@ public class AppDirector : MonoBehaviour
         Resources.UnloadUnusedAssets();
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
+        m_keyboard.CancelText();
         SetMenuBar(false);
 
         m_imageLoader.InvalidateLoading();
-        m_deviceGallery.InvalidateWork();
+        m_gallery.InvalidateWork();
         m_profile.InvalidateWork();
+        m_search.InvalidateWork();
         m_loginFlow.SetLoginFlowPage(0);
 
         m_menuController.SetLoginSubMenuActive(true);
@@ -139,11 +153,13 @@ public class AppDirector : MonoBehaviour
         Resources.UnloadUnusedAssets();
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
+        m_keyboard.CancelText();
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
-        m_deviceGallery.InvalidateWork();
+        m_gallery.InvalidateWork();
         m_profile.InvalidateWork();
+        m_search.InvalidateWork();
 
         m_profile.ShowProfileText();
 
@@ -152,21 +168,42 @@ public class AppDirector : MonoBehaviour
         m_appState = AppState.kProfile;
     }
 
+    private void SetSearchState()
+    {
+        Resources.UnloadUnusedAssets();
+        DisableAllOptions();
+        m_imageSphereController.HideAllImageSpheres();
+        m_keyboard.CancelText();
+        SetMenuBar(true);
+
+        m_imageLoader.InvalidateLoading();
+        m_gallery.InvalidateWork();
+        m_profile.InvalidateWork();
+        m_search.InvalidateWork();
+
+        m_search.ShowSearchText();
+
+        m_menuController.SetSearchSubMenuActive(true);
+        m_search.OpenSearch();
+        m_appState = AppState.kSearch;
+    }
+
     private void SetGalleryState()
     {
         Resources.UnloadUnusedAssets();
         DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
+        m_keyboard.CancelText();
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
-        m_deviceGallery.InvalidateWork();
+        m_gallery.InvalidateWork();
         m_profile.InvalidateWork();
 
-        m_deviceGallery.ShowGalleryText();
+        m_gallery.ShowGalleryText();
 
         m_menuController.SetGallerySubMenuActive(true);
-        m_deviceGallery.OpenAndroidGallery();
+        m_gallery.OpenAndroidGallery();
         m_appState = AppState.kGallery;
     }
 

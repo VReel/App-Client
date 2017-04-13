@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;                         // Exception
 using System.IO;                      // Stream
 using System.Collections;             // IEnumerator
 using System.Net;                     // HttpWebRequest
@@ -109,22 +110,20 @@ public class ImageLoader : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Downloading image and getting stream through GetImageStreamFromURL() with url: " + url);
         yield return m_threadJob.WaitFor();
+        bool debugOn = Debug.isDebugBuild;
         Stream imageStream = null;
+        bool success = false;
         m_threadJob.Start( () => 
-            imageStream = GetImageStreamFromURL(url)
+            success = GetImageStreamFromURL(url, ref imageStream, debugOn)
         );
         yield return m_threadJob.WaitFor();
 
-        if (imageStream != null)
+        if (success)
         {
             int textureIndex = GetAvailableTextureIndex();
             yield return m_cppPlugin.LoadImageFromStreamIntoImageSphere(imageSphereController, sphereIndex, imageStream, imageIdentifier, textureIndex);
 
             imageStream.Close();
-        }
-        else
-        {
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - WebRequest got a null stream for url: " + url);
         }
             
         if (showLoading)
@@ -133,11 +132,20 @@ public class ImageLoader : MonoBehaviour
         }
     }        
 
-    private Stream GetImageStreamFromURL(string url)
-    {
-        HttpWebRequest http = (HttpWebRequest)WebRequest.Create(url);
-        Stream imageStream = http.GetResponse().GetResponseStream();
-        return imageStream;
+    private bool GetImageStreamFromURL(string url, ref Stream imageStream, bool debugOn)
+    {        
+        try
+        {
+            HttpWebRequest http = (HttpWebRequest)WebRequest.Create(url);
+            imageStream = http.GetResponse().GetResponseStream();
+        }
+        catch(Exception e)
+        {
+            if (debugOn) Debug.Log("------- VREEL: ERROR - WebRequest got an exception: " + e);
+            return false;
+        }
+
+        return true;
     }
 
     private int GetAvailableTextureIndex()

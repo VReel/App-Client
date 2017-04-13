@@ -7,6 +7,9 @@ using RestSharp.Deserializers;
 
 namespace VReelJSON
 {    
+    //--------------------------------------------
+    // Error
+
     public class Model_Error
     {
         public List<ErrorData> errors { get; set; }
@@ -24,6 +27,7 @@ namespace VReelJSON
     }
 
     //--------------------------------------------
+    // S3PresignedURL
 
     public class Model_S3PresignedURL
     {
@@ -49,6 +53,7 @@ namespace VReelJSON
     }
 
     //--------------------------------------------
+    // Users
 
     public class Model_User
     {
@@ -64,48 +69,53 @@ namespace VReelJSON
 
     public class UserAttributes
     {
-        public string email { get; set; }
         public string handle { get; set; }
         public string name { get; set; }
+        public string thumbnail_url { get; set; }
+        public int follower_count { get; set; }
+        public int following_count { get; set; }
+        public int post_count { get; set; }
+        public string email { get; set; }
         public string profile { get; set; }
-    }       
+        public string original_url { get; set; }
+    }
 
     //--------------------------------------------
 
-    public class Model_Posts
-    {     
-        public List<PostsData> data { get; set; }
-        public PostsLinks links { get; set; }
-        public PostsMeta meta { get; set; }
+    public class Model_Users
+    {
+        public List<UserData> data { get; set; }
     }
 
-    public class PostsData
+    //--------------------------------------------
+    // Tags
+
+    public class Model_Tag
+    {
+        public TagData data { get; set; }
+    }
+
+    public class TagData
     {
         public string id { get; set; }
         public string type { get; set; }
-        public PostsAttributes attributes { get; set; }
+        public TagAttributes attributes { get; set; }
     }
 
-    public class PostsAttributes
+    public class TagAttributes
     {
-        public string thumbnail_url { get; set; }
-        public string caption { get; set; }
-        public string created_at { get; set; }
-        public bool edited { get; set; }
+        public string tag { get; set; }
     }       
 
-    public class PostsLinks
-    {
-        public string next { get; set; }
-    }
+    //--------------------------------------------
 
-    public class PostsMeta
+    public class Model_Tags
     {
-        public bool next_page { get; set; }
-        public string next_page_id { get; set; }
+        public List<TagData> data { get; set; }
     }
 
     //--------------------------------------------
+    // Posts
 
     public class Model_Post
     {     
@@ -122,11 +132,66 @@ namespace VReelJSON
     public class PostAttributes
     {
         public string thumbnail_url { get; set; }
-        public string original_url { get; set; }
         public string caption { get; set; }
+        public int like_count { get; set; }
         public string created_at { get; set; }
         public bool edited { get; set; }
-    }       
+        public string original_url { get; set; }
+    }     
+
+    //--------------------------------------------
+
+    public class Model_Posts
+    {     
+        public List<PostsData> data { get; set; }
+        public List<UserData> included { get; set; }
+        public PostsLinks links { get; set; }
+        public PostsMeta meta { get; set; }
+    }
+
+    public class PostsData
+    {
+        public string id { get; set; }
+        public string type { get; set; }
+        public PostsAttributes attributes { get; set; }
+        public PostsRelationships relationships { get; set; }
+    }
+
+    public class PostsAttributes
+    {
+        public string thumbnail_url { get; set; }
+        public string caption { get; set; }
+        public int like_count { get; set; }
+        public string created_at { get; set; }
+        public bool edited { get; set; }
+    }   
+
+    public class PostsRelationships
+    {
+        public PostsUser user { get; set; }
+    }   
+
+    public class PostsUser
+    {
+        public PostsUserData data { get; set; }
+    }
+
+    public class PostsUserData
+    {
+        public string id { get; set; }
+        public string type { get; set; }       
+    }
+
+    public class PostsLinks
+    {
+        public string next { get; set; }
+    }
+
+    public class PostsMeta
+    {
+        public bool next_page { get; set; }
+        public string next_page_id { get; set; }
+    }
 
     //--------------------------------------------
 }

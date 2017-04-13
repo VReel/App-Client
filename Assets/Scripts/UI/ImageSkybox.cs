@@ -7,8 +7,9 @@ public class ImageSkybox : MonoBehaviour
     // Member Variables
     // **************************
 
+    [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private ImageSphereController m_imageSphereController;
-    [SerializeField] private Profile m_profile;
+    [SerializeField] private Posts m_posts;
     [SerializeField] private GameObject m_uploadButton;
     [SerializeField] private GameObject m_deleteButton;
 
@@ -64,9 +65,11 @@ public class ImageSkybox : MonoBehaviour
         m_currTextureIndex = textureIndex;
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, true);
 
+        bool isProfileState = m_appDirector.GetState() == AppDirector.AppState.kProfile;
+        bool isGalleryState = m_appDirector.GetState() == AppDirector.AppState.kGallery;
         bool isImageFromDevice = m_imageIdentifier.StartsWith(m_imagesTopLevelDirectory);
-        m_uploadButton.SetActive(isImageFromDevice);  // Currently the ImageSkybox class is responsible for switching on the Upload button
-        m_deleteButton.SetActive(!isImageFromDevice); // and the Delete button, when its possible to select either
+        m_uploadButton.SetActive(isImageFromDevice && isGalleryState);  // Currently the ImageSkybox class is responsible for switching on the Upload button
+        m_deleteButton.SetActive(!isImageFromDevice && isProfileState); // and the Delete button, when its possible to select either
 
         if (!isImageFromDevice) // This image is being set from the Profile, not the Gallery
         {
@@ -74,7 +77,7 @@ public class ImageSkybox : MonoBehaviour
             bool isThumbnail = texture.width <= kStandardThumbnailWidth;
             if (isThumbnail) // This image is a Thumbnail, so we want to download the full image!
             {
-                m_profile.DownloadOriginalImage(m_imageIdentifier);
+                m_posts.DownloadOriginalImage(m_imageIdentifier);
             }
             else // TODO: This is the Original image, so we want to replace the Thumbnail on the ImageSphere!
             {                

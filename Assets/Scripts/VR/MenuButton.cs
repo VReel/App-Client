@@ -13,9 +13,9 @@ namespace VRStandardAssets.Menu
         // **************************
 
         [SerializeField] private Image m_buttonImage;
-        [SerializeField] private Sprite m_spriteButtonUp;       // Button's default sprite
-        [SerializeField] private Sprite m_spriteButtonOver;     // Button's sprite when the icon is over it
-        [SerializeField] private Sprite m_spriteButtonDown;     // Button's sprite when user presses on it
+        [SerializeField] private Color m_buttonColourUp;     // Button's default sprite
+        [SerializeField] private Color m_buttonColourOver;   // Button's sprite when the icon is over it
+        [SerializeField] private Color m_buttonColourDown;   // Button's sprite when user presses on it
         [SerializeField] private VRStandardAssets.Utils.VRInteractiveItem m_InteractiveItem;       // The interactive item used to know how the user is interacting with the button
 
         // TODO: Make this into a single event...
@@ -24,6 +24,9 @@ namespace VRStandardAssets.Menu
 
         private bool m_gazeOver = false;                     // Whether the user is looking at the VRInteractiveItem currently.
         private bool m_buttonDown = false;                   // Whether the user is pushing the VRInteractiveItem down.
+
+        private Color m_buttonForcedColour;  
+        private bool m_forceColour = false;
 
         // **************************
         // Public functions
@@ -39,44 +42,34 @@ namespace VRStandardAssets.Menu
             return m_buttonDown;
         }
 
-        public Sprite GetSpriteButtonUp()
+        public void SetForceColour(bool forceColour, Color buttonForcedColour)
         {
-            return m_spriteButtonUp;
+            m_forceColour = forceColour;
+            m_buttonForcedColour = buttonForcedColour;
         }
 
-        public Sprite GetSpriteButtonOver()
-        {
-            return m_spriteButtonOver;
-        }
-
-        public Sprite GetSpriteButtonDown()
-        {
-            return m_spriteButtonDown;
-        }
-
-        public void SetSpriteButtonUp(Sprite spriteButtonUp)
-        {
-            m_spriteButtonUp = spriteButtonUp;
-        }
-
-        public void RefreshButtonSprite()
+        public void RefreshButtonColor()
         {
             if (m_buttonImage == null)
             {
                 return;
             }
 
-            if (m_buttonDown && m_spriteButtonDown != null)
+            if (m_forceColour)
             {
-                m_buttonImage.sprite = m_spriteButtonDown;
+                m_buttonImage.color = m_buttonForcedColour;
             }
-            else if (m_gazeOver && m_spriteButtonOver != null)
+            else if (m_buttonDown)
             {
-                m_buttonImage.sprite = m_spriteButtonOver;
+                m_buttonImage.color = m_buttonColourDown;
             }
-            else if (m_spriteButtonUp != null)
+            else if (m_gazeOver)
             {
-                m_buttonImage.sprite = m_spriteButtonUp;
+                m_buttonImage.color = m_buttonColourOver;
+            }
+            else
+            {
+                m_buttonImage.color = m_buttonColourUp;
             }
         }
 
@@ -104,7 +97,7 @@ namespace VRStandardAssets.Menu
         {
             m_gazeOver = true;
 
-            RefreshButtonSprite();
+            RefreshButtonColor();
         }
             
         private void HandleOut()
@@ -112,14 +105,14 @@ namespace VRStandardAssets.Menu
             m_gazeOver = false;
             m_buttonDown = false;
 
-            RefreshButtonSprite();
+            RefreshButtonColor();
         }
 
         private void HandleDown()
         {
             m_buttonDown = true;
 
-            RefreshButtonSprite();
+            RefreshButtonColor();
         }
 
         private void HandleUp()
@@ -139,7 +132,7 @@ namespace VRStandardAssets.Menu
 
             m_buttonDown = false;
 
-            RefreshButtonSprite();
+            RefreshButtonColor();
         }
 
         // NOTE: The following functions is for making debugging without a headset easier...

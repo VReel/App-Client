@@ -43,10 +43,16 @@ public class MenuController : MonoBehaviour
         OnButtonSelected(m_menuBarButtons[0]);  // button 0 = Profile button
     }
 
+    public void SetSearchSubMenuActive(bool active)
+    {
+        m_gallerySubMenu.SetActive(active);
+        OnButtonSelected(m_menuBarButtons[1]);  // button 1 = Search button
+    }
+
     public void SetGallerySubMenuActive(bool active)
     {
         m_gallerySubMenu.SetActive(active);
-        OnButtonSelected(m_menuBarButtons[1]);  // button 1 = Gallery button
+        OnButtonSelected(m_menuBarButtons[2]);  // button 2 = Gallery button
     }
 
     public void SetAllSubMenusActive(bool active)
@@ -74,16 +80,16 @@ public class MenuController : MonoBehaviour
     {
         foreach(GameObject currButton in m_menuBarButtons)
         {       
-            var menuBarButton = currButton.GetComponent<MenuBarButton>();
+            var menuBarButton = currButton.GetComponent<SelectedButton>();
             if (button == currButton)
             {
                 menuBarButton.OnButtonSelected();
-                menuBarButton.SetMenuSectionActive(true);
+                menuBarButton.GetAdditionalReference().SetActive(true); // Set's MenuSection to Active
             }
             else 
             {
                 menuBarButton.OnButtonDeselected();
-                menuBarButton.SetMenuSectionActive(false);
+                menuBarButton.GetAdditionalReference().SetActive(false); // Set's MenuSection to not Active
             }
         }
     }
