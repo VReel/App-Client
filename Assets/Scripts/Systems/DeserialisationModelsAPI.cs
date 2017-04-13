@@ -7,6 +7,9 @@ using RestSharp.Deserializers;
 
 namespace VReelJSON
 {    
+    //--------------------------------------------
+    // Error
+
     public class Model_Error
     {
         public List<ErrorData> errors { get; set; }
@@ -24,6 +27,7 @@ namespace VReelJSON
     }
 
     //--------------------------------------------
+    // S3PresignedURL
 
     public class Model_S3PresignedURL
     {
@@ -49,6 +53,7 @@ namespace VReelJSON
     }
 
     //--------------------------------------------
+    // Users
 
     public class Model_User
     {
@@ -83,6 +88,7 @@ namespace VReelJSON
     }
 
     //--------------------------------------------
+    // Tags
 
     public class Model_Tag
     {
@@ -109,6 +115,7 @@ namespace VReelJSON
     }
 
     //--------------------------------------------
+    // Posts
 
     public class Model_Post
     {     
@@ -137,6 +144,7 @@ namespace VReelJSON
     public class Model_Posts
     {     
         public List<PostsData> data { get; set; }
+        public List<UserData> included { get; set; }
         public PostsLinks links { get; set; }
         public PostsMeta meta { get; set; }
     }
@@ -160,8 +168,19 @@ namespace VReelJSON
 
     public class PostsRelationships
     {
-        public Model_User user { get; set; }
+        public PostsUser user { get; set; }
     }   
+
+    public class PostsUser
+    {
+        public PostsUserData data { get; set; }
+    }
+
+    public class PostsUserData
+    {
+        public string id { get; set; }
+        public string type { get; set; }       
+    }
 
     public class PostsLinks
     {

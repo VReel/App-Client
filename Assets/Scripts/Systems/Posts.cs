@@ -18,14 +18,15 @@ public class Posts : MonoBehaviour
 
     public class Post
     {
-        public string id { get; set; }
+        public string postId { get; set; }
         public string thumbnailUrl { get; set; }
         public string originalUrl { get; set; }
-        public int like_count { get; set; }
+        public int likeCount { get; set; }
         public string caption { get; set; }
         public bool edited { get; set; }
-        public string created_at { get; set; }
-        //TODO: Get Handle of user who posted this Post
+        public string createdAt { get; set; }
+        public string userId { get; set; }
+        public string userHandle { get; set; }
     }
 
     public enum PostsType
@@ -244,12 +245,14 @@ public class Posts : MonoBehaviour
             foreach (VReelJSON.PostsData postData in posts.data)
             {   
                 Post newPost = new Post();
-                newPost.id = postData.id.ToString();
+                newPost.postId = postData.id.ToString();
                 newPost.thumbnailUrl = postData.attributes.thumbnail_url.ToString();
-                newPost.like_count = postData.attributes.like_count;
+                newPost.likeCount = postData.attributes.like_count;
                 newPost.caption = postData.attributes.caption.ToString();
                 newPost.edited = postData.attributes.edited;
-                newPost.created_at = postData.attributes.created_at.ToString();
+                newPost.createdAt = postData.attributes.created_at.ToString();
+                newPost.userId = postData.relationships.user.data.id.ToString();
+                newPost.userHandle = GetHandleFromIDAndPostData(ref posts, newPost.userId);
 
                 m_posts.Add(newPost);
             }
@@ -260,6 +263,19 @@ public class Posts : MonoBehaviour
                 m_nextPageOfPosts = posts.meta.next_page_id;
             }
         }
+    }
+
+    private string GetHandleFromIDAndPostData(ref VReelJSON.Model_Posts posts, string userId)
+    {
+        for (int i = 0; i < (posts.included).Count; i++)
+        {
+            if ((posts.included[i]).id.CompareTo(userId) == 0)
+            {
+                return (posts.included[i]).attributes.handle;
+            }
+        }
+
+        return "HANDLE_ERROR";
     }
 
     private IEnumerator DownloadThumbnailsAndSetSpheres()
@@ -275,14 +291,21 @@ public class Posts : MonoBehaviour
         {
             if (postIndex < m_posts.Count)
             {                   
-                string id = m_posts[postIndex].id;
-                string thumbnailURL = m_posts[postIndex].thumbnailUrl;
-                string captionText = m_posts[postIndex].caption;
-                int likeCount = m_posts[postIndex].like_count;
-
                 bool showLoading = sphereIndex == 0; // The first one in the profile should do some loading to let the user know things are happening
-                LoadImageInternalPlugin(thumbnailURL, sphereIndex, id, showLoading);
-                m_imageSphereController.SetMetadataAtIndex(sphereIndex, "", captionText, likeCount);
+
+                LoadImageInternalPlugin(
+                    m_posts[postIndex].thumbnailUrl, 
+                    sphereIndex, 
+                    m_posts[postIndex].postId, 
+                    showLoading
+                );
+
+                m_imageSphereController.SetMetadataAtIndex(
+                    sphereIndex, 
+                    (m_postsType == PostsType.kUserProfile) ? "" : m_posts[postIndex].userHandle, 
+                    m_posts[postIndex].caption, 
+                    m_posts[postIndex].likeCount
+                );
             }
             else
             {
@@ -291,24 +314,26 @@ public class Posts : MonoBehaviour
         }
     }
 
-    public IEnumerator DownloadOriginalImageInternal(string id)
+    public IEnumerator DownloadOriginalImageInternal(string postId)
     {
         yield return m_appDirector.VerifyInternetConnection();
 
         m_loadingIcon.Display();
 
-        yield return RefreshPostData(id);
+        yield return RefreshPostData(postId);
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
-            int sphereIndex = ConvertIdToIndex(id);
-            string originalURL = m_posts[sphereIndex].originalUrl;
-            string captionText = m_posts[sphereIndex].caption;
-            int likeCount = m_posts[sphereIndex].like_count;
-
+            int index = ConvertIdToIndex(postId); 
+            int sphereIndex = -1; // Set it on the skybox
             bool showLoading = true;
-            LoadImageInternalPlugin(originalURL, -1, id, showLoading); // a -1 sphereIndex maps to the SkyBox
-            m_imageSphereController.SetMetadataAtIndex(sphereIndex, "", captionText, likeCount);
+
+            LoadImageInternalPlugin(
+                m_posts[index].originalUrl, 
+                sphereIndex, 
+                postId, 
+                showLoading
+            );
         }
 
         m_loadingIcon.Hide();
@@ -327,24 +352,24 @@ public class Posts : MonoBehaviour
         {
             if (postIndex < m_posts.Count)
             {                   
-                yield return RefreshPostData(m_posts[postIndex].id);
+                yield return RefreshPostData(m_posts[postIndex].postId);
             }
         }
     }
 
-    private IEnumerator RefreshPostData(string id) // NOTE: Since URL's have a lifetime, we need to refresh the data at certain points...
+    private IEnumerator RefreshPostData(string postId) // NOTE: Since URL's have a lifetime, we need to refresh the data at certain points...
     {            
-        yield return m_backEndAPI.Posts_GetPost(id);
+        yield return m_backEndAPI.Posts_GetPost(postId);
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
-            int index = ConvertIdToIndex(id);
+            int index = ConvertIdToIndex(postId);
             if (index <= m_posts.Count)
             {
                 m_posts[index].thumbnailUrl = m_backEndAPI.GetPostResult().data.attributes.thumbnail_url;
                 m_posts[index].caption = m_backEndAPI.GetPostResult().data.attributes.caption.ToString();
-                m_posts[index].like_count = m_backEndAPI.GetPostResult().data.attributes.like_count;
-                m_posts[index].created_at = m_backEndAPI.GetPostResult().data.attributes.created_at.ToString();
+                m_posts[index].likeCount = m_backEndAPI.GetPostResult().data.attributes.like_count;
+                m_posts[index].createdAt = m_backEndAPI.GetPostResult().data.attributes.created_at.ToString();
                 m_posts[index].edited = m_backEndAPI.GetPostResult().data.attributes.edited;
                 m_posts[index].originalUrl = m_backEndAPI.GetPostResult().data.attributes.original_url;
             }
@@ -356,13 +381,6 @@ public class Posts : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: LoadImageInternal for " + imageIdentifier);
 
         m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, sphereIndex, url, imageIdentifier, showLoading);
-
-        /*
-        using (var stream = response.GetResponseStream())
-        {
-            yield return m_imageSphereController.LoadImageFromStreamIntoImageSphere(stream, sphereIndex, imageIdentifier);
-        }
-        */
     }
         
     /*
@@ -409,12 +427,12 @@ public class Posts : MonoBehaviour
     }
     */
 
-    private int ConvertIdToIndex(string id) //TODO: To remove this all I need to do is turn m_posts into a Map<ID, PostAttributes>...
+    private int ConvertIdToIndex(string postId) //TODO: To remove this all I need to do is turn m_posts into a Map<ID, PostAttributes>...
     {
         int index = 0;    
         for (; index < m_posts.Count; index++)
         {   
-            if (m_posts[index].id.CompareTo(id) == 0)
+            if ((m_posts[index].postId).CompareTo(postId) == 0)
             {
                 break;
             }
@@ -422,7 +440,7 @@ public class Posts : MonoBehaviour
 
         if (index >= m_posts.Count)
         {
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - Invalid ID being converted to Post Index!! -> " + id);
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - Invalid ID being converted to Post Index!! -> " + postId);
             index = 0;
         }
 
