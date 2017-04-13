@@ -92,15 +92,6 @@ public class AppDirector : MonoBehaviour
         }
     }
 
-    public void RequestProfileState()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestProfileState() called");
-        if (m_appState != AppState.kProfile)
-        {
-            SetProfileState();
-        }
-    }
-
     public void RequestSearchState()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestSearchState() called");
@@ -109,6 +100,15 @@ public class AppDirector : MonoBehaviour
             SetSearchState();
         }
     }
+
+    public void RequestProfileState()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestProfileState() called");
+        if (m_appState != AppState.kProfile)
+        {
+            SetProfileState();
+        }
+    }       
 
     public void RequestGalleryState()
     {
@@ -180,27 +180,6 @@ public class AppDirector : MonoBehaviour
         m_appState = AppState.kHome;
     }
 
-    private void SetProfileState()
-    {
-        Resources.UnloadUnusedAssets();
-        DisableAllOptions();
-        m_imageSphereController.HideAllImageSpheres();
-        m_keyboard.CancelText();
-        SetMenuBar(true);
-
-        m_imageLoader.InvalidateLoading();
-        m_home.InvalidateWork();
-        m_search.InvalidateWork();
-        m_profile.InvalidateWork();
-        m_gallery.InvalidateWork();
-
-        m_profile.ShowProfileText();
-
-        m_menuController.SetProfileSubMenuActive(true);
-        m_profile.OpenProfile();
-        m_appState = AppState.kProfile;
-    }
-
     private void SetSearchState()
     {
         Resources.UnloadUnusedAssets();
@@ -221,6 +200,27 @@ public class AppDirector : MonoBehaviour
         m_search.OpenSearch();
         m_appState = AppState.kSearch;
     }
+
+    private void SetProfileState()
+    {
+        Resources.UnloadUnusedAssets();
+        DisableAllOptions();
+        m_imageSphereController.HideAllImageSpheres();
+        m_keyboard.CancelText();
+        SetMenuBar(true);
+
+        m_imageLoader.InvalidateLoading();
+        m_home.InvalidateWork();
+        m_search.InvalidateWork();
+        m_profile.InvalidateWork();
+        m_gallery.InvalidateWork();
+
+        m_profile.ShowProfileText();
+
+        m_menuController.SetProfileSubMenuActive(true);
+        m_profile.OpenProfile();
+        m_appState = AppState.kProfile;
+    }        
 
     private void SetGalleryState()
     {

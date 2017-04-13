@@ -9,6 +9,7 @@ public class ImageSphere : MonoBehaviour
     // Member Variables
     // **************************
 
+    [SerializeField] private Search m_search;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
@@ -21,6 +22,7 @@ public class ImageSphere : MonoBehaviour
 
     private string m_imageIdentifier; // This is either (1) A Local Path on the Device or (2) A PostID from the backend
     private Texture2D m_imageSphereTexture;
+    private string m_userId;
     private string m_handle;
     private string m_caption;
     private int m_likes;
@@ -78,8 +80,9 @@ public class ImageSphere : MonoBehaviour
         }
     }
 
-    public void SetMetadata(string handle, string caption, int likes) 
+    public void SetMetadata(string userId, string handle, string caption, int likes) 
     { //NOTE: These are only set onto their UI elements when the Animation has ended!
+        m_userId = userId;
         m_handle = handle;
         m_caption = caption;
         m_likes = likes;
@@ -107,6 +110,11 @@ public class ImageSphere : MonoBehaviour
 
         m_coroutineQueue.Clear();
         transform.localScale = new Vector3(kMinShrink, kMinShrink, kMinShrink);
+    }
+
+    public void HandleSelected()
+    {
+        m_search.OpenSearchAndProfileWithId(m_userId);
     }
 
     // **************************

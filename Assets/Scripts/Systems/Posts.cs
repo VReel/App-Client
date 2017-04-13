@@ -324,6 +324,7 @@ public class Posts : MonoBehaviour
 
                 m_imageSphereController.SetMetadataAtIndex(
                     sphereIndex, 
+                    (m_postsType == PostsType.kUserProfile) ? "" : m_posts[postIndex].userId, 
                     (m_postsType == PostsType.kUserProfile) ? "" : m_posts[postIndex].userHandle, 
                     m_posts[postIndex].caption, 
                     m_posts[postIndex].likeCount

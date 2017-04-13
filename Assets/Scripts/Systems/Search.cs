@@ -180,6 +180,24 @@ public class Search : MonoBehaviour
         }            
     }
 
+    public void OpenSearchAndProfileWithId(string userId)
+    {
+        m_appDirector.RequestSearchState();
+        OpenUserSearch();
+        m_searchState = SearchState.kUserDisplay;
+        m_posts.OpenProfileWithID(userId);
+    }
+
+    /*
+    public void OpenSearchAndTagWithId(string hashTagId)
+    {
+        m_appDirector.RequestSearchState();
+        OpenTagSearch();
+        m_searchState = SearchState.kTagDisplay;
+        m_posts.OpenHashTag(hashTagId);
+    }
+    */
+
     public void HideProfileOrTag()
     {
         m_imageSphereController.HideAllImageSpheres();
@@ -191,7 +209,6 @@ public class Search : MonoBehaviour
         else if (m_searchState == SearchState.kTagDisplay)
         {
             m_searchState = SearchState.kTagSearch;
-            //TODO
         }     
     }
 
