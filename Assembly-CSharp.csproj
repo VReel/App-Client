@@ -73,6 +73,7 @@
      <Compile Include="Assets\Scripts\Systems\ImageSphereController.cs" />
      <Compile Include="Assets\Scripts\Systems\InternetReachabilityVerifier.cs" />
      <Compile Include="Assets\Scripts\Systems\KeyBoard.cs" />
+     <Compile Include="Assets\Scripts\Systems\Like.cs" />
      <Compile Include="Assets\Scripts\Systems\LoginFlow.cs" />
      <Compile Include="Assets\Scripts\Systems\MenuController.cs" />
      <Compile Include="Assets\Scripts\Systems\OptionsFlow.cs" />
