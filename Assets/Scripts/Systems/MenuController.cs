@@ -13,6 +13,8 @@ public class MenuController : MonoBehaviour
 
     [SerializeField] private GameObject m_menuSubTree;
     [SerializeField] private GameObject m_loginSubMenu;
+    [SerializeField] private GameObject m_homeSubMenu;
+    [SerializeField] private GameObject m_searchSubMenu;
     [SerializeField] private GameObject m_profileSubMenu;
     [SerializeField] private GameObject m_gallerySubMenu;
     [SerializeField] private User m_user;
@@ -37,27 +39,35 @@ public class MenuController : MonoBehaviour
         m_loginSubMenu.SetActive(active);
     }
 
-    public void SetProfileSubMenuActive(bool active)
+    public void SetHomeSubMenuActive(bool active)
     {
-        m_profileSubMenu.SetActive(active);
-        OnButtonSelected(m_menuBarButtons[0]);  // button 0 = Profile button
+        m_homeSubMenu.SetActive(active);
+        OnButtonSelected(m_menuBarButtons[0]);  // button 0 = Home button
     }
 
     public void SetSearchSubMenuActive(bool active)
     {
-        m_gallerySubMenu.SetActive(active);
+        m_searchSubMenu.SetActive(active);
         OnButtonSelected(m_menuBarButtons[1]);  // button 1 = Search button
+    }
+
+    public void SetProfileSubMenuActive(bool active)
+    {
+        m_profileSubMenu.SetActive(active);
+        OnButtonSelected(m_menuBarButtons[2]);  // button 2 = Profile button
     }
 
     public void SetGallerySubMenuActive(bool active)
     {
         m_gallerySubMenu.SetActive(active);
-        OnButtonSelected(m_menuBarButtons[2]);  // button 2 = Gallery button
+        OnButtonSelected(m_menuBarButtons[3]);  // button 3 = Gallery button
     }
 
     public void SetAllSubMenusActive(bool active)
     {
         m_loginSubMenu.SetActive(active);
+        m_homeSubMenu.SetActive(active);
+        m_searchSubMenu.SetActive(active);
         m_profileSubMenu.SetActive(active);
         m_gallerySubMenu.SetActive(active);
     }

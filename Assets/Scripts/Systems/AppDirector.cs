@@ -18,6 +18,7 @@ public class AppDirector : MonoBehaviour
     {
         kInit,          // This should only be the state at the very start and never again!
         kLogin,         // User is not yet logged in, they are going through the login flow
+        kHome,          // User is viewing their home (ie. public or personal timeline)
         kProfile,       // User is viewing the pictures in their own profile
         kSearch,        // User is searching profiles or tags
         kGallery        // User is viewing their 360 photo gallery, they can scroll through all the 360 photos on their phone
@@ -78,6 +79,15 @@ public class AppDirector : MonoBehaviour
         if (m_appState != AppState.kLogin)
         {
             SetLoginState();
+        }
+    }
+
+    public void RequestHomeState()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestHomeState() called");
+        if (m_appState != AppState.kHome)
+        {
+            SetHomeState();
         }
     }
 
@@ -146,6 +156,26 @@ public class AppDirector : MonoBehaviour
 
         m_menuController.SetLoginSubMenuActive(true);
         m_appState = AppState.kLogin;
+    }
+
+    private void SetHomeState()
+    {
+        Resources.UnloadUnusedAssets();
+        DisableAllOptions();
+        m_imageSphereController.HideAllImageSpheres();
+        m_keyboard.CancelText();
+        SetMenuBar(true);
+
+        m_imageLoader.InvalidateLoading();
+        m_gallery.InvalidateWork();
+        m_profile.InvalidateWork();
+        m_search.InvalidateWork();
+
+        //m_profile.ShowProfileText();
+
+        m_menuController.SetHomeSubMenuActive(true);
+        //m_profile.OpenProfile();
+        m_appState = AppState.kHome;
     }
 
     private void SetProfileState()

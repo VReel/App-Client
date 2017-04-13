@@ -42,9 +42,9 @@ public class Analytics : MonoBehaviour
         m_coroutineQueue.StartLoop();
     }
 
-    public void ProfileSelected()
+    public void HomeSelected()
     {
-        CustomEvent customEvent = new CustomEvent("ProfileSelected");
+        CustomEvent customEvent = new CustomEvent("HomeSelected");
         customEvent.AddAttribute("UserEmail", m_user.m_email);
 
         m_analyticsManager.RecordEvent(customEvent);
@@ -57,6 +57,14 @@ public class Analytics : MonoBehaviour
 
         m_analyticsManager.RecordEvent(customEvent);
     }
+
+    public void ProfileSelected()
+    {
+        CustomEvent customEvent = new CustomEvent("ProfileSelected");
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }        
 
     public void GallerySelected()
     {
