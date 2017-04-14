@@ -2,8 +2,6 @@
 using System.Collections;           // IEnumerator
 using System.Collections.Generic;   // List
 
-//using System.Net;                   // HttpWebRequest -- only used in old function LoadImageInternalUnity()
-
 public class Posts : MonoBehaviour 
 {   
     // **************************
@@ -184,6 +182,11 @@ public class Posts : MonoBehaviour
         m_posts.RemoveAt(ConvertIdToIndex(postId));
     }
 
+    public void LikeOrUnlikePost(string postId, bool doLike)
+    {
+        m_coroutineQueue.EnqueueAction(LikeOrUnlikePostInternal(postId, doLike));
+    }
+
     // **************************
     // Private/Helper functions
     // **************************
@@ -327,7 +330,8 @@ public class Posts : MonoBehaviour
                     (m_postsType == PostsType.kUserProfile) ? "" : m_posts[postIndex].userId, 
                     (m_postsType == PostsType.kUserProfile) ? "" : m_posts[postIndex].userHandle, 
                     m_posts[postIndex].caption, 
-                    m_posts[postIndex].likeCount
+                    m_posts[postIndex].likeCount,
+                    false //m_posts[postIndex].likedByMe
                 );
             }
             else
@@ -404,51 +408,19 @@ public class Posts : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: LoadImageInternal for " + imageIdentifier);
 
         m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, sphereIndex, url, imageIdentifier, showLoading);
-    }
-        
-    /*
-    private IEnumerator LoadImageInternalUnity(WebResponse response, int sphereIndex, string imageIdentifier)
+    }   
+
+    private IEnumerator LikeOrUnlikePostInternal(string postId, bool doLike)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: ConvertStreamAndSetImage for " + imageIdentifier);
-
-        const int kNumIterationsPerFrame = 150;
-        byte[] myBinary = null;
-        using (var stream = response.GetResponseStream())
-        {            
-            using( MemoryStream ms = new MemoryStream() )
-            {
-                int iterations = 0;
-                int byteCount = 0;
-                do
-                {
-                    byte[] buf = new byte[1024];
-                    byteCount = stream.Read(buf, 0, 1024);
-                    ms.Write(buf, 0, byteCount);
-                    iterations++;
-                    if (iterations % kNumIterationsPerFrame == 0)
-                    {                        
-                        yield return null;
-                    }
-                } 
-                while(stream.CanRead && byteCount > 0);
-
-                myBinary = ms.ToArray();
-            }
+        if (doLike)
+        {
+            yield return m_backEndAPI.Like_LikePost(postId);
         }
-
-        // The following is generally coming out to around 6-7MB in size...
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished iterating, length of byte[] is " + myBinary.Length);
-
-        Texture2D newImage = new Texture2D(2,2); 
-        newImage.LoadImage(myBinary);
-        m_imageSphereController.SetImageAtIndex(sphereIndex, newImage, imageIdentifier, -1 , true);
-        yield return null;
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished Setting Image!");
-
-        Resources.UnloadUnusedAssets();
+        else
+        {
+            yield return m_backEndAPI.Like_UnlikePost(postId);
+        }
     }
-    */
 
     private int ConvertIdToIndex(string postId) //TODO: To remove this all I need to do is turn m_posts into a Map<ID, PostAttributes>...
     {

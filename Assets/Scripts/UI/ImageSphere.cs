@@ -10,6 +10,7 @@ public class ImageSphere : MonoBehaviour
     // **************************
 
     [SerializeField] private Search m_search;
+    [SerializeField] private Posts m_posts;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
@@ -27,6 +28,7 @@ public class ImageSphere : MonoBehaviour
     private string m_handle;
     private string m_caption;
     private int m_likes;
+    private bool m_heartOn;
 
     private int m_imageSphereIndex = -1; // ImageSphere's know their index into the ImageSphereController - this is currently only for Debug!
     private int m_currTextureIndex = -1; // ImageSphere's track the index of the texture they are pointing to
@@ -81,12 +83,13 @@ public class ImageSphere : MonoBehaviour
         }
     }
 
-    public void SetMetadata(string userId, string handle, string caption, int likes) 
+    public void SetMetadata(string userId, string handle, string caption, int likes, bool likedByMe) 
     { //NOTE: These are only set onto their UI elements when the Animation has ended!
         m_userId = userId;
         m_handle = handle;
         m_caption = caption;
         m_likes = likes;
+        m_heartOn = likedByMe;
     }
 
     public void Hide()
@@ -95,6 +98,7 @@ public class ImageSphere : MonoBehaviour
         m_handle = "";
         m_caption = "";
         m_likes = -1;
+        m_heartOn = false;
 
         m_coroutineQueue.Clear();
         m_coroutineQueue.EnqueueAction(AnimateHide());
@@ -106,6 +110,7 @@ public class ImageSphere : MonoBehaviour
         m_handle = "";
         m_caption = "";
         m_likes = -1;
+        m_heartOn = false;
 
         UpdateMetadata();
 
@@ -116,6 +121,26 @@ public class ImageSphere : MonoBehaviour
     public void HandleSelected()
     {
         m_search.OpenSearchAndProfileWithId(m_userId);
+    }
+
+    public void HeartSelected()
+    {
+        m_heartOn = !m_heartOn;
+        m_likes = m_heartOn ? m_likes+1 : m_likes-1;
+
+        m_heartObject.GetComponentInChildren<HeartButton>().HeartOnOffSwitch(m_heartOn);
+        m_likesObject.GetComponentInChildren<Text>().text = m_likes.ToString();
+        m_posts.LikeOrUnlikePost(m_imageIdentifier, m_heartOn);
+    }
+
+    public void LikesSelected()
+    {
+        //TODO
+    }
+
+    public void CaptionSelected()
+    {
+        //TODO
     }
 
     // **************************
@@ -147,7 +172,7 @@ public class ImageSphere : MonoBehaviour
         m_likesObject.GetComponentInChildren<Text>().text = m_likes.ToString();
 
         m_heartObject.SetActive(m_likes >= 0);
-        m_heartObject.GetComponentInChildren<HeartButton>().HeartOff();
+        m_heartObject.GetComponentInChildren<HeartButton>().HeartOnOffSwitch(m_heartOn);
     }
 
     private void HideMetadata()

@@ -11,33 +11,21 @@ public class HeartButton : MonoBehaviour
     [SerializeField] private Color m_buttonColourSelected;
     [SerializeField] private Color m_buttonColourDeselected;
 
-    private bool m_isSelected = false;
-
-    public bool GetIsSelected()
-    {
-        return m_isSelected;
-    }
-
-    public void HeartOn()
-    {
-        m_isSelected = true;
-        m_heartButton.color = m_buttonColourSelected;
-    }
-
-    public void HeartOff()
-    {
-        m_isSelected = false;
-        m_heartButton.color = m_buttonColourDeselected;
-    }
+    private bool m_isOn = false;
 
     // **************************
     // Public functions
     // **************************
 
-    public void HeartOnOffSwitch()
+    public bool GetIsOn()
     {
-        m_isSelected = !m_isSelected;
-        if (m_isSelected)
+        return m_isOn;
+    }
+        
+    public void HeartOnOffSwitch(bool heartOn)
+    {
+        m_isOn = heartOn;
+        if (m_isOn)
         {
             m_heartButton.color = m_buttonColourSelected;
         }
