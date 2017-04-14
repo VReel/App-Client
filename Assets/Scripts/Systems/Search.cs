@@ -144,6 +144,7 @@ public class Search : MonoBehaviour
         OnButtonSelected(m_searchTypes[(int)m_searchState]);  // button 0 = Profile search button
         m_searchInputText.text = "";
         m_searchInput.SetActive(true);
+        HideAllResults();
     }
 
     public void OpenTagSearch()
@@ -161,6 +162,7 @@ public class Search : MonoBehaviour
         OnButtonSelected(m_searchTypes[(int)m_searchState]);  // button 1 = Tag search button
         m_searchInputText.text = "";
         m_searchInput.SetActive(true);
+        HideAllResults();
     }        
 
     public void OpenProfileOrTag(int resultNumber)

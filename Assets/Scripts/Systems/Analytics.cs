@@ -151,6 +151,18 @@ public class Analytics : MonoBehaviour
         m_analyticsManager.RecordEvent(customEvent);
     }
 
+    public void HeartSelected(int sphereNumber)
+    {
+        CustomEvent customEvent = new CustomEvent("HeartSelected");
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
+
+        SetAppState(ref customEvent);
+
+        customEvent.AddAttribute("SphereNumber", sphereNumber.ToString());
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
+
     public void PreviousArrowSelected()
     {
         CustomEvent customEvent = new CustomEvent("PreviousArrowSelected");

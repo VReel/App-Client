@@ -82,6 +82,7 @@
      <Compile Include="Assets\Scripts\Systems\Search.cs" />
      <Compile Include="Assets\Scripts\Systems\ThreadJob.cs" />
      <Compile Include="Assets\Scripts\Systems\User.cs" />
+     <Compile Include="Assets\Scripts\UI\HeartButton.cs" />
      <Compile Include="Assets\Scripts\UI\ImageSkybox.cs" />
      <Compile Include="Assets\Scripts\UI\ImageSphere.cs" />
      <Compile Include="Assets\Scripts\UI\LoadingIcon.cs" />

@@ -14,6 +14,7 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
     [SerializeField] private GameObject m_handleObject;
+    [SerializeField] private GameObject m_heartObject;
     [SerializeField] private GameObject m_likesObject;
     [SerializeField] private GameObject m_captionObject;
 
@@ -144,6 +145,9 @@ public class ImageSphere : MonoBehaviour
 
         m_likesObject.SetActive(m_likes >= 0);
         m_likesObject.GetComponentInChildren<Text>().text = m_likes.ToString();
+
+        m_heartObject.SetActive(m_likes >= 0);
+        m_heartObject.GetComponentInChildren<HeartButton>().HeartOff();
     }
 
     private void HideMetadata()
@@ -153,6 +157,7 @@ public class ImageSphere : MonoBehaviour
         m_handleObject.SetActive(false);
         m_captionObject.SetActive(false);
         m_likesObject.SetActive(false);
+        m_heartObject.SetActive(false);
     }
 
     private IEnumerator AnimateSetTexture()
