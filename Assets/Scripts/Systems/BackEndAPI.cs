@@ -676,6 +676,49 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
+        
+    public IEnumerator Post_GetPostLikes(string postId, string page = "")
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts/" + postId + "/likes?page=" + page + "' - Show all users who like post");
+
+        var request = new RestRequest("/posts/" + postId + "/likes?page=" + page, Method.GET);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts/" + postId + "/likes?page=" + page + "' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            UpdateAccessToken(response);
+
+            yield return m_threadJob.WaitFor();
+            VReelJSON.Model_Users result = null;
+            m_threadJob.Start( () => 
+                result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Users>(response.Content)
+            );
+            yield return m_threadJob.WaitFor();
+
+            m_usersJSONResult = result;
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "GET to '/posts/" + postId + "/likes?page=" + page + "'");
+        }
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }
 
     //--------------------------------------------
     // User
@@ -1001,10 +1044,6 @@ public class BackEndAPI
         request.AddHeader("uid", m_user.GetUID());
         request.AddHeader("access-token", m_user.GetAcceessToken());
 
-        request.AddJsonBody(new { 
-            postId = _postId
-        });
-
         yield return m_threadJob.WaitFor();
         float timeBeforeRequest = Time.realtimeSinceStartup;
         IRestResponse response = new RestResponse();
@@ -1038,10 +1077,6 @@ public class BackEndAPI
         request.AddHeader("client", m_user.GetClient());
         request.AddHeader("uid", m_user.GetUID());
         request.AddHeader("access-token", m_user.GetAcceessToken());
-
-        request.AddJsonBody(new { 
-            postId = _postId
-        });
 
         yield return m_threadJob.WaitFor();
         float timeBeforeRequest = Time.realtimeSinceStartup;

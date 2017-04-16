@@ -181,12 +181,7 @@ public class Posts : MonoBehaviour
         //  -> for now we always remove the post, but really we should be checking that post no longer exists...
         m_posts.RemoveAt(ConvertIdToIndex(postId));
     }
-
-    public void LikeOrUnlikePost(string postId, bool doLike)
-    {
-        m_coroutineQueue.EnqueueAction(LikeOrUnlikePostInternal(postId, doLike));
-    }
-
+        
     // **************************
     // Private/Helper functions
     // **************************
@@ -283,7 +278,7 @@ public class Posts : MonoBehaviour
             }
 
             m_nextPageOfPosts = null;
-            if (posts.meta.next_page) // Handle users with over 20 posts - if we have another page, then loop back around... 
+            if (posts.meta.next_page)
             {
                 m_nextPageOfPosts = posts.meta.next_page_id;
             }
@@ -408,19 +403,7 @@ public class Posts : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: LoadImageInternal for " + imageIdentifier);
 
         m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, sphereIndex, url, imageIdentifier, showLoading);
-    }   
-
-    private IEnumerator LikeOrUnlikePostInternal(string postId, bool doLike)
-    {
-        if (doLike)
-        {
-            yield return m_backEndAPI.Like_LikePost(postId);
-        }
-        else
-        {
-            yield return m_backEndAPI.Like_UnlikePost(postId);
-        }
-    }
+    }           
 
     private int ConvertIdToIndex(string postId) //TODO: To remove this all I need to do is turn m_posts into a Map<ID, PostAttributes>...
     {

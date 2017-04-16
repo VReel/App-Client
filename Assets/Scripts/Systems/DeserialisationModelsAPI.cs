@@ -85,6 +85,19 @@ namespace VReelJSON
     public class Model_Users
     {
         public List<UserData> data { get; set; }
+        public UsersLinks links { get; set; }
+        public UsersMeta meta { get; set; }
+    }
+
+    public class UsersLinks
+    {
+        public string next { get; set; }
+    }
+
+    public class UsersMeta
+    {
+        public bool next_page { get; set; }
+        public string next_page_id { get; set; }
     }
 
     //--------------------------------------------

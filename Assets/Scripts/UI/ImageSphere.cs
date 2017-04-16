@@ -10,7 +10,7 @@ public class ImageSphere : MonoBehaviour
     // **************************
 
     [SerializeField] private Search m_search;
-    [SerializeField] private Posts m_posts;
+    [SerializeField] private Likes m_likes;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
@@ -27,7 +27,7 @@ public class ImageSphere : MonoBehaviour
     private string m_userId;
     private string m_handle;
     private string m_caption;
-    private int m_likes;
+    private int m_numLikes;
     private bool m_heartOn;
 
     private int m_imageSphereIndex = -1; // ImageSphere's know their index into the ImageSphereController - this is currently only for Debug!
@@ -88,7 +88,7 @@ public class ImageSphere : MonoBehaviour
         m_userId = userId;
         m_handle = handle;
         m_caption = caption;
-        m_likes = likes;
+        m_numLikes = likes;
         m_heartOn = likedByMe;
     }
 
@@ -97,7 +97,7 @@ public class ImageSphere : MonoBehaviour
         m_imageIdentifier = "";
         m_handle = "";
         m_caption = "";
-        m_likes = -1;
+        m_numLikes = -1;
         m_heartOn = false;
 
         m_coroutineQueue.Clear();
@@ -109,7 +109,7 @@ public class ImageSphere : MonoBehaviour
         m_imageIdentifier = "";
         m_handle = "";
         m_caption = "";
-        m_likes = -1;
+        m_numLikes = -1;
         m_heartOn = false;
 
         UpdateMetadata();
@@ -126,16 +126,16 @@ public class ImageSphere : MonoBehaviour
     public void HeartSelected()
     {
         m_heartOn = !m_heartOn;
-        m_likes = m_heartOn ? m_likes+1 : m_likes-1;
+        m_numLikes = m_heartOn ? m_numLikes+1 : m_numLikes-1;
 
         m_heartObject.GetComponentInChildren<HeartButton>().HeartOnOffSwitch(m_heartOn);
-        m_likesObject.GetComponentInChildren<Text>().text = m_likes.ToString();
-        m_posts.LikeOrUnlikePost(m_imageIdentifier, m_heartOn);
+        m_likesObject.GetComponentInChildren<Text>().text = m_numLikes.ToString();
+        m_likes.LikeOrUnlikePost(m_imageIdentifier, m_heartOn);
     }
 
     public void LikesSelected()
     {
-        //TODO
+        m_likes.DisplayLikesResults(m_imageIdentifier);
     }
 
     public void CaptionSelected()
@@ -168,10 +168,10 @@ public class ImageSphere : MonoBehaviour
         m_captionObject.SetActive(m_caption.Length > 0);
         m_captionObject.GetComponentInChildren<Text>().text = m_caption;
 
-        m_likesObject.SetActive(m_likes >= 0);
-        m_likesObject.GetComponentInChildren<Text>().text = m_likes.ToString();
+        m_likesObject.SetActive(m_numLikes >= 0);
+        m_likesObject.GetComponentInChildren<Text>().text = m_numLikes.ToString();
 
-        m_heartObject.SetActive(m_likes >= 0);
+        m_heartObject.SetActive(m_numLikes >= 0);
         m_heartObject.GetComponentInChildren<HeartButton>().HeartOnOffSwitch(m_heartOn);
     }
 
