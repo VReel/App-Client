@@ -18,11 +18,13 @@ public class Posts : MonoBehaviour
     {
         public string postId { get; set; }
         public string thumbnailUrl { get; set; }
-        public string originalUrl { get; set; }
-        public int likeCount { get; set; }
         public string caption { get; set; }
-        public bool edited { get; set; }
+        public int likeCount { get; set; }
+        public int commentCount { get; set; }
         public string createdAt { get; set; }
+        public bool edited { get; set; }
+        public bool likedByMe { get; set; }
+        public string originalUrl { get; set; }
         public string userId { get; set; }
         public string userHandle { get; set; }
     }
@@ -57,7 +59,7 @@ public class Posts : MonoBehaviour
         m_coroutineQueue.StartLoop();
 
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
-	}              
+	}
         
     public int GetNumPosts()
     {
@@ -267,10 +269,12 @@ public class Posts : MonoBehaviour
                 Post newPost = new Post();
                 newPost.postId = postData.id.ToString();
                 newPost.thumbnailUrl = postData.attributes.thumbnail_url.ToString();
-                newPost.likeCount = postData.attributes.like_count;
                 newPost.caption = postData.attributes.caption.ToString();
-                newPost.edited = postData.attributes.edited;
+                newPost.likeCount = postData.attributes.like_count;
+                newPost.commentCount = postData.attributes.comment_count;
                 newPost.createdAt = postData.attributes.created_at.ToString();
+                newPost.edited = postData.attributes.edited;
+                newPost.likedByMe = postData.attributes.liked_by_me;
                 newPost.userId = postData.relationships.user.data.id.ToString();
                 newPost.userHandle = GetHandleFromIDAndPostData(ref posts, newPost.userId);
 
@@ -326,7 +330,7 @@ public class Posts : MonoBehaviour
                     (m_postsType == PostsType.kUserProfile) ? "" : m_posts[postIndex].userHandle, 
                     m_posts[postIndex].caption, 
                     m_posts[postIndex].likeCount,
-                    false //m_posts[postIndex].likedByMe
+                    m_posts[postIndex].likedByMe
                 );
             }
             else
@@ -391,8 +395,10 @@ public class Posts : MonoBehaviour
                 m_posts[index].thumbnailUrl = m_backEndAPI.GetPostResult().data.attributes.thumbnail_url;
                 m_posts[index].caption = m_backEndAPI.GetPostResult().data.attributes.caption.ToString();
                 m_posts[index].likeCount = m_backEndAPI.GetPostResult().data.attributes.like_count;
+                m_posts[index].commentCount = m_backEndAPI.GetPostResult().data.attributes.comment_count;
                 m_posts[index].createdAt = m_backEndAPI.GetPostResult().data.attributes.created_at.ToString();
                 m_posts[index].edited = m_backEndAPI.GetPostResult().data.attributes.edited;
+                m_posts[index].likedByMe = m_backEndAPI.GetPostResult().data.attributes.liked_by_me;
                 m_posts[index].originalUrl = m_backEndAPI.GetPostResult().data.attributes.original_url;
             }
         }
