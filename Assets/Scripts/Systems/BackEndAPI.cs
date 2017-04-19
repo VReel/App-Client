@@ -190,8 +190,6 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
-
             yield return m_threadJob.WaitFor();
             VReelJSON.Model_User result = null;
             m_threadJob.Start( () => 
@@ -210,6 +208,8 @@ public class BackEndAPI
 
             ShowErrors(response, "GET to '/users'");
         }
+
+        UpdateAccessToken(response);
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
@@ -247,12 +247,14 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
+            // Empty
         }
         else // Error Handling
         {            
             ShowErrors(response, "PUT to '/users'");
         }
+
+        UpdateAccessToken(response);
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
@@ -281,12 +283,14 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
+            // Empty
         }
         else // Error Handling
         {            
             ShowErrors(response, "DELETE to '/users'");
         }
+
+        UpdateAccessToken(response);
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
@@ -319,12 +323,14 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
+            // Empty
         }
         else // Error Handling
         {            
             ShowErrors(response, "POST to '/users/password'");
         }
+
+        UpdateAccessToken(response);
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
@@ -406,12 +412,14 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
+            // Empty
         }
         else // Error Handling
         {            
             ShowErrors(response, "DELETE to '/users/sign_out'");
         }
+
+        UpdateAccessToken(response);
 
         m_user.Clear();
 
@@ -447,8 +455,6 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
-
             yield return m_threadJob.WaitFor();
             VReelJSON.Model_S3PresignedURL result = null;
             m_threadJob.Start( () => 
@@ -462,6 +468,8 @@ public class BackEndAPI
         {            
             ShowErrors(response, "GET to '/s3_presigned_url'");
         }
+
+        UpdateAccessToken(response);
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
@@ -489,12 +497,10 @@ public class BackEndAPI
         float timeAfterRequest = Time.realtimeSinceStartup;
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts?page=" + page + "' - Response: " + response.Content);
-
+               
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
-
             yield return m_threadJob.WaitFor();
             VReelJSON.Model_Posts result = null;
             m_threadJob.Start( () => 
@@ -508,6 +514,8 @@ public class BackEndAPI
         {            
             ShowErrors(response, "GET to '/posts?page=" + page + "'");
         }
+
+        UpdateAccessToken(response);
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
@@ -542,12 +550,14 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
+            // Empty
         }
         else // Error Handling
         {            
             ShowErrors(response, "POST to '/posts'");
         }
+
+        UpdateAccessToken(response);
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
@@ -576,8 +586,6 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
-
             yield return m_threadJob.WaitFor();
             VReelJSON.Model_Post result = null;
             m_threadJob.Start( () => 
@@ -591,6 +599,8 @@ public class BackEndAPI
         {            
             ShowErrors(response, "GET to '/posts/" + postId + "'");
         }
+
+        UpdateAccessToken(response);
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
@@ -619,12 +629,14 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
+            // Empty
         }
         else // Error Handling
         {            
             ShowErrors(response, "DELETE to '/posts/" + postId + "'");
         }
+
+        UpdateAccessToken(response);
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
@@ -658,8 +670,6 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
-
             yield return m_threadJob.WaitFor();
             VReelJSON.Model_Post result = null;
             m_threadJob.Start( () => 
@@ -673,6 +683,51 @@ public class BackEndAPI
         {            
             ShowErrors(response, "GET to '/posts/" + postId + "'");
         }
+
+        UpdateAccessToken(response);
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }
+        
+    public IEnumerator Post_GetPostLikes(string postId, string page = "")
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts/" + postId + "/likes?page=" + page + "' - Show all users who like post");
+
+        var request = new RestRequest("/posts/" + postId + "/likes?page=" + page, Method.GET);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts/" + postId + "/likes?page=" + page + "' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            yield return m_threadJob.WaitFor();
+            VReelJSON.Model_Users result = null;
+            m_threadJob.Start( () => 
+                result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Users>(response.Content)
+            );
+            yield return m_threadJob.WaitFor();
+
+            m_usersJSONResult = result;
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "GET to '/posts/" + postId + "/likes?page=" + page + "'");
+        }
+
+        UpdateAccessToken(response);
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
@@ -705,8 +760,6 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
-
             yield return m_threadJob.WaitFor();
             VReelJSON.Model_User result = null;
             m_threadJob.Start( () => 
@@ -720,6 +773,8 @@ public class BackEndAPI
         {            
             ShowErrors(response, "GET to '/users/" + userId + "'");
         }
+
+        UpdateAccessToken(response);
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
@@ -748,8 +803,6 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
-
             yield return m_threadJob.WaitFor();
             VReelJSON.Model_Posts result = null;
             m_threadJob.Start( () => 
@@ -763,6 +816,8 @@ public class BackEndAPI
         {            
             ShowErrors(response, "GET to '/users/" + userId + "/posts?page=" + page + "'");
         }
+
+        UpdateAccessToken(response);
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
@@ -791,8 +846,6 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
-
             yield return m_threadJob.WaitFor();
             VReelJSON.Model_Users result = null;
             m_threadJob.Start( () => 
@@ -806,6 +859,8 @@ public class BackEndAPI
         {            
             ShowErrors(response, "GET to '/search/users/" + user + "'");
         }
+
+        UpdateAccessToken(response);
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
@@ -837,8 +892,6 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
-
             yield return m_threadJob.WaitFor();
             VReelJSON.Model_Posts result = null;
             m_threadJob.Start( () => 
@@ -852,6 +905,8 @@ public class BackEndAPI
         {            
             ShowErrors(response, "GET to '/hash_tags/" + hashTag + "/posts?page=" + page + "'");
         }
+
+        UpdateAccessToken(response);
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
@@ -880,8 +935,6 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
-
             yield return m_threadJob.WaitFor();
             VReelJSON.Model_Tags result = null;
             m_threadJob.Start( () => 
@@ -895,6 +948,8 @@ public class BackEndAPI
         {            
             ShowErrors(response, "GET to '/search/hash_tags/" + hashTag + "'");
         }
+
+        UpdateAccessToken(response);
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
@@ -926,8 +981,6 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
-
             yield return m_threadJob.WaitFor();
             VReelJSON.Model_Posts result = null;
             m_threadJob.Start( () => 
@@ -941,6 +994,8 @@ public class BackEndAPI
         {            
             ShowErrors(response, "GET to '/public_timeline?page=" + page + "'");
         }
+
+        UpdateAccessToken(response);
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
@@ -969,8 +1024,6 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
-
             yield return m_threadJob.WaitFor();
             VReelJSON.Model_Posts result = null;
             m_threadJob.Start( () => 
@@ -985,31 +1038,89 @@ public class BackEndAPI
             ShowErrors(response, "GET to '/timeline?page=" + page + "'");
         }
 
+        UpdateAccessToken(response);
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }
+
+    //--------------------------------------------
+    // Like
+
+    public IEnumerator Like_LikePost(string _postId)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/like/" + _postId + "' - Like a post");
+
+        var request = new RestRequest("/like/" + _postId, Method.POST);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/like/" + _postId + "' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            // Empty
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "POST to '/like/" + _postId + "'");
+        }
+
+        UpdateAccessToken(response);
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }
+
+    public IEnumerator Like_UnlikePost(string _postId)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/like/" + _postId + "' - Unlike a post");
+
+        var request = new RestRequest("/like/" + _postId, Method.DELETE);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/like/" + _postId + "' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            // Empty
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "DELETE to '/like/" + _postId + "'");
+        }
+
+        UpdateAccessToken(response);
+
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
 
     // **************************
     // Private/Helper functions
     // **************************
-
-    /*
-            using (Stream dataStream = httpRequest.GetRequestStream())
-            {                
-                byte[] buffer = new byte[8000];
-                using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-                {         
-                    int totalBytesRead = 0;
-                    int bytesRead = 0;
-                    while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) > 0)
-                    {
-                        dataStream.Write(buffer, 0, bytesRead);
-                        totalBytesRead += bytesRead;
-                    }
-
-                    Debug.Log("Total Bytes Read = " + totalBytesRead);
-                }
-            }
-    */
 
     private bool UploadObjectInternal(string url, string filePath, bool isDebugBuild)
     {

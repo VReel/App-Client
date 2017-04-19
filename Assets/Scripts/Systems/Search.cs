@@ -144,6 +144,7 @@ public class Search : MonoBehaviour
         OnButtonSelected(m_searchTypes[(int)m_searchState]);  // button 0 = Profile search button
         m_searchInputText.text = "";
         m_searchInput.SetActive(true);
+        HideAllResults();
     }
 
     public void OpenTagSearch()
@@ -161,12 +162,21 @@ public class Search : MonoBehaviour
         OnButtonSelected(m_searchTypes[(int)m_searchState]);  // button 1 = Tag search button
         m_searchInputText.text = "";
         m_searchInput.SetActive(true);
+        HideAllResults();
     }        
 
     public void OpenProfileOrTag(int resultNumber)
     {
         HideAllResults();
-        m_keyboard.CancelText();
+        if (m_keyboard.ShouldBeShowing())
+        {
+            m_keyboard.AcceptText();
+        }
+        else
+        {
+            m_keyboard.CancelText();
+        }
+        m_workingString = "";
 
         if (m_searchState == SearchState.kUserSearch)
         {

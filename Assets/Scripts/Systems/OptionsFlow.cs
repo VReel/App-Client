@@ -19,6 +19,7 @@ public class OptionsFlow : MonoBehaviour
     [SerializeField] private User m_user;
     [SerializeField] private KeyBoard m_keyboard;
 
+    [SerializeField] private GameObject m_optionsSubMenu;
     [SerializeField] private GameObject m_optionsPage;
     [SerializeField] private GameObject m_setPasswordPage;
     [SerializeField] private GameObject m_deleteAccountPage;
@@ -53,13 +54,13 @@ public class OptionsFlow : MonoBehaviour
          
     public void SetOptionsFlowPage(int pageNumber)
     {
+        m_optionsSubMenu.SetActive(true);
+
         if (pageNumber == -1)
         {
-            m_optionsPage.SetActive(false);
-            m_setPasswordPage.SetActive(false);
-            m_deleteAccountPage.SetActive(false);
+            m_optionsSubMenu.SetActive(false);
         }
-        if (pageNumber == 0)
+        else if (pageNumber == 0)
         {
             m_optionsPage.SetActive(true);
             m_setPasswordPage.SetActive(false);

@@ -142,7 +142,7 @@ public class User : MonoBehaviour
                 m_loginData = (LoginData) binaryFormatter.Deserialize(fileStream);
             }
 
-            StartCoroutine(m_backEndAPI.Register_GetUser());
+            m_coroutineQueue.EnqueueAction(m_backEndAPI.Register_GetUser());
         }
     }
 

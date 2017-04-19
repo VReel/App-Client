@@ -85,6 +85,19 @@ namespace VReelJSON
     public class Model_Users
     {
         public List<UserData> data { get; set; }
+        public UsersLinks links { get; set; }
+        public UsersMeta meta { get; set; }
+    }
+
+    public class UsersLinks
+    {
+        public string next { get; set; }
+    }
+
+    public class UsersMeta
+    {
+        public bool next_page { get; set; }
+        public string next_page_id { get; set; }
     }
 
     //--------------------------------------------
@@ -134,8 +147,10 @@ namespace VReelJSON
         public string thumbnail_url { get; set; }
         public string caption { get; set; }
         public int like_count { get; set; }
+        public int comment_count { get; set; }
         public string created_at { get; set; }
         public bool edited { get; set; }
+        public bool liked_by_me { get; set; }
         public string original_url { get; set; }
     }     
 
@@ -162,8 +177,10 @@ namespace VReelJSON
         public string thumbnail_url { get; set; }
         public string caption { get; set; }
         public int like_count { get; set; }
+        public int comment_count { get; set; }
         public string created_at { get; set; }
         public bool edited { get; set; }
+        public bool liked_by_me { get; set; }
     }   
 
     public class PostsRelationships

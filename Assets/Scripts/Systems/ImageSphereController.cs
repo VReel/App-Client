@@ -108,7 +108,7 @@ public class ImageSphereController : MonoBehaviour
         }
     }    
 
-    public void SetMetadataAtIndex(int sphereIndex, string userId, string handle, string caption, int likes)
+    public void SetMetadataAtIndex(int sphereIndex, string userId, string handle, string caption, int likes, bool likedByMe)
     {
         if (sphereIndex == -1)
         {
@@ -116,7 +116,7 @@ public class ImageSphereController : MonoBehaviour
         }
         else if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
         {
-            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetMetadata(userId, handle, caption, likes);
+            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetMetadata(userId, handle, caption, likes, likedByMe);
         }
         else
         {

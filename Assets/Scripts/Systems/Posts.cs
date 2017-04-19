@@ -2,8 +2,6 @@
 using System.Collections;           // IEnumerator
 using System.Collections.Generic;   // List
 
-//using System.Net;                   // HttpWebRequest -- only used in old function LoadImageInternalUnity()
-
 public class Posts : MonoBehaviour 
 {   
     // **************************
@@ -20,11 +18,13 @@ public class Posts : MonoBehaviour
     {
         public string postId { get; set; }
         public string thumbnailUrl { get; set; }
-        public string originalUrl { get; set; }
-        public int likeCount { get; set; }
         public string caption { get; set; }
-        public bool edited { get; set; }
+        public int likeCount { get; set; }
+        public int commentCount { get; set; }
         public string createdAt { get; set; }
+        public bool edited { get; set; }
+        public bool likedByMe { get; set; }
+        public string originalUrl { get; set; }
         public string userId { get; set; }
         public string userHandle { get; set; }
     }
@@ -59,7 +59,7 @@ public class Posts : MonoBehaviour
         m_coroutineQueue.StartLoop();
 
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
-	}              
+	}
         
     public int GetNumPosts()
     {
@@ -183,7 +183,7 @@ public class Posts : MonoBehaviour
         //  -> for now we always remove the post, but really we should be checking that post no longer exists...
         m_posts.RemoveAt(ConvertIdToIndex(postId));
     }
-
+        
     // **************************
     // Private/Helper functions
     // **************************
@@ -269,10 +269,12 @@ public class Posts : MonoBehaviour
                 Post newPost = new Post();
                 newPost.postId = postData.id.ToString();
                 newPost.thumbnailUrl = postData.attributes.thumbnail_url.ToString();
-                newPost.likeCount = postData.attributes.like_count;
                 newPost.caption = postData.attributes.caption.ToString();
-                newPost.edited = postData.attributes.edited;
+                newPost.likeCount = postData.attributes.like_count;
+                newPost.commentCount = postData.attributes.comment_count;
                 newPost.createdAt = postData.attributes.created_at.ToString();
+                newPost.edited = postData.attributes.edited;
+                newPost.likedByMe = postData.attributes.liked_by_me;
                 newPost.userId = postData.relationships.user.data.id.ToString();
                 newPost.userHandle = GetHandleFromIDAndPostData(ref posts, newPost.userId);
 
@@ -280,7 +282,7 @@ public class Posts : MonoBehaviour
             }
 
             m_nextPageOfPosts = null;
-            if (posts.meta.next_page) // Handle users with over 20 posts - if we have another page, then loop back around... 
+            if (posts.meta.next_page)
             {
                 m_nextPageOfPosts = posts.meta.next_page_id;
             }
@@ -327,7 +329,8 @@ public class Posts : MonoBehaviour
                     (m_postsType == PostsType.kUserProfile) ? "" : m_posts[postIndex].userId, 
                     (m_postsType == PostsType.kUserProfile) ? "" : m_posts[postIndex].userHandle, 
                     m_posts[postIndex].caption, 
-                    m_posts[postIndex].likeCount
+                    m_posts[postIndex].likeCount,
+                    m_posts[postIndex].likedByMe
                 );
             }
             else
@@ -392,8 +395,10 @@ public class Posts : MonoBehaviour
                 m_posts[index].thumbnailUrl = m_backEndAPI.GetPostResult().data.attributes.thumbnail_url;
                 m_posts[index].caption = m_backEndAPI.GetPostResult().data.attributes.caption.ToString();
                 m_posts[index].likeCount = m_backEndAPI.GetPostResult().data.attributes.like_count;
+                m_posts[index].commentCount = m_backEndAPI.GetPostResult().data.attributes.comment_count;
                 m_posts[index].createdAt = m_backEndAPI.GetPostResult().data.attributes.created_at.ToString();
                 m_posts[index].edited = m_backEndAPI.GetPostResult().data.attributes.edited;
+                m_posts[index].likedByMe = m_backEndAPI.GetPostResult().data.attributes.liked_by_me;
                 m_posts[index].originalUrl = m_backEndAPI.GetPostResult().data.attributes.original_url;
             }
         }
@@ -404,51 +409,7 @@ public class Posts : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: LoadImageInternal for " + imageIdentifier);
 
         m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, sphereIndex, url, imageIdentifier, showLoading);
-    }
-        
-    /*
-    private IEnumerator LoadImageInternalUnity(WebResponse response, int sphereIndex, string imageIdentifier)
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: ConvertStreamAndSetImage for " + imageIdentifier);
-
-        const int kNumIterationsPerFrame = 150;
-        byte[] myBinary = null;
-        using (var stream = response.GetResponseStream())
-        {            
-            using( MemoryStream ms = new MemoryStream() )
-            {
-                int iterations = 0;
-                int byteCount = 0;
-                do
-                {
-                    byte[] buf = new byte[1024];
-                    byteCount = stream.Read(buf, 0, 1024);
-                    ms.Write(buf, 0, byteCount);
-                    iterations++;
-                    if (iterations % kNumIterationsPerFrame == 0)
-                    {                        
-                        yield return null;
-                    }
-                } 
-                while(stream.CanRead && byteCount > 0);
-
-                myBinary = ms.ToArray();
-            }
-        }
-
-        // The following is generally coming out to around 6-7MB in size...
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished iterating, length of byte[] is " + myBinary.Length);
-
-        Texture2D newImage = new Texture2D(2,2); 
-        newImage.LoadImage(myBinary);
-        m_imageSphereController.SetImageAtIndex(sphereIndex, newImage, imageIdentifier, -1 , true);
-        yield return null;
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished Setting Image!");
-
-        Resources.UnloadUnusedAssets();
-    }
-    */
+    }           
 
     private int ConvertIdToIndex(string postId) //TODO: To remove this all I need to do is turn m_posts into a Map<ID, PostAttributes>...
     {

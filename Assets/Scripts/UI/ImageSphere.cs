@@ -10,10 +10,12 @@ public class ImageSphere : MonoBehaviour
     // **************************
 
     [SerializeField] private Search m_search;
+    [SerializeField] private Likes m_likes;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
     [SerializeField] private GameObject m_handleObject;
+    [SerializeField] private GameObject m_heartObject;
     [SerializeField] private GameObject m_likesObject;
     [SerializeField] private GameObject m_captionObject;
 
@@ -25,7 +27,8 @@ public class ImageSphere : MonoBehaviour
     private string m_userId;
     private string m_handle;
     private string m_caption;
-    private int m_likes;
+    private int m_numLikes;
+    private bool m_heartOn;
 
     private int m_imageSphereIndex = -1; // ImageSphere's know their index into the ImageSphereController - this is currently only for Debug!
     private int m_currTextureIndex = -1; // ImageSphere's track the index of the texture they are pointing to
@@ -80,12 +83,13 @@ public class ImageSphere : MonoBehaviour
         }
     }
 
-    public void SetMetadata(string userId, string handle, string caption, int likes) 
+    public void SetMetadata(string userId, string handle, string caption, int likes, bool likedByMe) 
     { //NOTE: These are only set onto their UI elements when the Animation has ended!
         m_userId = userId;
         m_handle = handle;
         m_caption = caption;
-        m_likes = likes;
+        m_numLikes = likes;
+        m_heartOn = likedByMe;
     }
 
     public void Hide()
@@ -93,7 +97,8 @@ public class ImageSphere : MonoBehaviour
         m_imageIdentifier = "";
         m_handle = "";
         m_caption = "";
-        m_likes = -1;
+        m_numLikes = -1;
+        m_heartOn = false;
 
         m_coroutineQueue.Clear();
         m_coroutineQueue.EnqueueAction(AnimateHide());
@@ -104,7 +109,8 @@ public class ImageSphere : MonoBehaviour
         m_imageIdentifier = "";
         m_handle = "";
         m_caption = "";
-        m_likes = -1;
+        m_numLikes = -1;
+        m_heartOn = false;
 
         UpdateMetadata();
 
@@ -115,6 +121,26 @@ public class ImageSphere : MonoBehaviour
     public void HandleSelected()
     {
         m_search.OpenSearchAndProfileWithId(m_userId);
+    }
+
+    public void HeartSelected()
+    {
+        m_heartOn = !m_heartOn;
+        m_numLikes = m_heartOn ? m_numLikes+1 : m_numLikes-1;
+
+        m_heartObject.GetComponentInChildren<HeartButton>().HeartOnOffSwitch(m_heartOn);
+        m_likesObject.GetComponentInChildren<Text>().text = m_numLikes.ToString();
+        m_likes.LikeOrUnlikePost(m_imageIdentifier, m_heartOn);
+    }
+
+    public void LikesSelected()
+    {
+        m_likes.DisplayLikesResults(m_imageIdentifier);
+    }
+
+    public void CaptionSelected()
+    {
+        //TODO
     }
 
     // **************************
@@ -142,8 +168,11 @@ public class ImageSphere : MonoBehaviour
         m_captionObject.SetActive(m_caption.Length > 0);
         m_captionObject.GetComponentInChildren<Text>().text = m_caption;
 
-        m_likesObject.SetActive(m_likes >= 0);
-        m_likesObject.GetComponentInChildren<Text>().text = m_likes.ToString();
+        m_likesObject.SetActive(m_numLikes >= 0);
+        m_likesObject.GetComponentInChildren<Text>().text = m_numLikes.ToString();
+
+        m_heartObject.SetActive(m_numLikes >= 0);
+        m_heartObject.GetComponentInChildren<HeartButton>().HeartOnOffSwitch(m_heartOn);
     }
 
     private void HideMetadata()
@@ -153,6 +182,7 @@ public class ImageSphere : MonoBehaviour
         m_handleObject.SetActive(false);
         m_captionObject.SetActive(false);
         m_likesObject.SetActive(false);
+        m_heartObject.SetActive(false);
     }
 
     private IEnumerator AnimateSetTexture()
