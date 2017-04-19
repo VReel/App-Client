@@ -209,6 +209,7 @@ public class KeyBoard : MonoBehaviour
             m_objectiveTextObject.text = m_previousText;
         }
         m_objectiveTextObject = null;
+        m_previousText = "";
 
         m_shouldBeShowing = false;
         Hide();

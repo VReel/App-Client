@@ -168,7 +168,15 @@ public class Search : MonoBehaviour
     public void OpenProfileOrTag(int resultNumber)
     {
         HideAllResults();
-        m_keyboard.CancelText();
+        if (m_keyboard.ShouldBeShowing())
+        {
+            m_keyboard.AcceptText();
+        }
+        else
+        {
+            m_keyboard.CancelText();
+        }
+        m_workingString = "";
 
         if (m_searchState == SearchState.kUserSearch)
         {
