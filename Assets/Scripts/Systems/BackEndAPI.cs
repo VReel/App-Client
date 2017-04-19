@@ -1171,9 +1171,6 @@ public class BackEndAPI
             if (parameter.Name == "Access-Token")
             {
                 m_user.SetAcceessToken(parameter.Value.ToString());
-                if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> Access-Token is now: " + m_user.GetAcceessToken()
-                    + ", Client is now: " + m_user.GetClient()
-                    + ", Uid is now: " + m_user.GetUID() );
             }               
         }
     }
