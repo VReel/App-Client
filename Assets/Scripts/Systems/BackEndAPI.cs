@@ -58,8 +58,6 @@ public class BackEndAPI
 
         m_vreelClient = new RestClient(m_vreelURL);
         m_threadJob = new ThreadJob(owner);
-
-        //ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) => true;
     }
 
     ~BackEndAPI()
