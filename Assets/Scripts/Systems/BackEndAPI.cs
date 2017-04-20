@@ -53,8 +53,8 @@ public class BackEndAPI
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: A BackEndAPI object was Created by = " + m_owner.name);
 
         // Version dependent code
-        m_vreelURL = m_vreelDevelopmentURL; //m_vreelDevelopmentURL; m_vreelStagingURL; m_vreelProductionURL;
-        m_applicationID = m_vreelDevelopmentApplicationID; //m_vreelDevelopmentApplicationID; m_vreelStagingApplicationID; m_vreelProductionApplicationID;
+        m_vreelURL = GetBackEndURL();
+        m_applicationID = GetApplicationID();
 
         m_vreelClient = new RestClient(m_vreelURL);
         m_threadJob = new ThreadJob(owner);
@@ -117,7 +117,7 @@ public class BackEndAPI
 
     //--------------------------------------------
     // Register
-        
+
     public IEnumerator Register_CreateUser(string _handle, string _email, string _password, string _password_confirmation)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users' - Create New User");
@@ -215,7 +215,7 @@ public class BackEndAPI
     public IEnumerator Register_UpdateUser(string _handle, string _password, string _password_confirmation, string _current_password)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> PUT to '/users' - Update User");
-        
+
         var request = new RestRequest("/users", Method.PUT);
         request.AddHeader("vreel-application-id", m_applicationID);
         request.AddHeader("client", m_user.GetClient());
@@ -295,7 +295,7 @@ public class BackEndAPI
 
     //--------------------------------------------
     // Passwords
-        
+
     public IEnumerator Passwords_PasswordReset(string _email)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users/password' - New Password Reset Email");
@@ -335,7 +335,7 @@ public class BackEndAPI
 
     //--------------------------------------------
     // Session
-        
+
     public IEnumerator Session_SignIn(string _login, string _password)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users/sign_in' - Sign In");
@@ -347,7 +347,7 @@ public class BackEndAPI
             login = _login, 
             password = _password,
         });
-            
+
         yield return m_threadJob.WaitFor();
         float timeBeforeRequest = Time.realtimeSinceStartup;
         IRestResponse response = new RestResponse();
@@ -385,11 +385,11 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
-        
+
     public IEnumerator Session_SignOut()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/users/sign_out' - Sign Out");
-        
+
         var request = new RestRequest("/users/sign_out", Method.DELETE);
         request.AddHeader("vreel-application-id", m_applicationID);
         request.AddHeader("client", m_user.GetClient());
@@ -426,11 +426,11 @@ public class BackEndAPI
 
     //--------------------------------------------
     // S3
-        
+
     public IEnumerator S3_PresignedURL()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/s3_presigned_url' - S3 Presigned URL");
-        
+
         var request = new RestRequest("/s3_presigned_url", Method.GET);
         request.AddHeader("vreel-application-id", m_applicationID);
         request.AddHeader("client", m_user.GetClient());
@@ -474,11 +474,11 @@ public class BackEndAPI
 
     //--------------------------------------------
     // Post
-        
+
     public IEnumerator Post_GetPosts(string page = "")
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts?page=" + page + "' - Get a page of posts");
-                    
+
         var request = new RestRequest("/posts?page=" + page, Method.GET);
         request.AddHeader("vreel-application-id", m_applicationID);
         request.AddHeader("client", m_user.GetClient());
@@ -495,7 +495,7 @@ public class BackEndAPI
         float timeAfterRequest = Time.realtimeSinceStartup;
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts?page=" + page + "' - Response: " + response.Content);
-               
+
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
@@ -517,11 +517,11 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
-        
+
     public IEnumerator Post_CreatePost(string _thumbnailKey, string _originalKey, string _caption)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/posts' - Create new post");
-        
+
         var request = new RestRequest("/posts", Method.POST);
         request.AddHeader("vreel-application-id", m_applicationID);
         request.AddHeader("client", m_user.GetClient());
@@ -602,7 +602,7 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
-        
+
     public IEnumerator Post_DeletePost(string postId)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/posts/" + postId + "' - Delete a post");
@@ -686,7 +686,7 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
-        
+
     public IEnumerator Post_GetPostLikes(string postId, string page = "")
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts/" + postId + "/likes?page=" + page + "' - Show all users who like post");
@@ -865,7 +865,7 @@ public class BackEndAPI
 
     //--------------------------------------------
     // HashTag
-        
+
     public IEnumerator HashTag_GetHashTagPosts(string hashTag, string page = "")
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/hash_tags/" + hashTag + "/posts?page=" + page + "' - Search for posts by hash_tag");
@@ -1119,6 +1119,38 @@ public class BackEndAPI
     // **************************
     // Private/Helper functions
     // **************************
+
+    private string GetBackEndURL()
+    {
+        if (m_user.GetBackEndEnvironment() == User.BackEndEnvironment.kProduction)
+        {
+            return m_vreelProductionURL;
+        }
+        else if (m_user.GetBackEndEnvironment() == User.BackEndEnvironment.kStaging)
+        {
+            return m_vreelStagingURL;
+        }
+        else
+        {
+            return m_vreelDevelopmentURL;
+        }
+    }
+
+    private string GetApplicationID()
+    {
+        if (m_user.GetBackEndEnvironment() == User.BackEndEnvironment.kProduction)
+        {
+            return m_vreelProductionApplicationID;
+        }
+        else if (m_user.GetBackEndEnvironment() == User.BackEndEnvironment.kStaging)
+        {
+            return m_vreelStagingApplicationID;
+        }
+        else
+        {
+            return m_vreelDevelopmentApplicationID;
+        }
+    }
 
     private bool UploadObjectInternal(string url, string filePath, bool isDebugBuild)
     {

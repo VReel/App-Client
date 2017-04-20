@@ -11,6 +11,14 @@ public class User : MonoBehaviour
     // Member Variables
     // **************************
 
+    public enum BackEndEnvironment
+    {
+        kDevelopment,
+        kStaging,
+        kProduction
+    };
+
+    [SerializeField] private BackEndEnvironment m_backEndEnvironment;
     [SerializeField] private GameObject m_userMessage;
     [SerializeField] private GameObject m_errorMessage;
 
@@ -47,7 +55,7 @@ public class User : MonoBehaviour
     public void Start()
     {
         // Version dependent code
-        m_vreelSaveFile = m_vreelDevelopmentSaveFile; //m_vreelDevelopmentSaveFile; m_vreelStagingSaveFile; m_vreelProductionSaveFile;
+        m_vreelSaveFile = GetSaveFile();
         m_dataFilePath = Application.persistentDataPath + m_vreelSaveFile;
 
         m_loginData = new LoginData();
@@ -62,6 +70,11 @@ public class User : MonoBehaviour
         m_threadJob = new ThreadJob(this);
 
         LoadLoginData();
+    }
+
+    public BackEndEnvironment GetBackEndEnvironment()
+    {
+        return m_backEndEnvironment;
     }
 
     public bool IsLoggedIn()
@@ -131,6 +144,22 @@ public class User : MonoBehaviour
     // **************************
     // Private/Helper functions
     // **************************
+
+    private string GetSaveFile()
+    {
+        if (m_backEndEnvironment == BackEndEnvironment.kProduction)
+        {
+            return m_vreelProductionSaveFile;
+        }
+        else if (m_backEndEnvironment == BackEndEnvironment.kStaging)
+        {
+            return m_vreelStagingSaveFile;
+        }
+        else
+        {
+            return m_vreelDevelopmentSaveFile;
+        }
+    }
 
     private void LoadLoginData()
     {
