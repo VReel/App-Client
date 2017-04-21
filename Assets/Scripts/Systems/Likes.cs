@@ -99,7 +99,8 @@ public class Likes : MonoBehaviour
     public void HandleSelected(int likeResultItemIndex)
     {
         m_displayItemsTopLevel.SetActive(false);
-        m_search.OpenSearchAndProfileWithId(m_likeResults[m_currResultIndex + likeResultItemIndex].userId);
+        int actualResultIndex = m_currResultIndex + likeResultItemIndex;
+        m_search.OpenSearchAndProfileWithId(m_likeResults[actualResultIndex].userId, m_likeResults[actualResultIndex].userHandle);
     }
      
     // **************************

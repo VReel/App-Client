@@ -60,7 +60,7 @@ public class User : MonoBehaviour
 
         m_loginData = new LoginData();
         m_loginData.m_client = m_loginData.m_uid = m_loginData.m_accessToken = "";
-        m_handle = m_email = m_name = m_profileDescription = "";
+        m_id = m_handle = m_email = m_name = m_profileDescription = "";
 
         m_backEndAPI = new BackEndAPI(this, m_errorMessage, this);
 
@@ -84,13 +84,13 @@ public class User : MonoBehaviour
 
     public bool IsUserDataStored()
     {
-        return (m_handle.Length > 0);
+        return (m_id.Length > 0);
     }
 
     public void Clear()
     {
         m_loginData.m_client = m_loginData.m_uid = "";
-        m_handle = m_email = m_name = m_profileDescription = "";
+        m_id = m_handle = m_email = m_name = m_profileDescription = "";
 
         if (File.Exists(m_dataFilePath))
         {

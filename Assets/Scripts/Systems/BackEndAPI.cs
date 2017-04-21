@@ -9,7 +9,6 @@ using RestSharp;                    // RestClient
 using System.Linq;                  // Select
 
 // This class acts as a wrapper to the Back-End API
-
 public class BackEndAPI
 {       
     // **************************
@@ -151,10 +150,18 @@ public class BackEndAPI
             UpdateAccessToken(response);
             UpdateLoginTokens(response);
 
-            m_user.m_handle = _handle;
-            m_user.m_email = _email;
-            m_user.m_name = "";
-            m_user.m_profileDescription = "";
+            yield return m_threadJob.WaitFor();
+            VReelJSON.Model_User result = null;
+            m_threadJob.Start( () => 
+                result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_User>(response.Content)
+            );
+            yield return m_threadJob.WaitFor();
+
+            m_user.m_id = result.data.id;
+            m_user.m_handle = result.data.attributes.handle;
+            m_user.m_email = result.data.attributes.email;
+            m_user.m_name = result.data.attributes.name;
+            m_user.m_profileDescription = result.data.attributes.profile;
         }
         else // Error Handling
         {            
@@ -188,6 +195,9 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
+            UpdateAccessToken(response);
+            UpdateLoginTokens(response);
+
             yield return m_threadJob.WaitFor();
             VReelJSON.Model_User result = null;
             m_threadJob.Start( () => 
@@ -195,6 +205,7 @@ public class BackEndAPI
             );
             yield return m_threadJob.WaitFor();
 
+            m_user.m_id = result.data.id;
             m_user.m_handle = result.data.attributes.handle;
             m_user.m_email = result.data.attributes.email;
             m_user.m_name = result.data.attributes.name;
@@ -206,8 +217,6 @@ public class BackEndAPI
 
             ShowErrors(response, "GET to '/users'");
         }
-
-        UpdateAccessToken(response);
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
@@ -820,6 +829,92 @@ public class BackEndAPI
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
 
+    public IEnumerator User_GetUserFollowers(string userId, string page = "")
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/users/" + userId + "/followers?page=" + page + "' - Get users that follow this user");
+
+        var request = new RestRequest("/users/" + userId + "/followers?page=" + page, Method.GET);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/users/" + userId + "/followers?page=" + page + "' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            yield return m_threadJob.WaitFor();
+            VReelJSON.Model_Users result = null;
+            m_threadJob.Start( () => 
+                result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Users>(response.Content)
+            );
+            yield return m_threadJob.WaitFor();
+
+            m_usersJSONResult = result;
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "GET to '/users/" + userId + "/followers?page=" + page + "'");
+        }
+
+        UpdateAccessToken(response);
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }
+
+    public IEnumerator User_GetUserFollowing(string userId, string page = "")
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/users/" + userId + "/following?page=" + page + "' - Get users that this user follows");
+
+        var request = new RestRequest("/users/" + userId + "/following?page=" + page, Method.GET);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/users/" + userId + "/following?page=" + page + "' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            yield return m_threadJob.WaitFor();
+            VReelJSON.Model_Users result = null;
+            m_threadJob.Start( () => 
+                result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Users>(response.Content)
+            );
+            yield return m_threadJob.WaitFor();
+
+            m_usersJSONResult = result;
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "GET to '/users/" + userId + "/following?page=" + page + "'");
+        }
+
+        UpdateAccessToken(response);
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }
+
     public IEnumerator User_SearchForUsers(string user)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/search/users/" + user + "' - Search for user");
@@ -953,6 +1048,167 @@ public class BackEndAPI
     }
 
     //--------------------------------------------
+    // Follow
+
+    public IEnumerator Follow_FollowUser(string userId)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/follow/" + userId + "' - Follow a user");
+
+        var request = new RestRequest("/follow/" + userId, Method.POST);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/follow/" + userId + "' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            // Empty
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "POST to '/follow/" + userId + "'");
+        }
+
+        UpdateAccessToken(response);
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }
+
+    public IEnumerator Follow_UnfollowUser(string userId)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/follow/" + userId + "' - Unfollow a user");
+
+        var request = new RestRequest("/follow/" + userId, Method.DELETE);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/follow/" + userId + "' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            // Empty
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "DELETE to '/follow/" + userId + "'");
+        }
+
+        UpdateAccessToken(response);
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }
+
+    public IEnumerator Follow_Followers(string page = "")
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/followers?page=" + page + "' - Get a list of your followers");
+
+        var request = new RestRequest("/followers?page=" + page, Method.GET);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/followers?page=" + page + "' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            yield return m_threadJob.WaitFor();
+            VReelJSON.Model_Users result = null;
+            m_threadJob.Start( () => 
+                result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Users>(response.Content)
+            );
+            yield return m_threadJob.WaitFor();
+
+            m_usersJSONResult = result;
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "GET to '/followers?page=" + page + "'");
+        }
+
+        UpdateAccessToken(response);
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }
+
+    public IEnumerator Follow_Following(string page = "")
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/following?page=" + page + "' - Get a list of users you follow");
+
+        var request = new RestRequest("/following?page=" + page, Method.GET);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/following?page=" + page + "' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            yield return m_threadJob.WaitFor();
+            VReelJSON.Model_Users result = null;
+            m_threadJob.Start( () => 
+                result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Users>(response.Content)
+            );
+            yield return m_threadJob.WaitFor();
+
+            m_usersJSONResult = result;
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "GET to '/following?page=" + page + "'");
+        }
+
+        UpdateAccessToken(response);
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }
+
+    //--------------------------------------------
     // Timeline
 
     public IEnumerator Timeline_GetPublicTimeline(string page = "")
@@ -1044,11 +1300,11 @@ public class BackEndAPI
     //--------------------------------------------
     // Like
 
-    public IEnumerator Like_LikePost(string _postId)
+    public IEnumerator Like_LikePost(string postId)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/like/" + _postId + "' - Like a post");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/like/" + postId + "' - Like a post");
 
-        var request = new RestRequest("/like/" + _postId, Method.POST);
+        var request = new RestRequest("/like/" + postId, Method.POST);
         request.AddHeader("vreel-application-id", m_applicationID);
         request.AddHeader("client", m_user.GetClient());
         request.AddHeader("uid", m_user.GetUID());
@@ -1063,7 +1319,7 @@ public class BackEndAPI
         yield return m_threadJob.WaitFor();
         float timeAfterRequest = Time.realtimeSinceStartup;
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/like/" + _postId + "' - Response: " + response.Content);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/like/" + postId + "' - Response: " + response.Content);
 
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
@@ -1072,7 +1328,7 @@ public class BackEndAPI
         }
         else // Error Handling
         {            
-            ShowErrors(response, "POST to '/like/" + _postId + "'");
+            ShowErrors(response, "POST to '/like/" + postId + "'");
         }
 
         UpdateAccessToken(response);
@@ -1080,11 +1336,11 @@ public class BackEndAPI
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
 
-    public IEnumerator Like_UnlikePost(string _postId)
+    public IEnumerator Like_UnlikePost(string postId)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/like/" + _postId + "' - Unlike a post");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/like/" + postId + "' - Unlike a post");
 
-        var request = new RestRequest("/like/" + _postId, Method.DELETE);
+        var request = new RestRequest("/like/" + postId, Method.DELETE);
         request.AddHeader("vreel-application-id", m_applicationID);
         request.AddHeader("client", m_user.GetClient());
         request.AddHeader("uid", m_user.GetUID());
@@ -1099,7 +1355,7 @@ public class BackEndAPI
         yield return m_threadJob.WaitFor();
         float timeAfterRequest = Time.realtimeSinceStartup;
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/like/" + _postId + "' - Response: " + response.Content);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/like/" + postId + "' - Response: " + response.Content);
 
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
@@ -1108,7 +1364,7 @@ public class BackEndAPI
         }
         else // Error Handling
         {            
-            ShowErrors(response, "DELETE to '/like/" + _postId + "'");
+            ShowErrors(response, "DELETE to '/like/" + postId + "'");
         }
 
         UpdateAccessToken(response);

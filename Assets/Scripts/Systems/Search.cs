@@ -53,8 +53,10 @@ public class Search : MonoBehaviour
     public void Start() 
 	{
         m_results = new List<Result>();
-        Result emptyResult = new Result();
-        m_results.AddRange(Enumerable.Repeat(emptyResult, m_resultObjects.Length));
+        for (int i = 0; i < m_resultObjects.Length; i++)
+        {
+            m_results.Add(new Result());
+        }
 
         m_coroutineQueue = new CoroutineQueue(this);
         m_coroutineQueue.StartLoop();
@@ -119,23 +121,22 @@ public class Search : MonoBehaviour
             m_coroutineQueue.Clear();
         }
 
-        ClearSearch();
+        ResetSearch();
     }
 
     public void OpenSearch()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenSearch() called");
 
-        ClearSearch();
+        ResetSearch();
     }       
 
     public void OpenUserSearch()
     {
-        if (m_searchState == SearchState.kUserSearch ||
-            m_searchState == SearchState.kUserDisplay)
+        if (m_searchState == SearchState.kUserSearch)
         {
             return;
-        }
+        }            
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenUserSearch() called");
 
@@ -149,8 +150,7 @@ public class Search : MonoBehaviour
 
     public void OpenTagSearch()
     {
-        if (m_searchState == SearchState.kTagSearch ||
-            m_searchState == SearchState.kTagDisplay)
+        if (m_searchState == SearchState.kTagSearch)
         {
             return;
         }
@@ -165,8 +165,10 @@ public class Search : MonoBehaviour
         HideAllResults();
     }        
 
-    public void OpenProfileOrTag(int resultNumber)
+    public void OpenProfileOrTag(int index)
     {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenProfileOrTag() called with Index: " + index);
+
         HideAllResults();
         if (m_keyboard.ShouldBeShowing())
         {
@@ -176,26 +178,39 @@ public class Search : MonoBehaviour
         {
             m_keyboard.CancelText();
         }
-        m_workingString = "";
+        ClearSearch();
 
         if (m_searchState == SearchState.kUserSearch)
         {
+            if(m_user.m_id.CompareTo(m_results[index].id) == 0)
+            {
+                m_appDirector.RequestProfileState();
+                return;
+            }
+
             m_searchState = SearchState.kUserDisplay;
-            m_posts.OpenProfileWithID(m_results[resultNumber].id);
+            m_posts.OpenProfileWithID(m_results[index].id, m_results[index].text);
         }
         else if (m_searchState == SearchState.kTagSearch)
         {
             m_searchState = SearchState.kTagDisplay;
-            m_posts.OpenHashTag(m_results[resultNumber].id);
-        }            
+            m_posts.OpenHashTag(m_results[index].id, m_results[index].text);
+        }
     }
 
-    public void OpenSearchAndProfileWithId(string userId)
+    public void OpenSearchAndProfileWithId(string userId, string userHandle)
     {
+        if(m_user.m_id.CompareTo(userId) == 0)
+        {
+            m_appDirector.RequestProfileState();
+            return;
+        }
+
         m_appDirector.RequestSearchState();
         OpenUserSearch();
+        ClearSearch();
         m_searchState = SearchState.kUserDisplay;
-        m_posts.OpenProfileWithID(userId);
+        m_posts.OpenProfileWithID(userId, userHandle);
     }
 
     /*
@@ -226,9 +241,14 @@ public class Search : MonoBehaviour
     // Private/Helper functions
     // **************************
 
-    private void ClearSearch()
+    private void ResetSearch()
     {
         m_searchState = SearchState.kNone;
+        ClearSearch();
+    }
+
+    private void ClearSearch()
+    {
         OnButtonSelected(null); // Deselect all buttons
         m_searchInput.SetActive(false);
         m_currSearchString = "";
@@ -334,5 +354,22 @@ public class Search : MonoBehaviour
                 m_resultObjects[index].SetActive(false);
             }
         }
-    }           
+    }    
+
+    private void DebugPrintResultList()
+    {
+        if (Debug.isDebugBuild)
+        {
+            string debugString = "------- VREEL: ResultsList ";
+            for (int index = 0; index < GetNumResultObjects(); index++)
+            {
+                if (m_resultObjects[index].activeSelf)
+                {
+                    debugString +=  "Index: " + index + ", ID: " + m_results[index].id + ", Text: " + m_results[index].text + "; ";
+                }
+            }
+
+            Debug.Log(debugString);
+        }
+    }
 }

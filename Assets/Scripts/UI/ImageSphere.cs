@@ -120,7 +120,7 @@ public class ImageSphere : MonoBehaviour
 
     public void HandleSelected()
     {
-        m_search.OpenSearchAndProfileWithId(m_userId);
+        m_search.OpenSearchAndProfileWithId(m_userId, m_handle);
     }
 
     public void HeartSelected()

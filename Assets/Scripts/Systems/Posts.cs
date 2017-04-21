@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;               // Text
 using System.Collections;           // IEnumerator
 using System.Collections.Generic;   // List
 
@@ -39,7 +40,7 @@ public class Posts : MonoBehaviour
     };
 
     private PostsType m_postsType;
-    private string m_currIdOrTag;
+    private string m_currUserOrTagId;
 
     private List<Post> m_posts;
     private string m_nextPageOfPosts = null;
@@ -93,8 +94,12 @@ public class Posts : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenPublicTimeline() called");
 
         m_postsType = PostsType.kPublicTimeline;
-        m_currIdOrTag = "";
+        m_currUserOrTagId = "";
         OpenPosts();
+
+        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
+        userTextComponent.text = "Public Timeline";
+        userTextComponent.color = Color.black;
     }    
 
     public void OpenPersonalTimeline()
@@ -102,8 +107,12 @@ public class Posts : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenPersonalTimeline() called");
 
         m_postsType = PostsType.kPersonalTimeline;
-        m_currIdOrTag = "";
+        m_currUserOrTagId = "";
         OpenPosts();
+
+        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
+        userTextComponent.text = "Personal Timeline";
+        userTextComponent.color = Color.black;
     }    
 
     public void OpenUserProfile()
@@ -111,26 +120,34 @@ public class Posts : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenUserProfile() called");
 
         m_postsType = PostsType.kUserProfile;
-        m_currIdOrTag = "";
+        m_currUserOrTagId = "";
         OpenPosts();
     }    
 
-    public void OpenProfileWithID(string userID)
+    public void OpenProfileWithID(string userID, string userHandle)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenProfileWithID() called with ID: " + userID);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenProfileWithID() called with Handle: " + userHandle + ", and ID: " + userID);
 
         m_postsType = PostsType.kOtherProfile;
-        m_currIdOrTag = userID;
+        m_currUserOrTagId = userID;
         OpenPosts();
+
+        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
+        userTextComponent.text = userHandle + "'s Profile";
+        userTextComponent.color = Color.black;
     } 
 
-    public void OpenHashTag(string hashTag)
+    public void OpenHashTag(string hashTagID, string hashTag)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenHashTag() called with ID: " + hashTag);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenHashTag() called with HashTag: " + hashTag + ", and ID: " + hashTagID);
 
         m_postsType = PostsType.kHashTag;
-        m_currIdOrTag = hashTag;
+        m_currUserOrTagId = hashTagID;
         OpenPosts();
+
+        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
+        userTextComponent.text = hashTag;
+        userTextComponent.color = Color.black;
     } 
 
     public void NextPosts()
@@ -247,11 +264,11 @@ public class Posts : MonoBehaviour
         }
         else if (m_postsType == PostsType.kOtherProfile)
         {
-            yield return m_backEndAPI.User_GetUserPosts(m_currIdOrTag, nextPageOfPosts);
+            yield return m_backEndAPI.User_GetUserPosts(m_currUserOrTagId, nextPageOfPosts);
         }
         else if (m_postsType == PostsType.kHashTag)
         {            
-            yield return m_backEndAPI.HashTag_GetHashTagPosts(m_currIdOrTag, nextPageOfPosts);
+            yield return m_backEndAPI.HashTag_GetHashTagPosts(m_currUserOrTagId, nextPageOfPosts);
         }
         else if (m_postsType == PostsType.kUserProfile)
         {
