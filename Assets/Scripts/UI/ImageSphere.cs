@@ -84,7 +84,7 @@ public class ImageSphere : MonoBehaviour
     }
 
     public void SetMetadata(string userId, string handle, string caption, int likes, bool likedByMe) 
-    { //NOTE: These are only set onto their UI elements when the Animation has ended!
+    {   //NOTE: These are only set onto their UI elements when the Animation has ended!
         m_userId = userId;
         m_handle = handle;
         m_caption = caption;
@@ -162,16 +162,18 @@ public class ImageSphere : MonoBehaviour
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateMetada() called on sphere: " + (m_imageSphereIndex+1) );
 
-        m_handleObject.SetActive(m_handle.Length > 0);
+        bool isSphereLoading = m_currTextureIndex == kLoadingTextureIndex;
+
+        m_handleObject.SetActive(!isSphereLoading && m_handle.Length > 0);
         m_handleObject.GetComponentInChildren<Text>().text = m_handle;
 
-        m_captionObject.SetActive(m_caption.Length > 0);
+        m_captionObject.SetActive(!isSphereLoading && m_caption.Length > 0);
         m_captionObject.GetComponentInChildren<Text>().text = m_caption;
 
-        m_likesObject.SetActive(m_numLikes >= 0);
+        m_likesObject.SetActive(!isSphereLoading && m_numLikes >= 0);
         m_likesObject.GetComponentInChildren<Text>().text = m_numLikes.ToString();
 
-        m_heartObject.SetActive(m_numLikes >= 0);
+        m_heartObject.SetActive(!isSphereLoading && m_numLikes >= 0);
         m_heartObject.GetComponentInChildren<HeartButton>().HeartOnOffSwitch(m_heartOn);
     }
 

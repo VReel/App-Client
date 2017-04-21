@@ -112,7 +112,7 @@ public class ImageSphereController : MonoBehaviour
     {
         if (sphereIndex == -1)
         {
-            //m_imageSkybox.SetMetadata(handle, caption, likes);
+            //m_imageSkybox.SetMetadata(userId, handle, caption, likes, likedByMe);
         }
         else if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
         {
@@ -147,8 +147,8 @@ public class ImageSphereController : MonoBehaviour
         for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
         {            
             SetImageAtIndex(sphereIndex, m_sphereLoadingTexture, kLoadingTextureFilePath, m_imageLoader.GetLoadingTextureIndex(), true);
-            yield return null; // Only calling SetImageAtIndex() once per frame
         }
+        yield break;
     }
 
     public IEnumerator HideAllImageSpheresInternal()
@@ -158,8 +158,8 @@ public class ImageSphereController : MonoBehaviour
         for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
         {
             HideSphereAtIndex(sphereIndex);
-            yield return null; // Only calling HideSphereAtIndex() once per frame
         }
+        yield break;
     }
 
     private void SetIndexOnAllImageSpheres()
