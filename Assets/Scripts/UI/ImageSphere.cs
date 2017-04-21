@@ -10,7 +10,8 @@ public class ImageSphere : MonoBehaviour
     // **************************
 
     [SerializeField] private Search m_search;
-    [SerializeField] private Likes m_likes;
+    [SerializeField] private Posts m_posts;
+    [SerializeField] private ListUsers m_listUsers;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
@@ -130,12 +131,12 @@ public class ImageSphere : MonoBehaviour
 
         m_heartObject.GetComponentInChildren<HeartButton>().HeartOnOffSwitch(m_heartOn);
         m_likesObject.GetComponentInChildren<Text>().text = m_numLikes.ToString();
-        m_likes.LikeOrUnlikePost(m_imageIdentifier, m_heartOn);
+        m_posts.LikeOrUnlikePost(m_imageIdentifier, m_heartOn);
     }
 
     public void LikesSelected()
     {
-        m_likes.DisplayLikesResults(m_imageIdentifier);
+        m_listUsers.DisplayLikeResults(m_imageIdentifier);
     }
 
     public void CaptionSelected()

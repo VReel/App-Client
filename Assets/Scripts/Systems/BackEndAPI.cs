@@ -1122,6 +1122,7 @@ public class BackEndAPI
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
 
+    // ----- CURRENTLY UNUSED ----- //
     public IEnumerator Follow_Followers(string page = "")
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/followers?page=" + page + "' - Get a list of your followers");
@@ -1165,6 +1166,7 @@ public class BackEndAPI
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
 
+    // ----- CURRENTLY UNUSED ----- //
     public IEnumerator Follow_Following(string page = "")
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/following?page=" + page + "' - Get a list of users you follow");
