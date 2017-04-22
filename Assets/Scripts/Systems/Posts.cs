@@ -235,7 +235,7 @@ public class Posts : MonoBehaviour
     {
         yield return m_appDirector.VerifyInternetConnection();
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Getting First set of Posts for Logged in User");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: StoreFirstPostsAndSetSpheres() called for PostType: " + m_postsType.ToString());
 
         m_loadingIcon.Display(); //NOTE: This should stop the following operation from ever being cut half-way through
 
@@ -258,7 +258,7 @@ public class Posts : MonoBehaviour
     {
         yield return m_appDirector.VerifyInternetConnection();
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Getting Posts for Logged in User from page: " + m_nextPageOfPosts);       
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: StorePostsFromNextPage() for page: " + m_nextPageOfPosts + ", for PostType: " + m_postsType.ToString());       
 
         m_loadingIcon.Display(); //NOTE: This should stop the following operation from ever being cut half-way through
 

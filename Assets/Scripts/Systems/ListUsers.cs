@@ -12,6 +12,7 @@ public class ListUsers : MonoBehaviour
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
     [SerializeField] private Search m_search;
+    [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private GameObject m_displayItemsTopLevel; //Top-level object for results
     [SerializeField] private GameObject[] m_displayItems;
     [SerializeField] private GameObject m_nextButton;
@@ -52,7 +53,7 @@ public class ListUsers : MonoBehaviour
 
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
 
-        m_displayItemsTopLevel.SetActive(false);
+        CloseListUsers();
 	}            
 
     public void Update()
@@ -116,9 +117,14 @@ public class ListUsers : MonoBehaviour
         DisplayUserResultsOnItems();
     }
 
-    public void HandleSelected(int userResultItemIndex)
+    public void CloseListUsers()
     {
         m_displayItemsTopLevel.SetActive(false);
+    }
+
+    public void HandleSelected(int userResultItemIndex)
+    {
+        CloseListUsers();
         int actualResultIndex = m_currResultIndex + userResultItemIndex;
         m_search.OpenSearchAndProfileWithId(m_userResults[actualResultIndex].userId, m_userResults[actualResultIndex].userHandle);
     }
@@ -147,6 +153,8 @@ public class ListUsers : MonoBehaviour
     public IEnumerator StoreAndDisplayUserResultsInternal(string postOrUserId)
     {
         yield return m_appDirector.VerifyInternetConnection();
+
+        m_profileDetails.CloseProfileDetails();
 
         m_userResults.Clear();
         m_currPostOrUserID = postOrUserId;

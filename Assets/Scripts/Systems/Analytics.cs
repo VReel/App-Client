@@ -21,7 +21,6 @@ public class Analytics : MonoBehaviour
     // Public functions
     // **************************
 
-
     public void Start()
     {                
         UnityInitializer.AttachToGameObject(this.gameObject);
@@ -171,6 +170,16 @@ public class Analytics : MonoBehaviour
         SetAppState(ref customEvent);
 
         customEvent.AddAttribute("SphereNumber", sphereNumber.ToString());
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
+
+    public void FollowSelected()
+    {
+        CustomEvent customEvent = new CustomEvent("FollowSelected");
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
+
+        SetAppState(ref customEvent);
 
         m_analyticsManager.RecordEvent(customEvent);
     }

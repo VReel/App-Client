@@ -54,7 +54,6 @@ public class Home : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenPublicTimeline() called");
 
-        m_imageSphereController.HideAllImageSpheres();
         m_homeState = HomeState.kPublicTimeline;
         OnButtonSelected(m_timelineTypes[(int)m_homeState]);  // button 0 = Public timeline button
 
@@ -70,7 +69,6 @@ public class Home : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenPersonalTimeline() called");
 
-        m_imageSphereController.HideAllImageSpheres();
         m_homeState = HomeState.kPersonalTimeline;
         OnButtonSelected(m_timelineTypes[(int)m_homeState]);  // button 1 = Personal timeline button
 

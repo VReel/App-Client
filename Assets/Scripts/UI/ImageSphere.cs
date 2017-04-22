@@ -150,7 +150,7 @@ public class ImageSphere : MonoBehaviour
 
     private void UpdateTextureAndID()
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateTextureAndID() called on sphere: " + (m_imageSphereIndex+1) );
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateTextureAndID() called on sphere: " + (m_imageSphereIndex+1) );
 
         gameObject.GetComponent<MeshRenderer>().material.mainTexture = m_imageSphereTexture;
 
@@ -161,7 +161,7 @@ public class ImageSphere : MonoBehaviour
 
     private void UpdateMetadata()
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateMetada() called on sphere: " + (m_imageSphereIndex+1) );
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateMetada() called on sphere: " + (m_imageSphereIndex+1) );
 
         bool isSphereLoading = m_currTextureIndex == kLoadingTextureIndex;
 
@@ -180,7 +180,7 @@ public class ImageSphere : MonoBehaviour
 
     private void HideMetadata()
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: HideMetadata() called on sphere");
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: HideMetadata() called on sphere");
 
         m_handleObject.SetActive(false);
         m_captionObject.SetActive(false);
@@ -190,7 +190,7 @@ public class ImageSphere : MonoBehaviour
 
     private IEnumerator AnimateSetTexture()
     {   
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateSetTexture() began on sphere: " + (m_imageSphereIndex+1) );
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateSetTexture() began on sphere: " + (m_imageSphereIndex+1) );
 
         HideMetadata();
 
@@ -221,7 +221,7 @@ public class ImageSphere : MonoBehaviour
 
     private IEnumerator AnimateHide()
     {        
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateHide() called on sphere: " + (m_imageSphereIndex+1));
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateHide() called on sphere: " + (m_imageSphereIndex+1));
 
         HideMetadata();
 

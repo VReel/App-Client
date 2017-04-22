@@ -32,6 +32,27 @@ namespace VRStandardAssets.Menu
         // Public functions
         // **************************
 
+        public void Start()
+        {
+            m_InteractiveItem.OnOver += HandleOver;
+            m_InteractiveItem.OnOut += HandleOut;
+            m_InteractiveItem.OnDown += HandleDown;
+            m_InteractiveItem.OnUp += HandleUp;
+        }
+
+        public void OnDestroy()
+        {
+            m_InteractiveItem.OnOver -= HandleOver;
+            m_InteractiveItem.OnOut -= HandleOut;
+            m_InteractiveItem.OnDown -= HandleDown;
+            m_InteractiveItem.OnUp -= HandleUp;
+        }
+
+        public void OnEnable()
+        {
+            HandleOut();
+        }
+
         public bool GetGazeOver()
         {
             return m_gazeOver;
@@ -77,22 +98,6 @@ namespace VRStandardAssets.Menu
         // Private/Helper functions
         // **************************
 
-        private void OnEnable ()
-        {
-            m_InteractiveItem.OnOver += HandleOver;
-            m_InteractiveItem.OnOut += HandleOut;
-            m_InteractiveItem.OnDown += HandleDown;
-            m_InteractiveItem.OnUp += HandleUp;
-        }
-
-        private void OnDisable ()
-        {
-            m_InteractiveItem.OnOver -= HandleOver;
-            m_InteractiveItem.OnOut -= HandleOut;
-            m_InteractiveItem.OnDown -= HandleDown;
-            m_InteractiveItem.OnUp -= HandleUp;
-        }
-
         private void HandleOver()
         {
             m_gazeOver = true;
@@ -116,8 +121,14 @@ namespace VRStandardAssets.Menu
         }
 
         private void HandleUp()
-        {                        
-            if (m_gazeOver && m_buttonDown)
+        {       
+            bool buttonSelected = m_gazeOver && m_buttonDown;
+
+            m_buttonDown = false;
+
+            RefreshButtonColor();
+
+            if (buttonSelected)
             {
                 if (OnButtonSelected != null)
                 {
@@ -128,11 +139,7 @@ namespace VRStandardAssets.Menu
                 {
                     OnButtonSelectedFunc.Invoke();
                 }
-            }
-
-            m_buttonDown = false;
-
-            RefreshButtonColor();
+            }   
         }
 
         // NOTE: The following functions is for making debugging without a headset easier...

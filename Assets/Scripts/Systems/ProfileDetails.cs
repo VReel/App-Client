@@ -41,7 +41,7 @@ public class ProfileDetails : MonoBehaviour
 
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
 
-        m_profileDetailsTopLevel.SetActive(false);
+        CloseProfileDetails();
     }
 
     public void OpenProfileDetails()
@@ -62,6 +62,8 @@ public class ProfileDetails : MonoBehaviour
         m_profileDescriptionObject.GetComponentInChildren<Text>().text = "";
 
         m_coroutineQueue.EnqueueAction(GetUserDetails());
+
+        m_listUsers.CloseListUsers();
     }
 
     public void DisplayFollowers()
@@ -72,6 +74,11 @@ public class ProfileDetails : MonoBehaviour
     public void DisplayFollowing()
     {
         m_listUsers.DisplayFollowingResults(m_posts.GetCurrUserOrTagID());
+    }
+
+    public void CloseProfileDetails()
+    {
+        m_profileDetailsTopLevel.SetActive(false);
     }
 
     // **************************
