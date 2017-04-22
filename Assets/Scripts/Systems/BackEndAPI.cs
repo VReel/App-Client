@@ -742,7 +742,6 @@ public class BackEndAPI
     //--------------------------------------------
     // User
 
-    // ----- CURRENTLY UNUSED ----- //
     public IEnumerator User_GetUser(string userId)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/users/" + userId + "' - Get user details");

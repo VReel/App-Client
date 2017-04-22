@@ -112,9 +112,11 @@
      <Compile Include="Assets\Scripts\Systems\OptionsFlow.cs" />
      <Compile Include="Assets\Scripts\Systems\Posts.cs" />
      <Compile Include="Assets\Scripts\Systems\Profile.cs" />
+     <Compile Include="Assets\Scripts\Systems\ProfileDetails.cs" />
      <Compile Include="Assets\Scripts\Systems\Search.cs" />
      <Compile Include="Assets\Scripts\Systems\ThreadJob.cs" />
      <Compile Include="Assets\Scripts\Systems\User.cs" />
+     <Compile Include="Assets\Scripts\UI\FollowButton.cs" />
      <Compile Include="Assets\Scripts\UI\HeartButton.cs" />
      <Compile Include="Assets\Scripts\UI\ImageSkybox.cs" />
      <Compile Include="Assets\Scripts\UI\ImageSphere.cs" />

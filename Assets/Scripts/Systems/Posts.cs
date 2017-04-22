@@ -67,6 +67,16 @@ public class Posts : MonoBehaviour
         return m_posts.Count;
     }
 
+    public string GetCurrUserOrTagID()
+    {
+        return m_currUserOrTagId;
+    }
+
+    public bool IsProfileType()
+    {
+        return (m_postsType == PostsType.kUserProfile || m_postsType == PostsType.kOtherProfile);
+    }
+
     public void InvalidateWork() // This function is called in order to stop any ongoing work
     {    
         m_imageLoader.InvalidateLoading();    
@@ -120,7 +130,7 @@ public class Posts : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenUserProfile() called");
 
         m_postsType = PostsType.kUserProfile;
-        m_currUserOrTagId = "";
+        m_currUserOrTagId = m_user.m_id;
         OpenPosts();
     }    
 
