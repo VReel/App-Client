@@ -201,12 +201,7 @@ public class Posts : MonoBehaviour
     {
         m_coroutineQueue.EnqueueAction(LikeOrUnlikePostInternal(postId, doLike));
     }
-
-    public void FollowOrUnfollowUser(string userId, bool doFollow)
-    {
-        m_coroutineQueue.EnqueueAction(FollowOrUnfollowUserInternal(userId, doFollow));
-    }
-
+        
     public void DownloadOriginalImage(string imageIdentifier)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadOriginalImage() called");
@@ -352,21 +347,7 @@ public class Posts : MonoBehaviour
             yield return m_backEndAPI.Like_UnlikePost(postId);
         }
     }
-
-    private IEnumerator FollowOrUnfollowUserInternal(string userId, bool doFollow)
-    {
-        yield return m_appDirector.VerifyInternetConnection();
-
-        if (doFollow)
-        {
-            yield return m_backEndAPI.Follow_FollowUser(userId);
-        }
-        else
-        {
-            yield return m_backEndAPI.Follow_UnfollowUser(userId);
-        }
-    }
-
+        
     private IEnumerator DownloadThumbnailsAndSetSpheres()
     {
         yield return m_appDirector.VerifyInternetConnection();

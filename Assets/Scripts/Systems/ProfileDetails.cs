@@ -9,6 +9,7 @@ public class ProfileDetails : MonoBehaviour
     // Member Variables
     // **************************
 
+    [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
     [SerializeField] private Posts m_posts;
     [SerializeField] private ListUsers m_listUsers;
@@ -42,6 +43,11 @@ public class ProfileDetails : MonoBehaviour
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
 
         CloseProfileDetails();
+    }
+
+    public string GetUserId()
+    {
+        return m_userId;
     }
 
     public void OpenProfileDetails()
@@ -81,12 +87,19 @@ public class ProfileDetails : MonoBehaviour
         m_profileDetailsTopLevel.SetActive(false);
     }
 
+    public void FollowOrUnfollowUser(string userId, bool doFollow)
+    {
+        m_coroutineQueue.EnqueueAction(FollowOrUnfollowUserInternal(userId, doFollow));
+    }
+
     // **************************
     // Private/Helper functions
     // **************************
 
     private IEnumerator GetUserDetails()
     {
+        yield return m_appDirector.VerifyInternetConnection();
+
         yield return m_backEndAPI.User_GetUser(m_posts.GetCurrUserOrTagID());
 
         m_userId = m_backEndAPI.GetUserResult().data.id;
@@ -102,5 +115,19 @@ public class ProfileDetails : MonoBehaviour
         m_followerCountObject.GetComponentInChildren<Text>().text = m_followerCount.ToString(); 
         m_followingCountObject.GetComponentInChildren<Text>().text = m_followingCount.ToString(); 
         m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_profileDescription; 
+    }
+
+    private IEnumerator FollowOrUnfollowUserInternal(string userId, bool doFollow)
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        if (doFollow)
+        {
+            yield return m_backEndAPI.Follow_FollowUser(userId);
+        }
+        else
+        {
+            yield return m_backEndAPI.Follow_UnfollowUser(userId);
+        }
     }
 }

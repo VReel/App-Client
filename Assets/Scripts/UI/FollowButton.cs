@@ -7,7 +7,7 @@ public class FollowButton : MonoBehaviour
     // Member Variables
     // **************************
 
-    [SerializeField] private Posts m_posts;
+    [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private Image m_followButton;
     [SerializeField] private Color m_buttonColourSelected;
     [SerializeField] private Color m_buttonColourDeselected;
@@ -27,7 +27,7 @@ public class FollowButton : MonoBehaviour
     public void FollowOnOffSwitch()
     {
         m_isOn = !m_isOn;
-        m_posts.FollowOrUnfollowUser(m_posts.GetCurrUserOrTagID(), m_isOn);
+        m_profileDetails.FollowOrUnfollowUser(m_profileDetails.GetUserId(), m_isOn);
         if (m_isOn)
         {
             m_followButton.color = m_buttonColourSelected;                      
