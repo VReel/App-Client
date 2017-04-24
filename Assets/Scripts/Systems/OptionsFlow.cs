@@ -141,8 +141,7 @@ public class OptionsFlow : MonoBehaviour
 
         m_loadingIcon.Display();
 
-        yield return m_backEndAPI.Register_UpdateUser(
-            m_user.m_handle,
+        yield return m_backEndAPI.Register_UpdatePassword(
             m_newPasswordInput.GetComponent<PasswordText>().GetString(),
             m_confirmPasswordInput.GetComponent<PasswordText>().GetString(),
             m_currentPasswordInput.GetComponent<PasswordText>().GetString()

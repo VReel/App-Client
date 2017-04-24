@@ -19,6 +19,10 @@ public class ProfileDetails : MonoBehaviour
     [SerializeField] private GameObject m_followerCountObject;
     [SerializeField] private GameObject m_followingCountObject;
     [SerializeField] private GameObject m_profileDescriptionObject;
+    [SerializeField] private GameObject m_profileDescriptionUpdateTopLevel;
+    [SerializeField] private GameObject m_profileDescriptionNewText;
+
+    private const int kMaxProfileDescriptionLength = 200; //NOTE: In API its 500 but in UI its currently 200
 
     private string m_userId;
     private string m_handle;
@@ -57,7 +61,7 @@ public class ProfileDetails : MonoBehaviour
 
         m_profileDetailsTopLevel.SetActive(true);
 
-        bool isCurrentUser = m_user.m_id.CompareTo(m_userId) == 0;
+        bool isCurrentUser = m_user.IsCurrentUser(m_userId);
         m_followButtonObject.SetActive(!isCurrentUser);
 
         m_handleObject.GetComponentInChildren<Text>().text = "";
@@ -83,6 +87,7 @@ public class ProfileDetails : MonoBehaviour
     public void CloseProfileDetails()
     {
         m_profileDetailsTopLevel.SetActive(false);
+        m_profileDescriptionUpdateTopLevel.SetActive(false);
     }
            
     public void FollowSelected()
@@ -95,11 +100,33 @@ public class ProfileDetails : MonoBehaviour
         int followers = System.Convert.ToInt32(textObject.text);
         followers = m_followedByMe ? followers+1 : followers-1;
         textObject.text = followers.ToString();
+    }       
+
+    public void PreUpdateProfileDescription()
+    {
+        bool isCurrentUser = m_user.IsCurrentUser(m_userId);
+        if (isCurrentUser)
+        {
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreUpdateProfileDescription() called");
+
+            m_profileDescriptionUpdateTopLevel.SetActive(true);
+            m_profileDescriptionNewText.GetComponentInChildren<Text>().text = m_profileDescriptionObject.GetComponentInChildren<Text>().text;
+        }
     }
 
-    public void FollowOrUnfollowUser(string userId, bool doFollow)
+    public void CancelUpdateProfileDescription()
     {
-        m_coroutineQueue.EnqueueAction(FollowOrUnfollowUserInternal(userId, doFollow));
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelUpdateProfileDescription() called");
+
+        m_profileDescriptionUpdateTopLevel.SetActive(false);
+    }
+
+    public void AcceptUpdateProfileDescription()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: AcceptUpdateProfileDescription() called");
+
+        m_profileDescriptionUpdateTopLevel.SetActive(false);
+        m_coroutineQueue.EnqueueAction(UpdateProfileDescriptionInternal());
     }
 
     // **************************
@@ -130,6 +157,12 @@ public class ProfileDetails : MonoBehaviour
         m_followButtonObject.GetComponentInChildren<FollowButton>().FollowOnOffSwitch(m_followedByMe);
     }
 
+    //TODO: Should this be somewhere else and as a public function...?
+    private void FollowOrUnfollowUser(string userId, bool doFollow)
+    {
+        m_coroutineQueue.EnqueueAction(FollowOrUnfollowUserInternal(userId, doFollow));
+    }
+
     private IEnumerator FollowOrUnfollowUserInternal(string userId, bool doFollow)
     {
         yield return m_appDirector.VerifyInternetConnection();
@@ -142,5 +175,16 @@ public class ProfileDetails : MonoBehaviour
         {
             yield return m_backEndAPI.Follow_UnfollowUser(userId);
         }
+    }
+
+    private IEnumerator UpdateProfileDescriptionInternal()
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        string profileDescriptionNewText = m_profileDescriptionNewText.GetComponentInChildren<Text>().text;
+        Helper.TruncateString(ref profileDescriptionNewText, kMaxProfileDescriptionLength);
+
+        m_profileDescriptionObject.GetComponentInChildren<Text>().text = profileDescriptionNewText;
+        yield return m_backEndAPI.Register_UpdateProfileDescription(profileDescriptionNewText);
     }
 }

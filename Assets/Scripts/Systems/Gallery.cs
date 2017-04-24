@@ -22,7 +22,7 @@ public class Gallery : MonoBehaviour
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private LoadingIcon m_loadingIcon;
     [SerializeField] private GameObject m_noGalleryImagesText;
-    [SerializeField] private GameObject m_captionText;
+    [SerializeField] private GameObject m_captionNewText;
     [SerializeField] private GameObject m_uploadConfirmation;
 
     private const int kMaxCaptionLength = 200; //NOTE: In API its 500 but in UI its currently 200
@@ -215,8 +215,8 @@ public class Gallery : MonoBehaviour
         // 5) Register Post as Created
         if (m_backEndAPI.IsLastAPICallSuccessful() && successfullyCreatedThumbnail)
         {            
-            string captionText = m_captionText.GetComponentInChildren<Text>().text;
-            TruncateString(ref captionText, kMaxCaptionLength);
+            string captionText = m_captionNewText.GetComponentInChildren<Text>().text;
+            Helper.TruncateString(ref captionText, kMaxCaptionLength);
 
             yield return m_backEndAPI.Post_CreatePost(
                 m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.key.ToString(), 
@@ -265,7 +265,7 @@ public class Gallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling FilterAndAdd360Images()");
         int numFilesSearched = 0;
         m_threadJob.Start( () => 
-            numFilesSearched = FilterAndAdd360Images(ref files, isDebugBuild)           
+            numFilesSearched = FilterAndAdd360Images(files, isDebugBuild)           
         );
         yield return m_threadJob.WaitFor();
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Searched the directory " + imagesTopLevelDirectory + ", through " + numFilesSearched +
@@ -331,7 +331,7 @@ public class Gallery : MonoBehaviour
         return files;
     }
 
-    private int FilterAndAdd360Images(ref List<string> files, bool isDebugBuild)
+    private int FilterAndAdd360Images(List<string> files, bool isDebugBuild)
     {
         AndroidJNI.AttachCurrentThread();
 
@@ -470,13 +470,5 @@ public class Gallery : MonoBehaviour
         if (debugOn) Debug.Log("------- VREEL: Call CreateThumbnail() returned with: " + success);
 
         return success;
-    }
-
-    private void TruncateString(ref string value, int maxLength)
-    {
-        if (!string.IsNullOrEmpty(value) && value.Length > maxLength ) 
-        {
-            value.Substring(0, maxLength); 
-        }
-    }
+    }        
 }

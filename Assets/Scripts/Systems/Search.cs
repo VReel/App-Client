@@ -182,7 +182,7 @@ public class Search : MonoBehaviour
 
         if (m_searchState == SearchState.kUserSearch)
         {
-            if(m_user.m_id.CompareTo(m_results[index].id) == 0)
+            if(m_user.IsCurrentUser(m_results[index].id))
             {
                 m_appDirector.RequestProfileState();
                 return;
@@ -200,7 +200,7 @@ public class Search : MonoBehaviour
 
     public void OpenSearchAndProfileWithId(string userId, string userHandle)
     {
-        if(m_user.m_id.CompareTo(userId) == 0)
+        if(m_user.IsCurrentUser(userId))
         {
             m_appDirector.RequestProfileState();
             return;

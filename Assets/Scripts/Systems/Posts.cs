@@ -136,8 +136,8 @@ public class Posts : MonoBehaviour
         m_currUserOrTagId = m_user.m_id;
         OpenPosts();
 
-        m_user.GetUserMessageButton().SetText(m_user.m_handle + "'s Profile");
         m_user.GetUserMessageButton().SetIsActiveButton(true, m_currUserOrTagId);
+        m_user.GetUserMessageButton().SetText(m_user.m_handle + "'s Profile");
     }    
 
     public void OpenProfileWithID(string userID, string userHandle)
@@ -312,7 +312,7 @@ public class Posts : MonoBehaviour
                 newPost.edited = postData.attributes.edited;
                 newPost.likedByMe = postData.attributes.liked_by_me;
                 newPost.userId = postData.relationships.user.data.id.ToString();
-                newPost.userHandle = GetHandleFromIDAndPostData(ref posts, newPost.userId);
+                newPost.userHandle = GetHandleFromIDAndPostData(posts, newPost.userId);
 
                 m_posts.Add(newPost);
             }
@@ -325,7 +325,7 @@ public class Posts : MonoBehaviour
         }
     }
 
-    private string GetHandleFromIDAndPostData(ref VReelJSON.Model_Posts posts, string userId)
+    private string GetHandleFromIDAndPostData(VReelJSON.Model_Posts posts, string userId)
     {
         for (int i = 0; i < (posts.included).Count; i++)
         {

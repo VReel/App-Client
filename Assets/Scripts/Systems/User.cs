@@ -87,6 +87,11 @@ public class User : MonoBehaviour
         return (m_id.Length > 0);
     }
 
+    public bool IsCurrentUser(string userId)
+    {
+        return m_id.CompareTo(userId) == 0;
+    }
+
     public void Clear()
     {
         m_loginData.m_client = m_loginData.m_uid = "";

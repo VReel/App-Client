@@ -131,7 +131,7 @@ public class Analytics : MonoBehaviour
         CustomEvent customEvent = new CustomEvent("ImageSphereSelected");
         customEvent.AddAttribute("UserEmail", m_user.m_email);
 
-        SetAppState(ref customEvent);
+        SetAppState(customEvent);
 
         customEvent.AddAttribute("SphereNumber", sphereNumber.ToString());
 
@@ -143,7 +143,7 @@ public class Analytics : MonoBehaviour
         CustomEvent customEvent = new CustomEvent("HandleSelected");
         customEvent.AddAttribute("UserEmail", m_user.m_email);
 
-        SetAppState(ref customEvent);
+        SetAppState(customEvent);
 
         customEvent.AddAttribute("SphereNumber", sphereNumber.ToString());
 
@@ -155,7 +155,7 @@ public class Analytics : MonoBehaviour
         CustomEvent customEvent = new CustomEvent("HeartSelected");
         customEvent.AddAttribute("UserEmail", m_user.m_email);
 
-        SetAppState(ref customEvent);
+        SetAppState(customEvent);
 
         customEvent.AddAttribute("SphereNumber", sphereNumber.ToString());
 
@@ -167,7 +167,7 @@ public class Analytics : MonoBehaviour
         CustomEvent customEvent = new CustomEvent("LikeSelected");
         customEvent.AddAttribute("UserEmail", m_user.m_email);
 
-        SetAppState(ref customEvent);
+        SetAppState(customEvent);
 
         customEvent.AddAttribute("SphereNumber", sphereNumber.ToString());
 
@@ -179,7 +179,7 @@ public class Analytics : MonoBehaviour
         CustomEvent customEvent = new CustomEvent("FollowSelected");
         customEvent.AddAttribute("UserEmail", m_user.m_email);
 
-        SetAppState(ref customEvent);
+        SetAppState(customEvent);
 
         m_analyticsManager.RecordEvent(customEvent);
     }
@@ -189,7 +189,7 @@ public class Analytics : MonoBehaviour
         CustomEvent customEvent = new CustomEvent("PreviousArrowSelected");
         customEvent.AddAttribute("UserEmail", m_user.m_email);
 
-        SetAppState(ref customEvent);
+        SetAppState(customEvent);
 
         m_analyticsManager.RecordEvent(customEvent);
     }
@@ -199,7 +199,7 @@ public class Analytics : MonoBehaviour
         CustomEvent customEvent = new CustomEvent("NextArrowSelected");
         customEvent.AddAttribute("UserEmail", m_user.m_email);
 
-        SetAppState(ref customEvent);
+        SetAppState(customEvent);
 
         m_analyticsManager.RecordEvent(customEvent);
     }
@@ -261,7 +261,7 @@ public class Analytics : MonoBehaviour
         }
     }
 
-    private void SetAppState(ref CustomEvent customEvent)
+    private void SetAppState(CustomEvent customEvent)
     {
         if (m_appDirector.GetState() == AppDirector.AppState.kHome)
         {

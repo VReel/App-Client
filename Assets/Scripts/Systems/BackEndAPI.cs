@@ -130,7 +130,7 @@ public class BackEndAPI
             password = _password,
             password_confirmation = _password_confirmation,
             name = "",
-            profile = ""
+            profile = _handle + "'s Viewing Reality from a new perspective =)"
         });
 
         yield return m_threadJob.WaitFor();
@@ -221,9 +221,9 @@ public class BackEndAPI
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
 
-    public IEnumerator Register_UpdateUser(string _handle, string _password, string _password_confirmation, string _current_password)
+    public IEnumerator Register_UpdatePassword(string _password, string _password_confirmation, string _current_password)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> PUT to '/users' - Update User");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> PUT to '/users' - Update Password");
 
         var request = new RestRequest("/users", Method.PUT);
         request.AddHeader("vreel-application-id", m_applicationID);
@@ -231,13 +231,50 @@ public class BackEndAPI
         request.AddHeader("uid", m_user.GetUID());
         request.AddHeader("access-token", m_user.GetAcceessToken());
 
-        request.AddJsonBody(new { 
-            handle = _handle,
+        request.AddJsonBody(new {
             password = _password,
             password_confirmation = _password_confirmation,
-            current_password = _current_password,
-            name = "",
-            profile = ""
+            current_password = _current_password
+        });
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> PUT to '/users' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            // Empty
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "PUT to '/users'");
+        }
+
+        UpdateAccessToken(response);
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }
+
+    public IEnumerator Register_UpdateProfileDescription(string _profile)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> PUT to '/users' - Update Profile Description");
+
+        var request = new RestRequest("/users", Method.PUT);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        request.AddJsonBody(new {
+            profile = _profile
         });
 
         yield return m_threadJob.WaitFor();
