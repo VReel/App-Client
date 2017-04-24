@@ -78,6 +78,8 @@ namespace VReelJSON
         public string email { get; set; }
         public string profile { get; set; }
         public string original_url { get; set; }
+        public bool follows_me { get; set; }
+        public bool followed_by_me { get; set; }
     }
 
     //--------------------------------------------

@@ -28,6 +28,7 @@ public class ProfileDetails : MonoBehaviour
     private int m_postCount;
     private string m_email;
     private string m_profileDescription;
+    private bool m_followedByMe;
     private BackEndAPI m_backEndAPI;
     private CoroutineQueue m_coroutineQueue;
 
@@ -86,6 +87,18 @@ public class ProfileDetails : MonoBehaviour
     {
         m_profileDetailsTopLevel.SetActive(false);
     }
+           
+    public void FollowSelected()
+    {
+        m_followedByMe = !m_followedByMe;
+        m_followButtonObject.GetComponentInChildren<FollowButton>().FollowOnOffSwitch(m_followedByMe);
+        FollowOrUnfollowUser(m_userId, m_followedByMe);
+
+        Text textObject = m_followerCountObject.GetComponentInChildren<Text>();
+        int followers = System.Convert.ToInt32(textObject.text);
+        followers = m_followedByMe ? followers+1 : followers-1;
+        textObject.text = followers.ToString();
+    }
 
     public void FollowOrUnfollowUser(string userId, bool doFollow)
     {
@@ -110,11 +123,14 @@ public class ProfileDetails : MonoBehaviour
         m_postCount = m_backEndAPI.GetUserResult().data.attributes.post_count;
         m_email = m_backEndAPI.GetUserResult().data.attributes.email;
         m_profileDescription = m_backEndAPI.GetUserResult().data.attributes.profile;
+        m_followedByMe = m_backEndAPI.GetUserResult().data.attributes.followed_by_me;
 
         m_handleObject.GetComponentInChildren<Text>().text = m_handle; 
         m_followerCountObject.GetComponentInChildren<Text>().text = m_followerCount.ToString(); 
         m_followingCountObject.GetComponentInChildren<Text>().text = m_followingCount.ToString(); 
         m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_profileDescription; 
+
+        m_followButtonObject.GetComponentInChildren<FollowButton>().FollowOnOffSwitch(m_followedByMe);
     }
 
     private IEnumerator FollowOrUnfollowUserInternal(string userId, bool doFollow)
