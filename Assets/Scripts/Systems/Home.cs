@@ -119,8 +119,6 @@ public class Home : MonoBehaviour
         }
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Home Text!");
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
-        userTextComponent.text = "Hi " + m_user.m_handle + "! =D";
-        userTextComponent.color = Color.black;
+        m_user.GetUserMessageButton().SetText("Hi " + m_user.m_handle + "! =D");
     }
 }

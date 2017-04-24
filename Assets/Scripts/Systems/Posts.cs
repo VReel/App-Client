@@ -39,6 +39,9 @@ public class Posts : MonoBehaviour
         kHashTag
     };
 
+    private const string kPublicTimelineText = "Public Timeline";
+    private const string kPersonalTimelineText = "Personal Timeline";
+
     private PostsType m_postsType;
     private string m_currUserOrTagId;
 
@@ -67,6 +70,7 @@ public class Posts : MonoBehaviour
         return m_posts.Count;
     }
 
+    /*
     public string GetCurrUserOrTagID()
     {
         return m_currUserOrTagId;
@@ -76,6 +80,7 @@ public class Posts : MonoBehaviour
     {
         return (m_postsType == PostsType.kUserProfile || m_postsType == PostsType.kOtherProfile);
     }
+    */
 
     public void InvalidateWork() // This function is called in order to stop any ongoing work
     {    
@@ -107,9 +112,8 @@ public class Posts : MonoBehaviour
         m_currUserOrTagId = "";
         OpenPosts();
 
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
-        userTextComponent.text = "Public Timeline";
-        userTextComponent.color = Color.black;
+        m_user.GetUserMessageButton().SetIsActiveButton(false);
+        m_user.GetUserMessageButton().SetText(kPublicTimelineText);
     }    
 
     public void OpenPersonalTimeline()
@@ -120,9 +124,8 @@ public class Posts : MonoBehaviour
         m_currUserOrTagId = "";
         OpenPosts();
 
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
-        userTextComponent.text = "Personal Timeline";
-        userTextComponent.color = Color.black;
+        m_user.GetUserMessageButton().SetIsActiveButton(false);
+        m_user.GetUserMessageButton().SetText(kPersonalTimelineText);
     }    
 
     public void OpenUserProfile()
@@ -132,6 +135,9 @@ public class Posts : MonoBehaviour
         m_postsType = PostsType.kUserProfile;
         m_currUserOrTagId = m_user.m_id;
         OpenPosts();
+
+        m_user.GetUserMessageButton().SetText(m_user.m_handle + "'s Profile");
+        m_user.GetUserMessageButton().SetIsActiveButton(true, m_currUserOrTagId);
     }    
 
     public void OpenProfileWithID(string userID, string userHandle)
@@ -142,9 +148,8 @@ public class Posts : MonoBehaviour
         m_currUserOrTagId = userID;
         OpenPosts();
 
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
-        userTextComponent.text = userHandle + "'s Profile";
-        userTextComponent.color = Color.black;
+        m_user.GetUserMessageButton().SetIsActiveButton(true, m_currUserOrTagId);
+        m_user.GetUserMessageButton().SetText(userHandle + "'s Profile");
     } 
 
     public void OpenHashTag(string hashTagID, string hashTag)
@@ -155,9 +160,8 @@ public class Posts : MonoBehaviour
         m_currUserOrTagId = hashTagID;
         OpenPosts();
 
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
-        userTextComponent.text = hashTag;
-        userTextComponent.color = Color.black;
+        m_user.GetUserMessageButton().SetIsActiveButton(false);
+        m_user.GetUserMessageButton().SetText(hashTag + "'s Profile");
     } 
 
     public void NextPosts()

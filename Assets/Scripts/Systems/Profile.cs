@@ -17,6 +17,11 @@ public class Profile : MonoBehaviour
     [SerializeField] private GameObject m_confirmDeleteButton;
     [SerializeField] private GameObject m_cancelDeleteButton;
 
+    private const string kPreDeleteText = "Definitely want to delete this post? =O";
+    private const string kCancelDeleteText = "Delete Cancelled =)";
+    private const string kSuccessfulDeleteText = "Post Deleted Successfully! =)";
+    private const string kFailedDeleteText = "Deleting failed =(\n Please try again!";
+
     private BackEndAPI m_backEndAPI;
     private CoroutineQueue m_coroutineQueue;
 
@@ -50,9 +55,7 @@ public class Profile : MonoBehaviour
         m_confirmDeleteButton.SetActive(true);
         m_cancelDeleteButton.SetActive(true);
 
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
-        userTextComponent.text = "Definitely want to delete this post? =(";
-        userTextComponent.color = Color.red;
+        m_user.GetUserMessageButton().SetTextAsError(kPreDeleteText);
     }
 
     public void CancelDelete()
@@ -62,9 +65,7 @@ public class Profile : MonoBehaviour
         m_confirmDeleteButton.SetActive(false);
         m_cancelDeleteButton.SetActive(false);
 
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
-        userTextComponent.text = "Delete Cancelled =)";
-        userTextComponent.color = Color.black;
+        m_user.GetUserMessageButton().SetText(kCancelDeleteText);
     }
 
     public void Delete()
@@ -77,7 +78,7 @@ public class Profile : MonoBehaviour
 
     public void ShowProfileText()
     {
-        m_coroutineQueue.EnqueueAction(ShowProfileTextInternal());
+        //m_coroutineQueue.EnqueueAction(ShowProfileTextInternal());
     }
         
     public void InvalidateWork() // This function is called in order to stop any ongoing work
@@ -103,35 +104,18 @@ public class Profile : MonoBehaviour
 
         yield return m_backEndAPI.Post_DeletePost(id);
 
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {            
             // Report Success in Profile
-            userTextComponent.text = "Post Deleted Successfully! =)";
-            userTextComponent.color = Color.black;
-
+            m_user.GetUserMessageButton().SetText(kSuccessfulDeleteText);
             m_posts.RequestPostRemoval(id);
         }
         else
         {
             // Report Failure in Profile
-            userTextComponent.text = "Deleting failed =(\n Please try again!";
-            userTextComponent.color = Color.red;
+            m_user.GetUserMessageButton().SetTextAsError(kFailedDeleteText);
         }
 
         m_loadingIcon.Hide();
-    }
-
-    private IEnumerator ShowProfileTextInternal()
-    {
-        while (!m_user.IsLoggedIn() || !m_user.IsUserDataStored())
-        {
-            yield return null;
-        }
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Profile Text!");
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
-        userTextComponent.text = m_user.m_handle + "'s Profile";
-        userTextComponent.color = Color.black;
     }
 }

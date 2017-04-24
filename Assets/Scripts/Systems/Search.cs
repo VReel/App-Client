@@ -37,6 +37,8 @@ public class Search : MonoBehaviour
         public string text { get; set; }
     }
 
+    private const string kSearchText = "Search!";
+
     private List<Result> m_results;
     private Text m_searchInputText;
     private SearchState m_searchState;
@@ -108,9 +110,7 @@ public class Search : MonoBehaviour
     public void ShowSearchText()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Search Text!");
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
-        userTextComponent.text = "Search!";
-        userTextComponent.color = Color.black;
+        m_user.GetUserMessageButton().SetText(kSearchText);
     }
         
     public void InvalidateWork() // This function is called in order to stop any ongoing work

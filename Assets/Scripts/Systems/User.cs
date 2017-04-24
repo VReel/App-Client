@@ -19,7 +19,7 @@ public class User : MonoBehaviour
     };
 
     [SerializeField] private BackEndEnvironment m_backEndEnvironment;
-    [SerializeField] private GameObject m_userMessage;
+    [SerializeField] private MessageButton m_userMessageButton;
     [SerializeField] private GameObject m_errorMessage;
 
     [Serializable]
@@ -98,9 +98,9 @@ public class User : MonoBehaviour
         }
     }
 
-    public GameObject GetUserMessage()
+    public MessageButton GetUserMessageButton()
     {
-        return m_userMessage;
+        return m_userMessageButton;
     }
 
     public GameObject GetErrorMessage()

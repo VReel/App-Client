@@ -26,6 +26,13 @@ public class Gallery : MonoBehaviour
     [SerializeField] private GameObject m_uploadConfirmation;
 
     private const int kMaxCaptionLength = 200; //NOTE: In API its 500 but in UI its currently 200
+    private const string kGalleryText = "Gallery"; 
+    private const string kPreUploadText = "Great choice! Write a comment and Share your post! =)"; 
+    private const string kCancelUploadText = "Upload Cancelled =/";
+    private const string kBeganUploadText = "Began Uploading!";
+    private const string kSuccessfulUploadText = "Succesful Upload! =)";
+    private const string kFailedUploadText = "Oh no! We failed to Upload! =(\n Please try again!";
+    private const string kFailedFileReadText = "Reading files Failed!\n Check permissions!";
 
     private string m_imagesTopLevelDirectory;
     private int m_currGalleryImageIndex = 0;
@@ -56,9 +63,7 @@ public class Gallery : MonoBehaviour
     public void ShowGalleryText()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Gallery Text!");
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
-        userTextComponent.text = "Gallery";
-        userTextComponent.color = Color.black;
+        m_user.GetUserMessageButton().SetText(kGalleryText);
     }
 
     public void InvalidateWork() // This function is called in order to stop any ongoing work
@@ -87,10 +92,7 @@ public class Gallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreUpload() called on post: " + m_imageSkybox.GetImageIdentifier());
 
         m_uploadConfirmation.SetActive(true);
-
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
-        userTextComponent.text = "Great choice! Write a comment and Share your post! =)";
-        userTextComponent.color = Color.black;
+        m_user.GetUserMessageButton().SetText(kPreUploadText);
     }
 
     public void CancelUpload()
@@ -98,10 +100,7 @@ public class Gallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelUpload() called");
 
         m_uploadConfirmation.SetActive(false);
-
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
-        userTextComponent.text = "Upload Cancelled =/";
-        userTextComponent.color = Color.black;
+        m_user.GetUserMessageButton().SetText(kCancelUploadText);
     }
         
     public void UploadImage()
@@ -175,9 +174,7 @@ public class Gallery : MonoBehaviour
         yield return m_appDirector.VerifyInternetConnection();
 
         m_loadingIcon.Display();
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
-        userTextComponent.text = "Began Uploading!";
-        userTextComponent.color = Color.black;
+        m_user.GetUserMessageButton().SetText(kBeganUploadText);
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Running UploadImageInternal() for image with path: " + filePath);
 
@@ -239,13 +236,11 @@ public class Gallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploaded image: " + originalImageFilePath + ", with Success: " + (m_backEndAPI.IsLastAPICallSuccessful() && successfullyCreatedThumbnail) );
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
-            userTextComponent.text = "Succesful Upload! =)";
-            userTextComponent.color = Color.black;
+            m_user.GetUserMessageButton().SetText(kSuccessfulUploadText);
         }
         else
         {           
-            userTextComponent.text = "Oh no! We failed to Upload! =(\n Please try again!";
-            userTextComponent.color = Color.red;
+            m_user.GetUserMessageButton().SetTextAsError(kFailedUploadText);
         }
 
         m_uploadConfirmation.SetActive(false);
@@ -261,9 +256,8 @@ public class Gallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling GetAllFileNamesRecursively()");
         List<string> files = new List<string>();
         bool isDebugBuild = Debug.isDebugBuild;
-        Text userTextComponent = m_user.GetUserMessage().GetComponentInChildren<Text>();
         m_threadJob.Start( () => 
-            files = GetAllFileNamesRecursively(imagesTopLevelDirectory, userTextComponent, isDebugBuild)
+            files = GetAllFileNamesRecursively(imagesTopLevelDirectory, isDebugBuild)
         );
         yield return m_threadJob.WaitFor();
 
@@ -290,7 +284,7 @@ public class Gallery : MonoBehaviour
         m_noGalleryImagesText.SetActive(noImagesInGallery); // If the user has yet take any 360-images then show them the NoGalleryImagesText!
     }
     
-    private List<string> GetAllFileNamesRecursively(string baseDirectory, Text userTextComponent, bool isDebugBuild)
+    private List<string> GetAllFileNamesRecursively(string baseDirectory, bool isDebugBuild)
     {
         // We iterate over all files in the given top level directory, recursively searching through all the subdirectories
         var files = new List<string>();
@@ -312,8 +306,7 @@ public class Gallery : MonoBehaviour
             if (isDebugBuild) Debug.Log("------- VREEL: Call to GetFiles() failed for: " + baseDirectory);
 
             // Report Failure in Gallery
-            userTextComponent.text = "Reading files Failed!\n Check permissions!";
-            userTextComponent.color = UnityEngine.Color.red;
+            m_user.GetUserMessageButton().SetTextAsError(kFailedFileReadText);
         }
 
         try
@@ -323,7 +316,7 @@ public class Gallery : MonoBehaviour
                 FileAttributes checkedFolderAttributes = (new DirectoryInfo(dirName).Attributes) & undesiredAttributes;
                 if (checkedFolderAttributes == 0)
                 {
-                    files.AddRange(GetAllFileNamesRecursively(dirName, userTextComponent, isDebugBuild));
+                    files.AddRange(GetAllFileNamesRecursively(dirName, isDebugBuild));
                 }
             }
         }
@@ -332,8 +325,7 @@ public class Gallery : MonoBehaviour
             if (isDebugBuild) Debug.Log("------- VREEL: Call to GetDirectories() failed for: " + baseDirectory);
 
             // Report Failure in Gallery
-            userTextComponent.text = "Reading files Failed!\n Check VReel's permissions!";
-            userTextComponent.color = UnityEngine.Color.red;
+            m_user.GetUserMessageButton().SetTextAsError(kFailedFileReadText);
         }
 
         return files;

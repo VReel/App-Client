@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;           //Text
-using System.Collections;       // IEnumerator
+using System.Collections;       //IEnumerator
 
 //TODO: Improve this class name and the way this communicates with everything else...
 public class ProfileDetails : MonoBehaviour 
@@ -51,16 +51,13 @@ public class ProfileDetails : MonoBehaviour
         return m_userId;
     }
 
-    public void OpenProfileDetails()
+    public void OpenProfileDetails(string userId)
     {
-        if( !m_posts.IsProfileType() )
-        {
-            return;
-        }
+        m_userId = userId;
 
         m_profileDetailsTopLevel.SetActive(true);
 
-        bool isCurrentUser = m_user.m_id.CompareTo(m_posts.GetCurrUserOrTagID()) == 0;
+        bool isCurrentUser = m_user.m_id.CompareTo(m_userId) == 0;
         m_followButtonObject.SetActive(!isCurrentUser);
 
         m_handleObject.GetComponentInChildren<Text>().text = "";
@@ -75,12 +72,12 @@ public class ProfileDetails : MonoBehaviour
 
     public void DisplayFollowers()
     {
-        m_listUsers.DisplayFollowersResults(m_posts.GetCurrUserOrTagID());
+        m_listUsers.DisplayFollowersResults(m_userId);
     }
 
     public void DisplayFollowing()
     {
-        m_listUsers.DisplayFollowingResults(m_posts.GetCurrUserOrTagID());
+        m_listUsers.DisplayFollowingResults(m_userId);
     }
 
     public void CloseProfileDetails()
@@ -113,7 +110,7 @@ public class ProfileDetails : MonoBehaviour
     {
         yield return m_appDirector.VerifyInternetConnection();
 
-        yield return m_backEndAPI.User_GetUser(m_posts.GetCurrUserOrTagID());
+        yield return m_backEndAPI.User_GetUser(m_userId);
 
         m_userId = m_backEndAPI.GetUserResult().data.id;
         m_handle = m_backEndAPI.GetUserResult().data.attributes.handle;

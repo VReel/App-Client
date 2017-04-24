@@ -4,6 +4,7 @@ using UnityEngine.VR;       //VRSettings
 using UnityEngine.Events;   //UnityEvent
 using System;
 
+//TODO: Take this out of this Namespace
 namespace VRStandardAssets.Menu
 {
     public class MenuButton : MonoBehaviour
