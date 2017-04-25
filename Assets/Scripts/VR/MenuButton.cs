@@ -68,6 +68,8 @@ namespace VRStandardAssets.Menu
         {
             m_forceColour = forceColour;
             m_buttonForcedColour = buttonForcedColour;
+
+            RefreshButtonColor();
         }
 
         public void RefreshButtonColor()

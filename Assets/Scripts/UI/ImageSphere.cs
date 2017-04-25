@@ -165,27 +165,39 @@ public class ImageSphere : MonoBehaviour
 
         bool isSphereLoading = m_currTextureIndex == kLoadingTextureIndex;
 
-        m_handleObject.SetActive(!isSphereLoading && m_handle.Length > 0);
-        m_handleObject.GetComponentInChildren<Text>().text = m_handle;
+        if (m_handleObject != null)
+        {
+            m_handleObject.SetActive(!isSphereLoading && m_handle.Length > 0);
+            m_handleObject.GetComponentInChildren<Text>().text = m_handle;
+        }
 
-        m_captionObject.SetActive(!isSphereLoading && m_caption.Length > 0);
-        m_captionObject.GetComponentInChildren<Text>().text = m_caption;
+        if (m_captionObject != null)
+        {
+            m_captionObject.SetActive(!isSphereLoading && m_caption.Length > 0);
+            m_captionObject.GetComponentInChildren<Text>().text = m_caption;
+        }
 
-        m_likesObject.SetActive(!isSphereLoading && m_numLikes >= 0);
-        m_likesObject.GetComponentInChildren<Text>().text = m_numLikes.ToString();
+        if (m_likesObject != null)
+        {
+            m_likesObject.SetActive(!isSphereLoading && m_numLikes >= 0);
+            m_likesObject.GetComponentInChildren<Text>().text = m_numLikes.ToString();
+        }
 
-        m_heartObject.SetActive(!isSphereLoading && m_numLikes >= 0);
-        m_heartObject.GetComponentInChildren<HeartButton>().HeartOnOffSwitch(m_heartOn);
+        if (m_heartObject != null)
+        {
+            m_heartObject.SetActive(!isSphereLoading && m_numLikes >= 0);
+            m_heartObject.GetComponentInChildren<HeartButton>().HeartOnOffSwitch(m_heartOn);
+        }
     }
 
     private void HideMetadata()
     {
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: HideMetadata() called on sphere");
 
-        m_handleObject.SetActive(false);
-        m_captionObject.SetActive(false);
-        m_likesObject.SetActive(false);
-        m_heartObject.SetActive(false);
+        if (m_handleObject != null) m_handleObject.SetActive(false);
+        if (m_captionObject != null) m_captionObject.SetActive(false);
+        if (m_likesObject != null) m_likesObject.SetActive(false);
+        if (m_heartObject != null) m_heartObject.SetActive(false);
     }
 
     private IEnumerator AnimateSetTexture()

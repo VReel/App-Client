@@ -13,7 +13,7 @@ public class ImageLoader : MonoBehaviour
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private LoadingIcon m_loadingIcon;
 
-    private const int kMaxNumTextures = 10; // 5 ImageSpheres + 1 Skybox + 4 spare textures
+    private const int kMaxNumTextures = 12; // 5 ImageSpheres + 1 Skybox + 1 ProfileImage + 5 spare textures
     private const int kLoadingTextureIndex = -1;
     private int[] m_textureIndexUsage;
 
@@ -77,7 +77,7 @@ public class ImageLoader : MonoBehaviour
     public void LoadImageFromURLIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, string url, string filePathAndIdentifier, bool showLoading)
     {
         m_coroutineQueue.EnqueueAction(LoadImageFromURLIntoImageSphereInternal(imageSphereController, sphereIndex, url, filePathAndIdentifier, showLoading));
-    }
+    }        
 
     // **************************
     // Private/Helper functions
@@ -130,7 +130,7 @@ public class ImageLoader : MonoBehaviour
         {
             m_loadingIcon.Hide();
         }
-    }        
+    }                   
 
     private bool GetImageStreamFromURL(string url, ref Stream imageStream, bool debugOn)
     {        

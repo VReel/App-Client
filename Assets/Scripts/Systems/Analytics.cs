@@ -218,6 +218,20 @@ public class Analytics : MonoBehaviour
         m_analyticsManager.RecordEvent(customEvent);
     }
 
+    public void ProfileImageUploaded()
+    {
+        CustomEvent customEvent = new CustomEvent("ProfileImageUploaded");
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
+
+        if (m_imageSphereSkybox.IsTextureValid())
+        {
+            customEvent.AddMetric("TextureWidth", m_imageSphereSkybox.GetTexture().width);
+            customEvent.AddMetric("TextureHeight", m_imageSphereSkybox.GetTexture().height);
+        }
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
+
     public void ImageDeleted()
     {
         CustomEvent customEvent = new CustomEvent("ImageDeleted");
@@ -225,7 +239,6 @@ public class Analytics : MonoBehaviour
 
         m_analyticsManager.RecordEvent(customEvent);
     }
-
 
     // **************************
     // Private/Helper functions

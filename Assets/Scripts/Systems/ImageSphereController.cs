@@ -17,6 +17,7 @@ public class ImageSphereController : MonoBehaviour
     [SerializeField] private float m_scalingFactor = 0.88f;
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSkybox m_imageSkybox;
+    [SerializeField] private ImageSphere m_profileImageSphere;
     [SerializeField] private GameObject[] m_imageSpheres;
     [SerializeField] private Texture2D m_sphereLoadingTexture;
 
@@ -83,7 +84,12 @@ public class ImageSphereController : MonoBehaviour
         
     public void HideAllImageSpheres()
     {
-        m_coroutineQueue.EnqueueAction(HideAllImageSpheresInternal());
+        m_coroutineQueue.EnqueueAction(HideAllImageSpheresInternal(false));
+    }
+
+    public void ForceHideAllImageSpheres()
+    {
+        m_coroutineQueue.EnqueueAction(HideAllImageSpheresInternal(true));
     }
 
     public void SetImageWithId(string imageIdentifier, Texture2D texture, int pluginTextureIndex)
@@ -94,9 +100,13 @@ public class ImageSphereController : MonoBehaviour
 
     public void SetImageAtIndex(int sphereIndex, Texture2D texture, string imageIdentifier, int pluginTextureIndex, bool animateOnSet)
     {
-        if (sphereIndex == -1)
+        if (sphereIndex == Helper.kSkyboxSphereIndex)
         {
             m_imageSkybox.SetImage(texture, imageIdentifier, pluginTextureIndex);
+        }
+        if (sphereIndex == Helper.kProfileSphereIndex)
+        {
+            m_profileImageSphere.SetImage(texture, imageIdentifier, pluginTextureIndex, animateOnSet);
         }
         else if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
         {
@@ -110,11 +120,7 @@ public class ImageSphereController : MonoBehaviour
 
     public void SetMetadataAtIndex(int sphereIndex, string userId, string handle, string caption, int likes, bool likedByMe)
     {
-        if (sphereIndex == -1)
-        {
-            //m_imageSkybox.SetMetadata(userId, handle, caption, likes, likedByMe);
-        }
-        else if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
+        if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
         {
             m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetMetadata(userId, handle, caption, likes, likedByMe);
         }
@@ -124,15 +130,33 @@ public class ImageSphereController : MonoBehaviour
         }
     }    
 
-    public void HideSphereAtIndex(int sphereIndex)
+    public void HideSphereAtIndex(int sphereIndex, bool forceHide = false)
     {
-        if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
+        ImageSphere imageSphereAtIndex = null;
+
+        if (sphereIndex == Helper.kProfileSphereIndex)
         {
-            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().Hide();
+            imageSphereAtIndex = m_profileImageSphere;
+        }
+        else if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
+        {
+            imageSphereAtIndex = m_imageSpheres[sphereIndex].GetComponent<ImageSphere>();
         }
         else
         {
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: Invalid request to HideSphereAtIndex: " + sphereIndex);
+        }
+
+        if (imageSphereAtIndex != null)
+        {
+            if (forceHide)
+            {
+                imageSphereAtIndex.ForceHide();
+            }
+            else
+            {
+                imageSphereAtIndex.Hide();
+            }
         }
     }
     
@@ -151,13 +175,13 @@ public class ImageSphereController : MonoBehaviour
         yield break;
     }
 
-    public IEnumerator HideAllImageSpheresInternal()
+    public IEnumerator HideAllImageSpheresInternal(bool forceHide)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling HideAllImageSpheres()");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling HideAllImageSpheres() with ForceHide set to: " + forceHide);
 
         for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
         {
-            HideSphereAtIndex(sphereIndex);
+            HideSphereAtIndex(sphereIndex, forceHide);
         }
         yield break;
     }
@@ -168,27 +192,28 @@ public class ImageSphereController : MonoBehaviour
         {
             m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetSphereIndex(sphereIndex);
         }
+
+        m_profileImageSphere.SetSphereIndex(Helper.kProfileSphereIndex);
     }
-
-    private void ForceHideAllImageSpheres()
-    {
-        for (int sphereIndex = 0; sphereIndex < GetNumSpheres(); sphereIndex++)
-        {
-            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().ForceHide();
-        }
-    }        
-
+        
     private int ConvertIdToIndex(string imageIdentifier)
     {
         int sphereIndex = 0;
-        for (; sphereIndex < GetNumSpheres(); sphereIndex++)
+        if (m_profileImageSphere.GetImageIdentifier().CompareTo(imageIdentifier) == 0)
         {
-            if (m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().GetImageIdentifier().CompareTo(imageIdentifier) == 0)
+            sphereIndex = Helper.kProfileSphereIndex;
+        }
+        else
+        {
+            for (; sphereIndex < GetNumSpheres(); sphereIndex++)
             {
-                break;
+                if (m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().GetImageIdentifier().CompareTo(imageIdentifier) == 0)
+                {
+                    break;
+                }
             }
         }
-
+            
         return sphereIndex;
     }
 }

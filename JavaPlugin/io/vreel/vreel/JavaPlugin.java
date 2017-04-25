@@ -61,11 +61,10 @@ public class JavaPlugin extends UnityPlayerActivity
         return imageWidth/ (float) imageHeight; // casting to float in order to ensure float output
     }
     
-    public static boolean CreateThumbnail(String originalPath, String thumbnailPath)
+    public static boolean CreateThumbnail(String originalPath, String thumbnailPath, int thumbnailWidth)
     {
-    	final int kThumbnailWidth = 640;
     	Bitmap thumbnailBitmap = 
-    			ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(originalPath), kThumbnailWidth, kThumbnailWidth/2);
+    			ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(originalPath), thumbnailWidth, thumbnailWidth/2);
 
     	FileOutputStream out = null;
     	try 

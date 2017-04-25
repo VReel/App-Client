@@ -25,7 +25,6 @@ public class Gallery : MonoBehaviour
     [SerializeField] private GameObject m_captionNewText;
     [SerializeField] private GameObject m_uploadConfirmation;
 
-    private const int kMaxCaptionLength = 200; //NOTE: In API its 500 but in UI its currently 200
     private const string kGalleryText = "Gallery"; 
     private const string kPreUploadText = "Great choice! Write a comment and Share your post! =)"; 
     private const string kCancelUploadText = "Upload Cancelled =/";
@@ -58,6 +57,8 @@ public class Gallery : MonoBehaviour
         m_threadJob = new ThreadJob(this);
 
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
+
+        m_uploadConfirmation.SetActive(false);
     }
 
     public void ShowGalleryText()
@@ -104,10 +105,13 @@ public class Gallery : MonoBehaviour
     }
         
     public void UploadImage()
-    {        
-        m_uploadConfirmation.SetActive(true);
-
+    {     
         m_coroutineQueue.EnqueueAction(UploadImageInternal(m_imageSkybox.GetImageIdentifier()));
+    }
+
+    public void UploadProfileImage()
+    {        
+        m_coroutineQueue.EnqueueAction(UploadImageInternal(m_imageSkybox.GetImageIdentifier(), true));
     }
 
     public void OpenAndroidGallery()
@@ -169,7 +173,7 @@ public class Gallery : MonoBehaviour
     // Private/Helper functions
     // **************************
 
-    private IEnumerator UploadImageInternal(string filePath) //NOTE: Ensured that this function cannot be stopped midway because the LoadingIcon blocks UI
+    private IEnumerator UploadImageInternal(string filePath, bool profilePic = false) //NOTE: Ensured that this function cannot be stopped midway because the LoadingIcon blocks UI
     {
         yield return m_appDirector.VerifyInternetConnection();
 
@@ -216,13 +220,23 @@ public class Gallery : MonoBehaviour
         if (m_backEndAPI.IsLastAPICallSuccessful() && successfullyCreatedThumbnail)
         {            
             string captionText = m_captionNewText.GetComponentInChildren<Text>().text;
-            Helper.TruncateString(ref captionText, kMaxCaptionLength);
+            Helper.TruncateString(ref captionText, Helper.kMaxCaptionOrDescriptionLength);
 
-            yield return m_backEndAPI.Post_CreatePost(
-                m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.key.ToString(), 
-                m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.key.ToString(),
-                captionText
-            );
+            if (profilePic)
+            {
+                yield return m_backEndAPI.Register_UpdateProfileImage(
+                    m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.key.ToString(), 
+                    m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.key.ToString()
+                );
+            }
+            else 
+            {
+                yield return m_backEndAPI.Post_CreatePost(
+                    m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.key.ToString(), 
+                    m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.key.ToString(),
+                    captionText
+                );
+            }
         }
 
         //6) Delete temporary thumbnail file
@@ -464,7 +478,7 @@ public class Gallery : MonoBehaviour
         if (debugOn) Debug.Log("------- VREEL: Called CreateThumbnail() with Thumbnail Path: " + thumbnailImagePath);
         AndroidJNI.AttachCurrentThread();
 
-        bool success = m_javaPluginClass.CallStatic<bool>("CreateThumbnail", originalImagePath, thumbnailImagePath);
+        bool success = m_javaPluginClass.CallStatic<bool>("CreateThumbnail", originalImagePath, thumbnailImagePath, Helper.kStandardThumbnailWidth);
 
         AndroidJNI.DetachCurrentThread();
         if (debugOn) Debug.Log("------- VREEL: Call CreateThumbnail() returned with: " + success);

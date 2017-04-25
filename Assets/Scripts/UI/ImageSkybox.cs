@@ -10,6 +10,7 @@ public class ImageSkybox : MonoBehaviour
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private Posts m_posts;
+    [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private GameObject m_uploadButton;
     [SerializeField] private GameObject m_deleteButton;
 
@@ -58,6 +59,8 @@ public class ImageSkybox : MonoBehaviour
             return;
         }
 
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: SetImage() got called with ImageIdentifier: " + imageIdentifier + ", and TextureIndex: " + textureIndex);
+
         m_imageIdentifier = imageIdentifier;
         m_skyboxTexture = texture;
 
@@ -67,17 +70,24 @@ public class ImageSkybox : MonoBehaviour
 
         bool isProfileState = m_appDirector.GetState() == AppDirector.AppState.kProfile;
         bool isGalleryState = m_appDirector.GetState() == AppDirector.AppState.kGallery;
+        bool isProfileImage = m_profileDetails.IsUser(imageIdentifier); // Identifier is of the User for Profile Pictures
         bool isImageFromDevice = m_imageIdentifier.StartsWith(m_imagesTopLevelDirectory);
-        m_uploadButton.SetActive(isImageFromDevice && isGalleryState);  // Currently the ImageSkybox class is responsible for switching on the Upload button
-        m_deleteButton.SetActive(!isImageFromDevice && isProfileState); // and the Delete button, when its possible to select either
+        m_uploadButton.SetActive(isImageFromDevice && isGalleryState && !isProfileImage);  // Currently the ImageSkybox class is responsible for switching on the Upload button
+        m_deleteButton.SetActive(!isImageFromDevice && isProfileState && !isProfileImage); // and the Delete button, when its possible to select either
 
         if (!isImageFromDevice) // This image is being set from the Profile, not the Gallery
-        {
-            const int kStandardThumbnailWidth = 640; //TODO: This is also hardcoded in DeviceGallery, need to move this into a global variable...
-            bool isThumbnail = texture.width <= kStandardThumbnailWidth;
+        {            
+            bool isThumbnail = texture.width <= Helper.kStandardThumbnailWidth;
             if (isThumbnail) // This image is a Thumbnail, so we want to download the full image!
             {
-                m_posts.DownloadOriginalImage(m_imageIdentifier);
+                if (isProfileImage) // Identifier is of the User for Profile Pictures
+                {
+                    m_profileDetails.DownloadOriginalImage();
+                }
+                else
+                {
+                    m_posts.DownloadOriginalImage(m_imageIdentifier);
+                }
             }
             else // TODO: This is the Original image, so we want to replace the Thumbnail on the ImageSphere!
             {                

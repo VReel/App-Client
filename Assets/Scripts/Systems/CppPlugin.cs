@@ -229,7 +229,7 @@ public class CppPlugin
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Completed LoadImageFromStreamIntoImageSphere() for image: " + imageIdentifier + ", with TextureIndex: " + textureIndex);
-    }     
+    }  
 
     // **************************
     // Private/Helper functions

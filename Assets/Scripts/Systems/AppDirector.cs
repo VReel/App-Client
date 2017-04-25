@@ -230,6 +230,8 @@ public class AppDirector : MonoBehaviour
         m_keyboard.CancelText();
         SetMenuBar(true);
 
+        m_user.GetUserMessageButton().SetIsActiveButton(false);
+
         m_imageLoader.InvalidateLoading();
         m_home.InvalidateWork();
         m_search.InvalidateWork();

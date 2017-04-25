@@ -401,7 +401,7 @@ public class Posts : MonoBehaviour
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
             int index = ConvertIdToIndex(postId); 
-            int sphereIndex = -1; // Set it on the skybox
+            int sphereIndex = Helper.kSkyboxSphereIndex;
             bool showLoading = true;
 
             LoadImageInternalPlugin(
@@ -461,7 +461,8 @@ public class Posts : MonoBehaviour
         m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, sphereIndex, url, imageIdentifier, showLoading);
     }           
 
-    private int ConvertIdToIndex(string postId) //TODO: To remove this all I need to do is turn m_posts into a Map<ID, PostAttributes>...
+    //TODO: To remove this all I need to do is turn m_posts into a Map<ID, PostAttributes>...
+    private int ConvertIdToIndex(string postId) 
     {
         int index = 0;    
         for (; index < m_posts.Count; index++)

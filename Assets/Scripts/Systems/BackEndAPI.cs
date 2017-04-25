@@ -301,6 +301,47 @@ public class BackEndAPI
         UpdateAccessToken(response);
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }        
+
+    public IEnumerator Register_UpdateProfileImage(string _thumbnailKey, string _originalKey)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> PUT to '/users' - Update Profile Image");
+
+        var request = new RestRequest("/users", Method.PUT);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        request.AddJsonBody(new { 
+            thumbnail_key = _thumbnailKey, 
+            original_key = _originalKey
+        });
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> PUT to '/users' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            // Empty
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "PUT to '/users'");
+        }
+
+        UpdateAccessToken(response);
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
 
     public IEnumerator Register_DeleteUser()

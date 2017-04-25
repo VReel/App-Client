@@ -13,6 +13,9 @@ public class ProfileDetails : MonoBehaviour
     [SerializeField] private User m_user;
     [SerializeField] private Posts m_posts;
     [SerializeField] private ListUsers m_listUsers;
+    [SerializeField] private ImageLoader m_imageLoader;
+    [SerializeField] private ImageSphereController m_imageSphereController;
+    [SerializeField] private LoadingIcon m_loadingIcon;
     [SerializeField] private GameObject m_profileDetailsTopLevel;
     [SerializeField] private GameObject m_followButtonObject;
     [SerializeField] private GameObject m_handleObject;
@@ -20,9 +23,7 @@ public class ProfileDetails : MonoBehaviour
     [SerializeField] private GameObject m_followingCountObject;
     [SerializeField] private GameObject m_profileDescriptionObject;
     [SerializeField] private GameObject m_profileDescriptionUpdateTopLevel;
-    [SerializeField] private GameObject m_profileDescriptionNewText;
-
-    private const int kMaxProfileDescriptionLength = 200; //NOTE: In API its 500 but in UI its currently 200
+    [SerializeField] private GameObject m_profileDescriptionNewText;       
 
     private string m_userId;
     private string m_handle;
@@ -33,6 +34,8 @@ public class ProfileDetails : MonoBehaviour
     private string m_email;
     private string m_profileDescription;
     private bool m_followedByMe;
+    private string m_thumbnailUrl;
+    private string m_originalUrl;
     private BackEndAPI m_backEndAPI;
     private CoroutineQueue m_coroutineQueue;
 
@@ -53,6 +56,11 @@ public class ProfileDetails : MonoBehaviour
     public string GetUserId()
     {
         return m_userId;
+    }
+
+    public bool IsUser(string userId)
+    {
+        return (m_userId != null && userId != null && m_userId.CompareTo(userId) == 0);
     }
 
     public void OpenProfileDetails(string userId)
@@ -88,6 +96,7 @@ public class ProfileDetails : MonoBehaviour
     {
         m_profileDetailsTopLevel.SetActive(false);
         m_profileDescriptionUpdateTopLevel.SetActive(false);
+        m_imageSphereController.HideSphereAtIndex(Helper.kProfileSphereIndex, true); // True tells it to ForceHide
     }
            
     public void FollowSelected()
@@ -129,32 +138,79 @@ public class ProfileDetails : MonoBehaviour
         m_coroutineQueue.EnqueueAction(UpdateProfileDescriptionInternal());
     }
 
+    public void DownloadOriginalImage()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadOriginalImage() called");
+
+        m_coroutineQueue.EnqueueAction(DownloadOriginalImageInternal());
+    }
+
     // **************************
     // Private/Helper functions
     // **************************
 
     private IEnumerator GetUserDetails()
     {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: GetUserDetails() called");
+
         yield return m_appDirector.VerifyInternetConnection();
 
+        yield return RefreshProfileData();
+
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            m_handleObject.GetComponentInChildren<Text>().text = m_handle; 
+            m_followerCountObject.GetComponentInChildren<Text>().text = m_followerCount.ToString(); 
+            m_followingCountObject.GetComponentInChildren<Text>().text = m_followingCount.ToString(); 
+            m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_profileDescription; 
+
+            m_followButtonObject.GetComponentInChildren<FollowButton>().FollowOnOffSwitch(m_followedByMe);
+
+            if (m_thumbnailUrl.Length > 0)
+            {
+                m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kProfileSphereIndex, m_thumbnailUrl, m_userId, false);
+            }
+        }
+        else
+        {
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - Unable to load User Profile Details!");
+        }
+    }
+
+    public IEnumerator DownloadOriginalImageInternal()
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        m_loadingIcon.Display();
+
+        yield return RefreshProfileData();
+
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {            
+            m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kSkyboxSphereIndex, m_originalUrl, m_userId, true);
+        }
+
+        m_loadingIcon.Hide();
+    }
+
+    private IEnumerator RefreshProfileData() // NOTE: Since URL's have a lifetime, we need to refresh the data at certain points...
+    {            
         yield return m_backEndAPI.User_GetUser(m_userId);
 
-        m_userId = m_backEndAPI.GetUserResult().data.id;
-        m_handle = m_backEndAPI.GetUserResult().data.attributes.handle;
-        m_name = m_backEndAPI.GetUserResult().data.attributes.name;
-        m_followerCount = m_backEndAPI.GetUserResult().data.attributes.follower_count;
-        m_followingCount = m_backEndAPI.GetUserResult().data.attributes.following_count;
-        m_postCount = m_backEndAPI.GetUserResult().data.attributes.post_count;
-        m_email = m_backEndAPI.GetUserResult().data.attributes.email;
-        m_profileDescription = m_backEndAPI.GetUserResult().data.attributes.profile;
-        m_followedByMe = m_backEndAPI.GetUserResult().data.attributes.followed_by_me;
-
-        m_handleObject.GetComponentInChildren<Text>().text = m_handle; 
-        m_followerCountObject.GetComponentInChildren<Text>().text = m_followerCount.ToString(); 
-        m_followingCountObject.GetComponentInChildren<Text>().text = m_followingCount.ToString(); 
-        m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_profileDescription; 
-
-        m_followButtonObject.GetComponentInChildren<FollowButton>().FollowOnOffSwitch(m_followedByMe);
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            m_userId = m_backEndAPI.GetUserResult().data.id;
+            m_handle = m_backEndAPI.GetUserResult().data.attributes.handle;
+            m_name = m_backEndAPI.GetUserResult().data.attributes.name;
+            m_followerCount = m_backEndAPI.GetUserResult().data.attributes.follower_count;
+            m_followingCount = m_backEndAPI.GetUserResult().data.attributes.following_count;
+            m_postCount = m_backEndAPI.GetUserResult().data.attributes.post_count;
+            m_email = m_backEndAPI.GetUserResult().data.attributes.email;
+            m_profileDescription = m_backEndAPI.GetUserResult().data.attributes.profile;
+            m_followedByMe = m_backEndAPI.GetUserResult().data.attributes.followed_by_me;
+            m_thumbnailUrl = m_backEndAPI.GetUserResult().data.attributes.thumbnail_url;
+            m_originalUrl = m_backEndAPI.GetUserResult().data.attributes.original_url;
+        }
     }
 
     //TODO: Should this be somewhere else and as a public function...?
@@ -182,7 +238,7 @@ public class ProfileDetails : MonoBehaviour
         yield return m_appDirector.VerifyInternetConnection();
 
         string profileDescriptionNewText = m_profileDescriptionNewText.GetComponentInChildren<Text>().text;
-        Helper.TruncateString(ref profileDescriptionNewText, kMaxProfileDescriptionLength);
+        Helper.TruncateString(ref profileDescriptionNewText, Helper.kMaxCaptionOrDescriptionLength);
 
         m_profileDescriptionObject.GetComponentInChildren<Text>().text = profileDescriptionNewText;
         yield return m_backEndAPI.Register_UpdateProfileDescription(profileDescriptionNewText);
