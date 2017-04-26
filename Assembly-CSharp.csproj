@@ -96,6 +96,7 @@
      <Compile Include="Assets\Scripts\Systems\Analytics.cs" />
      <Compile Include="Assets\Scripts\Systems\AppDirector.cs" />
      <Compile Include="Assets\Scripts\Systems\BackEndAPI.cs" />
+     <Compile Include="Assets\Scripts\Systems\Comments.cs" />
      <Compile Include="Assets\Scripts\Systems\CoroutineQueue.cs" />
      <Compile Include="Assets\Scripts\Systems\CppPlugin.cs" />
      <Compile Include="Assets\Scripts\Systems\DeserialisationModelsAPI.cs" />
