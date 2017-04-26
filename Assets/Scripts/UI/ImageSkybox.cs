@@ -68,6 +68,7 @@ public class ImageSkybox : MonoBehaviour
         m_currTextureIndex = textureIndex;
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, true);
 
+        // TODO: Change these such that it checks the UserId of a post instead, to see if the user it belongs to is the Profile User.
         bool isProfileState = m_appDirector.GetState() == AppDirector.AppState.kProfile;
         bool isGalleryState = m_appDirector.GetState() == AppDirector.AppState.kGallery;
         bool isProfileImage = m_profileDetails.IsUser(imageIdentifier); // Identifier is of the User for Profile Pictures

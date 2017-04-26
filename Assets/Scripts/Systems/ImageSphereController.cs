@@ -104,7 +104,7 @@ public class ImageSphereController : MonoBehaviour
         {
             m_imageSkybox.SetImage(texture, imageIdentifier, pluginTextureIndex);
         }
-        if (sphereIndex == Helper.kProfileSphereIndex)
+        else if (sphereIndex == Helper.kProfileSphereIndex)
         {
             m_profileImageSphere.SetImage(texture, imageIdentifier, pluginTextureIndex, animateOnSet);
         }
