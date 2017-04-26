@@ -101,8 +101,11 @@ public class ImageSphere : MonoBehaviour
         m_numLikes = -1;
         m_heartOn = false;
 
-        m_coroutineQueue.Clear();
-        m_coroutineQueue.EnqueueAction(AnimateHide());
+        if (m_coroutineQueue != null)
+        {
+            m_coroutineQueue.Clear();
+            m_coroutineQueue.EnqueueAction(AnimateHide());
+        }
     }
 
     public void ForceHide()
@@ -115,7 +118,10 @@ public class ImageSphere : MonoBehaviour
 
         UpdateMetadata();
 
-        m_coroutineQueue.Clear();
+        if (m_coroutineQueue != null)
+        {
+            m_coroutineQueue.Clear();
+        }
         transform.localScale = new Vector3(kMinShrink, kMinShrink, kMinShrink);
     }
 

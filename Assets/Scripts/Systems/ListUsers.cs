@@ -64,7 +64,7 @@ public class ListUsers : MonoBehaviour
 
     public void DisplayLikeResults(string postId)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: DisplayUserResults() called for post ID: " + postId);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: DisplayLikeResults() called for post ID: " + postId);
 
         m_resultType = ResultType.kLikes;
         m_coroutineQueue.EnqueueAction(StoreAndDisplayUserResultsInternal(postId));
