@@ -161,7 +161,7 @@ public class Posts : MonoBehaviour
         OpenPosts();
 
         m_user.GetUserMessageButton().SetIsActiveButton(false);
-        m_user.GetUserMessageButton().SetText(hashTag + "'s Profile");
+        m_user.GetUserMessageButton().SetText(hashTag);
     } 
 
     public void NextPosts()
