@@ -13,6 +13,7 @@ public class ListUsers : MonoBehaviour
     [SerializeField] private User m_user;
     [SerializeField] private Search m_search;
     [SerializeField] private ProfileDetails m_profileDetails;
+    [SerializeField] private ListComments m_listComments;
     [SerializeField] private GameObject m_displayItemsTopLevel; //Top-level object for results
     [SerializeField] private GameObject[] m_displayItems;
     [SerializeField] private GameObject m_nextButton;
@@ -155,6 +156,7 @@ public class ListUsers : MonoBehaviour
         yield return m_appDirector.VerifyInternetConnection();
 
         m_profileDetails.CloseProfileDetails();
+        m_listComments.CloseListComments();
 
         m_currResultIndex = 0;
         m_userResults.Clear();

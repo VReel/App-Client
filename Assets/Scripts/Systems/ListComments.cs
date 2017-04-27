@@ -15,6 +15,7 @@ public class ListComments : MonoBehaviour
     [SerializeField] private Posts m_posts;
     //[SerializeField] private Search m_search;
     [SerializeField] private ProfileDetails m_profileDetails;
+    [SerializeField] private ListUsers m_listUsers;
     [SerializeField] private GameObject m_displayItemsTopLevel; //Top-level object for results
     [SerializeField] private GameObject[] m_displayItems;
     [SerializeField] private GameObject m_nextButton;
@@ -159,6 +160,7 @@ public class ListComments : MonoBehaviour
         yield return m_appDirector.VerifyInternetConnection();
 
         m_profileDetails.CloseProfileDetails();
+        m_listUsers.CloseListUsers();
 
         m_currResultIndex = 0;
         m_commentResults.Clear();
