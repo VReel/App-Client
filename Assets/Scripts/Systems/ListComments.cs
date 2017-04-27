@@ -12,12 +12,15 @@ public class ListComments : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
+    [SerializeField] private Posts m_posts;
     //[SerializeField] private Search m_search;
     [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private GameObject m_displayItemsTopLevel; //Top-level object for results
     [SerializeField] private GameObject[] m_displayItems;
     [SerializeField] private GameObject m_nextButton;
     [SerializeField] private GameObject m_previousButton;
+    [SerializeField] private GameObject m_addCommentConfirmation;
+    [SerializeField] private GameObject m_commentNewText;
 
     public class CommentResult
     {
@@ -58,7 +61,7 @@ public class ListComments : MonoBehaviour
         m_previousButton.SetActive(!IsIndexAtStart());
     }        
 
-    public void DisplayCommentResults(string postId)
+    public void DisplayCommentResults(string postId) // NOTE: Fr now I'm sending caption as a param, should maybe be captured internally
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: DisplayCommentResults() called for post ID: " + postId);
 
@@ -99,6 +102,26 @@ public class ListComments : MonoBehaviour
     public void CloseListComments()
     {
         m_displayItemsTopLevel.SetActive(false);
+        m_addCommentConfirmation.SetActive(false);
+    }
+        
+    public void PreAddComment()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreAddComment() called on post: " + m_postId);
+
+        m_addCommentConfirmation.SetActive(true);
+    }
+
+    public void CancelAddComment()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelUpload() called");
+
+        m_addCommentConfirmation.SetActive(true);
+    }
+
+    public void ConfirmAddComment()
+    {     
+        m_coroutineQueue.EnqueueAction(ConfirmAddCommentInternal());
     }
 
     /*
@@ -137,6 +160,7 @@ public class ListComments : MonoBehaviour
 
         m_profileDetails.CloseProfileDetails();
 
+        m_currResultIndex = 0;
         m_commentResults.Clear();
         m_postId = postId;
 
@@ -144,12 +168,15 @@ public class ListComments : MonoBehaviour
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {            
+            StoreCaption();
+
             StoreNewUserResults();
 
             DisplayUserResultsOnItems();
         }
 
-        m_displayItemsTopLevel.SetActive(m_commentResults.Count > 0);
+        m_displayItemsTopLevel.SetActive(true);
+        m_addCommentConfirmation.SetActive(false);
     }
 
     private IEnumerator StoreUserResultsFromNextPage()
@@ -169,6 +196,20 @@ public class ListComments : MonoBehaviour
         yield return m_backEndAPI.Post_GetPostComments(m_postId, nextPageOfResults);
     }
 
+    private void StoreCaption()
+    {
+        Posts.Post postViewed = m_posts.GetPostFromID(m_postId);
+
+        CommentResult newCommentResult = new CommentResult();
+        newCommentResult.commentId = m_postId;
+        newCommentResult.text = postViewed.caption;
+        newCommentResult.edited = postViewed.edited;
+        newCommentResult.userId = postViewed.userId;
+        newCommentResult.userHandle = postViewed.userHandle;
+
+        m_commentResults.Add(newCommentResult);
+    }
+
     private void StoreNewUserResults()
     {
         VReelJSON.Model_Comments comments = m_backEndAPI.GetCommentsResult();
@@ -176,14 +217,14 @@ public class ListComments : MonoBehaviour
         {
             foreach (VReelJSON.CommentData commentData in comments.data)
             {   
-                CommentResult newUserResult = new CommentResult();
-                newUserResult.commentId = commentData.id.ToString();
-                newUserResult.text = commentData.attributes.text.ToString();
-                newUserResult.edited = commentData.attributes.edited;
-                newUserResult.userId = commentData.relationships.user.data.id;
-                newUserResult.userHandle = Helper.GetHandleFromIDAndUserData(comments.included, newUserResult.userId);
+                CommentResult newCommentResult = new CommentResult();
+                newCommentResult.commentId = commentData.id.ToString();
+                newCommentResult.text = commentData.attributes.text.ToString();
+                newCommentResult.edited = commentData.attributes.edited;
+                newCommentResult.userId = commentData.relationships.user.data.id;
+                newCommentResult.userHandle = Helper.GetHandleFromIDAndUserData(comments.included, newCommentResult.userId);
 
-                m_commentResults.Add(newUserResult);
+                m_commentResults.Add(newCommentResult);
             }
 
             m_nextPageOfResults = null;
@@ -206,12 +247,36 @@ public class ListComments : MonoBehaviour
             if (userResultIndex < m_commentResults.Count)
             {                                   
                 m_displayItems[itemIndex].SetActive(true);
-                m_displayItems[itemIndex].GetComponentInChildren<Text>().text = m_commentResults[userResultIndex].text;
+                m_displayItems[itemIndex].GetComponentInChildren<Text>().text = m_commentResults[userResultIndex].userHandle + ":\t" + m_commentResults[userResultIndex].text;
             }
             else
             {
                 m_displayItems[itemIndex].SetActive(false);
             }
         }
+    }
+
+    private IEnumerator ConfirmAddCommentInternal()
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        string commentText = m_commentNewText.GetComponentInChildren<Text>().text;
+        yield return m_backEndAPI.Comment_CreateComment(m_postId, commentText);
+
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            CommentResult newCommentResult = new CommentResult();
+            newCommentResult.commentId = m_backEndAPI.GetCommentResult().data.id.ToString();
+            newCommentResult.text = m_backEndAPI.GetCommentResult().data.attributes.text.ToString();
+            newCommentResult.edited = m_backEndAPI.GetCommentResult().data.attributes.edited;
+            newCommentResult.userId = m_user.m_id;
+            newCommentResult.userHandle = m_user.m_handle;
+
+            m_commentResults.Add(newCommentResult);
+
+            DisplayUserResultsOnItems();
+        }
+
+        m_addCommentConfirmation.SetActive(false);
     }
 }

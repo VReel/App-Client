@@ -219,6 +219,12 @@ public class Posts : MonoBehaviour
         //  -> for now we always remove the post, but really we should be checking that post no longer exists...
         m_posts.RemoveAt(ConvertIdToIndex(postId));
     }
+
+    public Post GetPostFromID(string postId)
+    {
+        int index = ConvertIdToIndex(postId);
+        return m_posts[index];
+    }
         
     // **************************
     // Private/Helper functions

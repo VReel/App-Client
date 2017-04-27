@@ -156,6 +156,7 @@ public class ListUsers : MonoBehaviour
 
         m_profileDetails.CloseProfileDetails();
 
+        m_currResultIndex = 0;
         m_userResults.Clear();
         m_currPostOrUserID = postOrUserId;
 

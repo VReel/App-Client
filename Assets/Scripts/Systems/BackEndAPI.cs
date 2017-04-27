@@ -38,6 +38,7 @@ public class BackEndAPI
     private VReelJSON.Model_Users m_usersJSONResult;
     private VReelJSON.Model_Post m_postJSONResult;
     private VReelJSON.Model_Posts m_postsJSONResult;
+    private VReelJSON.Model_Comment m_commentJSONResult;
     private VReelJSON.Model_Comments m_commentsJSONResult;
     private VReelJSON.Model_S3PresignedURL m_s3URLJSONResult;
 
@@ -98,6 +99,11 @@ public class BackEndAPI
     public VReelJSON.Model_Posts GetPostsResult()
     {
         return m_postsJSONResult;
+    }
+
+    public VReelJSON.Model_Comment GetCommentResult()
+    {
+        return m_commentJSONResult;
     }
 
     public VReelJSON.Model_Comments GetCommentsResult()
@@ -1115,7 +1121,14 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            // Empty
+            yield return m_threadJob.WaitFor();
+            VReelJSON.Model_Comment result = null;
+            m_threadJob.Start( () => 
+                result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Comment>(response.Content)
+            );
+            yield return m_threadJob.WaitFor();
+
+            m_commentJSONResult = result;
         }
         else // Error Handling
         {            
