@@ -300,7 +300,7 @@ public class Posts : MonoBehaviour
         VReelJSON.Model_Posts posts = m_backEndAPI.GetPostsResult();
         if (posts != null)
         {
-            foreach (VReelJSON.PostsData postData in posts.data)
+            foreach (VReelJSON.PostData postData in posts.data)
             {   
                 Post newPost = new Post();
                 newPost.postId = postData.id.ToString();
@@ -312,7 +312,7 @@ public class Posts : MonoBehaviour
                 newPost.edited = postData.attributes.edited;
                 newPost.likedByMe = postData.attributes.liked_by_me;
                 newPost.userId = postData.relationships.user.data.id.ToString();
-                newPost.userHandle = GetHandleFromIDAndPostData(posts, newPost.userId);
+                newPost.userHandle = Helper.GetHandleFromIDAndUserData(posts.included, newPost.userId);
 
                 m_posts.Add(newPost);
             }
@@ -323,19 +323,6 @@ public class Posts : MonoBehaviour
                 m_nextPageOfPosts = posts.meta.next_page_id;
             }
         }
-    }
-
-    private string GetHandleFromIDAndPostData(VReelJSON.Model_Posts posts, string userId)
-    {
-        for (int i = 0; i < (posts.included).Count; i++)
-        {
-            if ((posts.included[i]).id.CompareTo(userId) == 0)
-            {
-                return (posts.included[i]).attributes.handle;
-            }
-        }
-
-        return "HANDLE_ERROR";
     }
 
     private IEnumerator LikeOrUnlikePostInternal(string postId, bool doLike)

@@ -12,6 +12,7 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private Search m_search;
     [SerializeField] private Posts m_posts;
     [SerializeField] private ListUsers m_listUsers;
+    [SerializeField] private ListComments m_listComments;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
@@ -147,7 +148,7 @@ public class ImageSphere : MonoBehaviour
 
     public void CaptionSelected()
     {
-        //TODO
+        m_listComments.DisplayCommentResults(m_imageIdentifier);
     }
 
     // **************************

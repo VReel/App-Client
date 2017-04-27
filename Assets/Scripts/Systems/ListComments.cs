@@ -3,7 +3,8 @@ using UnityEngine.UI;               // Text
 using System.Collections;           // IEnumerator
 using System.Collections.Generic;   // List
 
-public class ListUsers : MonoBehaviour 
+//TODO: If this doesn't change much, then it should be merged into ListUsers somehow...
+public class ListComments : MonoBehaviour 
 {   
     // **************************
     // Member Variables
@@ -11,31 +12,26 @@ public class ListUsers : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
-    [SerializeField] private Search m_search;
+    //[SerializeField] private Search m_search;
     [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private GameObject m_displayItemsTopLevel; //Top-level object for results
     [SerializeField] private GameObject[] m_displayItems;
     [SerializeField] private GameObject m_nextButton;
     [SerializeField] private GameObject m_previousButton;
 
-    public class UserResult
+    public class CommentResult
     {
+        public string commentId { get; set; }
+        public string text { get; set; }
+        public bool edited { get; set; }
         public string userId { get; set; }
-        public string userHandle { get; set; }    
-    }
+        public string userHandle { get; set; }
+    }        
 
-    public enum ResultType
-    {
-        kLikes,
-        kFollowers,
-        kFollowing
-    };
-
-    private ResultType m_resultType;
-    private string m_currPostOrUserID = null;
+    private string m_postId = null;
     private int m_currResultIndex = 0;
 
-    private List<UserResult> m_userResults;
+    private List<CommentResult> m_commentResults;
     private string m_nextPageOfResults = null;
     private BackEndAPI m_backEndAPI;
     private CoroutineQueue m_coroutineQueue;
@@ -46,14 +42,14 @@ public class ListUsers : MonoBehaviour
 
     public void Start() 
 	{
-        m_userResults = new List<UserResult>();
+        m_commentResults = new List<CommentResult>();
 
         m_coroutineQueue = new CoroutineQueue(this);
         m_coroutineQueue.StartLoop();
 
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
 
-        CloseListUsers();
+        CloseListComments();
 	}            
 
     public void Update()
@@ -62,38 +58,21 @@ public class ListUsers : MonoBehaviour
         m_previousButton.SetActive(!IsIndexAtStart());
     }        
 
-    public void DisplayLikeResults(string postId)
+    public void DisplayCommentResults(string postId)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: DisplayLikeResults() called for post ID: " + postId);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: DisplayCommentResults() called for post ID: " + postId);
 
-        m_resultType = ResultType.kLikes;
         m_coroutineQueue.EnqueueAction(StoreAndDisplayUserResultsInternal(postId));
     }
 
-    public void DisplayFollowersResults(string userId)
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: DisplayFollowersResults() called for user ID: " + userId);
-
-        m_resultType = ResultType.kFollowers;
-        m_coroutineQueue.EnqueueAction(StoreAndDisplayUserResultsInternal(userId));
-    }
-
-    public void DisplayFollowingResults(string userId)
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: DisplayFollowingResults() called for user ID: " + userId);
-
-        m_resultType = ResultType.kFollowing;
-        m_coroutineQueue.EnqueueAction(StoreAndDisplayUserResultsInternal(userId));
-    }
-
-    public void NextUserResults()
+    public void NextCommentResults()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: NextUserResults() called");
 
         int numResultsToDisplay = GetNumDisplayItems();
-        int numUserResults = m_userResults.Count;
+        int numCommentResults = m_commentResults.Count;
 
-        m_currResultIndex = Mathf.Clamp(m_currResultIndex + numResultsToDisplay, 0, numUserResults);
+        m_currResultIndex = Mathf.Clamp(m_currResultIndex + numResultsToDisplay, 0, numCommentResults);
         m_coroutineQueue.Clear(); // Ensures we don't repeat operations
 
         if (m_nextPageOfResults != null)
@@ -104,30 +83,32 @@ public class ListUsers : MonoBehaviour
         DisplayUserResultsOnItems();
     }
 
-    public void PreviousUserResults()
+    public void PreviousCommentResults()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreviousUserResults() called");
 
         int numResultsToDisplay = GetNumDisplayItems();
-        int numUserResults = m_userResults.Count;
+        int numCommentResults = m_commentResults.Count;
 
-        m_currResultIndex = Mathf.Clamp(m_currResultIndex - numResultsToDisplay, 0, numUserResults);
+        m_currResultIndex = Mathf.Clamp(m_currResultIndex - numResultsToDisplay, 0, numCommentResults);
         m_coroutineQueue.Clear(); // Ensures we don't repeat operations
 
         DisplayUserResultsOnItems();
     }
 
-    public void CloseListUsers()
+    public void CloseListComments()
     {
         m_displayItemsTopLevel.SetActive(false);
     }
 
+    /*
     public void HandleSelected(int userResultItemIndex)
     {
-        CloseListUsers();
+        CloseListComments();
         int actualResultIndex = m_currResultIndex + userResultItemIndex;
         m_search.OpenSearchAndProfileWithId(m_userResults[actualResultIndex].userId, m_userResults[actualResultIndex].userHandle);
     }
+    */
      
     // **************************
     // Private/Helper functions
@@ -146,18 +127,18 @@ public class ListUsers : MonoBehaviour
     private bool IsIndexAtEnd()
     {
         int numDisplayItems = GetNumDisplayItems();
-        int numLikeResults = m_userResults.Count;
+        int numLikeResults = m_commentResults.Count;
         return m_currResultIndex >= (numLikeResults - numDisplayItems);       
     }        
         
-    public IEnumerator StoreAndDisplayUserResultsInternal(string postOrUserId)
+    public IEnumerator StoreAndDisplayUserResultsInternal(string postId)
     {
         yield return m_appDirector.VerifyInternetConnection();
 
         m_profileDetails.CloseProfileDetails();
 
-        m_userResults.Clear();
-        m_currPostOrUserID = postOrUserId;
+        m_commentResults.Clear();
+        m_postId = postId;
 
         yield return GetResults();
 
@@ -168,7 +149,7 @@ public class ListUsers : MonoBehaviour
             DisplayUserResultsOnItems();
         }
 
-        m_displayItemsTopLevel.SetActive(m_userResults.Count > 0);
+        m_displayItemsTopLevel.SetActive(m_commentResults.Count > 0);
     }
 
     private IEnumerator StoreUserResultsFromNextPage()
@@ -185,38 +166,30 @@ public class ListUsers : MonoBehaviour
 
     private IEnumerator GetResults(string nextPageOfResults = "")
     {
-        if (m_resultType == ResultType.kLikes)
-        {
-            yield return m_backEndAPI.Post_GetPostLikes(m_currPostOrUserID, nextPageOfResults);
-        }
-        else if (m_resultType == ResultType.kFollowers)
-        {
-            yield return m_backEndAPI.User_GetUserFollowers(m_currPostOrUserID, nextPageOfResults);
-        }
-        else if (m_resultType == ResultType.kFollowing)
-        {
-            yield return m_backEndAPI.User_GetUserFollowing(m_currPostOrUserID, nextPageOfResults);
-        }
+        yield return m_backEndAPI.Post_GetPostComments(m_postId, nextPageOfResults);
     }
 
     private void StoreNewUserResults()
     {
-        VReelJSON.Model_Users users = m_backEndAPI.GetUsersResult();
-        if (users != null)
+        VReelJSON.Model_Comments comments = m_backEndAPI.GetCommentsResult();
+        if (comments != null)
         {
-            foreach (VReelJSON.UserData userData in users.data)
+            foreach (VReelJSON.CommentData commentData in comments.data)
             {   
-                UserResult newUserResult = new UserResult();
-                newUserResult.userId = userData.id.ToString();
-                newUserResult.userHandle = userData.attributes.handle.ToString();
+                CommentResult newUserResult = new CommentResult();
+                newUserResult.commentId = commentData.id.ToString();
+                newUserResult.text = commentData.attributes.text.ToString();
+                newUserResult.edited = commentData.attributes.edited;
+                newUserResult.userId = commentData.relationships.user.data.id;
+                newUserResult.userHandle = Helper.GetHandleFromIDAndUserData(comments.included, newUserResult.userId);
 
-                m_userResults.Add(newUserResult);
+                m_commentResults.Add(newUserResult);
             }
 
             m_nextPageOfResults = null;
-            if (users.meta.next_page)
+            if (comments.meta.next_page)
             {
-                m_nextPageOfResults = users.meta.next_page_id;
+                m_nextPageOfResults = comments.meta.next_page_id;
             }
         }
     }
@@ -225,15 +198,15 @@ public class ListUsers : MonoBehaviour
     {
         int startingPostIndex = m_currResultIndex;
         int numResultsToDisplay = GetNumDisplayItems();
-        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Displaying {0} results beginning at index {1}. We've found {2} users!", numResultsToDisplay, startingPostIndex, m_userResults.Count));
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Displaying {0} results beginning at index {1}. We've found {2} comments for the post!", numResultsToDisplay, startingPostIndex, m_commentResults.Count));
 
         int userResultIndex = startingPostIndex;
         for (int itemIndex = 0; itemIndex < numResultsToDisplay; userResultIndex++, itemIndex++)
         {
-            if (userResultIndex < m_userResults.Count)
+            if (userResultIndex < m_commentResults.Count)
             {                                   
                 m_displayItems[itemIndex].SetActive(true);
-                m_displayItems[itemIndex].GetComponentInChildren<Text>().text = m_userResults[userResultIndex].userHandle;
+                m_displayItems[itemIndex].GetComponentInChildren<Text>().text = m_commentResults[userResultIndex].text;
             }
             else
             {

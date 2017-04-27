@@ -8,6 +8,31 @@ using RestSharp.Deserializers;
 namespace VReelJSON
 {    
     //--------------------------------------------
+    // Generic
+
+    public class GenericLinks
+    {
+        public string next { get; set; }
+    }
+
+    public class GenericMeta
+    {
+        public bool next_page { get; set; }
+        public string next_page_id { get; set; }
+    }
+
+    public class GenericRelationship
+    {
+        public GenericRelationshipData data { get; set; }
+    }
+
+    public class GenericRelationshipData
+    {
+        public string id { get; set; }
+        public string type { get; set; }       
+    }
+
+    //--------------------------------------------
     // Error
 
     public class Model_Error
@@ -87,19 +112,8 @@ namespace VReelJSON
     public class Model_Users
     {
         public List<UserData> data { get; set; }
-        public UsersLinks links { get; set; }
-        public UsersMeta meta { get; set; }
-    }
-
-    public class UsersLinks
-    {
-        public string next { get; set; }
-    }
-
-    public class UsersMeta
-    {
-        public bool next_page { get; set; }
-        public string next_page_id { get; set; }
+        public GenericLinks links { get; set; }
+        public GenericMeta meta { get; set; }
     }
 
     //--------------------------------------------
@@ -142,6 +156,7 @@ namespace VReelJSON
         public string id { get; set; }
         public string type { get; set; }
         public PostAttributes attributes { get; set; }
+        public PostRelationships relationships { get; set; }
     }
 
     public class PostAttributes
@@ -153,63 +168,60 @@ namespace VReelJSON
         public string created_at { get; set; }
         public bool edited { get; set; }
         public bool liked_by_me { get; set; }
-        public string original_url { get; set; }
+        public string original_url { get; set; } // NOTE: This field is not included when in Model_Posts
     }     
+
+    public class PostRelationships
+    {
+        public GenericRelationship user { get; set; }
+    } 
 
     //--------------------------------------------
 
     public class Model_Posts
     {     
-        public List<PostsData> data { get; set; }
+        public List<PostData> data { get; set; }
         public List<UserData> included { get; set; }
-        public PostsLinks links { get; set; }
-        public PostsMeta meta { get; set; }
+        public GenericLinks links { get; set; }
+        public GenericMeta meta { get; set; }
+    }
+        
+    //--------------------------------------------
+    // Comments
+
+    public class Model_Comment
+    {     
+        public CommentData data { get; set; }
     }
 
-    public class PostsData
+    public class CommentData
     {
         public string id { get; set; }
         public string type { get; set; }
-        public PostsAttributes attributes { get; set; }
-        public PostsRelationships relationships { get; set; }
+        public CommentAttributes attributes { get; set; }
+        public CommentRelationships relationships { get; set; }
     }
 
-    public class PostsAttributes
+    public class CommentAttributes
     {
-        public string thumbnail_url { get; set; }
-        public string caption { get; set; }
-        public int like_count { get; set; }
-        public int comment_count { get; set; }
-        public string created_at { get; set; }
+        public string text { get; set; }
         public bool edited { get; set; }
-        public bool liked_by_me { get; set; }
-    }   
-
-    public class PostsRelationships
-    {
-        public PostsUser user { get; set; }
-    }   
-
-    public class PostsUser
-    {
-        public PostsUserData data { get; set; }
     }
 
-    public class PostsUserData
+    public class CommentRelationships
     {
-        public string id { get; set; }
-        public string type { get; set; }       
-    }
+        public GenericRelationship user { get; set; }
+        public GenericRelationship post { get; set; }
+    }       
 
-    public class PostsLinks
-    {
-        public string next { get; set; }
-    }
+    //--------------------------------------------
 
-    public class PostsMeta
-    {
-        public bool next_page { get; set; }
-        public string next_page_id { get; set; }
+    public class Model_Comments
+    {     
+        public List<CommentData> data { get; set; }
+        public List<UserData> included { get; set; }
+        public GenericLinks links { get; set; }
+        public GenericMeta meta { get; set; }
     }
 
     //--------------------------------------------

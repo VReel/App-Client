@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections.Generic;   // List
 
-// This class holds a set of helper functions to be used throughout the code
+// This class holds a set of helper functions and values that get used in multiple classes
 public static class Helper
 {
     // **************************
@@ -23,5 +24,18 @@ public static class Helper
         {
             value.Substring(0, maxLength); 
         }
+    }
+
+    public static string GetHandleFromIDAndUserData(List<VReelJSON.UserData> userData, string userId)
+    {
+        for (int i = 0; i < userData.Count; i++)
+        {
+            if (userData[i].id.CompareTo(userId) == 0)
+            {
+                return userData[i].attributes.handle;
+            }
+        }
+
+        return "HANDLE_ERROR";
     }
 }

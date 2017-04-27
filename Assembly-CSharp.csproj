@@ -96,7 +96,6 @@
      <Compile Include="Assets\Scripts\Systems\Analytics.cs" />
      <Compile Include="Assets\Scripts\Systems\AppDirector.cs" />
      <Compile Include="Assets\Scripts\Systems\BackEndAPI.cs" />
-     <Compile Include="Assets\Scripts\Systems\Comments.cs" />
      <Compile Include="Assets\Scripts\Systems\CoroutineQueue.cs" />
      <Compile Include="Assets\Scripts\Systems\CppPlugin.cs" />
      <Compile Include="Assets\Scripts\Systems\DeserialisationModelsAPI.cs" />
@@ -108,6 +107,7 @@
      <Compile Include="Assets\Scripts\Systems\ImageSphereController.cs" />
      <Compile Include="Assets\Scripts\Systems\InternetReachabilityVerifier.cs" />
      <Compile Include="Assets\Scripts\Systems\KeyBoard.cs" />
+     <Compile Include="Assets\Scripts\Systems\ListComments.cs" />
      <Compile Include="Assets\Scripts\Systems\ListUsers.cs" />
      <Compile Include="Assets\Scripts\Systems\LoginFlow.cs" />
      <Compile Include="Assets\Scripts\Systems\MenuController.cs" />
