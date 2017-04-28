@@ -77,6 +77,11 @@ public class ImageSphereController : MonoBehaviour
         return identifier;
     }
 
+    public void SetImageAtIndexToLoading(int sphereIndex)
+    {
+        SetImageAtIndex(sphereIndex, m_sphereLoadingTexture, kLoadingTextureFilePath, m_imageLoader.GetLoadingTextureIndex(), true);
+    }
+
     public void SetAllImageSpheresToLoading()
     {
         m_coroutineQueue.EnqueueAction(SetAllImageSpheresToLoadingInternal());
@@ -176,7 +181,7 @@ public class ImageSphereController : MonoBehaviour
     // Private/Helper functions
     // **************************
 
-    public IEnumerator SetAllImageSpheresToLoadingInternal()
+    private IEnumerator SetAllImageSpheresToLoadingInternal()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetAllImageSpheresToLoading()");
 
@@ -187,7 +192,7 @@ public class ImageSphereController : MonoBehaviour
         yield break;
     }
 
-    public IEnumerator HideAllImageSpheresInternal(bool forceHide)
+    private IEnumerator HideAllImageSpheresInternal(bool forceHide)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling HideAllImageSpheres() with ForceHide set to: " + forceHide);
 
