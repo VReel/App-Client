@@ -274,7 +274,7 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
-
+           
     public IEnumerator Register_UpdateProfileDescription(string _profile)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> PUT to '/users' - Update Profile Description");
@@ -737,8 +737,7 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
-
-    // ----- CURRENTLY UNUSED ----- //
+        
     public IEnumerator Post_UpdatePost(string postId, string _caption)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts/" + postId + "' - Show a post");

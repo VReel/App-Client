@@ -107,6 +107,12 @@ public class ImageSphere : MonoBehaviour
         m_heartOn = false;
     }
 
+    public void AddToCommentCount(int addValue)
+    {
+        m_commentCount += addValue;
+        m_commentCountObject.GetComponentInChildren<Text>().text = (m_commentCount + 1).ToString(); //Adding 1 for Caption itself
+    }
+
     public void Hide()
     {        
         SetMetadataToEmpty();
@@ -152,7 +158,7 @@ public class ImageSphere : MonoBehaviour
 
     public void CaptionSelected()
     {
-        m_listComments.DisplayCommentResults(m_imageIdentifier);
+        m_listComments.DisplayCommentResults(m_imageIdentifier, this);
     }
 
     // **************************
