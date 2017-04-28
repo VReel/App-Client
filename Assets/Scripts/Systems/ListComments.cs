@@ -16,6 +16,7 @@ public class ListComments : MonoBehaviour
     //[SerializeField] private Search m_search;
     [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private ListUsers m_listUsers;
+    [SerializeField] private LoadingIcon m_loadingIcon;
     [SerializeField] private GameObject m_displayItemsTopLevel; //Top-level object for results
     [SerializeField] private GameObject[] m_displayItems;
     [SerializeField] private GameObject m_nextButton;
@@ -26,6 +27,9 @@ public class ListComments : MonoBehaviour
     [SerializeField] private GameObject m_commentUpdateText;
     [SerializeField] private GameObject m_deleteCommentOption;
     [SerializeField] private GameObject m_deleteCommentConfirmation;
+    [SerializeField] private GameObject m_flagPostConfirmation;
+    [SerializeField] private GameObject m_flagReasonText;
+    [SerializeField] private GameObject m_flagPostResult;
 
     public class CommentResult
     {
@@ -35,6 +39,9 @@ public class ListComments : MonoBehaviour
         public string userId { get; set; }
         public string userHandle { get; set; }
     }        
+
+    private const string kFlagSuccessText = "Thank you for letting us know! We'll investigate your report!";
+    private const string kFlagFailureText = "Hmm, something went wrong, please try again later!";
 
     private string m_postId = null;
     private int m_currResultIndex = 0;
@@ -125,7 +132,7 @@ public class ListComments : MonoBehaviour
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelUpload() called");
 
-        m_addCommentConfirmation.SetActive(true);
+        m_addCommentConfirmation.SetActive(false);
     }
 
     public void ConfirmAddComment()
@@ -182,6 +189,26 @@ public class ListComments : MonoBehaviour
         m_coroutineQueue.EnqueueAction(ConfirmDeleteCommentInternal());
     }
 
+    public void PreFlagPost()
+    {        
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreFlagPost() called on post: " + m_postId);
+
+        CloseSubMenus();
+        m_flagPostConfirmation.SetActive(true);
+    }
+
+    public void CancelFlagPost()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelFlagPost() called");
+
+        m_flagPostConfirmation.SetActive(false);
+    }
+
+    public void ConfirmFlagPost()
+    {     
+        m_coroutineQueue.EnqueueAction(ConfirmFlagPostInternal());
+    }
+
     /*
     public void HandleSelected(int userResultItemIndex)
     {
@@ -217,6 +244,8 @@ public class ListComments : MonoBehaviour
         m_addCommentConfirmation.SetActive(false);
         m_updateCommentConfirmation.SetActive(false);
         m_deleteCommentConfirmation.SetActive(false);
+        m_flagPostConfirmation.SetActive(false);
+        m_flagPostResult.SetActive(false);
     }
         
     public IEnumerator StoreAndDisplayUserResultsInternal(string postId)
@@ -352,9 +381,10 @@ public class ListComments : MonoBehaviour
             m_commentResults.Add(newCommentResult);
 
             DisplayUserResultsOnItems();
+
+            m_currImageSphere.AddToCommentCount(1);
         }
 
-        m_currImageSphere.AddToCommentCount(1);
         CloseSubMenus();
     }
 
@@ -395,9 +425,34 @@ public class ListComments : MonoBehaviour
             m_commentResults.RemoveAt(commentIndex);
 
             DisplayUserResultsOnItems();
+
+            m_currImageSphere.AddToCommentCount(-1);
         }
 
-        m_currImageSphere.AddToCommentCount(-1);
         CloseSubMenus();
+    }
+
+    private IEnumerator ConfirmFlagPostInternal()
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        m_loadingIcon.Display();
+
+        string flagReasonText = m_flagReasonText.GetComponentInChildren<Text>().text;
+        yield return m_backEndAPI.Flag_FlagPost(m_postId, flagReasonText);
+
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            m_flagPostResult.GetComponentInChildren<Text>().text = kFlagSuccessText;
+        } 
+        else
+        {
+            m_flagPostResult.GetComponentInChildren<Text>().text = kFlagFailureText;
+        }
+
+        m_flagPostConfirmation.SetActive(false);
+        m_flagPostResult.SetActive(true);
+
+        m_loadingIcon.Hide();
     }
 }

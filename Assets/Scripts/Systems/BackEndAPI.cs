@@ -1631,6 +1631,49 @@ public class BackEndAPI
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
 
+    //--------------------------------------------
+    // Flag
+
+    public IEnumerator Flag_FlagPost(string postId, string _reason)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/posts/" + postId + "/flags' - Flag a Post");
+
+        var request = new RestRequest("/posts/" + postId + "/flags", Method.POST);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        request.AddJsonBody(new { 
+            reason = _reason
+        });
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/posts/" + postId + "/flags' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            // Empty
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "POST to '/posts/" + postId + "/flags'");
+        }
+
+        UpdateAccessToken(response);
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }
+
     // **************************
     // Private/Helper functions
     // **************************
