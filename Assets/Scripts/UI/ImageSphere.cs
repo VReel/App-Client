@@ -13,6 +13,7 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private Posts m_posts;
     [SerializeField] private ListUsers m_listUsers;
     [SerializeField] private ListComments m_listComments;
+    [SerializeField] private MenuController m_menuController;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
@@ -211,6 +212,16 @@ public class ImageSphere : MonoBehaviour
             m_heartObject.SetActive(!isSphereLoading && m_numLikes >= 0);
             m_heartObject.GetComponentInChildren<HeartButton>().HeartOnOffSwitch(m_heartOn);
         }
+          
+        if (m_menuController != null)
+        {
+            bool isMenuActive = m_menuController.IsMenuActive();
+            EnableAllInteractableComponentsInObject(m_handleObject, isMenuActive);
+            EnableAllInteractableComponentsInObject(m_captionObject, isMenuActive);
+            EnableAllInteractableComponentsInObject(m_commentCountObject, isMenuActive);
+            EnableAllInteractableComponentsInObject(m_likesObject, isMenuActive);
+            EnableAllInteractableComponentsInObject(m_heartObject, isMenuActive);
+        }
     }
 
     private void HideMetadata()
@@ -222,6 +233,27 @@ public class ImageSphere : MonoBehaviour
         if (m_commentCountObject != null) m_commentCountObject.SetActive(false);
         if (m_likesObject != null) m_likesObject.SetActive(false);
         if (m_heartObject != null) m_heartObject.SetActive(false);
+    }
+
+    private void EnableAllInteractableComponentsInObject(GameObject gameObject, bool enable)
+    {
+        if (gameObject != null)
+        {
+            foreach(var renderer in gameObject.GetComponentsInChildren<Renderer>())
+            {                
+                renderer.enabled = enable; // Handles Mesh + SpriteRenderer components
+            }
+
+            foreach(var ui in gameObject.GetComponentsInChildren<UnityEngine.UI.Graphic>())
+            {                
+                ui.enabled = enable; // Handles Images + Text components
+            }
+
+            foreach(var collider in gameObject.GetComponentsInChildren<Collider>())
+            {                
+                collider.enabled = enable; // Handles BoxCollider + MeshCollider components
+            }
+        }
     }
 
     private IEnumerator AnimateSetTexture()

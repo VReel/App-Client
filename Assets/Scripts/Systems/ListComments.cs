@@ -223,12 +223,18 @@ public class ListComments : MonoBehaviour
     {
         yield return m_appDirector.VerifyInternetConnection();
 
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: A");
+
         m_profileDetails.CloseProfileDetails();
         m_listUsers.CloseListUsers();
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: B");
 
         m_currResultIndex = 0;
         m_commentResults.Clear();
         m_postId = postId;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: C");
 
         yield return GetResults();
 
@@ -239,11 +245,15 @@ public class ListComments : MonoBehaviour
             StoreNewUserResults();
 
             DisplayUserResultsOnItems();
+
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: D");
         }
 
         m_displayItemsTopLevel.SetActive(true);
         m_addCommentConfirmation.SetActive(false);
         m_updateCommentConfirmation.SetActive(false);
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: E");
     }
 
     private IEnumerator StoreUserResultsFromNextPage()
