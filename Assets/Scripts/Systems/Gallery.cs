@@ -433,7 +433,7 @@ public class Gallery : MonoBehaviour
                 {
                     bool showLoading = sphereIndex == 0; // The first one in the gallery should do some loading to let the user know things are happening
                     m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(filePath, sphereIndex, showLoading));
-                    m_imageSphereController.SetMetadataAtIndex(sphereIndex, "", "", "", -1, false);
+                    m_imageSphereController.SetMetadataToEmptyAtIndex(sphereIndex);
                 }
             }
             else

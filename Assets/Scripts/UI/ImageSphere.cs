@@ -20,6 +20,7 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private GameObject m_heartObject;
     [SerializeField] private GameObject m_likesObject;
     [SerializeField] private GameObject m_captionObject;
+    [SerializeField] private GameObject m_commentCountObject;
 
     private const float kMinShrink = 0.0005f; // Minimum value the sphere will shrink to...
     private const int kLoadingTextureIndex = -1;
@@ -29,6 +30,7 @@ public class ImageSphere : MonoBehaviour
     private string m_userId;
     private string m_handle;
     private string m_caption;
+    private int m_commentCount;
     private int m_numLikes;
     private bool m_heartOn;
 
@@ -85,22 +87,29 @@ public class ImageSphere : MonoBehaviour
         }
     }
 
-    public void SetMetadata(string userId, string handle, string caption, int likes, bool likedByMe) 
+    public void SetMetadata(string userId, string handle, string caption, int commentCount, int likes, bool likedByMe) 
     {   //NOTE: These are only set onto their UI elements when the Animation has ended!
         m_userId = userId;
         m_handle = handle;
         m_caption = caption;
+        m_commentCount = commentCount;
         m_numLikes = likes;
         m_heartOn = likedByMe;
     }
 
-    public void Hide()
-    {        
+    public void SetMetadataToEmpty()
+    {
         m_imageIdentifier = "";
         m_handle = "";
         m_caption = "";
+        m_commentCount = -1;
         m_numLikes = -1;
         m_heartOn = false;
+    }
+
+    public void Hide()
+    {        
+        SetMetadataToEmpty();
 
         if (m_coroutineQueue != null)
         {
@@ -111,12 +120,7 @@ public class ImageSphere : MonoBehaviour
 
     public void ForceHide()
     {        
-        m_imageIdentifier = "";
-        m_handle = "";
-        m_caption = "";
-        m_numLikes = -1;
-        m_heartOn = false;
-
+        SetMetadataToEmpty();
         UpdateMetadata();
 
         if (m_coroutineQueue != null)
@@ -184,6 +188,12 @@ public class ImageSphere : MonoBehaviour
             m_captionObject.GetComponentInChildren<Text>().text = m_caption;
         }
 
+        if (m_commentCountObject != null)
+        {
+            m_commentCountObject.SetActive(!isSphereLoading && m_caption.Length > 0);
+            m_commentCountObject.GetComponentInChildren<Text>().text = (m_commentCount + 1).ToString(); //Adding 1 for Caption itself
+        }
+
         if (m_likesObject != null)
         {
             m_likesObject.SetActive(!isSphereLoading && m_numLikes >= 0);
@@ -203,6 +213,7 @@ public class ImageSphere : MonoBehaviour
 
         if (m_handleObject != null) m_handleObject.SetActive(false);
         if (m_captionObject != null) m_captionObject.SetActive(false);
+        if (m_commentCountObject != null) m_commentCountObject.SetActive(false);
         if (m_likesObject != null) m_likesObject.SetActive(false);
         if (m_heartObject != null) m_heartObject.SetActive(false);
     }

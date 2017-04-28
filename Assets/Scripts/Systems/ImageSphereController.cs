@@ -118,17 +118,29 @@ public class ImageSphereController : MonoBehaviour
         }
     }    
 
-    public void SetMetadataAtIndex(int sphereIndex, string userId, string handle, string caption, int likes, bool likedByMe)
+    public void SetMetadataAtIndex(int sphereIndex, string userId, string handle, string caption, int commentCount, int likes, bool likedByMe)
     {
         if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
         {
-            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetMetadata(userId, handle, caption, likes, likedByMe);
+            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetMetadata(userId, handle, caption, commentCount, likes, likedByMe);
         }
         else
         {
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: Invalid request to SetMetadataAtIndex: " + sphereIndex);
         }
-    }    
+    }   
+
+    public void SetMetadataToEmptyAtIndex(int sphereIndex)
+    {
+        if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
+        {
+            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetMetadataToEmpty();
+        }
+        else
+        {
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: Invalid request to SetMetadataAtIndex: " + sphereIndex);
+        }
+    }   
 
     public void HideSphereAtIndex(int sphereIndex, bool forceHide = false)
     {

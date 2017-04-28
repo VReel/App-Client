@@ -372,6 +372,7 @@ public class Posts : MonoBehaviour
                     (m_postsType == PostsType.kUserProfile) ? "" : m_posts[postIndex].userId, 
                     (m_postsType == PostsType.kUserProfile) ? "" : m_posts[postIndex].userHandle, 
                     m_posts[postIndex].caption, 
+                    m_posts[postIndex].commentCount, 
                     m_posts[postIndex].likeCount,
                     m_posts[postIndex].likedByMe
                 );
