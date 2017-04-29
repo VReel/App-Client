@@ -351,7 +351,7 @@ public class Posts : MonoBehaviour
 
         int startingPostIndex = m_currPostIndex;
         int numImages = m_imageSphereController.GetNumSpheres();
-        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading {0} images beginning at index {1}. We've found {2} posts for the user!", numImages, startingPostIndex, m_posts.Count));
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading {0} images beginning at index {1}. We've found {2} posts!", numImages, startingPostIndex, m_posts.Count));
 
         int postIndex = startingPostIndex;
         for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, postIndex++)

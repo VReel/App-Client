@@ -179,7 +179,7 @@ public class ProfileDetails : MonoBehaviour
 
     private void DownloadThumbnailImage()
     {
-        if (m_thumbnailUrl.Length > 0)
+        if (m_thumbnailUrl != null && m_thumbnailUrl.Length > 0)
         {
             m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kProfileSphereIndex, m_thumbnailUrl, m_userId, false);
         }
