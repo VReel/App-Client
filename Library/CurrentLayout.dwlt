@@ -89,8 +89,8 @@ MonoBehaviour:
     y: 0
     width: 318
     height: 455
-  m_MinSize: {x: 202, y: 221}
-  m_MaxSize: {x: 4002, y: 4021}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 14}
   m_Panes:
   - {fileID: 14}
@@ -297,19 +297,19 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets/Art/Buttons
+    - Assets/Scenes
   m_ViewMode: 1
   m_StartGridSize: 55
   m_LastFolders:
-  - Assets/Art/Buttons
+  - Assets/Scenes
   m_LastFoldersGridSize: 55
   m_LastProjectPath: /Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp
   m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 06290000
-    m_LastClickedID: 10502
-    m_ExpandedIDs: 00000000c82500007226000080260000ee260000f826000090270000d4270000f427000072280000962800007c3500007e3500008035000082350000843500008635000000ca9a3bffffff7f
+    scrollPos: {x: 0, y: 498}
+    m_SelectedIDs: 4e270000
+    m_LastClickedID: 10062
+    m_ExpandedIDs: 00000000d02500007c2600008a260000f8260000022700009a270000de270000fe2700007c280000a4280000024200000442000006420000084200000a4200000c42000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -337,7 +337,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000c82500007226000080260000ee260000f826000090270000d4270000f427000072280000962800007c3500007e35000080350000823500008435000086350000
+    m_ExpandedIDs: 00000000d02500007c2600008a260000f8260000022700009a270000de270000fe2700007c280000a4280000024200000442000006420000084200000a4200000c420000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -453,23 +453,23 @@ MonoBehaviour:
     height: 434
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 48b30800
-    m_LastClickedID: 570184
-    m_ExpandedIDs: 12c0fdffd6c0fdffecc1fdff26c7fdffeac7fdff00c9fdff56cbfdff1accfdff30cdfdffbed2fdffd0d9fdff94dafdffc0dbfdff8ce7fdff50e8fdff7ce9fdff44f6fdff08f7fdff34f8fdff84fefdff48fffdff7400feff9207feff5608feff8209feff9612feff5a13feff8614feff2a1dfeffee1dfeff1a1ffeff6421feff2822feff5423feffbe25feff8226feffae27feffba30feff7e31feffaa32fefffa43feffbe44feffea45feff9e4dfeff624efeff8e4ffefff852feffbc53feffe854feff6c5ffeff3060feff5c61feff2a51ffffc251ffffee52ffff6655fffffe55ffff2a57ffff5459ffffec59ffff185bffffd65dffff6e5effff9a5fffff3a63ffffd263ffff0065ffff5e86ffffc4b3ffff4ab8ffffe2b8ffff0ebaffff38c0ffffd0c0fffffcc1ffffbee7ffff56e8ffff84e9ffffe2fbffff00000000f0510000945400008a580000f65b0000ee5e00004c600000c06000008c9a0000a4a200008ca4000010a90000eaaa000050d0000046d90000b2dc00006ae00000268c0100568e010032900100b4930100746a0200be6b0200ee6b0200166d0200b66d0200e0710200bc7302005c740200907602003e770200987a0200827b0200b2540400f8570400105e0400a461040062b30400daec04006ef004008cf404002a2c05003e34050024370500b4370500d2370500183805000e8f0500329605007a970500589e0500ca9f050046a005004641060070420600cc460600dc4a0600e44c0600704e0600ba510600a8530600be7a060054840600e88706004cc3060070ca0600b8cb060096d2060008d4060084d40600c4fc060030050700c40807000e0c0700fc0d0700a83e07003c4207005a4607009c7f0700408107000c860700a0890700b68b0700be8d0700d88e070016c7070090cd070024d1070042d507007af40700d6f40700f4fa0700dafd070088fe0700a602080030690800746a0800246b0800f26b0800
+    m_SelectedIDs: 82740000
+    m_LastClickedID: 29826
+    m_ExpandedIDs: 3ed7ffff7ce2ffffc8e3ffff6ceefffff2eeffff96f9ffffe2fbffff00000000c27100008c720000d27200002e730000427300009a730000de73000082740000e0740000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: SkyboxSphere
-      m_OriginalName: SkyboxSphere
+      m_Name: 
+      m_OriginalName: 
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 570736
+      m_UserData: 0
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 0
+      m_OriginalEventType: 11
       m_IsRenamingFilename: 0
       m_ClientGUIView: {fileID: 4}
     m_SearchString: 
@@ -510,9 +510,9 @@ MonoBehaviour:
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 0.29010463, y: -0.30222312, z: 5.4858875}
+    m_Target: {x: 3.109375, y: 3.0371094, z: 8.143555}
     speed: 2
-    m_Value: {x: 0.29010463, y: -0.30222312, z: 5.4858875}
+    m_Value: {x: 3.109375, y: 3.0371094, z: 8.143555}
   m_RenderMode: 0
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -527,21 +527,21 @@ MonoBehaviour:
       speed: 2
       m_Value: 0
     yGrid:
-      m_Target: 0
+      m_Target: 1
       speed: 2
-      m_Value: 0
+      m_Value: 1
     zGrid:
       m_Target: 0
       speed: 2
       m_Value: 0
   m_Rotation:
-    m_Target: {x: 0.051273886, y: -0.045602147, z: 0.0014995129, w: 0.997648}
+    m_Target: {x: 0.1440554, y: 0.3897995, z: -0.062837675, w: 0.9074181}
     speed: 2
-    m_Value: {x: 0.05127357, y: -0.045601863, z: 0.0014995036, w: 0.9976418}
+    m_Value: {x: 0.14405167, y: 0.38978943, z: -0.06283605, w: 0.9073946}
   m_Size:
-    m_Target: 7.436664
+    m_Target: 88.21517
     speed: 2
-    m_Value: 7.436664
+    m_Value: 88.21517
   m_Ortho:
     m_Target: 1
     speed: 2
