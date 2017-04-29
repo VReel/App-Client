@@ -15,7 +15,6 @@ public class OptionsFlow : MonoBehaviour
     [SerializeField] private Text m_confirmPasswordInput;
     [SerializeField] private GameObject m_setPasswordConfirmedMessage;
     [SerializeField] private GameObject m_deleteConfirmedMessage;
-    [SerializeField] private GameObject m_errorMessage;
     [SerializeField] private User m_user;
     [SerializeField] private KeyBoard m_keyboard;
 
@@ -37,7 +36,7 @@ public class OptionsFlow : MonoBehaviour
         m_coroutineQueue = new CoroutineQueue(this);
         m_coroutineQueue.StartLoop();
 
-        m_backEndAPI = new BackEndAPI(this, m_errorMessage, m_user);
+        m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
     }
 
     public void OpenCloseSwitch()

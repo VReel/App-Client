@@ -122,6 +122,7 @@
      <Compile Include="Assets\Scripts\UI\HeartButton.cs" />
      <Compile Include="Assets\Scripts\UI\ImageSkybox.cs" />
      <Compile Include="Assets\Scripts\UI\ImageSphere.cs" />
+     <Compile Include="Assets\Scripts\UI\ImageSphereAnimation.cs" />
      <Compile Include="Assets\Scripts\UI\LoadingIcon.cs" />
      <Compile Include="Assets\Scripts\UI\MessageButton.cs" />
      <Compile Include="Assets\Scripts\UI\PasswordText.cs" />

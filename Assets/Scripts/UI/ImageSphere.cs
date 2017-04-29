@@ -17,6 +17,7 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
+    [SerializeField] private GameObject m_imageObject;
     [SerializeField] private GameObject m_handleObject;
     [SerializeField] private GameObject m_heartObject;
     [SerializeField] private GameObject m_likesObject;
@@ -134,7 +135,7 @@ public class ImageSphere : MonoBehaviour
         {
             m_coroutineQueue.Clear();
         }
-        transform.localScale = new Vector3(kMinShrink, kMinShrink, kMinShrink);
+        m_imageObject.transform.localScale = new Vector3(kMinShrink, kMinShrink, kMinShrink);
     }
 
     public void HandleSelected()
@@ -170,7 +171,7 @@ public class ImageSphere : MonoBehaviour
     {
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateTextureAndID() called on sphere: " + (m_imageSphereIndex+1) );
 
-        gameObject.GetComponent<MeshRenderer>().material.mainTexture = m_imageSphereTexture;
+        m_imageObject.GetComponent<MeshRenderer>().material.mainTexture = m_imageSphereTexture;
 
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, false);
         m_currTextureIndex = m_nextTextureIndex;
@@ -266,9 +267,9 @@ public class ImageSphere : MonoBehaviour
         float defaultScale = m_imageSphereController.GetDefaultSphereScale();
 
         // Scale down
-        while (transform.localScale.magnitude > kMinShrink)
+        while (m_imageObject.transform.localScale.magnitude > kMinShrink)
         {
-            transform.localScale = transform.localScale * scalingFactor;
+            m_imageObject.transform.localScale = m_imageObject.transform.localScale * scalingFactor;
             yield return null;
         }
 
@@ -276,15 +277,15 @@ public class ImageSphere : MonoBehaviour
         UpdateTextureAndID();
 
         // Scale up
-        while (transform.localScale.magnitude < defaultScale)
+        while (m_imageObject.transform.localScale.magnitude < defaultScale)
         {
-            transform.localScale = transform.localScale / scalingFactor;
+            m_imageObject.transform.localScale = m_imageObject.transform.localScale / scalingFactor;
             yield return null;
         }
 
         UpdateMetadata();
 
-        transform.localScale = new Vector3(defaultScale, defaultScale, defaultScale);
+        m_imageObject.transform.localScale = new Vector3(defaultScale, defaultScale, defaultScale);
     }
 
     private IEnumerator AnimateHide()
@@ -295,9 +296,9 @@ public class ImageSphere : MonoBehaviour
 
         float scalingFactor = m_imageSphereController.GetScalingFactor();
 
-        while (transform.localScale.magnitude > kMinShrink)
+        while (m_imageObject.transform.localScale.magnitude > kMinShrink)
         {
-            transform.localScale = transform.localScale * scalingFactor;
+            m_imageObject.transform.localScale = m_imageObject.transform.localScale * scalingFactor;
             yield return null;
         }
 
