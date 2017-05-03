@@ -50,6 +50,7 @@
      <Compile Include="Assets\OVR\Editor\OVRManifestPreprocessor.cs" />
      <Compile Include="Assets\OVR\Editor\OVRMoonlightLoader.cs" />
      <Compile Include="Assets\OVR\Editor\OVRScreenshotWizard.cs" />
+     <Compile Include="Assets\Scripts\Editor\EditorUtils.cs" />
      <None Include="Assets\AWSSDK\Examples\License.txt" />
      <None Include="Assets\Art\Shader\UIOverlay.shader" />
      <None Include="Assets\OVR\Editor\AndroidManifest.OVRSubmission.xml" />

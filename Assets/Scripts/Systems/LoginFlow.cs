@@ -18,7 +18,6 @@ public class LoginFlow : MonoBehaviour
     [SerializeField] private Text m_signUpPasswordConfirmationInput;
     [SerializeField] private Text m_resetPasswordEmailInput;
     [SerializeField] private GameObject m_resetConfirmedText;
-    [SerializeField] private GameObject m_errorMessage;
     [SerializeField] private User m_user;
 
     [SerializeField] private GameObject m_loginPage;
@@ -38,7 +37,7 @@ public class LoginFlow : MonoBehaviour
         m_coroutineQueue = new CoroutineQueue(this);
         m_coroutineQueue.StartLoop();
 
-        m_backEndAPI = new BackEndAPI(this, m_errorMessage, m_user);
+        m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
     }
 
     /*

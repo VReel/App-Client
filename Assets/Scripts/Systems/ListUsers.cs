@@ -13,6 +13,7 @@ public class ListUsers : MonoBehaviour
     [SerializeField] private User m_user;
     [SerializeField] private Search m_search;
     [SerializeField] private ProfileDetails m_profileDetails;
+    [SerializeField] private ListComments m_listComments;
     [SerializeField] private GameObject m_displayItemsTopLevel; //Top-level object for results
     [SerializeField] private GameObject[] m_displayItems;
     [SerializeField] private GameObject m_nextButton;
@@ -64,7 +65,7 @@ public class ListUsers : MonoBehaviour
 
     public void DisplayLikeResults(string postId)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: DisplayUserResults() called for post ID: " + postId);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: DisplayLikeResults() called for post ID: " + postId);
 
         m_resultType = ResultType.kLikes;
         m_coroutineQueue.EnqueueAction(StoreAndDisplayUserResultsInternal(postId));
@@ -155,7 +156,9 @@ public class ListUsers : MonoBehaviour
         yield return m_appDirector.VerifyInternetConnection();
 
         m_profileDetails.CloseProfileDetails();
+        m_listComments.CloseListComments();
 
+        m_currResultIndex = 0;
         m_userResults.Clear();
         m_currPostOrUserID = postOrUserId;
 
@@ -225,7 +228,7 @@ public class ListUsers : MonoBehaviour
     {
         int startingPostIndex = m_currResultIndex;
         int numResultsToDisplay = GetNumDisplayItems();
-        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Displaying {0} like results beginning at index {1}. We've found {2} likes for the post!", numResultsToDisplay, startingPostIndex, m_userResults.Count));
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Displaying {0} results beginning at index {1}. We've found {2} users!", numResultsToDisplay, startingPostIndex, m_userResults.Count));
 
         int userResultIndex = startingPostIndex;
         for (int itemIndex = 0; itemIndex < numResultsToDisplay; userResultIndex++, itemIndex++)

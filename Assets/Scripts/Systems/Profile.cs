@@ -17,7 +17,7 @@ public class Profile : MonoBehaviour
     [SerializeField] private GameObject m_confirmDeleteButton;
     [SerializeField] private GameObject m_cancelDeleteButton;
 
-    private const string kPreDeleteText = "Definitely want to delete this post? =O";
+    private const string kPreDeleteText = "Sure you want to delete this post? =O";
     private const string kCancelDeleteText = "Delete Cancelled =)";
     private const string kSuccessfulDeleteText = "Post Deleted Successfully! =)";
     private const string kFailedDeleteText = "Deleting failed =(\n Please try again!";

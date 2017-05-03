@@ -184,6 +184,16 @@ public class Analytics : MonoBehaviour
         m_analyticsManager.RecordEvent(customEvent);
     }
 
+    public void CommentUploaded()
+    {
+        CustomEvent customEvent = new CustomEvent("CommentUploaded");
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
+
+        SetAppState(customEvent);
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
+
     public void PreviousArrowSelected()
     {
         CustomEvent customEvent = new CustomEvent("PreviousArrowSelected");
@@ -217,7 +227,7 @@ public class Analytics : MonoBehaviour
 
         m_analyticsManager.RecordEvent(customEvent);
     }
-
+        
     public void ProfileImageUploaded()
     {
         CustomEvent customEvent = new CustomEvent("ProfileImageUploaded");

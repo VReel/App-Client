@@ -38,6 +38,8 @@ public class BackEndAPI
     private VReelJSON.Model_Users m_usersJSONResult;
     private VReelJSON.Model_Post m_postJSONResult;
     private VReelJSON.Model_Posts m_postsJSONResult;
+    private VReelJSON.Model_Comment m_commentJSONResult;
+    private VReelJSON.Model_Comments m_commentsJSONResult;
     private VReelJSON.Model_S3PresignedURL m_s3URLJSONResult;
 
     // **************************
@@ -97,6 +99,16 @@ public class BackEndAPI
     public VReelJSON.Model_Posts GetPostsResult()
     {
         return m_postsJSONResult;
+    }
+
+    public VReelJSON.Model_Comment GetCommentResult()
+    {
+        return m_commentJSONResult;
+    }
+
+    public VReelJSON.Model_Comments GetCommentsResult()
+    {
+        return m_commentsJSONResult;
     }
 
     public VReelJSON.Model_S3PresignedURL GetS3PresignedURLResult()
@@ -262,7 +274,7 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
-
+           
     public IEnumerator Register_UpdateProfileDescription(string _profile)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> PUT to '/users' - Update Profile Description");
@@ -725,8 +737,7 @@ public class BackEndAPI
 
         if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
     }
-
-    // ----- CURRENTLY UNUSED ----- //
+        
     public IEnumerator Post_UpdatePost(string postId, string _caption)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts/" + postId + "' - Show a post");
@@ -810,6 +821,49 @@ public class BackEndAPI
         else // Error Handling
         {            
             ShowErrors(response, "GET to '/posts/" + postId + "/likes?page=" + page + "'");
+        }
+
+        UpdateAccessToken(response);
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }
+
+    public IEnumerator Post_GetPostComments(string postId, string page = "")
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts/" + postId + "/likes?comments=" + page + "' - Show all comments on a post");
+
+        var request = new RestRequest("/posts/" + postId + "/comments?page=" + page, Method.GET);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> GET to '/posts/" + postId + "/comments?page=" + page + "' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            yield return m_threadJob.WaitFor();
+            VReelJSON.Model_Comments result = null;
+            m_threadJob.Start( () => 
+                result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Comments>(response.Content)
+            );
+            yield return m_threadJob.WaitFor();
+
+            m_commentsJSONResult = result;
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "GET to '/posts/" + postId + "/comments?page=" + page + "'");
         }
 
         UpdateAccessToken(response);
@@ -1028,6 +1082,132 @@ public class BackEndAPI
         else // Error Handling
         {            
             ShowErrors(response, "GET to '/search/users/" + user + "'");
+        }
+
+        UpdateAccessToken(response);
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }
+
+    //--------------------------------------------
+    // Comment
+
+    public IEnumerator Comment_CreateComment(string postId, string _text)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/posts/" + postId + "/comments' - Create New Comment");
+
+        var request = new RestRequest("/posts/" + postId + "/comments", Method.POST);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        request.AddJsonBody(new { 
+            text = _text
+        });
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/posts/" + postId + "/comments' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            yield return m_threadJob.WaitFor();
+            VReelJSON.Model_Comment result = null;
+            m_threadJob.Start( () => 
+                result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_Comment>(response.Content)
+            );
+            yield return m_threadJob.WaitFor();
+
+            m_commentJSONResult = result;
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "POST to '/posts/" + postId + "/comments'");
+        }
+
+        UpdateAccessToken(response);
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }
+
+    public IEnumerator Comment_UpdateComment(string commentId, string _text)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> PUT to '/comments/" + commentId + "' - Update a Comment");
+
+        var request = new RestRequest("/comments/" + commentId, Method.PUT);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        request.AddJsonBody(new { 
+            text = _text
+        });
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> PUT to '/comments/" + commentId + "' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            // Empty
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "PUT to '/comments/" + commentId);
+        }
+
+        UpdateAccessToken(response);
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }
+
+    public IEnumerator Comment_DeleteComment(string commentId)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/comments/" + commentId + "' - Delete a Comment");
+
+        var request = new RestRequest("/comments/" + commentId, Method.DELETE);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> DELETE to '/comments/" + commentId + "' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            // Empty
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "DELETE to '/comments/" + commentId);
         }
 
         UpdateAccessToken(response);
@@ -1444,6 +1624,49 @@ public class BackEndAPI
         else // Error Handling
         {            
             ShowErrors(response, "DELETE to '/like/" + postId + "'");
+        }
+
+        UpdateAccessToken(response);
+
+        if (Debug.isDebugBuild) LogRequest(request, response, (timeAfterRequest - timeBeforeRequest));
+    }
+
+    //--------------------------------------------
+    // Flag
+
+    public IEnumerator Flag_FlagPost(string postId, string _reason)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/posts/" + postId + "/flags' - Flag a Post");
+
+        var request = new RestRequest("/posts/" + postId + "/flags", Method.POST);
+        request.AddHeader("vreel-application-id", m_applicationID);
+        request.AddHeader("client", m_user.GetClient());
+        request.AddHeader("uid", m_user.GetUID());
+        request.AddHeader("access-token", m_user.GetAcceessToken());
+
+        request.AddJsonBody(new { 
+            reason = _reason
+        });
+
+        yield return m_threadJob.WaitFor();
+        float timeBeforeRequest = Time.realtimeSinceStartup;
+        IRestResponse response = new RestResponse();
+        m_threadJob.Start( () => 
+            response = m_vreelClient.Execute(request)
+        );
+        yield return m_threadJob.WaitFor();
+        float timeAfterRequest = Time.realtimeSinceStartup;
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/posts/" + postId + "/flags' - Response: " + response.Content);
+
+        m_lastStatusCode = response.StatusCode;
+        if (IsSuccessCode(m_lastStatusCode))
+        {
+            // Empty
+        }
+        else // Error Handling
+        {            
+            ShowErrors(response, "POST to '/posts/" + postId + "/flags'");
         }
 
         UpdateAccessToken(response);

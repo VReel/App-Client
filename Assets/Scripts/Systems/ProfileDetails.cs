@@ -120,7 +120,8 @@ public class ProfileDetails : MonoBehaviour
 
             m_profileDescriptionUpdateTopLevel.SetActive(true);
             m_profileDescriptionNewText.GetComponentInChildren<Text>().text = m_profileDescriptionObject.GetComponentInChildren<Text>().text;
-        }
+            m_imageSphereController.HideSphereAtIndex(Helper.kProfileSphereIndex, false); // True tells it to ForceHide
+        }            
     }
 
     public void CancelUpdateProfileDescription()
@@ -128,6 +129,7 @@ public class ProfileDetails : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelUpdateProfileDescription() called");
 
         m_profileDescriptionUpdateTopLevel.SetActive(false);
+        DownloadThumbnailImage();
     }
 
     public void AcceptUpdateProfileDescription()
@@ -136,6 +138,7 @@ public class ProfileDetails : MonoBehaviour
 
         m_profileDescriptionUpdateTopLevel.SetActive(false);
         m_coroutineQueue.EnqueueAction(UpdateProfileDescriptionInternal());
+        DownloadThumbnailImage();
     }
 
     public void DownloadOriginalImage()
@@ -166,10 +169,7 @@ public class ProfileDetails : MonoBehaviour
 
             m_followButtonObject.GetComponentInChildren<FollowButton>().FollowOnOffSwitch(m_followedByMe);
 
-            if (m_thumbnailUrl.Length > 0)
-            {
-                m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kProfileSphereIndex, m_thumbnailUrl, m_userId, false);
-            }
+            DownloadThumbnailImage();
         }
         else
         {
@@ -177,7 +177,15 @@ public class ProfileDetails : MonoBehaviour
         }
     }
 
-    public IEnumerator DownloadOriginalImageInternal()
+    private void DownloadThumbnailImage()
+    {
+        if (m_thumbnailUrl != null && m_thumbnailUrl.Length > 0)
+        {
+            m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kProfileSphereIndex, m_thumbnailUrl, m_userId, false);
+        }
+    }
+
+    private IEnumerator DownloadOriginalImageInternal()
     {
         yield return m_appDirector.VerifyInternetConnection();
 
@@ -218,7 +226,7 @@ public class ProfileDetails : MonoBehaviour
     {
         m_coroutineQueue.EnqueueAction(FollowOrUnfollowUserInternal(userId, doFollow));
     }
-
+        
     private IEnumerator FollowOrUnfollowUserInternal(string userId, bool doFollow)
     {
         yield return m_appDirector.VerifyInternetConnection();

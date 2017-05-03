@@ -54,6 +54,8 @@ public class User : MonoBehaviour
 
     public void Start()
     {
+        UnityEngine.Random.InitState((int)System.DateTime.Now.Ticks);
+
         // Version dependent code
         m_vreelSaveFile = GetSaveFile();
         m_dataFilePath = Application.persistentDataPath + m_vreelSaveFile;

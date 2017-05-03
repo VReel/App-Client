@@ -77,6 +77,11 @@ public class ImageSphereController : MonoBehaviour
         return identifier;
     }
 
+    public void SetImageAtIndexToLoading(int sphereIndex)
+    {
+        SetImageAtIndex(sphereIndex, m_sphereLoadingTexture, kLoadingTextureFilePath, m_imageLoader.GetLoadingTextureIndex(), true);
+    }
+
     public void SetAllImageSpheresToLoading()
     {
         m_coroutineQueue.EnqueueAction(SetAllImageSpheresToLoadingInternal());
@@ -118,17 +123,29 @@ public class ImageSphereController : MonoBehaviour
         }
     }    
 
-    public void SetMetadataAtIndex(int sphereIndex, string userId, string handle, string caption, int likes, bool likedByMe)
+    public void SetMetadataAtIndex(int sphereIndex, string userId, string handle, string caption, int commentCount, int likes, bool likedByMe)
     {
         if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
         {
-            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetMetadata(userId, handle, caption, likes, likedByMe);
+            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetMetadata(userId, handle, caption, commentCount, likes, likedByMe);
         }
         else
         {
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: Invalid request to SetMetadataAtIndex: " + sphereIndex);
         }
-    }    
+    }   
+
+    public void SetMetadataToEmptyAtIndex(int sphereIndex)
+    {
+        if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
+        {
+            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetMetadataToEmpty();
+        }
+        else
+        {
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: Invalid request to SetMetadataAtIndex: " + sphereIndex);
+        }
+    }   
 
     public void HideSphereAtIndex(int sphereIndex, bool forceHide = false)
     {
@@ -164,7 +181,7 @@ public class ImageSphereController : MonoBehaviour
     // Private/Helper functions
     // **************************
 
-    public IEnumerator SetAllImageSpheresToLoadingInternal()
+    private IEnumerator SetAllImageSpheresToLoadingInternal()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetAllImageSpheresToLoading()");
 
@@ -175,7 +192,7 @@ public class ImageSphereController : MonoBehaviour
         yield break;
     }
 
-    public IEnumerator HideAllImageSpheresInternal(bool forceHide)
+    private IEnumerator HideAllImageSpheresInternal(bool forceHide)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling HideAllImageSpheres() with ForceHide set to: " + forceHide);
 

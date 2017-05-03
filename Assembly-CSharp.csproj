@@ -107,6 +107,7 @@
      <Compile Include="Assets\Scripts\Systems\ImageSphereController.cs" />
      <Compile Include="Assets\Scripts\Systems\InternetReachabilityVerifier.cs" />
      <Compile Include="Assets\Scripts\Systems\KeyBoard.cs" />
+     <Compile Include="Assets\Scripts\Systems\ListComments.cs" />
      <Compile Include="Assets\Scripts\Systems\ListUsers.cs" />
      <Compile Include="Assets\Scripts\Systems\LoginFlow.cs" />
      <Compile Include="Assets\Scripts\Systems\MenuController.cs" />
@@ -121,6 +122,7 @@
      <Compile Include="Assets\Scripts\UI\HeartButton.cs" />
      <Compile Include="Assets\Scripts\UI\ImageSkybox.cs" />
      <Compile Include="Assets\Scripts\UI\ImageSphere.cs" />
+     <Compile Include="Assets\Scripts\UI\ImageSphereAnimation.cs" />
      <Compile Include="Assets\Scripts\UI\LoadingIcon.cs" />
      <Compile Include="Assets\Scripts\UI\MessageButton.cs" />
      <Compile Include="Assets\Scripts\UI\PasswordText.cs" />

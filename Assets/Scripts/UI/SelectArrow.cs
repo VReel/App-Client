@@ -53,7 +53,7 @@ public class SelectArrow : MonoBehaviour
     {
         if (m_menuController != null)
         {
-            if (!m_menuController.GetMenuActive())
+            if (!m_menuController.IsMenuActive())
             {
                 return false;
             }

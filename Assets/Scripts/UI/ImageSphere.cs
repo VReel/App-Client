@@ -12,13 +12,17 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private Search m_search;
     [SerializeField] private Posts m_posts;
     [SerializeField] private ListUsers m_listUsers;
+    [SerializeField] private ListComments m_listComments;
+    [SerializeField] private MenuController m_menuController;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
+    [SerializeField] private GameObject m_imageObject;
     [SerializeField] private GameObject m_handleObject;
     [SerializeField] private GameObject m_heartObject;
     [SerializeField] private GameObject m_likesObject;
     [SerializeField] private GameObject m_captionObject;
+    [SerializeField] private GameObject m_commentCountObject;
 
     private const float kMinShrink = 0.0005f; // Minimum value the sphere will shrink to...
     private const int kLoadingTextureIndex = -1;
@@ -28,6 +32,7 @@ public class ImageSphere : MonoBehaviour
     private string m_userId;
     private string m_handle;
     private string m_caption;
+    private int m_commentCount;
     private int m_numLikes;
     private bool m_heartOn;
 
@@ -84,39 +89,53 @@ public class ImageSphere : MonoBehaviour
         }
     }
 
-    public void SetMetadata(string userId, string handle, string caption, int likes, bool likedByMe) 
+    public void SetMetadata(string userId, string handle, string caption, int commentCount, int likes, bool likedByMe) 
     {   //NOTE: These are only set onto their UI elements when the Animation has ended!
         m_userId = userId;
         m_handle = handle;
         m_caption = caption;
+        m_commentCount = commentCount;
         m_numLikes = likes;
         m_heartOn = likedByMe;
     }
 
-    public void Hide()
-    {        
+    public void SetMetadataToEmpty()
+    {
         m_imageIdentifier = "";
         m_handle = "";
         m_caption = "";
+        m_commentCount = -1;
         m_numLikes = -1;
         m_heartOn = false;
+    }
 
-        m_coroutineQueue.Clear();
-        m_coroutineQueue.EnqueueAction(AnimateHide());
+    public void AddToCommentCount(int addValue)
+    {
+        m_commentCount += addValue;
+        m_commentCountObject.GetComponentInChildren<Text>().text = (m_commentCount + 1).ToString(); //Adding 1 for Caption itself
+    }
+
+    public void Hide()
+    {        
+        SetMetadataToEmpty();
+
+        if (m_coroutineQueue != null)
+        {
+            m_coroutineQueue.Clear();
+            m_coroutineQueue.EnqueueAction(AnimateHide());
+        }
     }
 
     public void ForceHide()
     {        
-        m_imageIdentifier = "";
-        m_handle = "";
-        m_caption = "";
-        m_numLikes = -1;
-        m_heartOn = false;
-
+        SetMetadataToEmpty();
         UpdateMetadata();
 
-        m_coroutineQueue.Clear();
-        transform.localScale = new Vector3(kMinShrink, kMinShrink, kMinShrink);
+        if (m_coroutineQueue != null)
+        {
+            m_coroutineQueue.Clear();
+        }
+        m_imageObject.transform.localScale = new Vector3(kMinShrink, kMinShrink, kMinShrink);
     }
 
     public void HandleSelected()
@@ -141,7 +160,7 @@ public class ImageSphere : MonoBehaviour
 
     public void CaptionSelected()
     {
-        //TODO
+        m_listComments.DisplayCommentResults(m_imageIdentifier, this);
     }
 
     // **************************
@@ -152,7 +171,7 @@ public class ImageSphere : MonoBehaviour
     {
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateTextureAndID() called on sphere: " + (m_imageSphereIndex+1) );
 
-        gameObject.GetComponent<MeshRenderer>().material.mainTexture = m_imageSphereTexture;
+        m_imageObject.GetComponent<MeshRenderer>().material.mainTexture = m_imageSphereTexture;
 
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, false);
         m_currTextureIndex = m_nextTextureIndex;
@@ -177,6 +196,12 @@ public class ImageSphere : MonoBehaviour
             m_captionObject.GetComponentInChildren<Text>().text = m_caption;
         }
 
+        if (m_commentCountObject != null)
+        {
+            m_commentCountObject.SetActive(!isSphereLoading && m_caption.Length > 0);
+            m_commentCountObject.GetComponentInChildren<Text>().text = (m_commentCount + 1).ToString(); //Adding 1 for Caption itself
+        }
+
         if (m_likesObject != null)
         {
             m_likesObject.SetActive(!isSphereLoading && m_numLikes >= 0);
@@ -188,6 +213,16 @@ public class ImageSphere : MonoBehaviour
             m_heartObject.SetActive(!isSphereLoading && m_numLikes >= 0);
             m_heartObject.GetComponentInChildren<HeartButton>().HeartOnOffSwitch(m_heartOn);
         }
+          
+        if (m_menuController != null)
+        {
+            bool isMenuActive = m_menuController.IsMenuActive();
+            EnableAllInteractableComponentsInObject(m_handleObject, isMenuActive);
+            EnableAllInteractableComponentsInObject(m_captionObject, isMenuActive);
+            EnableAllInteractableComponentsInObject(m_commentCountObject, isMenuActive);
+            EnableAllInteractableComponentsInObject(m_likesObject, isMenuActive);
+            EnableAllInteractableComponentsInObject(m_heartObject, isMenuActive);
+        }
     }
 
     private void HideMetadata()
@@ -196,8 +231,30 @@ public class ImageSphere : MonoBehaviour
 
         if (m_handleObject != null) m_handleObject.SetActive(false);
         if (m_captionObject != null) m_captionObject.SetActive(false);
+        if (m_commentCountObject != null) m_commentCountObject.SetActive(false);
         if (m_likesObject != null) m_likesObject.SetActive(false);
         if (m_heartObject != null) m_heartObject.SetActive(false);
+    }
+
+    private void EnableAllInteractableComponentsInObject(GameObject gameObject, bool enable)
+    {
+        if (gameObject != null)
+        {
+            foreach(var renderer in gameObject.GetComponentsInChildren<Renderer>())
+            {                
+                renderer.enabled = enable; // Handles Mesh + SpriteRenderer components
+            }
+
+            foreach(var ui in gameObject.GetComponentsInChildren<UnityEngine.UI.Graphic>())
+            {                
+                ui.enabled = enable; // Handles Images + Text components
+            }
+
+            foreach(var collider in gameObject.GetComponentsInChildren<Collider>())
+            {                
+                collider.enabled = enable; // Handles BoxCollider + MeshCollider components
+            }
+        }
     }
 
     private IEnumerator AnimateSetTexture()
@@ -210,9 +267,9 @@ public class ImageSphere : MonoBehaviour
         float defaultScale = m_imageSphereController.GetDefaultSphereScale();
 
         // Scale down
-        while (transform.localScale.magnitude > kMinShrink)
+        while (m_imageObject.transform.localScale.magnitude > kMinShrink)
         {
-            transform.localScale = transform.localScale * scalingFactor;
+            m_imageObject.transform.localScale = m_imageObject.transform.localScale * scalingFactor;
             yield return null;
         }
 
@@ -220,15 +277,15 @@ public class ImageSphere : MonoBehaviour
         UpdateTextureAndID();
 
         // Scale up
-        while (transform.localScale.magnitude < defaultScale)
+        while (m_imageObject.transform.localScale.magnitude < defaultScale)
         {
-            transform.localScale = transform.localScale / scalingFactor;
+            m_imageObject.transform.localScale = m_imageObject.transform.localScale / scalingFactor;
             yield return null;
         }
 
         UpdateMetadata();
 
-        transform.localScale = new Vector3(defaultScale, defaultScale, defaultScale);
+        m_imageObject.transform.localScale = new Vector3(defaultScale, defaultScale, defaultScale);
     }
 
     private IEnumerator AnimateHide()
@@ -239,9 +296,9 @@ public class ImageSphere : MonoBehaviour
 
         float scalingFactor = m_imageSphereController.GetScalingFactor();
 
-        while (transform.localScale.magnitude > kMinShrink)
+        while (m_imageObject.transform.localScale.magnitude > kMinShrink)
         {
-            transform.localScale = transform.localScale * scalingFactor;
+            m_imageObject.transform.localScale = m_imageObject.transform.localScale * scalingFactor;
             yield return null;
         }
 

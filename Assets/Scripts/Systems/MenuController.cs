@@ -29,7 +29,7 @@ public class MenuController : MonoBehaviour
     // Public functions
     // **************************
 
-    public bool GetMenuActive()
+    public bool IsMenuActive()
     {
         return m_isMenuActive;
     }

@@ -125,6 +125,10 @@ public class ImageLoader : MonoBehaviour
 
             imageStream.Close();
         }
+        else
+        {
+            imageSphereController.SetImageAtIndexToLoading(sphereIndex);
+        }
             
         if (showLoading)
         {
@@ -170,6 +174,6 @@ public class ImageLoader : MonoBehaviour
             Debug.Log("------- VREEL: " + m_textureIndexUsage[0] + ", " + m_textureIndexUsage[1] + ", " + m_textureIndexUsage[2] 
                 + ", " + m_textureIndexUsage[3] + ", " + m_textureIndexUsage[4] + ", " + m_textureIndexUsage[5] 
                 + ", " + m_textureIndexUsage[6] + ", " + m_textureIndexUsage[7] + ", " + m_textureIndexUsage[8]
-                + ", " + m_textureIndexUsage[9]); // + ", " + m_textureIndexUsage[10]);
+                + ", " + m_textureIndexUsage[9] + ", " + m_textureIndexUsage[10] + ", " + m_textureIndexUsage[11]);
     }
 }

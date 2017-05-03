@@ -161,7 +161,7 @@ public class Posts : MonoBehaviour
         OpenPosts();
 
         m_user.GetUserMessageButton().SetIsActiveButton(false);
-        m_user.GetUserMessageButton().SetText(hashTag + "'s Profile");
+        m_user.GetUserMessageButton().SetText(hashTag);
     } 
 
     public void NextPosts()
@@ -218,6 +218,12 @@ public class Posts : MonoBehaviour
         // Lets Posts decide whether it should remove the post 
         //  -> for now we always remove the post, but really we should be checking that post no longer exists...
         m_posts.RemoveAt(ConvertIdToIndex(postId));
+    }
+
+    public Post GetPostFromID(string postId)
+    {
+        int index = ConvertIdToIndex(postId);
+        return m_posts[index];
     }
         
     // **************************
@@ -300,7 +306,7 @@ public class Posts : MonoBehaviour
         VReelJSON.Model_Posts posts = m_backEndAPI.GetPostsResult();
         if (posts != null)
         {
-            foreach (VReelJSON.PostsData postData in posts.data)
+            foreach (VReelJSON.PostData postData in posts.data)
             {   
                 Post newPost = new Post();
                 newPost.postId = postData.id.ToString();
@@ -312,7 +318,7 @@ public class Posts : MonoBehaviour
                 newPost.edited = postData.attributes.edited;
                 newPost.likedByMe = postData.attributes.liked_by_me;
                 newPost.userId = postData.relationships.user.data.id.ToString();
-                newPost.userHandle = GetHandleFromIDAndPostData(posts, newPost.userId);
+                newPost.userHandle = Helper.GetHandleFromIDAndUserData(posts.included, newPost.userId);
 
                 m_posts.Add(newPost);
             }
@@ -323,19 +329,6 @@ public class Posts : MonoBehaviour
                 m_nextPageOfPosts = posts.meta.next_page_id;
             }
         }
-    }
-
-    private string GetHandleFromIDAndPostData(VReelJSON.Model_Posts posts, string userId)
-    {
-        for (int i = 0; i < (posts.included).Count; i++)
-        {
-            if ((posts.included[i]).id.CompareTo(userId) == 0)
-            {
-                return (posts.included[i]).attributes.handle;
-            }
-        }
-
-        return "HANDLE_ERROR";
     }
 
     private IEnumerator LikeOrUnlikePostInternal(string postId, bool doLike)
@@ -358,7 +351,7 @@ public class Posts : MonoBehaviour
 
         int startingPostIndex = m_currPostIndex;
         int numImages = m_imageSphereController.GetNumSpheres();
-        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading {0} images beginning at index {1}. We've found {2} posts for the user!", numImages, startingPostIndex, m_posts.Count));
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading {0} images beginning at index {1}. We've found {2} posts!", numImages, startingPostIndex, m_posts.Count));
 
         int postIndex = startingPostIndex;
         for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, postIndex++)
@@ -379,6 +372,7 @@ public class Posts : MonoBehaviour
                     (m_postsType == PostsType.kUserProfile) ? "" : m_posts[postIndex].userId, 
                     (m_postsType == PostsType.kUserProfile) ? "" : m_posts[postIndex].userHandle, 
                     m_posts[postIndex].caption, 
+                    m_posts[postIndex].commentCount, 
                     m_posts[postIndex].likeCount,
                     m_posts[postIndex].likedByMe
                 );
@@ -421,7 +415,7 @@ public class Posts : MonoBehaviour
 
         int startingPostIndex = m_currPostIndex;
         int numImages = m_imageSphereController.GetNumSpheres();
-        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Refreshing {0} posts beginning at index {1}. We've found {2} posts for the user!", numImages, startingPostIndex, m_posts.Count));
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Refreshing {0} posts beginning at index {1}. We've found {2} posts!", numImages, startingPostIndex, m_posts.Count));
 
         int postIndex = startingPostIndex;
         for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, postIndex++)
