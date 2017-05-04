@@ -7,6 +7,7 @@ public class ImageSphereAnimation : MonoBehaviour
     // Member Variables
     // **************************
 
+    [SerializeField] private bool m_active = true;
     [SerializeField] private float m_timeTakenForFullSineWave = 10; // x second for full sign rotation
     [SerializeField] private float m_magnitude = 0.015f; // magnitude of variance
     [SerializeField] private float m_ChanceOfSignFlip = 0.001f; // magnitude of randomVariance
@@ -31,7 +32,12 @@ public class ImageSphereAnimation : MonoBehaviour
     }
 
     public void Update()
-    {                   
+    {      
+        if (!m_active)
+        {
+            return;
+        }
+
         float updateBasedOnFullTimeTaken = kLengthOfSine/m_timeTakenForFullSineWave;
 
         m_currTimeVec.x = (m_currTimeVec.x + m_currTimeVecSign.x *
@@ -53,8 +59,18 @@ public class ImageSphereAnimation : MonoBehaviour
         m_currPos.z = m_originalPos.z + (Mathf.Sin(m_currTimeVec.z) * m_magnitude);
         transform.localPosition = m_currPos;
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Transform LocalPos: " + m_currPos.ToString("F5") + ", CurrTimeVector: " + m_currTimeVec);
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Transform LocalPos: " + m_currPos.ToString("F5") + ", CurrTimeVector: " + m_currTimeVec);
     }       
+
+    public bool IsActive()
+    {
+        return m_active;
+    }
+
+    public void SetActive(bool active)
+    {
+        m_active = active;
+    }
 
     // **************************
     // Private/Helper functions

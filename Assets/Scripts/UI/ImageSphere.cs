@@ -14,6 +14,7 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private ListUsers m_listUsers;
     [SerializeField] private ListComments m_listComments;
     [SerializeField] private MenuController m_menuController;
+    [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
@@ -176,6 +177,8 @@ public class ImageSphere : MonoBehaviour
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, false);
         m_currTextureIndex = m_nextTextureIndex;
         m_nextTextureIndex = kLoadingTextureIndex;
+
+        m_imageObject.GetComponent<ImageSphereAnimation>().SetActive(true);
     }
 
     private void UpdateMetadata()
@@ -319,8 +322,118 @@ public class ImageSphere : MonoBehaviour
     }        
 
     private void OnButtonSelected(VRStandardAssets.Menu.MenuButton button)
+    {   
+        const bool kAnimationEffectOn = true;
+        if (kAnimationEffectOn)
+        {
+            m_coroutineQueue.EnqueueAction(AnimateSphereTowardsUser());
+        }
+        else
+        {
+            SetOriginalImageOnSkybox();
+            SetSkybox();
+        }            
+    }
+
+    private IEnumerator AnimateSphereTowardsUser()
     {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateSphereTowardsUser() called on sphere: " + (m_imageSphereIndex+1));
+
+        SetOriginalImageOnSkybox();
+        m_imageObject.GetComponent<ImageSphereAnimation>().SetActive(false);
+        m_imageObject.GetComponent<Collider>().enabled = false;
+
+        float kScalingFactor = m_imageSphereController.GetScalingFactor();
+        float kDefaultScale = m_imageSphereController.GetDefaultSphereScale();
+
+        Vector3 initialPos = m_imageObject.transform.position;
+        Vector3 userPos = Camera.main.gameObject.transform.position;
+        Quaternion initialRot = m_imageObject.transform.rotation;
+        Quaternion skyboxRot = m_imageSphereSkybox.transform.rotation;
+        Vector3 initialScale = new Vector3(kDefaultScale, kDefaultScale, kDefaultScale);
+        Vector3 skyboxScale = m_imageSphereSkybox.transform.localScale;
+
+        // Travel to user and partially scale
+        const float kPercentageRotationDuration = 0.3f;
+        const float kSecondsToGetToUser = 5.0f;
+        float progress = 0;
+        while (progress <= 1)
+        {
+            if (progress < kPercentageRotationDuration) // All Rotation needs to have taken place before it reaches your face!
+            {
+                m_imageObject.transform.rotation = Quaternion.Slerp(initialRot, skyboxRot, progress/kPercentageRotationDuration); 
+            }
+            else
+            {
+                m_imageObject.transform.rotation = Quaternion.Slerp(initialRot, skyboxRot, 1.0f); 
+            }
+
+            m_imageObject.transform.position = Vector3.Lerp(initialPos, userPos, progress);
+            m_imageObject.transform.localScale = Vector3.Lerp(initialScale, skyboxScale/2.0f, ExponentialProgress(progress));
+            progress += Time.deltaTime / kSecondsToGetToUser;
+            yield return null;
+        }
+
+        // When Image has reached the user then SetSkybox to Thumbnail and grow the sphere
         SetSkybox();
+        m_imageObject.transform.position = userPos;
+
+        // Scale to size of SkyBox
+        const float kSecondsToGetToGrowFully = 1.0f;
+        progress = 0;
+        while (progress <= 1)
+        {            
+            m_imageObject.transform.localScale = Vector3.Lerp(skyboxScale/2.0f, skyboxScale, progress);
+            progress += Time.deltaTime / kSecondsToGetToGrowFully;
+            yield return null;
+        }
+
+        m_imageObject.transform.position = userPos;
+        m_imageObject.transform.localScale = skyboxScale;
+
+        yield return null;
+
+        // When Sphere has grown reset it
+        m_imageObject.transform.position = initialPos;
+        m_imageObject.transform.rotation = initialRot;
+        m_imageObject.transform.localScale = new Vector3(kMinShrink, kMinShrink, kMinShrink);
+
+        // Scale up the newly appeared ImageSphere
+        while (m_imageObject.transform.localScale.magnitude < kDefaultScale)
+        {
+            m_imageObject.transform.localScale = m_imageObject.transform.localScale / kScalingFactor;
+            yield return null;
+        }
+
+        m_imageObject.transform.localScale = initialScale;
+        m_imageObject.GetComponent<ImageSphereAnimation>().SetActive(true);
+        m_imageObject.GetComponent<Collider>().enabled = true;
+    }
+
+    private float ExponentialProgress(float progress)
+    {
+        // f(x) = e^(1−(1/x^2))
+        const float kA = 100;
+        float result = (Mathf.Pow(kA, progress) - 1)/(kA - 1);
+        return result;
+    }
+
+    private void SetOriginalImageOnSkybox()
+    {        
+        const string imagesTopLevelDirectory = "TopLevel"; //TODO Get actual top level
+        bool isImageFromDevice = m_imageIdentifier.StartsWith(imagesTopLevelDirectory);
+        if (!isImageFromDevice)
+        {
+            bool isProfileImage = m_profileDetails.IsUser(m_imageIdentifier); 
+            if (isProfileImage) // Image Identifier is of the User for Profile Pictures
+            {
+                m_profileDetails.DownloadOriginalImage();
+            }
+            else
+            {
+                m_posts.DownloadOriginalImage(m_imageIdentifier);
+            }
+        }
     }
 
     private void SetSkybox()

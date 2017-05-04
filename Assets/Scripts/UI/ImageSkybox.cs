@@ -76,26 +76,6 @@ public class ImageSkybox : MonoBehaviour
         m_uploadButton.SetActive(isImageFromDevice && isGalleryState && !isProfileImage);  // Currently the ImageSkybox class is responsible for switching on the Upload button
         m_deleteButton.SetActive(!isImageFromDevice && isProfileState && !isProfileImage); // and the Delete button, when its possible to select either
 
-        if (!isImageFromDevice) // This image is being set from the Profile, not the Gallery
-        {            
-            bool isThumbnail = texture.width <= Helper.kStandardThumbnailWidth;
-            if (isThumbnail) // This image is a Thumbnail, so we want to download the full image!
-            {
-                if (isProfileImage) // Identifier is of the User for Profile Pictures
-                {
-                    m_profileDetails.DownloadOriginalImage();
-                }
-                else
-                {
-                    m_posts.DownloadOriginalImage(m_imageIdentifier);
-                }
-            }
-            else // TODO: This is the Original image, so we want to replace the Thumbnail on the ImageSphere!
-            {                
-                m_imageSphereController.SetImageWithId(imageIdentifier, texture, textureIndex);
-            }
-        }
-
         gameObject.GetComponent<MeshRenderer>().material.mainTexture = m_skyboxTexture;
 
         // TODO: have the skybox be used instead of just a sphere around the user
