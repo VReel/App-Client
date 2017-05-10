@@ -25,6 +25,8 @@ public class ImageSphereController : MonoBehaviour
 
     private CoroutineQueue m_coroutineQueue;
 
+    private string m_imagesTopLevelDirectory;
+
     // **************************
     // Public functions
     // **************************
@@ -36,6 +38,8 @@ public class ImageSphereController : MonoBehaviour
 
         ForceHideAllImageSpheres();
         SetIndexOnAllImageSpheres();
+
+        m_imagesTopLevelDirectory = "InvalidTopLevelDirectory";
     }
 
     public void SetTextureInUse(int textureID, bool inUse)
@@ -56,6 +60,16 @@ public class ImageSphereController : MonoBehaviour
     public int GetNumSpheres()
     {
         return m_imageSpheres.GetLength(0);
+    }
+
+    public string GetTopLevelDirectory()
+    {
+        return m_imagesTopLevelDirectory;
+    }
+
+    public void SetTopLevelDirectory(string imagesTopLevelDirectory)
+    {
+        m_imagesTopLevelDirectory = imagesTopLevelDirectory;
     }
 
     public string GetIdentifierAtIndex(int sphereIndex)
@@ -123,11 +137,11 @@ public class ImageSphereController : MonoBehaviour
         }
     }    
 
-    public void SetMetadataAtIndex(int sphereIndex, string userId, string handle, string caption, int commentCount, int likes, bool likedByMe)
+    public void SetMetadataAtIndex(int sphereIndex, string userId, string handle, string caption, int commentCount, int likes, bool likedByMe, bool updateMetadata)
     {
         if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
         {
-            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetMetadata(userId, handle, caption, commentCount, likes, likedByMe);
+            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetMetadata(userId, handle, caption, commentCount, likes, likedByMe, updateMetadata);
         }
         else
         {

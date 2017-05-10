@@ -15,12 +15,12 @@ public class BackEndAPI
     // Member Variables
     // **************************
 
-    const string m_vreelDevelopmentURL = "https://vreel-development.herokuapp.com/v1";
-    const string m_vreelStagingURL = "https://vreel-staging.herokuapp.com/v1";
-    const string m_vreelProductionURL = "https://api.vreel.io/v1";
-    const string m_vreelDevelopmentApplicationID = "6ziuhyy8teraucg8vjq5zigx45mqd1qzexmezewy1wuq44kk7eyitjkjz8qj9rcs";
-    const string m_vreelStagingApplicationID = "366vapr5iwscaicaswycf8lvwetzmkj1r6loby9nc3uq26flimxpbqnadbt6vam3";
-    const string m_vreelProductionApplicationID = "55z96ha833gxes1s1yf80bf1ckcq9ofdf6mm9n365f33bgvcf6n41usdaorya0pu";
+    const string m_vreelDevelopmentURL  = "https://vreel-development.herokuapp.com/v1";
+    const string m_vreelStagingURL      = "https://vreel-staging.herokuapp.com/v1";
+    const string m_vreelProductionURL   = "https://api.vreel.io/v1";
+    const string m_vreelDevelopmentApplicationID    = "6ziuhyy8teraucg8vjq5zigx45mqd1qzexmezewy1wuq44kk7eyitjkjz8qj9rcs";
+    const string m_vreelStagingApplicationID        = "hn6w6n7me8rkqeby3evdxx8e732gbaypdqh8yeg462vw2dys7du9e2n13vuodkmr";
+    const string m_vreelProductionApplicationID     = "edsewyw1a5x59epomtebi7pl6j0qfdn14jsavr5pyktbl7tpacol1irggdqtdib6";
 
     private string m_vreelURL = "";
     private string m_applicationID = "";

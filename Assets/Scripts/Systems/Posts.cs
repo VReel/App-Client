@@ -225,6 +225,11 @@ public class Posts : MonoBehaviour
         int index = ConvertIdToIndex(postId);
         return m_posts[index];
     }
+
+    public void RefreshPostData(string postId)
+    {
+        m_coroutineQueue.EnqueueAction(RefreshPostDataInternal(postId, true));
+    }       
         
     // **************************
     // Private/Helper functions
@@ -349,11 +354,10 @@ public class Posts : MonoBehaviour
     {
         yield return m_appDirector.VerifyInternetConnection();
 
-        int startingPostIndex = m_currPostIndex;
+        int postIndex = m_currPostIndex;
         int numImages = m_imageSphereController.GetNumSpheres();
-        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading {0} images beginning at index {1}. We've found {2} posts!", numImages, startingPostIndex, m_posts.Count));
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading {0} images beginning at index {1}. We've found {2} posts!", numImages, postIndex, m_posts.Count));
 
-        int postIndex = startingPostIndex;
         for (int sphereIndex = 0; sphereIndex < numImages; sphereIndex++, postIndex++)
         {
             if (postIndex < m_posts.Count)
@@ -374,7 +378,8 @@ public class Posts : MonoBehaviour
                     m_posts[postIndex].caption, 
                     m_posts[postIndex].commentCount, 
                     m_posts[postIndex].likeCount,
-                    m_posts[postIndex].likedByMe
+                    m_posts[postIndex].likedByMe,
+                    false
                 );
             }
             else
@@ -390,7 +395,7 @@ public class Posts : MonoBehaviour
 
         m_loadingIcon.Display();
 
-        yield return RefreshPostData(postId);
+        yield return RefreshPostDataInternal(postId);
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
@@ -422,13 +427,15 @@ public class Posts : MonoBehaviour
         {
             if (postIndex < m_posts.Count)
             {                   
-                yield return RefreshPostData(m_posts[postIndex].postId);
+                yield return RefreshPostDataInternal(m_posts[postIndex].postId);
             }
         }
     }
 
-    private IEnumerator RefreshPostData(string postId) // NOTE: Since URL's have a lifetime, we need to refresh the data at certain points...
-    {            
+    private IEnumerator RefreshPostDataInternal(string postId, bool updateMetadata = false) // NOTE: Since URL's have a lifetime, we need to refresh the data at certain points...
+    {           
+        yield return m_appDirector.VerifyInternetConnection();
+
         yield return m_backEndAPI.Post_GetPost(postId);
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
@@ -444,9 +451,21 @@ public class Posts : MonoBehaviour
                 m_posts[index].edited = m_backEndAPI.GetPostResult().data.attributes.edited;
                 m_posts[index].likedByMe = m_backEndAPI.GetPostResult().data.attributes.liked_by_me;
                 m_posts[index].originalUrl = m_backEndAPI.GetPostResult().data.attributes.original_url;
+
+                int sphereIndex = index - m_currPostIndex;
+                m_imageSphereController.SetMetadataAtIndex(
+                    sphereIndex, 
+                    (m_postsType == PostsType.kUserProfile) ? "" : m_posts[index].userId, 
+                    (m_postsType == PostsType.kUserProfile) ? "" : m_posts[index].userHandle, 
+                    m_posts[index].caption, 
+                    m_posts[index].commentCount, 
+                    m_posts[index].likeCount,
+                    m_posts[index].likedByMe,
+                    updateMetadata
+                );
             }
         }
-    }
+    }        
 
     private void LoadImageInternalPlugin(string url, int sphereIndex, string imageIdentifier, bool showLoading)
     {        

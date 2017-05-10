@@ -29,6 +29,7 @@ public class ImageSphere : MonoBehaviour
     private const int kLoadingTextureIndex = -1;
 
     private string m_imageIdentifier; // This is either (1) A Local Path on the Device or (2) A PostID from the backend
+    private string m_workingImageIdentifier; // This is in order to allow the ImageIdentifier to change midway through the TextureSettingAnimation
     private Texture2D m_imageSphereTexture;
     private string m_userId;
     private string m_handle;
@@ -90,7 +91,7 @@ public class ImageSphere : MonoBehaviour
         }
     }
 
-    public void SetMetadata(string userId, string handle, string caption, int commentCount, int likes, bool likedByMe) 
+    public void SetMetadata(string userId, string handle, string caption, int commentCount, int likes, bool likedByMe, bool updateMetadata = false) 
     {   //NOTE: These are only set onto their UI elements when the Animation has ended!
         m_userId = userId;
         m_handle = handle;
@@ -98,16 +99,25 @@ public class ImageSphere : MonoBehaviour
         m_commentCount = commentCount;
         m_numLikes = likes;
         m_heartOn = likedByMe;
+
+        if (updateMetadata)
+        {
+            UpdateMetadata();
+        }
     }
 
-    public void SetMetadataToEmpty()
-    {
-        m_imageIdentifier = "";
+    public void SetMetadataToEmpty(bool updateMetadata = false)
+    {        
         m_handle = "";
         m_caption = "";
         m_commentCount = -1;
         m_numLikes = -1;
         m_heartOn = false;
+
+        if (updateMetadata)
+        {
+            UpdateMetadata();
+        }
     }
 
     public void AddToCommentCount(int addValue)
@@ -309,6 +319,7 @@ public class ImageSphere : MonoBehaviour
 
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, false);
         m_currTextureIndex = kLoadingTextureIndex;
+        m_imageIdentifier = "";
     }
         
     private void OnEnable ()
@@ -323,23 +334,30 @@ public class ImageSphere : MonoBehaviour
 
     private void OnButtonSelected(VRStandardAssets.Menu.MenuButton button)
     {   
+        bool willChangeImage = (m_imageIdentifier.Length > 0) && (m_imageSphereSkybox.GetImageIdentifier().CompareTo(m_imageIdentifier) != 0) && (m_currTextureIndex != kLoadingTextureIndex);
+        if (!willChangeImage)
+        {
+            return;
+        }
+
+        m_workingImageIdentifier = m_imageIdentifier;
         const bool kAnimationEffectOn = true;
         if (kAnimationEffectOn)
         {
-            m_coroutineQueue.EnqueueAction(AnimateSphereTowardsUser());
+            m_coroutineQueue.EnqueueAction(AnimateSphereTowardsUser(m_workingImageIdentifier));
         }
         else
         {
-            SetOriginalImageOnSkybox();
-            SetSkybox();
+            SetOriginalImageOnSkybox(m_workingImageIdentifier);
+            SetSkybox(m_workingImageIdentifier);
         }            
     }
 
-    private IEnumerator AnimateSphereTowardsUser()
+    private IEnumerator AnimateSphereTowardsUser(string imageIdentifier)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateSphereTowardsUser() called on sphere: " + (m_imageSphereIndex+1));
 
-        SetOriginalImageOnSkybox();
+        SetOriginalImageOnSkybox(imageIdentifier);
         m_imageObject.GetComponent<ImageSphereAnimation>().SetActive(false);
         m_imageObject.GetComponent<Collider>().enabled = false;
 
@@ -375,7 +393,7 @@ public class ImageSphere : MonoBehaviour
         }
 
         // When Image has reached the user then SetSkybox to Thumbnail and grow the sphere
-        SetSkybox();
+        SetSkybox(imageIdentifier);
         m_imageObject.transform.position = userPos;
 
         // Scale to size of SkyBox
@@ -418,31 +436,30 @@ public class ImageSphere : MonoBehaviour
         return result;
     }
 
-    private void SetOriginalImageOnSkybox()
-    {        
-        const string imagesTopLevelDirectory = "TopLevel"; //TODO Get actual top level
-        bool isImageFromDevice = m_imageIdentifier.StartsWith(imagesTopLevelDirectory);
+    private void SetOriginalImageOnSkybox(string imageIdentifier)
+    {                
+        bool isImageFromDevice = imageIdentifier.StartsWith(m_imageSphereController.GetTopLevelDirectory());
         if (!isImageFromDevice)
         {
-            bool isProfileImage = m_profileDetails.IsUser(m_imageIdentifier); 
+            bool isProfileImage = m_profileDetails.IsUser(imageIdentifier); 
             if (isProfileImage) // Image Identifier is of the User for Profile Pictures
             {
                 m_profileDetails.DownloadOriginalImage();
             }
             else
             {
-                m_posts.DownloadOriginalImage(m_imageIdentifier);
+                m_posts.DownloadOriginalImage(imageIdentifier);
             }
         }
     }
 
-    private void SetSkybox()
+    private void SetSkybox(string imageIdentifier)
     {    
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: SetSkybox() got called on sphere: " + (m_imageSphereIndex+1));
 
-        if (m_imageSphereSkybox != null && (m_imageSphereSkybox.GetImageIdentifier().CompareTo(m_imageIdentifier) != 0) && m_currTextureIndex != kLoadingTextureIndex)
+        if (m_imageSphereSkybox != null)
         {            
-            m_imageSphereSkybox.SetImage(m_imageSphereTexture, m_imageIdentifier, m_currTextureIndex);
+            m_imageSphereSkybox.SetImage(m_imageSphereTexture, imageIdentifier, m_currTextureIndex);
         }
     }
 }

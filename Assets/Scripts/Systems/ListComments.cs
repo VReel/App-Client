@@ -406,6 +406,10 @@ public class ListComments : MonoBehaviour
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
             m_commentResults[commentIndex].text = commentText;
+            if (commentIndex == 0) //if its the caption
+            {
+                m_posts.RefreshPostData(m_postId);
+            }
 
             DisplayUserResultsOnItems();
         }

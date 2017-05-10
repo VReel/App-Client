@@ -129,7 +129,7 @@ public class Gallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: About to call GetImagesPath function...");
         m_imagesTopLevelDirectory = m_javaPluginClass.CallStatic<string>("GetAndroidImagesPath"); //string path = "/storage/emulated/0/DCIM/Gear 360/";
 
-        m_imageSkybox.SetTopLevelDirectory(m_imagesTopLevelDirectory);
+        m_imageSphereController.SetTopLevelDirectory(m_imagesTopLevelDirectory);
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Storing all FilePaths from directory: " + m_imagesTopLevelDirectory);
 
         yield return StoreAllImageGalleryFilePaths(m_imagesTopLevelDirectory);

@@ -17,7 +17,6 @@ public class ImageSkybox : MonoBehaviour
     private int m_currTextureIndex = -1; // ImageSkybox must track the index of the underlying texture it points to in C++ plugin
     private Texture2D m_skyboxTexture;
     private string m_imageIdentifier; // Points to where the Image came from (S3 Bucket, or Local Device)
-    private string m_imagesTopLevelDirectory;   
 
     // **************************
     // Public functions
@@ -27,7 +26,6 @@ public class ImageSkybox : MonoBehaviour
     {
         m_skyboxTexture = new Texture2D(2,2);
         m_imageIdentifier = "Invalid";
-        m_imagesTopLevelDirectory = "InvalidTopLevelDirectory";
     }
 
     public bool IsTextureValid()
@@ -43,12 +41,7 @@ public class ImageSkybox : MonoBehaviour
     public string GetImageIdentifier()
     {
         return m_imageIdentifier;
-    }
-
-    public void SetTopLevelDirectory(string imagesTopLevelDirectory)
-    {
-        m_imagesTopLevelDirectory = imagesTopLevelDirectory;
-    }
+    }       
 
     public void SetImage(Texture2D texture, string imageIdentifier, int textureIndex)
     {        
@@ -72,7 +65,7 @@ public class ImageSkybox : MonoBehaviour
         bool isProfileState = m_appDirector.GetState() == AppDirector.AppState.kProfile;
         bool isGalleryState = m_appDirector.GetState() == AppDirector.AppState.kGallery;
         bool isProfileImage = m_profileDetails.IsUser(imageIdentifier); // Identifier is of the User for Profile Pictures
-        bool isImageFromDevice = m_imageIdentifier.StartsWith(m_imagesTopLevelDirectory);
+        bool isImageFromDevice = m_imageIdentifier.StartsWith(m_imageSphereController.GetTopLevelDirectory());
         m_uploadButton.SetActive(isImageFromDevice && isGalleryState && !isProfileImage);  // Currently the ImageSkybox class is responsible for switching on the Upload button
         m_deleteButton.SetActive(!isImageFromDevice && isProfileState && !isProfileImage); // and the Delete button, when its possible to select either
 
