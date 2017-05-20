@@ -122,3 +122,4 @@
 /Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Temp/bin/Debug/Mono.Cecil.Mdb.dll
 /Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Temp/bin/Debug/UnityEngine.TestRunner.dll
 /Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Temp/bin/Debug/nunit.framework.dll
+/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Temp/bin/Debug/OneSignalSDK_WP_WNS.dll

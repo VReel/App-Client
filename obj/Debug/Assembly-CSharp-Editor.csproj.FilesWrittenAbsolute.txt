@@ -190,3 +190,7 @@
 /Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Temp/bin/Debug/Mono.Cecil.Mdb.dll
 /Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Temp/bin/Debug/UnityEditor.iOS.Extensions.Xcode.dll
 /Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Temp/bin/Debug/UnityEditor.iOS.Extensions.Xcode.xml
+/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Temp/bin/Debug/Google.IOSResolver.dll
+/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Temp/bin/Debug/OneSignalSDK_WP_WNS.dll
+/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Temp/bin/Debug/Google.JarResolver.dll
+/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Temp/bin/Debug/Google.VersionHandler.dll
