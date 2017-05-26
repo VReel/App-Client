@@ -5,6 +5,9 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/VReel_v1.1.unity
-    guid: 00000000000000000000000000000000
+    guid: 9bf300e8861854c0b9321f29a20bdd55
+  - enabled: 1
+    path: Assets/Scenes/DesignPrototyping/DesignPrototyping_01.unity
+    guid: f4c8721758a224021814e316a589deb6
