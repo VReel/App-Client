@@ -28,6 +28,12 @@ public class PushNotifications : MonoBehaviour
         {
             OneSignal.SetLogLevel(OneSignal.LOG_LEVEL.DEBUG, OneSignal.LOG_LEVEL.DEBUG);
         }
+
+        OneSignal.IdsAvailable((userId, pushToken) => 
+        {
+            //TODO: Send "userId" over to back-end!
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: UserID: " + userId + " - PushToken: " + pushToken);
+        });
     }
 
     // **************************
