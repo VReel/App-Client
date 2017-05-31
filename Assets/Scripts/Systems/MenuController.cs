@@ -39,28 +39,34 @@ public class MenuController : MonoBehaviour
         m_loginSubMenu.SetActive(active);
     }
 
-    public void SetHomeSubMenuActive(bool active)
+    public void SetProfileSubMenuActive(bool active)
+    {
+        m_profileSubMenu.SetActive(active);
+        OnButtonSelected(m_menuBarButtons[0]);  // button 0 = Profile button
+    }
+
+    public void SetExploreSubMenuActive(bool active)
     {
         m_homeSubMenu.SetActive(active);
-        OnButtonSelected(m_menuBarButtons[0]);  // button 0 = Home button
+        OnButtonSelected(m_menuBarButtons[1]);  // button 1 = Explore button
+    }
+
+    public void SetFollowingSubMenuActive(bool active)
+    {
+        m_homeSubMenu.SetActive(active);
+        OnButtonSelected(m_menuBarButtons[2]);  // button 2 = Following button
     }
 
     public void SetSearchSubMenuActive(bool active)
     {
         m_searchSubMenu.SetActive(active);
-        OnButtonSelected(m_menuBarButtons[1]);  // button 1 = Search button
-    }
-
-    public void SetProfileSubMenuActive(bool active)
-    {
-        m_profileSubMenu.SetActive(active);
-        OnButtonSelected(m_menuBarButtons[2]);  // button 2 = Profile button
-    }
+        OnButtonSelected(m_menuBarButtons[3]);  // button 3 = Search button
+    }        
 
     public void SetGallerySubMenuActive(bool active)
     {
         m_gallerySubMenu.SetActive(active);
-        OnButtonSelected(m_menuBarButtons[3]);  // button 3 = Gallery button
+        OnButtonSelected(m_menuBarButtons[4]);  // button 4 = Gallery button
     }
 
     public void SetAllSubMenusActive(bool active)

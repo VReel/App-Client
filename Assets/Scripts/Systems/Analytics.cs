@@ -41,9 +41,25 @@ public class Analytics : MonoBehaviour
         m_coroutineQueue.StartLoop();
     }
 
-    public void HomeSelected()
+    public void ProfileSelected()
     {
-        CustomEvent customEvent = new CustomEvent("HomeSelected");
+        CustomEvent customEvent = new CustomEvent("ProfileSelected");
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
+
+    public void ExploreSelected()
+    {
+        CustomEvent customEvent = new CustomEvent("ExploreSelected");
+        customEvent.AddAttribute("UserEmail", m_user.m_email);
+
+        m_analyticsManager.RecordEvent(customEvent);
+    }
+
+    public void FollowingSelected()
+    {
+        CustomEvent customEvent = new CustomEvent("FollowingSelected");
         customEvent.AddAttribute("UserEmail", m_user.m_email);
 
         m_analyticsManager.RecordEvent(customEvent);
@@ -55,15 +71,7 @@ public class Analytics : MonoBehaviour
         customEvent.AddAttribute("UserEmail", m_user.m_email);
 
         m_analyticsManager.RecordEvent(customEvent);
-    }
-
-    public void ProfileSelected()
-    {
-        CustomEvent customEvent = new CustomEvent("ProfileSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
-
-        m_analyticsManager.RecordEvent(customEvent);
-    }        
+    }             
 
     public void GallerySelected()
     {
@@ -286,9 +294,13 @@ public class Analytics : MonoBehaviour
 
     private void SetAppState(CustomEvent customEvent)
     {
-        if (m_appDirector.GetState() == AppDirector.AppState.kHome)
+        if (m_appDirector.GetState() == AppDirector.AppState.kExplore)
         {
-            customEvent.AddAttribute("AppState", "Home");
+            customEvent.AddAttribute("AppState", "Explore");
+        }
+        else if (m_appDirector.GetState() == AppDirector.AppState.kFollowing)
+        {
+            customEvent.AddAttribute("AppState", "Following");
         }
         else if (m_appDirector.GetState() == AppDirector.AppState.kSearch)
         {

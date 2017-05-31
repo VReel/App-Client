@@ -39,12 +39,7 @@ public class Home : MonoBehaviour
 
         m_homeState = HomeState.kNone;
 	}
-
-    public void OpenHome()
-    {
-        OpenPublicTimeline();
-    }
-
+        
     public void OpenPublicTimeline()
     {
         if (m_homeState == HomeState.kPublicTimeline)

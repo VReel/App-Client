@@ -81,7 +81,7 @@ public class User : MonoBehaviour
 
     public bool IsLoggedIn()
     {
-        return (m_loginData.m_client.Length + m_loginData.m_uid.Length > 0);
+        return (m_loginData.m_client.Length > 0 && m_loginData.m_uid.Length > 0);
     }
 
     public bool IsUserDataStored()

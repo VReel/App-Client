@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.VR;               //VRSettings
+using UnityEngine.UI;
 using System.Collections;           //IEnumerator
 
 // AppDirector keeps track of the current state of the App 
@@ -18,7 +19,9 @@ public class AppDirector : MonoBehaviour
     {
         kInit,          // This should only be the state at the very start and never again!
         kLogin,         // User is not yet logged in, they are going through the login flow
-        kHome,          // User is viewing their home (ie. public or personal timeline)
+        //kHome,          // User is viewing their home (ie. public or personal timeline)
+        kExplore,       // User is viewing the public timeline (ie. public or personal timeline)
+        kFollowing,     // User is viewing the personal timeline (ie. public or personal timeline)
         kProfile,       // User is viewing the pictures in their own profile
         kSearch,        // User is searching profiles or tags
         kGallery        // User is viewing their 360 photo gallery, they can scroll through all the 360 photos on their phone
@@ -36,6 +39,7 @@ public class AppDirector : MonoBehaviour
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private KeyBoard m_keyboard;
     [SerializeField] private InternetReachabilityVerifier m_internetReachabilityVerifier;
+    [SerializeField] private GameObject m_profileButtonObject;
     [SerializeField] private GameObject m_lostConnectionIcon;
 
     private AppState m_appState;
@@ -68,9 +72,10 @@ public class AppDirector : MonoBehaviour
         {
             RequestLoginState();
         }
-        else if ( (m_appState == AppDirector.AppState.kLogin || m_appState == AppDirector.AppState.kInit) && m_user.IsLoggedIn())
+        else if ( (m_appState == AppDirector.AppState.kLogin || m_appState == AppDirector.AppState.kInit) && m_user.IsLoggedIn() && m_user.m_handle.Length > 0)
         {
-            RequestHomeState();
+            RequestExploreState();
+            m_profileButtonObject.GetComponentInChildren<Text>().text = m_user.m_handle;
         }
     }
         
@@ -83,12 +88,21 @@ public class AppDirector : MonoBehaviour
         }
     }
 
-    public void RequestHomeState()
+    public void RequestExploreState()
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestHomeState() called");
-        if (m_appState != AppState.kHome)
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestExploreState() called");
+        if (m_appState != AppState.kExplore)
         {
-            SetHomeState();
+            SetExploreState();
+        }
+    }
+
+    public void RequestFollowingState()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestFollowingState() called");
+        if (m_appState != AppState.kFollowing)
+        {
+            SetFollowingState();
         }
     }
 
@@ -159,7 +173,7 @@ public class AppDirector : MonoBehaviour
         m_appState = AppState.kLogin;
     }
 
-    private void SetHomeState()
+    private void SetExploreState()
     {
         Resources.UnloadUnusedAssets();
         DisableAllOptions();
@@ -175,9 +189,30 @@ public class AppDirector : MonoBehaviour
 
         m_home.ShowHomeText();
 
-        m_menuController.SetHomeSubMenuActive(true);
-        m_home.OpenHome();
-        m_appState = AppState.kHome;
+        m_menuController.SetExploreSubMenuActive(true);
+        m_home.OpenPublicTimeline();
+        m_appState = AppState.kExplore;
+    }
+
+    private void SetFollowingState()
+    {
+        Resources.UnloadUnusedAssets();
+        DisableAllOptions();
+        m_imageSphereController.HideAllImageSpheres();
+        m_keyboard.CancelText();
+        SetMenuBar(true);
+
+        m_imageLoader.InvalidateLoading();
+        m_home.InvalidateWork();
+        m_search.InvalidateWork();
+        m_profile.InvalidateWork();
+        m_gallery.InvalidateWork();
+
+        m_home.ShowHomeText();
+
+        m_menuController.SetFollowingSubMenuActive(true);
+        m_home.OpenPersonalTimeline();
+        m_appState = AppState.kFollowing;
     }
 
     private void SetSearchState()

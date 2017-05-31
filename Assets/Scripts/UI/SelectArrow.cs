@@ -121,8 +121,9 @@ public class SelectArrow : MonoBehaviour
 
     private bool IsPostsActive()
     {
-        return (m_appDirector.GetState() == AppDirector.AppState.kHome ||
-                m_appDirector.GetState() == AppDirector.AppState.kProfile ||
+        return (m_appDirector.GetState() == AppDirector.AppState.kExplore   ||
+                m_appDirector.GetState() == AppDirector.AppState.kFollowing ||
+                m_appDirector.GetState() == AppDirector.AppState.kProfile   ||
                (m_appDirector.GetState() == AppDirector.AppState.kSearch && m_search.GetSearchState() == Search.SearchState.kUserDisplay) ||
                (m_appDirector.GetState() == AppDirector.AppState.kSearch && m_search.GetSearchState() == Search.SearchState.kTagDisplay));
     }
