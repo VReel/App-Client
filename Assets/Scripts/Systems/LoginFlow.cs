@@ -113,7 +113,8 @@ public class LoginFlow : MonoBehaviour
 
         yield return m_backEndAPI.Session_SignIn(
             m_loginUsernameEmailInput.text, 
-            m_loginPasswordInput.GetComponent<PasswordText>().GetString()
+            m_loginPasswordInput.GetComponent<PasswordText>().GetString(),
+            m_user.GetPushNotificationUserID()
         );
 
         m_loadingIcon.Hide();
@@ -131,7 +132,8 @@ public class LoginFlow : MonoBehaviour
             m_signUpUsernameInput.text, 
             m_signUpEmailInput.text, 
             m_signUpPasswordInput.GetComponent<PasswordText>().GetString(),
-            m_signUpPasswordConfirmationInput.GetComponent<PasswordText>().GetString()
+            m_signUpPasswordConfirmationInput.GetComponent<PasswordText>().GetString(),
+            m_user.GetPushNotificationUserID()
         );
 
         m_loadingIcon.Hide();

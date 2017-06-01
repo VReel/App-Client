@@ -17,8 +17,9 @@ public class User : MonoBehaviour
         kStaging,
         kProduction
     };
-
+        
     [SerializeField] private BackEndEnvironment m_backEndEnvironment;
+    [SerializeField] private PushNotifications m_pushNotifications;
     [SerializeField] private MessageButton m_userMessageButton;
     [SerializeField] private GameObject m_errorMessage;
 
@@ -103,6 +104,11 @@ public class User : MonoBehaviour
         {
             File.Delete(m_dataFilePath);
         }
+    }
+
+    public string GetPushNotificationUserID()
+    {
+        return m_pushNotifications.m_oneSignalPlayerID;
     }
 
     public MessageButton GetUserMessageButton()

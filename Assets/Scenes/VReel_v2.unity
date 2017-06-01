@@ -17240,7 +17240,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 453a5b962305545b2944cca8c2adcecd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_backEndEnvironment: 2
+  m_backEndEnvironment: 0
+  m_pushNotifications: {fileID: 1544063735}
   m_userMessageButton: {fileID: 5616099}
   m_errorMessage: {fileID: 1579463189}
 --- !u!114 &1802
@@ -26858,6 +26859,7 @@ GameObject:
   - component: {fileID: 472248800}
   - component: {fileID: 472248803}
   - component: {fileID: 472248801}
+  - component: {fileID: 472248805}
   - component: {fileID: 472248802}
   - component: {fileID: 472248804}
   m_Layer: 5
@@ -26916,7 +26918,7 @@ MonoBehaviour:
   m_buttonColourUp: {r: 1, g: 1, b: 1, a: 0}
   m_buttonColourOver: {r: 0.7254902, g: 0.7254902, b: 0.7254902, a: 1}
   m_buttonColourDown: {r: 1, g: 1, b: 1, a: 1}
-  m_InteractiveItem: {fileID: 0}
+  m_InteractiveItem: {fileID: 472248805}
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
@@ -26932,7 +26934,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 2027}
-        m_MethodName: HomeSelected
+        m_MethodName: ExploreSelected
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -26965,6 +26967,17 @@ MonoBehaviour:
   m_additionalReference: {fileID: 391}
   m_menuButton: {fileID: 472248802}
   m_buttonColourSelected: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &472248805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 472248799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43758647af32f45619b1f4cf67feb6cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &506356243
 GameObject:
   m_ObjectHideFlags: 0
@@ -27370,7 +27383,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1000012540889912, guid: de986de7df7c340ada7274f7a8755195, type: 2}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: de986de7df7c340ada7274f7a8755195, type: 2}
@@ -29336,6 +29349,7 @@ GameObject:
   - component: {fileID: 1074149608}
   - component: {fileID: 1074149611}
   - component: {fileID: 1074149609}
+  - component: {fileID: 1074149613}
   - component: {fileID: 1074149610}
   - component: {fileID: 1074149612}
   m_Layer: 5
@@ -29394,7 +29408,7 @@ MonoBehaviour:
   m_buttonColourUp: {r: 1, g: 1, b: 1, a: 0}
   m_buttonColourOver: {r: 0.7254902, g: 0.7254902, b: 0.7254902, a: 1}
   m_buttonColourDown: {r: 1, g: 1, b: 1, a: 1}
-  m_InteractiveItem: {fileID: 0}
+  m_InteractiveItem: {fileID: 1074149613}
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
@@ -29410,7 +29424,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 2027}
-        m_MethodName: HomeSelected
+        m_MethodName: FollowingSelected
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -29443,6 +29457,17 @@ MonoBehaviour:
   m_additionalReference: {fileID: 391}
   m_menuButton: {fileID: 1074149610}
   m_buttonColourSelected: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &1074149613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1074149607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43758647af32f45619b1f4cf67feb6cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1150631812
 GameObject:
   m_ObjectHideFlags: 0
@@ -29695,6 +29720,7 @@ GameObject:
   - component: {fileID: 1238088100}
   - component: {fileID: 1238088103}
   - component: {fileID: 1238088101}
+  - component: {fileID: 1238088105}
   - component: {fileID: 1238088102}
   - component: {fileID: 1238088104}
   m_Layer: 5
@@ -29753,7 +29779,7 @@ MonoBehaviour:
   m_buttonColourUp: {r: 1, g: 1, b: 1, a: 0}
   m_buttonColourOver: {r: 0.7254902, g: 0.7254902, b: 0.7254902, a: 1}
   m_buttonColourDown: {r: 1, g: 1, b: 1, a: 1}
-  m_InteractiveItem: {fileID: 0}
+  m_InteractiveItem: {fileID: 1238088105}
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
@@ -29802,6 +29828,17 @@ MonoBehaviour:
   m_additionalReference: {fileID: 389}
   m_menuButton: {fileID: 1238088102}
   m_buttonColourSelected: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &1238088105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1238088099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43758647af32f45619b1f4cf67feb6cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1308204861
 GameObject:
   m_ObjectHideFlags: 0
@@ -30016,6 +30053,12 @@ CanvasRenderer:
     type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1476482634}
+--- !u!114 &1544063735 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114968044725641736, guid: 5d68de0858483422a933ef12ea7ca889,
+    type: 2}
+  m_PrefabInternal: {fileID: 856211863}
+  m_Script: {fileID: 11500000, guid: 8617dffcc5d174beebceaee3e7e5e17f, type: 3}
 --- !u!1 &1567393839
 GameObject:
   m_ObjectHideFlags: 0
@@ -31665,6 +31708,7 @@ GameObject:
   - component: {fileID: 2022351287}
   - component: {fileID: 2022351290}
   - component: {fileID: 2022351288}
+  - component: {fileID: 2022351292}
   - component: {fileID: 2022351291}
   - component: {fileID: 2022351289}
   m_Layer: 5
@@ -31744,7 +31788,7 @@ MonoBehaviour:
   m_buttonColourUp: {r: 1, g: 1, b: 1, a: 0}
   m_buttonColourOver: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
   m_buttonColourDown: {r: 1, g: 1, b: 1, a: 1}
-  m_InteractiveItem: {fileID: 0}
+  m_InteractiveItem: {fileID: 2022351292}
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
@@ -31772,6 +31816,17 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+--- !u!114 &2022351292
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2022351286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43758647af32f45619b1f4cf67feb6cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2045628757
 GameObject:
   m_ObjectHideFlags: 0
@@ -32056,6 +32111,7 @@ GameObject:
   - component: {fileID: 2099745973}
   - component: {fileID: 2099745976}
   - component: {fileID: 2099745974}
+  - component: {fileID: 2099745978}
   - component: {fileID: 2099745975}
   - component: {fileID: 2099745977}
   m_Layer: 5
@@ -32114,7 +32170,7 @@ MonoBehaviour:
   m_buttonColourUp: {r: 1, g: 1, b: 1, a: 0}
   m_buttonColourOver: {r: 0.7254902, g: 0.7254902, b: 0.7254902, a: 1}
   m_buttonColourDown: {r: 1, g: 1, b: 1, a: 1}
-  m_InteractiveItem: {fileID: 0}
+  m_InteractiveItem: {fileID: 2099745978}
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
@@ -32163,6 +32219,17 @@ MonoBehaviour:
   m_additionalReference: {fileID: 441}
   m_menuButton: {fileID: 0}
   m_buttonColourSelected: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &2099745978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2099745972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43758647af32f45619b1f4cf67feb6cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2130114295
 GameObject:
   m_ObjectHideFlags: 0

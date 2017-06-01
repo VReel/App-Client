@@ -129,7 +129,7 @@ public class BackEndAPI
     //--------------------------------------------
     // Register
 
-    public IEnumerator Register_CreateUser(string _handle, string _email, string _password, string _password_confirmation)
+    public IEnumerator Register_CreateUser(string _handle, string _email, string _password, string _password_confirmation, string _player_id)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users' - Create New User");
 
@@ -142,7 +142,8 @@ public class BackEndAPI
             password = _password,
             password_confirmation = _password_confirmation,
             name = "",
-            profile = _handle + "'s Viewing Reality from a new perspective =)"
+            profile = _handle + "'s Viewing Reality from a new perspective =)",
+            player_id = _player_id
         });
 
         yield return m_threadJob.WaitFor();
@@ -435,7 +436,7 @@ public class BackEndAPI
     //--------------------------------------------
     // Session
 
-    public IEnumerator Session_SignIn(string _login, string _password)
+    public IEnumerator Session_SignIn(string _login, string _password, string _player_id)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> POST to '/users/sign_in' - Sign In");
 
@@ -445,6 +446,7 @@ public class BackEndAPI
         request.AddJsonBody(new { 
             login = _login, 
             password = _password,
+            player_id = _player_id
         });
 
         yield return m_threadJob.WaitFor();
