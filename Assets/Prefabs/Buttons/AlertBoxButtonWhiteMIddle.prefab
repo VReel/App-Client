@@ -39,6 +39,8 @@ GameObject:
   - component: {fileID: 222324190447922614}
   - component: {fileID: 114130963847816370}
   - component: {fileID: 65845799228527992}
+  - component: {fileID: 114127264222658774}
+  - component: {fileID: 114797891934519232}
   m_Layer: 0
   m_Name: AlertBoxButtonWhiteMIddle
   m_TagString: Untagged
@@ -93,6 +95,17 @@ MonoBehaviour:
   m_Text: 'Login
 
 '
+--- !u!114 &114127264222658774
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1532175146308630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43758647af32f45619b1f4cf67feb6cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114130963847816370
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -120,6 +133,38 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114797891934519232
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1532175146308630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09fc8a0c6ede44af49b69ae765ee50fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_buttonImage: {fileID: 114130963847816370}
+  m_buttonColourUp: {r: 0.2, g: 0.2, b: 0.2, a: 1}
+  m_buttonColourOver: {r: 0.7254902, g: 0.7254902, b: 0.7254902, a: 1}
+  m_buttonColourDown: {r: 0.85882354, g: 0.85882354, b: 0.85882354, a: 1}
+  m_InteractiveItem: {fileID: 114127264222658774}
+  OnButtonSelectedFunc:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_MethodName: Login
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
 --- !u!222 &222127244916184440
 CanvasRenderer:
   m_ObjectHideFlags: 1
