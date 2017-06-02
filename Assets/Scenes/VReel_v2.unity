@@ -231,7 +231,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &20
 GameObject:
   m_ObjectHideFlags: 0
@@ -12357,7 +12357,7 @@ RectTransform:
   m_Children:
   - {fileID: 1579}
   m_Father: {fileID: 862681440}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -28375,7 +28375,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &239789398
 Transform:
   m_ObjectHideFlags: 0
@@ -29354,7 +29354,7 @@ RectTransform:
   m_GameObject: {fileID: 361636101}
   m_LocalRotation: {x: 0, y: -0.17364825, z: 0, w: 0.9848078}
   m_LocalPosition: {x: 0, y: 0, z: 0.1}
-  m_LocalScale: {x: 0.013, y: 0.013, z: 1}
+  m_LocalScale: {x: 0.0094, y: 0.0094, z: 1}
   m_Children:
   - {fileID: 1164400763}
   m_Father: {fileID: 604528699}
@@ -29432,7 +29432,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 75, y: 75, z: 0.1}
+  m_Size: {x: 105, y: 105, z: 0.1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &361636106
 MonoBehaviour:
@@ -29454,7 +29454,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: f7e25d46b0174485f9ea2bab018dc519, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 254007fa7c1514830af9634afc2b61a3, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -31564,6 +31564,21 @@ Prefab:
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: SignUp
       objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.b
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6d77096d9165e4f12a0b563ced4be6d4, type: 2}
   m_IsPrefabParent: 0
@@ -31936,6 +31951,21 @@ Prefab:
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: m_buttonColourUp.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: m_buttonColourUp.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: m_buttonColourUp.b
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 231542d4898e941a68adc853bcba143d, type: 2}
@@ -34962,6 +34992,7 @@ Transform:
   m_Children:
   - {fileID: 1111911706}
   - {fileID: 2129300155}
+  - {fileID: 1947439172}
   - {fileID: 2026151196}
   - {fileID: 1437}
   m_Father: {fileID: 1172}
@@ -35267,11 +35298,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11400010, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
@@ -35539,6 +35570,21 @@ Prefab:
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_StringArgument
       value: Username
       objectReference: {fileID: 0}
+    - target: {fileID: 114401141821101940, guid: b4248a7cc3a114979b1487ca794caa1c,
+        type: 2}
+      propertyPath: m_buttonColourUp.r
+      value: 0.90196085
+      objectReference: {fileID: 0}
+    - target: {fileID: 114401141821101940, guid: b4248a7cc3a114979b1487ca794caa1c,
+        type: 2}
+      propertyPath: m_buttonColourUp.g
+      value: 0.90196085
+      objectReference: {fileID: 0}
+    - target: {fileID: 114401141821101940, guid: b4248a7cc3a114979b1487ca794caa1c,
+        type: 2}
+      propertyPath: m_buttonColourUp.b
+      value: 0.90196085
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b4248a7cc3a114979b1487ca794caa1c, type: 2}
   m_IsPrefabParent: 0
@@ -35677,6 +35723,21 @@ Prefab:
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: m_buttonColourUp.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: m_buttonColourUp.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: m_buttonColourUp.b
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 231542d4898e941a68adc853bcba143d, type: 2}
@@ -37730,7 +37791,7 @@ RectTransform:
   m_GameObject: {fileID: 1114277545}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.013, y: 0.013, z: 1}
+  m_LocalScale: {x: 0.0094, y: 0.0094, z: 1}
   m_Children:
   - {fileID: 665229493}
   m_Father: {fileID: 720766553}
@@ -37738,7 +37799,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.47, y: -1.75}
+  m_AnchoredPosition: {x: 0.5, y: -1.75}
   m_SizeDelta: {x: 70, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1114277547
@@ -37808,7 +37869,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 75, y: 75, z: 0.1}
+  m_Size: {x: 105, y: 105, z: 0.1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1114277550
 MonoBehaviour:
@@ -37830,7 +37891,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: f7e25d46b0174485f9ea2bab018dc519, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 254007fa7c1514830af9634afc2b61a3, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -38044,6 +38105,21 @@ Prefab:
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_StringArgument
       value: Password
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.r
+      value: 0.90196085
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.g
+      value: 0.90196085
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.b
+      value: 0.90196085
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6d77096d9165e4f12a0b563ced4be6d4, type: 2}
@@ -38486,7 +38562,7 @@ RectTransform:
   m_GameObject: {fileID: 1170056279}
   m_LocalRotation: {x: 0, y: 0.17364816, z: 0, w: 0.9848078}
   m_LocalPosition: {x: 0, y: 0, z: -0.235}
-  m_LocalScale: {x: 0.013, y: 0.013, z: 1}
+  m_LocalScale: {x: 0.0094, y: 0.0094, z: 1}
   m_Children:
   - {fileID: 290344042}
   m_Father: {fileID: 1179452499}
@@ -38494,7 +38570,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 20, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.47, y: -1.75}
+  m_AnchoredPosition: {x: 0.5, y: -1.75}
   m_SizeDelta: {x: 70, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1170056281
@@ -38564,7 +38640,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 75, y: 75, z: 0.1}
+  m_Size: {x: 105, y: 105, z: 0.1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1170056284
 MonoBehaviour:
@@ -38586,7 +38662,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: f7e25d46b0174485f9ea2bab018dc519, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 254007fa7c1514830af9634afc2b61a3, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -39275,6 +39351,21 @@ Prefab:
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_StringArgument
       value: Username / Email
+      objectReference: {fileID: 0}
+    - target: {fileID: 114401141821101940, guid: b4248a7cc3a114979b1487ca794caa1c,
+        type: 2}
+      propertyPath: m_buttonColourUp.r
+      value: 0.90196085
+      objectReference: {fileID: 0}
+    - target: {fileID: 114401141821101940, guid: b4248a7cc3a114979b1487ca794caa1c,
+        type: 2}
+      propertyPath: m_buttonColourUp.g
+      value: 0.90196085
+      objectReference: {fileID: 0}
+    - target: {fileID: 114401141821101940, guid: b4248a7cc3a114979b1487ca794caa1c,
+        type: 2}
+      propertyPath: m_buttonColourUp.b
+      value: 0.90196085
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b4248a7cc3a114979b1487ca794caa1c, type: 2}
@@ -41380,7 +41471,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1536027463
 RectTransform:
   m_ObjectHideFlags: 0
@@ -42716,6 +42807,21 @@ Prefab:
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.b
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6d77096d9165e4f12a0b563ced4be6d4, type: 2}
   m_IsPrefabParent: 0
@@ -42838,6 +42944,21 @@ Prefab:
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: Login
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.b
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6d77096d9165e4f12a0b563ced4be6d4, type: 2}
@@ -43302,6 +43423,21 @@ Prefab:
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
       value: 
       objectReference: {fileID: 1661286810}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.r
+      value: 0.90196085
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.g
+      value: 0.90196085
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.b
+      value: 0.90196085
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6d77096d9165e4f12a0b563ced4be6d4, type: 2}
   m_IsPrefabParent: 0
@@ -45276,6 +45412,21 @@ Prefab:
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_StringArgument
       value: Confirm Password
       objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.r
+      value: 0.90196085
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.g
+      value: 0.90196085
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.b
+      value: 0.90196085
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6d77096d9165e4f12a0b563ced4be6d4, type: 2}
   m_IsPrefabParent: 0
@@ -46063,6 +46214,21 @@ Prefab:
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_StringArgument
       value: Email
       objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.r
+      value: 0.90196085
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.g
+      value: 0.90196085
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.b
+      value: 0.90196085
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6d77096d9165e4f12a0b563ced4be6d4, type: 2}
   m_IsPrefabParent: 0
@@ -46432,6 +46598,184 @@ Prefab:
     - {fileID: 9500000, guid: 87aa076c8a5354bb288687184615c3cf, type: 3}
   m_ParentPrefab: {fileID: 100100000, guid: 87aa076c8a5354bb288687184615c3cf, type: 3}
   m_IsPrefabParent: 0
+--- !u!1001 &1947439171
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 862681440}
+    m_Modifications:
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 2.993
+      objectReference: {fileID: 0}
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_AnchoredPosition.x
+      value: -1.08
+      objectReference: {fileID: 0}
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_AnchoredPosition.y
+      value: -1.67
+      objectReference: {fileID: 0}
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_SizeDelta.x
+      value: 3.37
+      objectReference: {fileID: 0}
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_SizeDelta.y
+      value: 0.56
+      objectReference: {fileID: 0}
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_AnchorMin.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_AnchorMin.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114041819233278330, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_Text
+      value: Reset
+      objectReference: {fileID: 0}
+    - target: {fileID: 114130963847816370, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114130963847816370, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114130963847816370, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1529233693088588, guid: 6d77096d9165e4f12a0b563ced4be6d4, type: 2}
+      propertyPath: m_Name
+      value: Text
+      objectReference: {fileID: 0}
+    - target: {fileID: 114041819233278330, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_Color.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114041819233278330, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114041819233278330, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532175146308630, guid: 6d77096d9165e4f12a0b563ced4be6d4, type: 2}
+      propertyPath: m_Name
+      value: ResetButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2239}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ResetPassword
+      objectReference: {fileID: 0}
+    - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.b
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 6d77096d9165e4f12a0b563ced4be6d4, type: 2}
+  m_IsPrefabParent: 0
+--- !u!224 &1947439172 stripped
+RectTransform:
+  m_PrefabParentObject: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+    type: 2}
+  m_PrefabInternal: {fileID: 1947439171}
 --- !u!1 &1958490428
 GameObject:
   m_ObjectHideFlags: 0
@@ -47581,7 +47925,7 @@ Prefab:
     - target: {fileID: 224033499422572898, guid: 231542d4898e941a68adc853bcba143d,
         type: 2}
       propertyPath: m_RootOrder
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 224033499422572898, guid: 231542d4898e941a68adc853bcba143d,
         type: 2}
@@ -47591,7 +47935,7 @@ Prefab:
     - target: {fileID: 224033499422572898, guid: 231542d4898e941a68adc853bcba143d,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -1.67
+      value: -2.23
       objectReference: {fileID: 0}
     - target: {fileID: 224033499422572898, guid: 231542d4898e941a68adc853bcba143d,
         type: 2}
@@ -47636,7 +47980,7 @@ Prefab:
     - target: {fileID: 114021338498483898, guid: 231542d4898e941a68adc853bcba143d,
         type: 2}
       propertyPath: m_Text
-      value: Reset
+      value: Back
       objectReference: {fileID: 0}
     - target: {fileID: 224034161354618814, guid: 231542d4898e941a68adc853bcba143d,
         type: 2}
@@ -47645,7 +47989,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1907824563746824, guid: 231542d4898e941a68adc853bcba143d, type: 2}
       propertyPath: m_Name
-      value: ResetButton
+      value: BackButton
       objectReference: {fileID: 0}
     - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
         type: 2}
@@ -47655,7 +47999,31 @@ Prefab:
     - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ResetPassword
+      value: SetLoginFlowPage
+      objectReference: {fileID: 0}
+    - target: {fileID: 1547250528814942, guid: 231542d4898e941a68adc853bcba143d, type: 2}
+      propertyPath: m_Name
+      value: Text
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: m_buttonColourUp.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: m_buttonColourUp.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: m_buttonColourUp.b
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 231542d4898e941a68adc853bcba143d, type: 2}
@@ -48614,6 +48982,21 @@ Prefab:
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_StringArgument
       value: Email
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.r
+      value: 0.90196085
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.g
+      value: 0.90196085
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: m_buttonColourUp.b
+      value: 0.90196085
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6d77096d9165e4f12a0b563ced4be6d4, type: 2}
