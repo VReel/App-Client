@@ -52,7 +52,8 @@ public class AppDirector : MonoBehaviour
     public void Start()
     {
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
-        m_keyboard.gameObject.SetActive(true); // this is to ensure that it is always switched on even if I switch it off in the editor...
+        m_keyboard.gameObject.SetActive(true); // this is to ensure the keyboard is always switched on even if I switch it off in the editor...
+        m_imageSphereController.gameObject.SetActive(true);  // this is to ensure that its always switched on even if I switch it off in the editor...
 
         //m_coroutineQueue = new CoroutineQueue(this);
         //m_coroutineQueue.StartLoop();       
