@@ -9,6 +9,7 @@ public class OptionsFlow : MonoBehaviour
     // **************************
 
     [SerializeField] private AppDirector m_appDirector;  
+    [SerializeField] private MenuController m_menuController;
     [SerializeField] private LoadingIcon m_loadingIcon;
     [SerializeField] private Text m_currentPasswordInput;
     [SerializeField] private Text m_newPasswordInput;
@@ -22,6 +23,7 @@ public class OptionsFlow : MonoBehaviour
     [SerializeField] private GameObject m_optionsPage;
     [SerializeField] private GameObject m_setPasswordPage;
     [SerializeField] private GameObject m_deleteAccountPage;
+    [SerializeField] private GameObject m_aboutPage;
 
     private bool m_menuOpen = false;
     private CoroutineQueue m_coroutineQueue;
@@ -59,23 +61,33 @@ public class OptionsFlow : MonoBehaviour
         {
             m_optionsSubMenu.SetActive(false);
         }
-        else if (pageNumber == 0)
+        else if (pageNumber == 0) // Options Page
         {
             m_optionsPage.SetActive(true);
             m_setPasswordPage.SetActive(false);
             m_deleteAccountPage.SetActive(false);
+            m_aboutPage.SetActive(false);
         }
-        else if (pageNumber == 1)
+        else if (pageNumber == 1) // Set Password
         {
             m_optionsPage.SetActive(false);
             m_setPasswordPage.SetActive(true);
             m_deleteAccountPage.SetActive(false);
+            m_aboutPage.SetActive(false);
         }
-        else if (pageNumber == 2)
+        else if (pageNumber == 2) // Delete Account
         {
             m_optionsPage.SetActive(false);
             m_setPasswordPage.SetActive(false);
             m_deleteAccountPage.SetActive(true);
+            m_aboutPage.SetActive(false);
+        }
+        else if (pageNumber == 3) // About Account
+        {
+            m_optionsPage.SetActive(false);
+            m_setPasswordPage.SetActive(false);
+            m_deleteAccountPage.SetActive(false);
+            m_aboutPage.SetActive(true);
         }
     }
 
@@ -108,6 +120,8 @@ public class OptionsFlow : MonoBehaviour
     {
         SetOptionsFlowPage(0);
         m_menuOpen = true;
+
+        m_menuController.SetImagesAndMenuBarActive(false);
     }
 
     private void CloseMenu()
@@ -115,6 +129,8 @@ public class OptionsFlow : MonoBehaviour
         m_keyboard.CancelText();
         SetOptionsFlowPage(-1);
         m_menuOpen = false;
+
+        m_menuController.SetImagesAndMenuBarActive(true);
     }
 
     private IEnumerator LogoutInternal()

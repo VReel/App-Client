@@ -159,7 +159,7 @@ public class ImageSphere : MonoBehaviour
         m_heartOn = !m_heartOn;
         m_numLikes = m_heartOn ? m_numLikes+1 : m_numLikes-1;
 
-        m_heartObject.GetComponentInChildren<HeartButton>().HeartOnOffSwitch(m_heartOn);
+        m_heartObject.GetComponentInChildren<SelectedButton>().ButtonSelected(m_heartOn);
         m_likesObject.GetComponentInChildren<Text>().text = m_numLikes.ToString();
         m_posts.LikeOrUnlikePost(m_imageIdentifier, m_heartOn);
     }
@@ -224,7 +224,7 @@ public class ImageSphere : MonoBehaviour
         if (m_heartObject != null)
         {
             m_heartObject.SetActive(!isSphereLoading && m_numLikes >= 0);
-            m_heartObject.GetComponentInChildren<HeartButton>().HeartOnOffSwitch(m_heartOn);
+            m_heartObject.GetComponentInChildren<SelectedButton>().ButtonSelected(m_heartOn);
         }
           
         if (m_menuController != null)

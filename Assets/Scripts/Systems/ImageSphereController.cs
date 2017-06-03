@@ -18,6 +18,7 @@ public class ImageSphereController : MonoBehaviour
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private ImageSphere m_profileImageSphere;
+    [SerializeField] private GameObject m_imageSphereCanvas;
     [SerializeField] private GameObject[] m_imageSpheres;
     [SerializeField] private Texture2D m_sphereLoadingTexture;
 
@@ -89,6 +90,11 @@ public class ImageSphereController : MonoBehaviour
         }
 
         return identifier;
+    }
+
+    public void EnableOrDisableAllImageSpheres(bool enable)
+    {
+        m_imageSphereCanvas.SetActive(enable);
     }
 
     public void SetImageAtIndexToLoading(int sphereIndex)

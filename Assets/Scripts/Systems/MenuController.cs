@@ -11,6 +11,7 @@ public class MenuController : MonoBehaviour
 
     public bool m_swipeEnabled = true;      // When on, swiping switches the menu on/off
 
+    [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private GameObject m_menuSubTree;
     [SerializeField] private GameObject m_loginSubMenu;
     [SerializeField] private GameObject m_homeSubMenu;
@@ -21,6 +22,7 @@ public class MenuController : MonoBehaviour
     [SerializeField] private KeyBoard m_keyboard;
     [SerializeField] private VRStandardAssets.Utils.Reticle m_reticle;
     [SerializeField] private VRStandardAssets.Utils.VRInput m_input;
+    [SerializeField] private GameObject m_menuBar;
     [SerializeField] private GameObject[] m_menuBarButtons;
 
     private bool m_isMenuActive = true;
@@ -32,6 +34,12 @@ public class MenuController : MonoBehaviour
     public bool IsMenuActive()
     {
         return m_isMenuActive;
+    }
+
+    public void SetImagesAndMenuBarActive(bool active)
+    {
+        m_imageSphereController.EnableOrDisableAllImageSpheres(active);
+        m_menuBar.SetActive(active);
     }
 
     public void SetLoginSubMenuActive(bool active)
