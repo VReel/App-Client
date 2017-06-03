@@ -38,7 +38,7 @@ public class MenuController : MonoBehaviour
 
     public void SetImagesAndMenuBarActive(bool active)
     {
-        m_imageSphereController.EnableOrDisableAllImageSpheres(active);
+        SetSubTreeVisible(m_imageSphereController.gameObject, active);
         m_menuBar.SetActive(active);
     }
 
@@ -144,21 +144,7 @@ public class MenuController : MonoBehaviour
     {        
         if (m_menuSubTree != null)
         {
-            //We Trawl through all the subobjects, hiding all meshes, images and colliders!
-            foreach(var renderer in m_menuSubTree.GetComponentsInChildren<Renderer>())
-            {                
-                renderer.enabled = visible; // Handles Mesh + SpriteRenderer components
-            }
-
-            foreach(var ui in m_menuSubTree.GetComponentsInChildren<UnityEngine.UI.Graphic>())
-            {                
-                ui.enabled = visible; // Handles Images + Text components
-            }
-
-            foreach(var collider in m_menuSubTree.GetComponentsInChildren<Collider>())
-            {                
-                collider.enabled = visible; // Handles BoxCollider + MeshCollider components
-            }
+            SetSubTreeVisible(m_menuSubTree, visible);
         }
 
         if (m_reticle != null)
@@ -186,5 +172,24 @@ public class MenuController : MonoBehaviour
         }
 
         m_isMenuActive = visible;
+    }
+
+    private void SetSubTreeVisible(GameObject subtree, bool visible)
+    {
+        //We Trawl through all the subobjects, hiding all meshes, images and colliders!
+        foreach(var renderer in subtree.GetComponentsInChildren<Renderer>())
+        {                
+            renderer.enabled = visible; // Handles Mesh + SpriteRenderer components
+        }
+
+        foreach(var ui in subtree.GetComponentsInChildren<UnityEngine.UI.Graphic>())
+        {                
+            ui.enabled = visible; // Handles Images + Text components
+        }
+
+        foreach(var collider in subtree.GetComponentsInChildren<Collider>())
+        {                
+            collider.enabled = visible; // Handles BoxCollider + MeshCollider components
+        }
     }
 }

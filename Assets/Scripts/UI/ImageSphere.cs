@@ -229,12 +229,12 @@ public class ImageSphere : MonoBehaviour
           
         if (m_menuController != null)
         {
-            bool isMenuActive = m_menuController.IsMenuActive();
-            EnableAllInteractableComponentsInObject(m_handleObject, isMenuActive);
-            EnableAllInteractableComponentsInObject(m_captionObject, isMenuActive);
-            EnableAllInteractableComponentsInObject(m_commentCountObject, isMenuActive);
-            EnableAllInteractableComponentsInObject(m_likesObject, isMenuActive);
-            EnableAllInteractableComponentsInObject(m_heartObject, isMenuActive);
+            bool isVisible = m_menuController.IsMenuActive() && m_imageObject.GetComponent<MeshRenderer>().enabled;
+            EnableAllInteractableComponentsInObject(m_handleObject, isVisible);
+            EnableAllInteractableComponentsInObject(m_captionObject, isVisible);
+            EnableAllInteractableComponentsInObject(m_commentCountObject, isVisible);
+            EnableAllInteractableComponentsInObject(m_likesObject, isVisible);
+            EnableAllInteractableComponentsInObject(m_heartObject, isVisible);
         }
     }
 
