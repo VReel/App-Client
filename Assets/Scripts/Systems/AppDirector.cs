@@ -171,8 +171,8 @@ public class AppDirector : MonoBehaviour
         m_search.InvalidateWork();
         m_loginFlow.SetLoginFlowPage(0);
 
-        m_menuController.SetLoginSubMenuActive(true);
         m_appState = AppState.kLogin;
+        m_menuController.SetCurrentSubMenuActive(true); // m_menuController.SetLoginSubMenuActive(true);
     }
 
     private void SetExploreState()
@@ -191,9 +191,9 @@ public class AppDirector : MonoBehaviour
 
         m_home.ShowHomeText();
 
-        m_menuController.SetExploreSubMenuActive(true);
         m_home.OpenPublicTimeline();
         m_appState = AppState.kExplore;
+        m_menuController.SetCurrentSubMenuActive(true); //m_menuController.SetExploreSubMenuActive(true);
     }
 
     private void SetFollowingState()
@@ -212,9 +212,9 @@ public class AppDirector : MonoBehaviour
 
         m_home.ShowHomeText();
 
-        m_menuController.SetFollowingSubMenuActive(true);
         m_home.OpenPersonalTimeline();
         m_appState = AppState.kFollowing;
+        m_menuController.SetCurrentSubMenuActive(true); //m_menuController.SetFollowingSubMenuActive(true);
     }
 
     private void SetSearchState()
@@ -233,9 +233,9 @@ public class AppDirector : MonoBehaviour
 
         m_search.ShowSearchText();
 
-        m_menuController.SetSearchSubMenuActive(true);
         m_search.OpenSearch();
         m_appState = AppState.kSearch;
+        m_menuController.SetCurrentSubMenuActive(true); //m_menuController.SetSearchSubMenuActive(true);
     }
 
     private void SetProfileState()
@@ -254,9 +254,9 @@ public class AppDirector : MonoBehaviour
 
         m_profile.ShowProfileText();
 
-        m_menuController.SetProfileSubMenuActive(true);
         m_profile.OpenProfile();
         m_appState = AppState.kProfile;
+        m_menuController.SetCurrentSubMenuActive(true); //m_menuController.SetProfileSubMenuActive(true);
     }        
 
     private void SetGalleryState()
@@ -277,9 +277,9 @@ public class AppDirector : MonoBehaviour
 
         m_gallery.ShowGalleryText();
 
-        m_menuController.SetGallerySubMenuActive(true);
         m_gallery.OpenAndroidGallery();
         m_appState = AppState.kGallery;
+        m_menuController.SetCurrentSubMenuActive(true); //m_menuController.SetGallerySubMenuActive(true);
     }
 
     private void DisableAllOptions()

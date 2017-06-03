@@ -8,7 +8,7 @@ public class OptionsFlow : MonoBehaviour
     // Member Variables
     // **************************
 
-    [SerializeField] private AppDirector m_appDirector;  
+    [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private LoadingIcon m_loadingIcon;
     [SerializeField] private Text m_currentPasswordInput;
@@ -121,6 +121,7 @@ public class OptionsFlow : MonoBehaviour
         SetOptionsFlowPage(0);
         m_menuOpen = true;
 
+        m_menuController.SetCurrentSubMenuActive(false);
         m_menuController.SetImagesAndMenuBarActive(false);
     }
 
@@ -130,6 +131,7 @@ public class OptionsFlow : MonoBehaviour
         SetOptionsFlowPage(-1);
         m_menuOpen = false;
 
+        m_menuController.SetCurrentSubMenuActive(true);
         m_menuController.SetImagesAndMenuBarActive(true);
     }
 

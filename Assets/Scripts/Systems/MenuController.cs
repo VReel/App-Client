@@ -11,6 +11,7 @@ public class MenuController : MonoBehaviour
 
     public bool m_swipeEnabled = true;      // When on, swiping switches the menu on/off
 
+    [SerializeField] private AppDirector m_appDirector;  
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private GameObject m_menuSubTree;
     [SerializeField] private GameObject m_loginSubMenu;
@@ -36,47 +37,42 @@ public class MenuController : MonoBehaviour
         return m_isMenuActive;
     }
 
+    public void SetCurrentSubMenuActive(bool active)
+    {
+        SetAllSubMenusActive(false);
+
+        if (m_appDirector.GetState() == AppDirector.AppState.kLogin)
+        {
+            SetLoginSubMenuActive(active);
+        }
+        else if (m_appDirector.GetState() == AppDirector.AppState.kExplore)
+        {
+            SetExploreSubMenuActive(active);
+        }
+        else if (m_appDirector.GetState() == AppDirector.AppState.kFollowing)
+        {
+            SetFollowingSubMenuActive(active);
+        }
+        else if (m_appDirector.GetState() == AppDirector.AppState.kProfile)
+        {
+            SetProfileSubMenuActive(active);
+        }
+        else if (m_appDirector.GetState() == AppDirector.AppState.kSearch)
+        {
+            SetSearchSubMenuActive(active);
+        }
+        else if (m_appDirector.GetState() == AppDirector.AppState.kGallery)
+        {
+            SetGallerySubMenuActive(active);
+        }
+    }
+
     public void SetImagesAndMenuBarActive(bool active)
     {
         SetSubTreeVisible(m_imageSphereController.gameObject, active);
         m_menuBar.SetActive(active);
     }
-
-    public void SetLoginSubMenuActive(bool active)
-    {
-        m_loginSubMenu.SetActive(active);
-    }
-
-    public void SetProfileSubMenuActive(bool active)
-    {
-        m_profileSubMenu.SetActive(active);
-        OnButtonSelected(m_menuBarButtons[0]);  // button 0 = Profile button
-    }
-
-    public void SetExploreSubMenuActive(bool active)
-    {
-        m_homeSubMenu.SetActive(active);
-        OnButtonSelected(m_menuBarButtons[1]);  // button 1 = Explore button
-    }
-
-    public void SetFollowingSubMenuActive(bool active)
-    {
-        m_homeSubMenu.SetActive(active);
-        OnButtonSelected(m_menuBarButtons[2]);  // button 2 = Following button
-    }
-
-    public void SetSearchSubMenuActive(bool active)
-    {
-        m_searchSubMenu.SetActive(active);
-        OnButtonSelected(m_menuBarButtons[3]);  // button 3 = Search button
-    }        
-
-    public void SetGallerySubMenuActive(bool active)
-    {
-        m_gallerySubMenu.SetActive(active);
-        OnButtonSelected(m_menuBarButtons[4]);  // button 4 = Gallery button
-    }
-
+                
     public void SetAllSubMenusActive(bool active)
     {
         m_loginSubMenu.SetActive(active);
@@ -89,6 +85,41 @@ public class MenuController : MonoBehaviour
     // **************************
     // Private/Helper functions
     // **************************
+
+    private void SetLoginSubMenuActive(bool active)
+    {
+        m_loginSubMenu.SetActive(active);
+    }
+
+    private void SetProfileSubMenuActive(bool active)
+    {
+        m_profileSubMenu.SetActive(active);
+        OnButtonSelected(m_menuBarButtons[0]);  // button 0 = Profile button
+    }
+
+    private void SetExploreSubMenuActive(bool active)
+    {
+        m_homeSubMenu.SetActive(active);
+        OnButtonSelected(m_menuBarButtons[1]);  // button 1 = Explore button
+    }
+
+    private void SetFollowingSubMenuActive(bool active)
+    {
+        m_homeSubMenu.SetActive(active);
+        OnButtonSelected(m_menuBarButtons[2]);  // button 2 = Following button
+    }
+
+    private void SetSearchSubMenuActive(bool active)
+    {
+        m_searchSubMenu.SetActive(active);
+        OnButtonSelected(m_menuBarButtons[3]);  // button 3 = Search button
+    }        
+
+    private void SetGallerySubMenuActive(bool active)
+    {        
+        m_gallerySubMenu.SetActive(active);
+        OnButtonSelected(m_menuBarButtons[4]);  // button 4 = Gallery button
+    }
 
     private void OnEnable ()
     {
@@ -108,12 +139,12 @@ public class MenuController : MonoBehaviour
             if (button == currButton)
             {
                 menuBarButton.OnButtonSelected();
-                menuBarButton.GetAdditionalReference().SetActive(true); // Set's MenuSection to Active
+                //menuBarButton.GetAdditionalReference().SetActive(true); // Set's MenuSection to Active
             }
             else 
             {
                 menuBarButton.OnButtonDeselected();
-                menuBarButton.GetAdditionalReference().SetActive(false); // Set's MenuSection to not Active
+                //menuBarButton.GetAdditionalReference().SetActive(false); // Set's MenuSection to not Active
             }
         }
     }

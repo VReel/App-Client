@@ -17,10 +17,12 @@ public class Gallery : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
+    [SerializeField] private MenuController m_menuController;
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private LoadingIcon m_loadingIcon;
+    [SerializeField] private GameObject m_uploadButton;
     [SerializeField] private GameObject m_noGalleryImagesText;
     [SerializeField] private GameObject m_captionNewText;
     [SerializeField] private GameObject m_uploadConfirmation;
@@ -94,6 +96,8 @@ public class Gallery : MonoBehaviour
 
         m_uploadConfirmation.SetActive(true);
         m_user.GetUserMessageButton().SetText(kPreUploadText);
+        m_uploadButton.SetActive(false);
+        m_menuController.SetImagesAndMenuBarActive(false);
     }
 
     public void CancelUpload()
@@ -102,6 +106,8 @@ public class Gallery : MonoBehaviour
 
         m_uploadConfirmation.SetActive(false);
         m_user.GetUserMessageButton().SetText(kCancelUploadText);
+        m_uploadButton.SetActive(true);
+        m_menuController.SetImagesAndMenuBarActive(true);
     }
         
     public void UploadImage()
@@ -250,15 +256,18 @@ public class Gallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploaded image: " + originalImageFilePath + ", with Success: " + (m_backEndAPI.IsLastAPICallSuccessful() && successfullyCreatedThumbnail) );
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
+            //TODO: SHOW A SUCCESS MESSAGE!
             m_user.GetUserMessageButton().SetText(kSuccessfulUploadText);
         }
         else
-        {           
+        {   
+            //TODO: SHOW A FAILURE MESSAGE!
             m_user.GetUserMessageButton().SetTextAsError(kFailedUploadText);
         }
 
         m_uploadConfirmation.SetActive(false);
         m_loadingIcon.Hide();
+        m_menuController.SetImagesAndMenuBarActive(true);
     }
 
     // TODO: Only download 10 images at a time!
