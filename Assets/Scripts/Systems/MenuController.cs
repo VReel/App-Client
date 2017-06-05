@@ -156,6 +156,8 @@ public class MenuController : MonoBehaviour
 
     private void OnSwipe(VRStandardAssets.Utils.VRInput.SwipeDirection swipe)
     {
+        return;
+        
         if (!m_swipeEnabled)
         {
             return;

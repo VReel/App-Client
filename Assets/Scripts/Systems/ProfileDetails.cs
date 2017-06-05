@@ -26,7 +26,8 @@ public class ProfileDetails : MonoBehaviour
     [SerializeField] private GameObject m_followingCountObject;
     [SerializeField] private GameObject m_profileDescriptionObject;
     [SerializeField] private GameObject m_profileDescriptionUpdateTopLevel;
-    [SerializeField] private GameObject m_profileDescriptionNewText;       
+    [SerializeField] private GameObject m_profileHandleNewText;
+    [SerializeField] private GameObject m_profileDescriptionNewText;
 
     private string m_userId;
     private string m_handle;
@@ -87,6 +88,7 @@ public class ProfileDetails : MonoBehaviour
         m_userId = userId;
 
         m_profileDetailsTopLevel.SetActive(true);
+        m_profileDescriptionUpdateTopLevel.SetActive(false);
 
         bool isCurrentUser = m_user.IsCurrentUser(m_userId);
         m_followButtonObject.SetActive(!isCurrentUser);
@@ -115,8 +117,8 @@ public class ProfileDetails : MonoBehaviour
     public void CloseProfileDetails()
     {
         m_imageSphereController.HideSphereAtIndex(Helper.kProfilePageSphereIndex, true); // True tells it to ForceHide
-        m_profileDetailsTopLevel.SetActive(false);
-        m_profileDescriptionUpdateTopLevel.SetActive(false);
+        //m_profileDetailsTopLevel.SetActive(false);
+        //m_profileDescriptionUpdateTopLevel.SetActive(false);
     }
            
     public void FollowSelected()
@@ -138,8 +140,12 @@ public class ProfileDetails : MonoBehaviour
         {
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreUpdateProfileDescription() called");
 
+            m_profileDetailsTopLevel.SetActive(false);
             m_profileDescriptionUpdateTopLevel.SetActive(true);
-            m_profileDescriptionNewText.GetComponentInChildren<Text>().text = m_profileDescriptionObject.GetComponentInChildren<Text>().text;
+            m_profileHandleNewText.GetComponentInChildren<Text>().text = m_handle;
+            m_profileDescriptionNewText.GetComponentInChildren<Text>().text = m_profileDescription;
+
+            m_menuController.SetImagesAndMenuBarActive(false);
         }            
     }
 
@@ -147,14 +153,16 @@ public class ProfileDetails : MonoBehaviour
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelUpdateProfileDescription() called");
 
+        m_profileDetailsTopLevel.SetActive(true);
         m_profileDescriptionUpdateTopLevel.SetActive(false);
+        m_menuController.SetImagesAndMenuBarActive(true);
+        m_menuController.SetMenuBarActive(false);
     }
 
     public void AcceptUpdateProfileDescription()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: AcceptUpdateProfileDescription() called");
 
-        m_profileDescriptionUpdateTopLevel.SetActive(false);
         m_coroutineQueue.EnqueueAction(UpdateProfileDescriptionInternal());
     }
 
@@ -328,10 +336,27 @@ public class ProfileDetails : MonoBehaviour
     {
         yield return m_appDirector.VerifyInternetConnection();
 
-        string profileDescriptionNewText = m_profileDescriptionNewText.GetComponentInChildren<Text>().text;
-        Helper.TruncateString(ref profileDescriptionNewText, Helper.kMaxCaptionOrDescriptionLength);
+        m_loadingIcon.Display();
 
-        m_profileDescriptionObject.GetComponentInChildren<Text>().text = profileDescriptionNewText;
-        yield return m_backEndAPI.Register_UpdateProfileDescription(profileDescriptionNewText);
+        m_handle = m_profileHandleNewText.GetComponentInChildren<Text>().text;
+        Helper.TruncateString(ref m_handle, Helper.kMaxCaptionOrDescriptionLength);
+        m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_handle;
+        yield return m_backEndAPI.Register_UpdateHandle(m_handle);
+
+        m_profileDescription = m_profileDescriptionNewText.GetComponentInChildren<Text>().text;
+        Helper.TruncateString(ref m_profileDescription, Helper.kMaxCaptionOrDescriptionLength);
+        m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_profileDescription;
+        yield return m_backEndAPI.Register_UpdateProfileDescription(m_profileDescription);
+
+        m_handleObject.GetComponentInChildren<Text>().text = m_handle; 
+        m_menuBarProfileButtonObject.GetComponentInChildren<Text>().text = m_handle;
+        m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_profileDescription; 
+
+        m_profileDetailsTopLevel.SetActive(true);
+        m_profileDescriptionUpdateTopLevel.SetActive(false);
+        m_menuController.SetImagesAndMenuBarActive(true);
+        m_menuController.SetMenuBarActive(false);
+
+        m_loadingIcon.Hide();
     }
 }
