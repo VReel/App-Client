@@ -67,6 +67,11 @@ public class MenuController : MonoBehaviour
         }
     }
 
+    public void SetMenuBarActive(bool active)
+    {
+        m_menuBar.SetActive(active);
+    }
+
     public void SetImagesAndMenuBarActive(bool active)
     {
         SetSubTreeVisible(m_imageSphereController.gameObject, active);

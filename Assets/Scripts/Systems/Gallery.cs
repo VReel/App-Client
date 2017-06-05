@@ -18,6 +18,7 @@ public class Gallery : MonoBehaviour
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
     [SerializeField] private MenuController m_menuController;
+    [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
@@ -233,7 +234,7 @@ public class Gallery : MonoBehaviour
                 yield return m_backEndAPI.Register_UpdateProfileImage(
                     m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.key.ToString(), 
                     m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.key.ToString()
-                );
+                );                    
             }
             else 
             {
@@ -268,6 +269,11 @@ public class Gallery : MonoBehaviour
         m_uploadConfirmation.SetActive(false);
         m_loadingIcon.Hide();
         m_menuController.SetImagesAndMenuBarActive(true);
+
+        if (profilePic)
+        {
+            m_profileDetails.SetMenuBarProfileDetails();
+        }
     }
 
     // TODO: Only download 10 images at a time!

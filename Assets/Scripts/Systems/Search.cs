@@ -198,6 +198,7 @@ public class Search : MonoBehaviour
         }
     }
 
+    /*
     public void OpenSearchAndProfileWithId(string userId, string userHandle)
     {
         if(m_user.IsCurrentUser(userId))
@@ -212,6 +213,7 @@ public class Search : MonoBehaviour
         m_searchState = SearchState.kUserDisplay;
         m_posts.OpenProfileWithID(userId, userHandle);
     }
+    */
 
     /*
     public void OpenSearchAndTagWithId(string hashTagId)

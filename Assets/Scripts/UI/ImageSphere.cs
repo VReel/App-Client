@@ -14,16 +14,19 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private ListUsers m_listUsers;
     [SerializeField] private ListComments m_listComments;
     [SerializeField] private MenuController m_menuController;
+    [SerializeField] private Profile m_profile;
     [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
     [SerializeField] private GameObject m_imageObject;
+    [SerializeField] private GameObject m_handleImageObject;
     [SerializeField] private GameObject m_handleObject;
     [SerializeField] private GameObject m_heartObject;
     [SerializeField] private GameObject m_likesObject;
     [SerializeField] private GameObject m_captionObject;
     [SerializeField] private GameObject m_commentCountObject;
+    [SerializeField] private bool m_isSmallImageSphere;
 
     private const float kMinShrink = 0.0005f; // Minimum value the sphere will shrink to...
     private const int kLoadingTextureIndex = -1;
@@ -151,7 +154,7 @@ public class ImageSphere : MonoBehaviour
 
     public void HandleSelected()
     {
-        m_search.OpenSearchAndProfileWithId(m_userId, m_handle);
+        m_profile.OpenProfileWithId(m_userId, m_handle);
     }
 
     public void HeartSelected()
@@ -197,9 +200,16 @@ public class ImageSphere : MonoBehaviour
 
         bool isSphereLoading = m_currTextureIndex == kLoadingTextureIndex;
 
+        if (m_handleImageObject != null)
+        {
+            m_handleImageObject.SetActive(false);
+            //m_handleImageObject.SetActive(!isSphereLoading && m_handle.Length > 0 && !m_posts.IsProfileType());
+            //TODO: Appropriately load image...
+        }
+
         if (m_handleObject != null)
         {
-            m_handleObject.SetActive(!isSphereLoading && m_handle.Length > 0);
+            m_handleObject.SetActive(!isSphereLoading && m_handle.Length > 0 && !m_posts.IsProfileType());
             m_handleObject.GetComponentInChildren<Text>().text = m_handle;
         }
 
@@ -230,6 +240,7 @@ public class ImageSphere : MonoBehaviour
         if (m_menuController != null)
         {
             bool isVisible = m_menuController.IsMenuActive() && m_imageObject.GetComponent<MeshRenderer>().enabled;
+            EnableAllInteractableComponentsInObject(m_handleImageObject, isVisible);
             EnableAllInteractableComponentsInObject(m_handleObject, isVisible);
             EnableAllInteractableComponentsInObject(m_captionObject, isVisible);
             EnableAllInteractableComponentsInObject(m_commentCountObject, isVisible);
@@ -242,6 +253,7 @@ public class ImageSphere : MonoBehaviour
     {
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: HideMetadata() called on sphere");
 
+        if (m_handleImageObject != null) m_handleImageObject.SetActive(false);
         if (m_handleObject != null) m_handleObject.SetActive(false);
         if (m_captionObject != null) m_captionObject.SetActive(false);
         if (m_commentCountObject != null) m_commentCountObject.SetActive(false);
@@ -276,13 +288,13 @@ public class ImageSphere : MonoBehaviour
 
         HideMetadata();
 
-        float scalingFactor = m_imageSphereController.GetScalingFactor();
-        float defaultScale = m_imageSphereController.GetDefaultSphereScale();
+        float kScalingFactor = m_imageSphereController.GetScalingFactor();
+        float kMaxScale = m_isSmallImageSphere ? m_imageSphereController.GetSmallSphereScale() : m_imageSphereController.GetDefaultSphereScale();
 
         // Scale down
         while (m_imageObject.transform.localScale.magnitude > kMinShrink)
         {
-            m_imageObject.transform.localScale = m_imageObject.transform.localScale * scalingFactor;
+            m_imageObject.transform.localScale = m_imageObject.transform.localScale * kScalingFactor;
             yield return null;
         }
 
@@ -290,15 +302,15 @@ public class ImageSphere : MonoBehaviour
         UpdateTextureAndID();
 
         // Scale up
-        while (m_imageObject.transform.localScale.magnitude < defaultScale)
+        while (m_imageObject.transform.localScale.magnitude < kMaxScale)
         {
-            m_imageObject.transform.localScale = m_imageObject.transform.localScale / scalingFactor;
+            m_imageObject.transform.localScale = m_imageObject.transform.localScale / kScalingFactor;
             yield return null;
         }
 
         UpdateMetadata();
 
-        m_imageObject.transform.localScale = new Vector3(defaultScale, defaultScale, defaultScale);
+        m_imageObject.transform.localScale = new Vector3(kMaxScale, kMaxScale, kMaxScale);
     }
 
     private IEnumerator AnimateHide()
@@ -334,9 +346,18 @@ public class ImageSphere : MonoBehaviour
 
     private void OnButtonSelected(VRStandardAssets.Menu.MenuButton button)
     {   
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() called on sphere: " + (m_imageSphereIndex+1));
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() (m_imageIdentifier.Length > 0): " + (m_imageIdentifier.Length > 0));
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() (m_imageSphereSkybox.GetImageIdentifier().CompareTo(m_imageIdentifier) != 0): " + (m_imageSphereSkybox.GetImageIdentifier().CompareTo(m_imageIdentifier) != 0));
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() (m_currTextureIndex != kLoadingTextureIndex): " + (m_currTextureIndex != kLoadingTextureIndex));
+
         bool willChangeImage = (m_imageIdentifier.Length > 0) && (m_imageSphereSkybox.GetImageIdentifier().CompareTo(m_imageIdentifier) != 0) && (m_currTextureIndex != kLoadingTextureIndex);
         if (!willChangeImage)
         {
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() will not ChangeImage");
             return;
         }
 
@@ -362,18 +383,18 @@ public class ImageSphere : MonoBehaviour
         m_imageObject.GetComponent<Collider>().enabled = false;
 
         float kScalingFactor = m_imageSphereController.GetScalingFactor();
-        float kDefaultScale = m_imageSphereController.GetDefaultSphereScale();
+        float kMaxScale = m_isSmallImageSphere ? m_imageSphereController.GetSmallSphereScale() : m_imageSphereController.GetDefaultSphereScale();
 
         Vector3 initialPos = m_imageObject.transform.position;
         Vector3 userPos = Camera.main.gameObject.transform.position;
         Quaternion initialRot = m_imageObject.transform.rotation;
         Quaternion skyboxRot = m_imageSphereSkybox.transform.rotation;
-        Vector3 initialScale = new Vector3(kDefaultScale, kDefaultScale, kDefaultScale);
+        Vector3 initialScale = new Vector3(kMaxScale, kMaxScale, kMaxScale);
         Vector3 skyboxScale = m_imageSphereSkybox.transform.localScale;
 
         // Travel to user and partially scale
         const float kPercentageRotationDuration = 0.3f;
-        const float kSecondsToGetToUser = 5.0f;
+        const float kSecondsToGetToUser = 3.0f;
         float progress = 0;
         while (progress <= 1)
         {
@@ -393,8 +414,8 @@ public class ImageSphere : MonoBehaviour
         }
 
         // When Image has reached the user then SetSkybox to Thumbnail and grow the sphere
-        SetSkybox(imageIdentifier);
         m_imageObject.transform.position = userPos;
+        SetSkybox(imageIdentifier);
 
         // Scale to size of SkyBox
         const float kSecondsToGetToGrowFully = 1.0f;
@@ -417,7 +438,7 @@ public class ImageSphere : MonoBehaviour
         m_imageObject.transform.localScale = new Vector3(kMinShrink, kMinShrink, kMinShrink);
 
         // Scale up the newly appeared ImageSphere
-        while (m_imageObject.transform.localScale.magnitude < kDefaultScale)
+        while (m_imageObject.transform.localScale.magnitude < kMaxScale)
         {
             m_imageObject.transform.localScale = m_imageObject.transform.localScale / kScalingFactor;
             yield return null;
@@ -441,10 +462,18 @@ public class ImageSphere : MonoBehaviour
         bool isImageFromDevice = imageIdentifier.StartsWith(m_imageSphereController.GetTopLevelDirectory());
         if (!isImageFromDevice)
         {
-            bool isProfileImage = m_profileDetails.IsUser(imageIdentifier); 
-            if (isProfileImage) // Image Identifier is of the User for Profile Pictures
+            if (m_isSmallImageSphere) // Only small image Spheres query ProfileDetails...
             {
-                m_profileDetails.DownloadOriginalImage();
+                bool isLoggedUserImage = m_profileDetails.IsLoggedUser(imageIdentifier);
+                bool isProfilePageImage = m_profileDetails.IsUser(imageIdentifier); 
+                if (isProfilePageImage) // Image Identifier is of the User for Profile Pictures
+                {
+                    m_profileDetails.DownloadOriginalImage();
+                }
+                else if (isLoggedUserImage)
+                {
+                    m_profileDetails.DownloadMenuBarOriginalImage();
+                }
             }
             else
             {

@@ -36,10 +36,10 @@ public class AppDirector : MonoBehaviour
     [SerializeField] private Profile m_profile;
     [SerializeField] private Gallery m_gallery;
     [SerializeField] private LoginFlow m_loginFlow;
+    [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private KeyBoard m_keyboard;
     [SerializeField] private InternetReachabilityVerifier m_internetReachabilityVerifier;
-    [SerializeField] private GameObject m_profileButtonObject;
     [SerializeField] private GameObject m_lostConnectionIcon;
 
     private AppState m_appState;
@@ -77,7 +77,7 @@ public class AppDirector : MonoBehaviour
         else if ( (m_appState == AppDirector.AppState.kLogin || m_appState == AppDirector.AppState.kInit) && m_user.IsLoggedIn() && m_user.m_handle.Length > 0)
         {
             RequestExploreState();
-            m_profileButtonObject.GetComponentInChildren<Text>().text = m_user.m_handle;
+            m_profileDetails.SetMenuBarProfileDetails();
         }
     }
         

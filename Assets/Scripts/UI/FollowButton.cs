@@ -8,7 +8,8 @@ public class FollowButton : MonoBehaviour
     // Member Variables
     // **************************
 
-    [SerializeField] private Image m_followButton;
+    [SerializeField] private Text m_followText;
+    [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
     [SerializeField] private Color m_buttonColourSelected;
     [SerializeField] private Color m_buttonColourDeselected;
 
@@ -28,11 +29,19 @@ public class FollowButton : MonoBehaviour
         m_isOn = isOn;
         if (m_isOn)
         {
-            m_followButton.color = m_buttonColourSelected;                      
+            m_menuButton.SetForceColour(true, m_buttonColourSelected);
+            m_menuButton.RefreshButtonColor();
+  
+            m_followText.color = m_buttonColourSelected;
+            m_followText.text = "Unfollow";
         }
         else
         {
-            m_followButton.color = m_buttonColourDeselected;
+            m_menuButton.SetForceColour(false, m_buttonColourSelected);
+            m_menuButton.RefreshButtonColor();
+
+            m_followText.color = m_buttonColourDeselected;
+            m_followText.text = "Follow";
         }
     }
 }

@@ -11,7 +11,7 @@ public class ListUsers : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
-    [SerializeField] private Search m_search;
+    [SerializeField] private Profile m_profile;
     [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private ListComments m_listComments;
     [SerializeField] private GameObject m_displayItemsTopLevel; //Top-level object for results
@@ -127,7 +127,7 @@ public class ListUsers : MonoBehaviour
     {
         CloseListUsers();
         int actualResultIndex = m_currResultIndex + userResultItemIndex;
-        m_search.OpenSearchAndProfileWithId(m_userResults[actualResultIndex].userId, m_userResults[actualResultIndex].userHandle);
+        m_profile.OpenProfileWithId(m_userResults[actualResultIndex].userId, m_userResults[actualResultIndex].userHandle);
     }
      
     // **************************
@@ -155,7 +155,7 @@ public class ListUsers : MonoBehaviour
     {
         yield return m_appDirector.VerifyInternetConnection();
 
-        m_profileDetails.CloseProfileDetails();
+        //m_profileDetails.CloseProfileDetails();
         m_listComments.CloseListComments();
 
         m_currResultIndex = 0;
