@@ -20,6 +20,18 @@ public class SelectedButton : MonoBehaviour
         return m_additionalReference;
     }
 
+    public void ButtonSelected(bool selected)
+    {
+        if (selected)
+        {
+            OnButtonSelected();
+        }
+        else
+        {
+            OnButtonDeselected();
+        }
+    }
+
     public void OnButtonSelected()
     {
         m_isSelected = true;

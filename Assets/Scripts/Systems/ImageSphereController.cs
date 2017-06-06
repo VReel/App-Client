@@ -14,10 +14,13 @@ public class ImageSphereController : MonoBehaviour
     // **************************
 
     [SerializeField] private float m_defaultSphereScale = 1.0f;
+    [SerializeField] private float m_smallSphereScale = 0.5f;
     [SerializeField] private float m_scalingFactor = 0.88f;
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSkybox m_imageSkybox;
-    [SerializeField] private ImageSphere m_profileImageSphere;
+    [SerializeField] private ImageSphere m_profilePageImageSphere;
+    [SerializeField] private ImageSphere m_menuBarProfileImageSphere;
+    [SerializeField] private GameObject m_imageSphereCanvas;
     [SerializeField] private GameObject[] m_imageSpheres;
     [SerializeField] private Texture2D m_sphereLoadingTexture;
 
@@ -50,6 +53,11 @@ public class ImageSphereController : MonoBehaviour
     public float GetDefaultSphereScale()
     {
         return m_defaultSphereScale;
+    }
+
+    public float GetSmallSphereScale()
+    {
+        return m_smallSphereScale;
     }
 
     public float GetScalingFactor()
@@ -91,6 +99,11 @@ public class ImageSphereController : MonoBehaviour
         return identifier;
     }
 
+    public void EnableOrDisableAllImageSpheres(bool enable)
+    {
+        m_imageSphereCanvas.SetActive(enable);
+    }
+
     public void SetImageAtIndexToLoading(int sphereIndex)
     {
         SetImageAtIndex(sphereIndex, m_sphereLoadingTexture, kLoadingTextureFilePath, m_imageLoader.GetLoadingTextureIndex(), true);
@@ -119,13 +132,19 @@ public class ImageSphereController : MonoBehaviour
 
     public void SetImageAtIndex(int sphereIndex, Texture2D texture, string imageIdentifier, int pluginTextureIndex, bool animateOnSet)
     {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: SetImageAtIndex() called with index: " + sphereIndex);
+
         if (sphereIndex == Helper.kSkyboxSphereIndex)
         {
             m_imageSkybox.SetImage(texture, imageIdentifier, pluginTextureIndex);
         }
-        else if (sphereIndex == Helper.kProfileSphereIndex)
+        else if (sphereIndex == Helper.kProfilePageSphereIndex)
         {
-            m_profileImageSphere.SetImage(texture, imageIdentifier, pluginTextureIndex, animateOnSet);
+            m_profilePageImageSphere.SetImage(texture, imageIdentifier, pluginTextureIndex, animateOnSet);
+        }
+        else if (sphereIndex == Helper.kMenuBarProfileSphereIndex)
+        {
+            m_menuBarProfileImageSphere.SetImage(texture, imageIdentifier, pluginTextureIndex, animateOnSet);
         }
         else if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
         {
@@ -165,9 +184,13 @@ public class ImageSphereController : MonoBehaviour
     {
         ImageSphere imageSphereAtIndex = null;
 
-        if (sphereIndex == Helper.kProfileSphereIndex)
+        if (sphereIndex == Helper.kProfilePageSphereIndex)
         {
-            imageSphereAtIndex = m_profileImageSphere;
+            imageSphereAtIndex = m_profilePageImageSphere;
+        }
+        else if (sphereIndex == Helper.kMenuBarProfileSphereIndex)
+        {
+            imageSphereAtIndex = m_menuBarProfileImageSphere;
         }
         else if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
         {
@@ -224,15 +247,20 @@ public class ImageSphereController : MonoBehaviour
             m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetSphereIndex(sphereIndex);
         }
 
-        m_profileImageSphere.SetSphereIndex(Helper.kProfileSphereIndex);
+        m_profilePageImageSphere.SetSphereIndex(Helper.kProfilePageSphereIndex);
+        m_menuBarProfileImageSphere.SetSphereIndex(Helper.kMenuBarProfileSphereIndex);
     }
         
     private int ConvertIdToIndex(string imageIdentifier)
     {
         int sphereIndex = 0;
-        if (m_profileImageSphere.GetImageIdentifier().CompareTo(imageIdentifier) == 0)
+        if (m_profilePageImageSphere.GetImageIdentifier().CompareTo(imageIdentifier) == 0)
         {
-            sphereIndex = Helper.kProfileSphereIndex;
+            sphereIndex = Helper.kProfilePageSphereIndex;
+        }
+        else if (m_menuBarProfileImageSphere.GetImageIdentifier().CompareTo(imageIdentifier) == 0)
+        {
+            sphereIndex = Helper.kMenuBarProfileSphereIndex;
         }
         else
         {

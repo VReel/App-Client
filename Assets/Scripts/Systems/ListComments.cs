@@ -254,7 +254,7 @@ public class ListComments : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: A");
 
-        m_profileDetails.CloseProfileDetails();
+        //m_profileDetails.CloseProfileDetails();
         m_listUsers.CloseListUsers();
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: B");

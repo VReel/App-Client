@@ -14,6 +14,7 @@ namespace VRStandardAssets.Menu
         // **************************
 
         [SerializeField] private Image m_buttonImage;
+        [SerializeField] private Text m_buttonText;
         [SerializeField] private Color m_buttonColourUp;     // Button's default sprite
         [SerializeField] private Color m_buttonColourOver;   // Button's sprite when the icon is over it
         [SerializeField] private Color m_buttonColourDown;   // Button's sprite when user presses on it
@@ -70,6 +71,7 @@ namespace VRStandardAssets.Menu
             m_buttonForcedColour = buttonForcedColour;
 
             RefreshButtonColor();
+            RefreshTextColor();
         }
 
         public void RefreshButtonColor()
@@ -97,6 +99,31 @@ namespace VRStandardAssets.Menu
             }
         }
 
+        public void RefreshTextColor()
+        {
+            if (m_buttonText == null)
+            {
+                return;
+            }
+
+            if (m_forceColour)
+            {
+                m_buttonText.color = m_buttonForcedColour;
+            }
+            else if (m_buttonDown)
+            {
+                m_buttonText.color = m_buttonColourDown;
+            }
+            else if (m_gazeOver)
+            {
+                m_buttonText.color = m_buttonColourOver;
+            }
+            else
+            {
+                m_buttonText.color = m_buttonColourUp;
+            }
+        }
+
         // **************************
         // Private/Helper functions
         // **************************
@@ -106,6 +133,7 @@ namespace VRStandardAssets.Menu
             m_gazeOver = true;
 
             RefreshButtonColor();
+            RefreshTextColor();
         }
             
         private void HandleOut()
@@ -114,6 +142,7 @@ namespace VRStandardAssets.Menu
             m_buttonDown = false;
 
             RefreshButtonColor();
+            RefreshTextColor();
         }
 
         private void HandleDown()
@@ -121,6 +150,7 @@ namespace VRStandardAssets.Menu
             m_buttonDown = true;
 
             RefreshButtonColor();
+            RefreshTextColor();
         }
 
         private void HandleUp()
@@ -130,6 +160,7 @@ namespace VRStandardAssets.Menu
             m_buttonDown = false;
 
             RefreshButtonColor();
+            RefreshTextColor();
 
             if (buttonSelected)
             {

@@ -10,6 +10,8 @@ public class Profile : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
+    [SerializeField] private MenuController m_menuController;
+    [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private Posts m_posts;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private LoadingIcon m_loadingIcon;
@@ -21,6 +23,9 @@ public class Profile : MonoBehaviour
     private const string kCancelDeleteText = "Delete Cancelled =)";
     private const string kSuccessfulDeleteText = "Post Deleted Successfully! =)";
     private const string kFailedDeleteText = "Deleting failed =(\n Please try again!";
+
+    private string m_userId;
+    private string m_userHandle;
 
     private BackEndAPI m_backEndAPI;
     private CoroutineQueue m_coroutineQueue;
@@ -45,7 +50,39 @@ public class Profile : MonoBehaviour
 
     public void OpenProfile()
     {
-        m_posts.OpenUserProfile();
+        if (m_user.IsCurrentUser(m_userId))
+        {
+            m_posts.OpenUserProfile();
+        }
+        else
+        {
+            m_posts.OpenProfileWithID(m_userId, m_userHandle);
+        }
+
+        m_menuController.SetMenuBarActive(false);
+    }
+
+    public void OpenUserProfile()
+    {
+        m_userId = m_user.m_id;
+        m_userHandle = m_user.m_handle;
+
+        m_appDirector.RequestProfileState();
+    }
+
+    public void OpenProfileWithId(string userId, string handle)
+    {
+        m_userId = userId;
+        m_userHandle = handle;
+
+        m_appDirector.RequestProfileState();
+    }
+
+    public void CloseProfile()
+    {
+        //TODO: Do something more intelligent in order to not lose the state you were in...
+        m_profileDetails.CloseProfileDetails();
+        m_appDirector.RequestExploreState();
     }
 
     public void PreDelete()

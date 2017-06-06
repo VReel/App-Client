@@ -11,11 +11,13 @@ public class ListUsers : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
-    [SerializeField] private Search m_search;
+    [SerializeField] private MenuController m_menuController;
+    [SerializeField] private Profile m_profile;
     [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private ListComments m_listComments;
     [SerializeField] private GameObject m_displayItemsTopLevel; //Top-level object for results
     [SerializeField] private GameObject[] m_displayItems;
+    [SerializeField] private GameObject m_title;
     [SerializeField] private GameObject m_nextButton;
     [SerializeField] private GameObject m_previousButton;
 
@@ -23,6 +25,7 @@ public class ListUsers : MonoBehaviour
     {
         public string userId { get; set; }
         public string userHandle { get; set; }    
+        public bool followedByMe { get; set; }    
     }
 
     public enum ResultType
@@ -68,6 +71,7 @@ public class ListUsers : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: DisplayLikeResults() called for post ID: " + postId);
 
         m_resultType = ResultType.kLikes;
+        m_title.GetComponentInChildren<Text>().text = "Likes";
         m_coroutineQueue.EnqueueAction(StoreAndDisplayUserResultsInternal(postId));
     }
 
@@ -76,6 +80,7 @@ public class ListUsers : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: DisplayFollowersResults() called for user ID: " + userId);
 
         m_resultType = ResultType.kFollowers;
+        m_title.GetComponentInChildren<Text>().text = "Followers";
         m_coroutineQueue.EnqueueAction(StoreAndDisplayUserResultsInternal(userId));
     }
 
@@ -84,6 +89,7 @@ public class ListUsers : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: DisplayFollowingResults() called for user ID: " + userId);
 
         m_resultType = ResultType.kFollowing;
+        m_title.GetComponentInChildren<Text>().text = "Following";
         m_coroutineQueue.EnqueueAction(StoreAndDisplayUserResultsInternal(userId));
     }
 
@@ -121,13 +127,24 @@ public class ListUsers : MonoBehaviour
     public void CloseListUsers()
     {
         m_displayItemsTopLevel.SetActive(false);
+        m_menuController.SetImagesAndMenuBarActive(true);
+        m_profileDetails.ShowOrHide(true); //Show
     }
 
     public void HandleSelected(int userResultItemIndex)
     {
         CloseListUsers();
         int actualResultIndex = m_currResultIndex + userResultItemIndex;
-        m_search.OpenSearchAndProfileWithId(m_userResults[actualResultIndex].userId, m_userResults[actualResultIndex].userHandle);
+        m_profile.OpenProfileWithId(m_userResults[actualResultIndex].userId, m_userResults[actualResultIndex].userHandle);
+    }
+
+    public void FollowSelected(int userResultItemIndex)
+    {        
+        int actualResultIndex = m_currResultIndex + userResultItemIndex;
+
+        m_userResults[actualResultIndex].followedByMe = !m_userResults[actualResultIndex].followedByMe;
+        m_displayItems[userResultItemIndex].GetComponentInChildren<FollowButton>().FollowOnOffSwitch(m_userResults[actualResultIndex].followedByMe);
+        FollowOrUnfollowUser(m_userResults[actualResultIndex].userId, m_userResults[actualResultIndex].followedByMe);
     }
      
     // **************************
@@ -155,7 +172,8 @@ public class ListUsers : MonoBehaviour
     {
         yield return m_appDirector.VerifyInternetConnection();
 
-        m_profileDetails.CloseProfileDetails();
+        m_menuController.SetImagesAndMenuBarActive(false);
+        m_profileDetails.ShowOrHide(false); //Hide
         m_listComments.CloseListComments();
 
         m_currResultIndex = 0;
@@ -212,6 +230,7 @@ public class ListUsers : MonoBehaviour
                 UserResult newUserResult = new UserResult();
                 newUserResult.userId = userData.id.ToString();
                 newUserResult.userHandle = userData.attributes.handle.ToString();
+                newUserResult.followedByMe = userData.attributes.followed_by_me; 
 
                 m_userResults.Add(newUserResult);
             }
@@ -220,7 +239,7 @@ public class ListUsers : MonoBehaviour
             if (users.meta.next_page)
             {
                 m_nextPageOfResults = users.meta.next_page_id;
-            }
+            }                
         }
     }
 
@@ -234,14 +253,41 @@ public class ListUsers : MonoBehaviour
         for (int itemIndex = 0; itemIndex < numResultsToDisplay; userResultIndex++, itemIndex++)
         {
             if (userResultIndex < m_userResults.Count)
-            {                                   
+            {                   
+                if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Index {0} - Handle {1} - Following {2}", 
+                    itemIndex, m_userResults[userResultIndex].userHandle, m_userResults[userResultIndex].followedByMe));
+
                 m_displayItems[itemIndex].SetActive(true);
                 m_displayItems[itemIndex].GetComponentInChildren<Text>().text = m_userResults[userResultIndex].userHandle;
+                m_displayItems[itemIndex].GetComponentInChildren<FollowButton>().FollowOnOffSwitch(m_userResults[userResultIndex].followedByMe);
+
+                GameObject followButton = m_displayItems[itemIndex].GetComponentInChildren<FollowButton>().gameObject;
+                m_menuController.SetSubTreeVisible(followButton, !m_user.IsCurrentUser(m_userResults[userResultIndex].userId));
             }
             else
             {
                 m_displayItems[itemIndex].SetActive(false);
             }
+        }
+    }
+
+    //TODO: This is now a repeated function, should this be somewhere else and as a public function...?
+    private void FollowOrUnfollowUser(string userId, bool doFollow)
+    {
+        m_coroutineQueue.EnqueueAction(FollowOrUnfollowUserInternal(userId, doFollow));
+    }
+
+    private IEnumerator FollowOrUnfollowUserInternal(string userId, bool doFollow)
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        if (doFollow)
+        {
+            yield return m_backEndAPI.Follow_FollowUser(userId);
+        }
+        else
+        {
+            yield return m_backEndAPI.Follow_UnfollowUser(userId);
         }
     }
 }

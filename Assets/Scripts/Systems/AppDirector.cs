@@ -36,10 +36,10 @@ public class AppDirector : MonoBehaviour
     [SerializeField] private Profile m_profile;
     [SerializeField] private Gallery m_gallery;
     [SerializeField] private LoginFlow m_loginFlow;
+    [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private KeyBoard m_keyboard;
     [SerializeField] private InternetReachabilityVerifier m_internetReachabilityVerifier;
-    [SerializeField] private GameObject m_profileButtonObject;
     [SerializeField] private GameObject m_lostConnectionIcon;
 
     private AppState m_appState;
@@ -59,6 +59,7 @@ public class AppDirector : MonoBehaviour
         //m_coroutineQueue.StartLoop();       
 
         m_appState = AppState.kInit;
+        m_menuController.SetAllSubMenusActive(false);
 
         m_lostConnectionIcon.SetActive(false);
     }
@@ -77,7 +78,7 @@ public class AppDirector : MonoBehaviour
         else if ( (m_appState == AppDirector.AppState.kLogin || m_appState == AppDirector.AppState.kInit) && m_user.IsLoggedIn() && m_user.m_handle.Length > 0)
         {
             RequestExploreState();
-            m_profileButtonObject.GetComponentInChildren<Text>().text = m_user.m_handle;
+            m_profileDetails.SetMenuBarProfileDetails();
         }
     }
         
@@ -171,8 +172,8 @@ public class AppDirector : MonoBehaviour
         m_search.InvalidateWork();
         m_loginFlow.SetLoginFlowPage(0);
 
-        m_menuController.SetLoginSubMenuActive(true);
         m_appState = AppState.kLogin;
+        m_menuController.SetCurrentSubMenuActive(true); // m_menuController.SetLoginSubMenuActive(true);
     }
 
     private void SetExploreState()
@@ -191,9 +192,9 @@ public class AppDirector : MonoBehaviour
 
         m_home.ShowHomeText();
 
-        m_menuController.SetExploreSubMenuActive(true);
         m_home.OpenPublicTimeline();
         m_appState = AppState.kExplore;
+        m_menuController.SetCurrentSubMenuActive(true); //m_menuController.SetExploreSubMenuActive(true);
     }
 
     private void SetFollowingState()
@@ -212,9 +213,9 @@ public class AppDirector : MonoBehaviour
 
         m_home.ShowHomeText();
 
-        m_menuController.SetFollowingSubMenuActive(true);
         m_home.OpenPersonalTimeline();
         m_appState = AppState.kFollowing;
+        m_menuController.SetCurrentSubMenuActive(true); //m_menuController.SetFollowingSubMenuActive(true);
     }
 
     private void SetSearchState()
@@ -233,9 +234,9 @@ public class AppDirector : MonoBehaviour
 
         m_search.ShowSearchText();
 
-        m_menuController.SetSearchSubMenuActive(true);
         m_search.OpenSearch();
         m_appState = AppState.kSearch;
+        m_menuController.SetCurrentSubMenuActive(true); //m_menuController.SetSearchSubMenuActive(true);
     }
 
     private void SetProfileState()
@@ -254,9 +255,9 @@ public class AppDirector : MonoBehaviour
 
         m_profile.ShowProfileText();
 
-        m_menuController.SetProfileSubMenuActive(true);
         m_profile.OpenProfile();
         m_appState = AppState.kProfile;
+        m_menuController.SetCurrentSubMenuActive(true); //m_menuController.SetProfileSubMenuActive(true);
     }        
 
     private void SetGalleryState()
@@ -277,9 +278,9 @@ public class AppDirector : MonoBehaviour
 
         m_gallery.ShowGalleryText();
 
-        m_menuController.SetGallerySubMenuActive(true);
         m_gallery.OpenAndroidGallery();
         m_appState = AppState.kGallery;
+        m_menuController.SetCurrentSubMenuActive(true); //m_menuController.SetGallerySubMenuActive(true);
     }
 
     private void DisableAllOptions()

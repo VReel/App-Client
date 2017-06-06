@@ -11,6 +11,7 @@ public class Posts : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
+    [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private LoadingIcon m_loadingIcon;
@@ -75,12 +76,12 @@ public class Posts : MonoBehaviour
     {
         return m_currUserOrTagId;
     }
-
+    */
+        
     public bool IsProfileType()
     {
         return (m_postsType == PostsType.kUserProfile || m_postsType == PostsType.kOtherProfile);
     }
-    */
 
     public void InvalidateWork() // This function is called in order to stop any ongoing work
     {    
@@ -136,6 +137,8 @@ public class Posts : MonoBehaviour
         m_currUserOrTagId = m_user.m_id;
         OpenPosts();
 
+        m_profileDetails.OpenProfileDetails(m_currUserOrTagId);
+
         m_user.GetUserMessageButton().SetIsActiveButton(true, m_currUserOrTagId);
         m_user.GetUserMessageButton().SetText(m_user.m_handle + "'s Profile");
     }    
@@ -147,6 +150,8 @@ public class Posts : MonoBehaviour
         m_postsType = PostsType.kOtherProfile;
         m_currUserOrTagId = userID;
         OpenPosts();
+
+        m_profileDetails.OpenProfileDetails(m_currUserOrTagId);
 
         m_user.GetUserMessageButton().SetIsActiveButton(true, m_currUserOrTagId);
         m_user.GetUserMessageButton().SetText(userHandle + "'s Profile");
@@ -373,8 +378,8 @@ public class Posts : MonoBehaviour
 
                 m_imageSphereController.SetMetadataAtIndex(
                     sphereIndex, 
-                    (m_postsType == PostsType.kUserProfile) ? "" : m_posts[postIndex].userId, 
-                    (m_postsType == PostsType.kUserProfile) ? "" : m_posts[postIndex].userHandle, 
+                    m_posts[postIndex].userId, 
+                    m_posts[postIndex].userHandle, 
                     m_posts[postIndex].caption, 
                     m_posts[postIndex].commentCount, 
                     m_posts[postIndex].likeCount,
@@ -455,8 +460,8 @@ public class Posts : MonoBehaviour
                 int sphereIndex = index - m_currPostIndex;
                 m_imageSphereController.SetMetadataAtIndex(
                     sphereIndex, 
-                    (m_postsType == PostsType.kUserProfile) ? "" : m_posts[index].userId, 
-                    (m_postsType == PostsType.kUserProfile) ? "" : m_posts[index].userHandle, 
+                    m_posts[index].userId, 
+                    m_posts[index].userHandle, 
                     m_posts[index].caption, 
                     m_posts[index].commentCount, 
                     m_posts[index].likeCount,

@@ -2,7 +2,7 @@
 using UnityEngine.UI;           //Text
 using System.Collections;       //IEnumerator
 
-//TODO: Improve this class name and the way this communicates with everything else...
+//TODO: Merge this into Profile.cs...
 public class ProfileDetails : MonoBehaviour 
 {
     // **************************
@@ -11,19 +11,23 @@ public class ProfileDetails : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
+    [SerializeField] private MenuController m_menuController;
     [SerializeField] private Posts m_posts;
     [SerializeField] private ListUsers m_listUsers;
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private LoadingIcon m_loadingIcon;
+    [SerializeField] private GameObject m_menuBarProfileButtonObject;
     [SerializeField] private GameObject m_profileDetailsTopLevel;
+    [SerializeField] private GameObject m_editProfileButtonObject;
     [SerializeField] private GameObject m_followButtonObject;
     [SerializeField] private GameObject m_handleObject;
     [SerializeField] private GameObject m_followerCountObject;
     [SerializeField] private GameObject m_followingCountObject;
     [SerializeField] private GameObject m_profileDescriptionObject;
     [SerializeField] private GameObject m_profileDescriptionUpdateTopLevel;
-    [SerializeField] private GameObject m_profileDescriptionNewText;       
+    [SerializeField] private GameObject m_profileHandleNewText;
+    [SerializeField] private GameObject m_profileDescriptionNewText;
 
     private string m_userId;
     private string m_handle;
@@ -36,6 +40,10 @@ public class ProfileDetails : MonoBehaviour
     private bool m_followedByMe;
     private string m_thumbnailUrl;
     private string m_originalUrl;
+
+    private string m_loggedUserThumbnailUrl;
+    private string m_loggedUserOriginalUrl;
+
     private BackEndAPI m_backEndAPI;
     private CoroutineQueue m_coroutineQueue;
 
@@ -63,14 +71,28 @@ public class ProfileDetails : MonoBehaviour
         return (m_userId != null && userId != null && m_userId.CompareTo(userId) == 0);
     }
 
+    public bool IsLoggedUser(string userId)
+    {
+        return (userId != null && m_user.m_id.CompareTo(userId) == 0);
+    }
+
+    public void SetMenuBarProfileDetails()
+    {
+        m_menuController.SetMenuBarActive(true);
+        m_menuBarProfileButtonObject.GetComponentInChildren<Text>().text = m_user.m_handle;
+        m_coroutineQueue.EnqueueAction(SetMenuBarProfileDetailsInternal());
+    }
+
     public void OpenProfileDetails(string userId)
     {
         m_userId = userId;
 
         m_profileDetailsTopLevel.SetActive(true);
+        m_profileDescriptionUpdateTopLevel.SetActive(false);
 
         bool isCurrentUser = m_user.IsCurrentUser(m_userId);
         m_followButtonObject.SetActive(!isCurrentUser);
+        m_editProfileButtonObject.SetActive(isCurrentUser);
 
         m_handleObject.GetComponentInChildren<Text>().text = "";
         m_followerCountObject.GetComponentInChildren<Text>().text = "";
@@ -94,11 +116,23 @@ public class ProfileDetails : MonoBehaviour
 
     public void CloseProfileDetails()
     {
-        m_profileDetailsTopLevel.SetActive(false);
-        m_profileDescriptionUpdateTopLevel.SetActive(false);
-        m_imageSphereController.HideSphereAtIndex(Helper.kProfileSphereIndex, true); // True tells it to ForceHide
+        m_imageSphereController.HideSphereAtIndex(Helper.kProfilePageSphereIndex, true); // True tells it to ForceHide
+        m_menuController.SetMenuBarActive(true);
+        //m_profileDetailsTopLevel.SetActive(false);
+        //m_profileDescriptionUpdateTopLevel.SetActive(false);
     }
-           
+
+    //HACK - do this better, Calling it from ListUsers, which is also always showing the ImageSpheres even when it shouldn't...
+    public void ShowOrHide(bool show)
+    {
+        m_profileDetailsTopLevel.SetActive(show);
+
+        if (m_appDirector.GetState() == AppDirector.AppState.kProfile && show) 
+        {
+            m_menuController.SetMenuBarActive(false);
+        }
+    }
+
     public void FollowSelected()
     {
         m_followedByMe = !m_followedByMe;
@@ -118,9 +152,12 @@ public class ProfileDetails : MonoBehaviour
         {
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreUpdateProfileDescription() called");
 
+            m_profileDetailsTopLevel.SetActive(false);
             m_profileDescriptionUpdateTopLevel.SetActive(true);
-            m_profileDescriptionNewText.GetComponentInChildren<Text>().text = m_profileDescriptionObject.GetComponentInChildren<Text>().text;
-            m_imageSphereController.HideSphereAtIndex(Helper.kProfileSphereIndex, false); // True tells it to ForceHide
+            m_profileHandleNewText.GetComponentInChildren<Text>().text = m_handle;
+            m_profileDescriptionNewText.GetComponentInChildren<Text>().text = m_profileDescription;
+
+            m_menuController.SetImagesAndMenuBarActive(false);
         }            
     }
 
@@ -128,17 +165,17 @@ public class ProfileDetails : MonoBehaviour
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelUpdateProfileDescription() called");
 
+        m_profileDetailsTopLevel.SetActive(true);
         m_profileDescriptionUpdateTopLevel.SetActive(false);
-        DownloadThumbnailImage();
+        m_menuController.SetImagesAndMenuBarActive(true);
+        m_menuController.SetMenuBarActive(false);
     }
 
     public void AcceptUpdateProfileDescription()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: AcceptUpdateProfileDescription() called");
 
-        m_profileDescriptionUpdateTopLevel.SetActive(false);
         m_coroutineQueue.EnqueueAction(UpdateProfileDescriptionInternal());
-        DownloadThumbnailImage();
     }
 
     public void DownloadOriginalImage()
@@ -148,9 +185,34 @@ public class ProfileDetails : MonoBehaviour
         m_coroutineQueue.EnqueueAction(DownloadOriginalImageInternal());
     }
 
+    public void DownloadMenuBarOriginalImage()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadMenuBarOriginalImage() called");
+
+        m_coroutineQueue.EnqueueAction(DownloadMenuBarOriginalImageInternal());
+    }
+
     // **************************
     // Private/Helper functions
     // **************************
+
+    private IEnumerator SetMenuBarProfileDetailsInternal()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: SetMenuBarProfileDetailsInternal() called");
+
+        yield return m_appDirector.VerifyInternetConnection();
+
+        yield return RefreshLoggedProfileData();
+
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            DownloadMenuBarThumbnailImage();
+        }
+        else
+        {
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - Unable to load logged user Profile Details!");
+        }
+    }
 
     private IEnumerator GetUserDetails()
     {
@@ -181,10 +243,10 @@ public class ProfileDetails : MonoBehaviour
     {
         if (m_thumbnailUrl != null && m_thumbnailUrl.Length > 0)
         {
-            m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kProfileSphereIndex, m_thumbnailUrl, m_userId, false);
+            m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kProfilePageSphereIndex, m_thumbnailUrl, m_userId, false);
         }
     }
-
+        
     private IEnumerator DownloadOriginalImageInternal()
     {
         yield return m_appDirector.VerifyInternetConnection();
@@ -195,14 +257,18 @@ public class ProfileDetails : MonoBehaviour
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {            
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadOriginalImageInternal() loading User Original Image!");
+
             m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kSkyboxSphereIndex, m_originalUrl, m_userId, true);
         }
 
         m_loadingIcon.Hide();
     }
-
+        
     private IEnumerator RefreshProfileData() // NOTE: Since URL's have a lifetime, we need to refresh the data at certain points...
     {            
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: RefreshProfileData() for user: " + m_userId);
+
         yield return m_backEndAPI.User_GetUser(m_userId);
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
@@ -218,6 +284,43 @@ public class ProfileDetails : MonoBehaviour
             m_followedByMe = m_backEndAPI.GetUserResult().data.attributes.followed_by_me;
             m_thumbnailUrl = m_backEndAPI.GetUserResult().data.attributes.thumbnail_url;
             m_originalUrl = m_backEndAPI.GetUserResult().data.attributes.original_url;
+        }
+    }
+
+    private void DownloadMenuBarThumbnailImage()
+    {
+        if (m_loggedUserThumbnailUrl != null && m_loggedUserThumbnailUrl.Length > 0)
+        {
+            m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kMenuBarProfileSphereIndex, m_loggedUserThumbnailUrl, m_user.m_id, false);
+        }
+    }
+
+    private IEnumerator DownloadMenuBarOriginalImageInternal()
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        m_loadingIcon.Display();
+
+        yield return RefreshLoggedProfileData();
+
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {            
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadMenuBarOriginalImageInternal() loading User Original Image!");
+
+            m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kSkyboxSphereIndex, m_loggedUserOriginalUrl, m_user.m_id, true);
+        }
+
+        m_loadingIcon.Hide();
+    }
+
+    private IEnumerator RefreshLoggedProfileData() // NOTE: Since URL's have a lifetime, we need to refresh the data at certain points...
+    {            
+        yield return m_backEndAPI.User_GetUser(m_user.m_id);
+
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            m_loggedUserThumbnailUrl = m_backEndAPI.GetUserResult().data.attributes.thumbnail_url;
+            m_loggedUserOriginalUrl = m_backEndAPI.GetUserResult().data.attributes.original_url;
         }
     }
 
@@ -245,10 +348,27 @@ public class ProfileDetails : MonoBehaviour
     {
         yield return m_appDirector.VerifyInternetConnection();
 
-        string profileDescriptionNewText = m_profileDescriptionNewText.GetComponentInChildren<Text>().text;
-        Helper.TruncateString(ref profileDescriptionNewText, Helper.kMaxCaptionOrDescriptionLength);
+        m_loadingIcon.Display();
 
-        m_profileDescriptionObject.GetComponentInChildren<Text>().text = profileDescriptionNewText;
-        yield return m_backEndAPI.Register_UpdateProfileDescription(profileDescriptionNewText);
+        m_handle = m_profileHandleNewText.GetComponentInChildren<Text>().text;
+        Helper.TruncateString(ref m_handle, Helper.kMaxCaptionOrDescriptionLength);
+        m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_handle;
+        yield return m_backEndAPI.Register_UpdateHandle(m_handle);
+
+        m_profileDescription = m_profileDescriptionNewText.GetComponentInChildren<Text>().text;
+        Helper.TruncateString(ref m_profileDescription, Helper.kMaxCaptionOrDescriptionLength);
+        m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_profileDescription;
+        yield return m_backEndAPI.Register_UpdateProfileDescription(m_profileDescription);
+
+        m_handleObject.GetComponentInChildren<Text>().text = m_handle; 
+        m_menuBarProfileButtonObject.GetComponentInChildren<Text>().text = m_handle;
+        m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_profileDescription; 
+
+        m_profileDetailsTopLevel.SetActive(true);
+        m_profileDescriptionUpdateTopLevel.SetActive(false);
+        m_menuController.SetImagesAndMenuBarActive(true);
+        m_menuController.SetMenuBarActive(false);
+
+        m_loadingIcon.Hide();
     }
 }
