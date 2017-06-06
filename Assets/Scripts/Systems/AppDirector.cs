@@ -59,6 +59,7 @@ public class AppDirector : MonoBehaviour
         //m_coroutineQueue.StartLoop();       
 
         m_appState = AppState.kInit;
+        m_menuController.SetAllSubMenusActive(false);
 
         m_lostConnectionIcon.SetActive(false);
     }

@@ -67,15 +67,22 @@ public class MenuController : MonoBehaviour
         }
     }
 
+    //TODO: BE MORE RESTRICTIVE WITH THE ABILITY FOR OTHER CLASSES TO JUST ACTIVATE/DEACTIVATE UI!
     public void SetMenuBarActive(bool active)
     {
-        m_menuBar.SetActive(active);
+        //m_menuBar.SetActive(active);
+        SetSubTreeVisible(m_menuBar.gameObject, active);
+    }
+
+    public void SetImagesActive(bool active)
+    {
+        SetSubTreeVisible(m_imageSphereController.gameObject, active);
     }
 
     public void SetImagesAndMenuBarActive(bool active)
     {
-        SetSubTreeVisible(m_imageSphereController.gameObject, active);
-        m_menuBar.SetActive(active);
+        SetImagesActive(active);
+        SetMenuBarActive(active);
     }
                 
     public void SetAllSubMenusActive(bool active)
@@ -85,6 +92,11 @@ public class MenuController : MonoBehaviour
         m_searchSubMenu.SetActive(active);
         m_profileSubMenu.SetActive(active);
         m_gallerySubMenu.SetActive(active);
+    }
+
+    public void SetSubTreeVisible(GameObject subtree, bool visible)
+    {
+        SetSubTreeVisibleInternal(subtree, visible);
     }
 
     // **************************
@@ -212,7 +224,7 @@ public class MenuController : MonoBehaviour
         m_isMenuActive = visible;
     }
 
-    private void SetSubTreeVisible(GameObject subtree, bool visible)
+    private void SetSubTreeVisibleInternal(GameObject subtree, bool visible)
     {
         //We Trawl through all the subobjects, hiding all meshes, images and colliders!
         foreach(var renderer in subtree.GetComponentsInChildren<Renderer>())

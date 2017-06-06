@@ -17,7 +17,7 @@ public class FollowButton : MonoBehaviour
 
     // **************************
     // Public functions
-    // **************************
+    // **************************   
 
     public bool GetIsOn()
     {
@@ -33,7 +33,7 @@ public class FollowButton : MonoBehaviour
             m_menuButton.RefreshButtonColor();
   
             m_followText.color = m_buttonColourSelected;
-            m_followText.text = "Unfollow";
+            m_followText.text = "Following";
         }
         else
         {
@@ -41,7 +41,7 @@ public class FollowButton : MonoBehaviour
             m_menuButton.RefreshButtonColor();
 
             m_followText.color = m_buttonColourDeselected;
-            m_followText.text = "Follow";
+            m_followText.text = "Follow +";
         }
     }
 }

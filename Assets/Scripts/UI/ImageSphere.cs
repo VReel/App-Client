@@ -169,7 +169,10 @@ public class ImageSphere : MonoBehaviour
 
     public void LikesSelected()
     {
-        m_listUsers.DisplayLikeResults(m_imageIdentifier);
+        if (m_numLikes > 0)
+        {
+            m_listUsers.DisplayLikeResults(m_imageIdentifier);
+        }
     }
 
     public void CaptionSelected()

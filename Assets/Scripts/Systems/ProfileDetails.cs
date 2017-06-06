@@ -117,10 +117,22 @@ public class ProfileDetails : MonoBehaviour
     public void CloseProfileDetails()
     {
         m_imageSphereController.HideSphereAtIndex(Helper.kProfilePageSphereIndex, true); // True tells it to ForceHide
+        m_menuController.SetMenuBarActive(true);
         //m_profileDetailsTopLevel.SetActive(false);
         //m_profileDescriptionUpdateTopLevel.SetActive(false);
     }
-           
+
+    //HACK - do this better, Calling it from ListUsers, which is also always showing the ImageSpheres even when it shouldn't...
+    public void ShowOrHide(bool show)
+    {
+        m_profileDetailsTopLevel.SetActive(show);
+
+        if (m_appDirector.GetState() == AppDirector.AppState.kProfile && show) 
+        {
+            m_menuController.SetMenuBarActive(false);
+        }
+    }
+
     public void FollowSelected()
     {
         m_followedByMe = !m_followedByMe;
