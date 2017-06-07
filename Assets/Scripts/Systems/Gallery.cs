@@ -99,6 +99,7 @@ public class Gallery : MonoBehaviour
         m_user.GetUserMessageButton().SetText(kPreUploadText);
         m_uploadButton.SetActive(false);
         m_menuController.SetImagesAndMenuBarActive(false);
+        m_appDirector.SetOverlayShowing(true);
     }
 
     public void CancelUpload()
@@ -109,6 +110,7 @@ public class Gallery : MonoBehaviour
         m_user.GetUserMessageButton().SetText(kCancelUploadText);
         m_uploadButton.SetActive(true);
         m_menuController.SetImagesAndMenuBarActive(true);
+        m_appDirector.SetOverlayShowing(false);
     }
         
     public void UploadImage()

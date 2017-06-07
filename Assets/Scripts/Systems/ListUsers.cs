@@ -126,6 +126,7 @@ public class ListUsers : MonoBehaviour
 
     public void CloseListUsers()
     {
+        m_appDirector.SetOverlayShowing(false);
         m_displayItemsTopLevel.SetActive(false);
         m_menuController.SetImagesAndMenuBarActive(true);
         m_profileDetails.ShowOrHide(true); //Show
@@ -172,6 +173,7 @@ public class ListUsers : MonoBehaviour
     {
         yield return m_appDirector.VerifyInternetConnection();
 
+        m_appDirector.SetOverlayShowing(true);
         m_menuController.SetImagesAndMenuBarActive(false);
         m_profileDetails.ShowOrHide(false); //Hide
         m_listComments.CloseListComments();

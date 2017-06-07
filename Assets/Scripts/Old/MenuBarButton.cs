@@ -23,14 +23,14 @@ public class MenuBarButton : MonoBehaviour
     {
         m_isSelected = true;
         m_menuButton.SetForceColour(true, m_buttonColourSelected);
-        m_menuButton.RefreshButtonColor();
+        m_menuButton.RefreshColour();
     }
         
     public void OnButtonDeselected()
     {
         m_isSelected = false;
         m_menuButton.SetForceColour(false, m_buttonColourSelected);
-        m_menuButton.RefreshButtonColor();
+        m_menuButton.RefreshColour();
     }
 
     public void SetMenuSectionActive(bool active)

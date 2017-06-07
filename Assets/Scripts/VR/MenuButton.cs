@@ -70,11 +70,20 @@ namespace VRStandardAssets.Menu
             m_forceColour = forceColour;
             m_buttonForcedColour = buttonForcedColour;
 
-            RefreshButtonColor();
-            RefreshTextColor();
+            RefreshColour();
         }
 
-        public void RefreshButtonColor()
+        public void RefreshColour()
+        {
+            RefreshButtonColor();
+            RefreshTextColor();
+        }            
+
+        // **************************
+        // Private/Helper functions
+        // **************************
+
+        private void RefreshButtonColor()
         {
             if (m_buttonImage == null)
             {
@@ -99,7 +108,7 @@ namespace VRStandardAssets.Menu
             }
         }
 
-        public void RefreshTextColor()
+        private void RefreshTextColor()
         {
             if (m_buttonText == null)
             {
@@ -124,16 +133,11 @@ namespace VRStandardAssets.Menu
             }
         }
 
-        // **************************
-        // Private/Helper functions
-        // **************************
-
         private void HandleOver()
         {
             m_gazeOver = true;
 
-            RefreshButtonColor();
-            RefreshTextColor();
+            RefreshColour();
         }
             
         private void HandleOut()
@@ -141,16 +145,14 @@ namespace VRStandardAssets.Menu
             m_gazeOver = false;
             m_buttonDown = false;
 
-            RefreshButtonColor();
-            RefreshTextColor();
+            RefreshColour();
         }
 
         private void HandleDown()
         {
             m_buttonDown = true;
 
-            RefreshButtonColor();
-            RefreshTextColor();
+            RefreshColour();
         }
 
         private void HandleUp()
@@ -159,8 +161,7 @@ namespace VRStandardAssets.Menu
 
             m_buttonDown = false;
 
-            RefreshButtonColor();
-            RefreshTextColor();
+            RefreshColour();
 
             if (buttonSelected)
             {

@@ -43,6 +43,7 @@ public class AppDirector : MonoBehaviour
     [SerializeField] private GameObject m_lostConnectionIcon;
 
     private AppState m_appState;
+    private bool m_overlayShowing; // This is true when for example the Options menu comes on, as we don't want to change AppState entirely
     //private CoroutineQueue m_coroutineQueue;
 
     // **************************
@@ -67,6 +68,16 @@ public class AppDirector : MonoBehaviour
     public AppState GetState()
     {
         return m_appState;
+    }
+
+    public bool GetOverlayShowing()
+    {
+        return m_overlayShowing;
+    }
+
+    public void SetOverlayShowing(bool overlayShowing)
+    {
+        m_overlayShowing = overlayShowing;
     }
 
     public void Update()

@@ -78,6 +78,7 @@ public class ProfileDetails : MonoBehaviour
 
     public void SetMenuBarProfileDetails()
     {
+        //TODO: Improve this - such that there's less need to set so many things to active/inactive
         m_menuController.SetMenuBarActive(true);
         m_menuBarProfileButtonObject.GetComponentInChildren<Text>().text = m_user.m_handle;
         m_coroutineQueue.EnqueueAction(SetMenuBarProfileDetailsInternal());
@@ -152,12 +153,14 @@ public class ProfileDetails : MonoBehaviour
         {
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreUpdateProfileDescription() called");
 
+            //TODO: Improve this - such that there's less need to set so many things to active/inactive
             m_profileDetailsTopLevel.SetActive(false);
             m_profileDescriptionUpdateTopLevel.SetActive(true);
             m_profileHandleNewText.GetComponentInChildren<Text>().text = m_handle;
             m_profileDescriptionNewText.GetComponentInChildren<Text>().text = m_profileDescription;
 
             m_menuController.SetImagesAndMenuBarActive(false);
+            m_appDirector.SetOverlayShowing(true);
         }            
     }
 
@@ -165,10 +168,12 @@ public class ProfileDetails : MonoBehaviour
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelUpdateProfileDescription() called");
 
+        //TODO: Improve this - such that there's less need to set so many things to active/inactive
         m_profileDetailsTopLevel.SetActive(true);
         m_profileDescriptionUpdateTopLevel.SetActive(false);
         m_menuController.SetImagesAndMenuBarActive(true);
         m_menuController.SetMenuBarActive(false);
+        m_appDirector.SetOverlayShowing(false);
     }
 
     public void AcceptUpdateProfileDescription()
@@ -364,10 +369,12 @@ public class ProfileDetails : MonoBehaviour
         m_menuBarProfileButtonObject.GetComponentInChildren<Text>().text = m_handle;
         m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_profileDescription; 
 
+        //TODO: Improve this - such that there's less need to set so many things to active/inactive
         m_profileDetailsTopLevel.SetActive(true);
         m_profileDescriptionUpdateTopLevel.SetActive(false);
         m_menuController.SetImagesAndMenuBarActive(true);
         m_menuController.SetMenuBarActive(false);
+        m_appDirector.SetOverlayShowing(false);
 
         m_loadingIcon.Hide();
     }

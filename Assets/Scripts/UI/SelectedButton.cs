@@ -38,7 +38,7 @@ public class SelectedButton : MonoBehaviour
         if (m_menuButton != null)
         {
             m_menuButton.SetForceColour(true, m_buttonColourSelected);
-            m_menuButton.RefreshButtonColor();
+            m_menuButton.RefreshColour();
         }
     }
 
@@ -48,7 +48,7 @@ public class SelectedButton : MonoBehaviour
         if (m_menuButton != null)
         {
             m_menuButton.SetForceColour(false, m_buttonColourSelected);
-            m_menuButton.RefreshButtonColor();
+            m_menuButton.RefreshColour();
         }
     }
 }

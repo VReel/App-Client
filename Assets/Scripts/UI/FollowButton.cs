@@ -30,7 +30,7 @@ public class FollowButton : MonoBehaviour
         if (m_isOn)
         {
             m_menuButton.SetForceColour(true, m_buttonColourSelected);
-            m_menuButton.RefreshButtonColor();
+            m_menuButton.RefreshColour();
   
             m_followText.color = m_buttonColourSelected;
             m_followText.text = "Following";
@@ -38,7 +38,7 @@ public class FollowButton : MonoBehaviour
         else
         {
             m_menuButton.SetForceColour(false, m_buttonColourSelected);
-            m_menuButton.RefreshButtonColor();
+            m_menuButton.RefreshColour();
 
             m_followText.color = m_buttonColourDeselected;
             m_followText.text = "Follow +";

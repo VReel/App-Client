@@ -123,6 +123,8 @@ public class OptionsFlow : MonoBehaviour
 
         m_menuController.SetCurrentSubMenuActive(false);
         m_menuController.SetImagesAndMenuBarActive(false);
+
+        m_appDirector.SetOverlayShowing(true);
     }
 
     private void CloseMenu()
@@ -133,6 +135,8 @@ public class OptionsFlow : MonoBehaviour
 
         m_menuController.SetCurrentSubMenuActive(true);
         m_menuController.SetImagesAndMenuBarActive(true);
+
+        m_appDirector.SetOverlayShowing(false);
     }
 
     private IEnumerator LogoutInternal()
