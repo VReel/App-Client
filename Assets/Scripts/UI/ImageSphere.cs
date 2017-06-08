@@ -9,6 +9,7 @@ public class ImageSphere : MonoBehaviour
     // Member Variables
     // **************************
 
+    [SerializeField] private User m_user;
     [SerializeField] private Search m_search;
     [SerializeField] private Posts m_posts;
     [SerializeField] private ListUsers m_listUsers;
@@ -16,6 +17,7 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private Profile m_profile;
     [SerializeField] private ProfileDetails m_profileDetails;
+    [SerializeField] private ImageFlow m_imageFlow;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
@@ -123,10 +125,51 @@ public class ImageSphere : MonoBehaviour
         }
     }
 
+    public void SetImageSummary(GameObject handleObject, GameObject captionObject, GameObject likeCountObject, GameObject commentCountObject, GameObject heartObject)
+    {
+        if (handleObject != null)
+        {
+            handleObject.SetActive(m_handle.Length > 0);
+            handleObject.GetComponentInChildren<Text>().text = m_handle;
+        }
+
+        if (captionObject != null)
+        {
+            captionObject.SetActive(m_caption.Length > 0);
+            captionObject.GetComponentInChildren<Text>().text = m_caption;
+        }
+
+        if (likeCountObject != null)
+        {
+            likeCountObject.SetActive(m_numLikes >= 0);
+            likeCountObject.GetComponentInChildren<Text>().text = m_numLikes.ToString() + (m_numLikes == 1 ? " like" : " likes");
+        }
+
+        if (commentCountObject != null)
+        {
+            commentCountObject.SetActive(m_caption.Length > 0);
+            commentCountObject.GetComponentInChildren<Text>().text = (m_commentCount + 1).ToString() + (m_commentCount == 1 ? " comment" : " comments"); //Adding 1 for Caption itself
+        }
+
+        if (heartObject != null)
+        {
+            heartObject.SetActive(m_numLikes >= 0);
+            heartObject.GetComponentInChildren<SelectedButton>().ButtonSelected(m_heartOn);
+        }
+    }
+
+    public int GetCommentCount()
+    {
+        return m_commentCount;
+    }
+
     public void AddToCommentCount(int addValue)
     {
         m_commentCount += addValue;
-        m_commentCountObject.GetComponentInChildren<Text>().text = (m_commentCount + 1).ToString(); //Adding 1 for Caption itself
+        if (m_commentCountObject != null)
+        {
+            m_commentCountObject.GetComponentInChildren<Text>().text = (m_commentCount + 1).ToString(); //Adding 1 for Caption itself
+        }
     }
 
     public void Hide()
@@ -167,6 +210,16 @@ public class ImageSphere : MonoBehaviour
         m_posts.LikeOrUnlikePost(m_imageIdentifier, m_heartOn);
     }
 
+    public void HeartSelectedWithObject(GameObject heartObject, GameObject likeCountObject)
+    {
+        m_heartOn = !m_heartOn;
+        m_numLikes = m_heartOn ? m_numLikes+1 : m_numLikes-1;
+
+        heartObject.GetComponentInChildren<SelectedButton>().ButtonSelected(m_heartOn);
+        likeCountObject.GetComponentInChildren<Text>().text = m_numLikes.ToString() + " likes";
+        m_posts.LikeOrUnlikePost(m_imageIdentifier, m_heartOn);
+    }
+
     public void LikesSelected()
     {
         if (m_numLikes > 0)
@@ -175,9 +228,14 @@ public class ImageSphere : MonoBehaviour
         }
     }
 
-    public void CaptionSelected()
+    public void CommentsSelected()
     {
         m_listComments.DisplayCommentResults(m_imageIdentifier, this);
+    }
+
+    public bool IsLoggedUserImage()
+    {
+        return m_user.IsCurrentUser(m_userId);
     }
 
     // **************************
@@ -197,6 +255,7 @@ public class ImageSphere : MonoBehaviour
         m_imageObject.GetComponent<ImageSphereAnimation>().SetActive(true);
     }
 
+    //TODO: Limit this to only update things that exist in the new Design...
     private void UpdateMetadata()
     {
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateMetada() called on sphere: " + (m_imageSphereIndex+1) );
@@ -351,15 +410,14 @@ public class ImageSphere : MonoBehaviour
     {   
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() called on sphere: " + (m_imageSphereIndex+1));
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() (m_imageIdentifier.Length > 0): " + (m_imageIdentifier.Length > 0));
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() (m_imageSphereSkybox.GetImageIdentifier().CompareTo(m_imageIdentifier) != 0): " + (m_imageSphereSkybox.GetImageIdentifier().CompareTo(m_imageIdentifier) != 0));
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() (m_currTextureIndex != kLoadingTextureIndex): " + (m_currTextureIndex != kLoadingTextureIndex));
-
         bool willChangeImage = (m_imageIdentifier.Length > 0) && (m_imageSphereSkybox.GetImageIdentifier().CompareTo(m_imageIdentifier) != 0) && (m_currTextureIndex != kLoadingTextureIndex);
         if (!willChangeImage)
         {
+            if (m_imageFlow != null)
+            {
+                m_imageFlow.OpenWithImageSphere(this);
+            }
+            
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() will not ChangeImage");
             return;
         }
@@ -450,6 +508,11 @@ public class ImageSphere : MonoBehaviour
         m_imageObject.transform.localScale = initialScale;
         m_imageObject.GetComponent<ImageSphereAnimation>().SetActive(true);
         m_imageObject.GetComponent<Collider>().enabled = true;
+
+        if (m_imageFlow != null)
+        {
+            m_imageFlow.OpenWithImageSphere(this);
+        }
     }
 
     private float ExponentialProgress(float progress)

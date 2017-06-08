@@ -44,7 +44,7 @@ public class Profile : MonoBehaviour
 
     public void Update() //TODO Make this event based instead...
     {
-        bool noImagesUploaded = m_posts.GetNumPosts() <= 0;
+        bool noImagesUploaded = m_posts.GetNumPosts() <= 0 && !m_loadingIcon.IsDisplaying() && m_user.IsCurrentUser(m_userId);
         m_newUserText.SetActive(noImagesUploaded); // If the user has yet to upload any images then show them the New User Text!
     }
 
@@ -85,6 +85,7 @@ public class Profile : MonoBehaviour
         m_appDirector.RequestExploreState();
     }
 
+    // TODO: DELETE this function...
     public void PreDelete()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreDelete() called on post: " + m_imageSkybox.GetImageIdentifier());
@@ -95,6 +96,7 @@ public class Profile : MonoBehaviour
         m_user.GetUserMessageButton().SetTextAsError(kPreDeleteText);
     }
 
+    // TODO: DELETE this function...
     public void CancelDelete()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelDelete() called");
@@ -105,6 +107,7 @@ public class Profile : MonoBehaviour
         m_user.GetUserMessageButton().SetText(kCancelDeleteText);
     }
 
+    // TODO: Move this function somewhere else...
     public void Delete()
     {
         m_confirmDeleteButton.SetActive(false);
@@ -144,13 +147,15 @@ public class Profile : MonoBehaviour
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {            
             // Report Success in Profile
-            m_user.GetUserMessageButton().SetText(kSuccessfulDeleteText);
+            // TODO: Report Success!
+            //m_user.GetUserMessageButton().SetText(kSuccessfulDeleteText);
             m_posts.RequestPostRemoval(id);
         }
         else
         {
             // Report Failure in Profile
-            m_user.GetUserMessageButton().SetTextAsError(kFailedDeleteText);
+            // TODO: Report Failure!
+            //m_user.GetUserMessageButton().SetTextAsError(kFailedDeleteText);
         }
 
         m_loadingIcon.Hide();
