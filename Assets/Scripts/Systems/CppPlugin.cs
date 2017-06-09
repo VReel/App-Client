@@ -71,7 +71,8 @@ public class CppPlugin
         kInit = 0,
         kCreateEmptyTexture = 1,
         kLoadScanlinesIntoTextureFromWorkingMemory = 2,
-        kTerminate = 3
+        kRenewTextureHandle = 3,
+        kTerminate = 4
     };
 
     // **************************
@@ -121,9 +122,12 @@ public class CppPlugin
 
         //TODO: Make CreateEmptyTexture() more efficient - the problem is simply that a glTexImage2D() call is slow with large textures!
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateEmptyTexture() over textureIndex = " + textureIndex);
-        yield return null;
-        SetCurrTextureIndex(textureIndex);
         yield return m_waitForEndOfFrame;
+        SetCurrTextureIndex(textureIndex);
+        GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kRenewTextureHandle);
+        yield return m_waitForSeconds; // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
+
+        yield return null;
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kCreateEmptyTexture);
         yield return m_waitForSeconds; // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateEmptyTexture(), Texture Handle = " + GetCurrStoredTexturePtr() );
@@ -145,12 +149,13 @@ public class CppPlugin
             Texture2D.CreateExternalTexture(
                 GetCurrStoredImageWidth(), 
                 GetCurrStoredImageHeight(), 
-                TextureFormat.RGBA32,           // Default textures have a format of ARGB32
-                false,
-                false,
+                TextureFormat.RGB24, //TextureFormat.RGBA32,           // Default textures have a format of ARGB32
+                true,
+                true,
                 GetCurrStoredTexturePtr()
             );
         yield return null;
+        m_lastTextureOperatedOn.filterMode = FilterMode.Trilinear;
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateExternalTexture()!");
 
 
@@ -191,9 +196,12 @@ public class CppPlugin
 
         //TODO: Make CreateEmptyTexture() more efficient - the problem is simply that a glTexImage2D() call is slow with large textures!
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateEmptyTexture()");
-        yield return null;
-        SetCurrTextureIndex(textureIndex);
         yield return m_waitForEndOfFrame;
+        SetCurrTextureIndex(textureIndex);
+        GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kRenewTextureHandle);
+        yield return m_waitForSeconds; // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
+
+        yield return null;
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kCreateEmptyTexture);
         yield return m_waitForSeconds; // These waits need to be longer to ensure that GL.IssuePluginEvent() has gone through!
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateEmptyTexture(), Texture Handle = " + GetCurrStoredTexturePtr() );
@@ -215,12 +223,13 @@ public class CppPlugin
             Texture2D.CreateExternalTexture(
                 GetCurrStoredImageWidth(), 
                 GetCurrStoredImageHeight(), 
-                TextureFormat.RGBA32,           // Default textures have a format of ARGB32
-                false,
-                false,
+                TextureFormat.RGB24, //TextureFormat.RGBA32,           // Default textures have a format of ARGB32
+                true,
+                true,
                 GetCurrStoredTexturePtr()
             );
         yield return null;
+        m_lastTextureOperatedOn.filterMode = FilterMode.Trilinear;
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateExternalTexture()!");
 
 

@@ -1,14 +1,16 @@
 #include <jni.h>
 #include <string>
 #include <cstdio>
+#include <ctime>
+#include <chrono>
 #include <android/log.h>
-#include <GLES2/gl2.h>
+#include <GLES3/gl3.h>
 #include "Unity/IUnityGraphics.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 #define  LOG_TAG    "----------------- VREEL: CppPlugin - "
-#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
+#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 
 // **************************
 // Member Variables
@@ -69,7 +71,8 @@ enum RenderFunctions
     kInit = 0,
     kCreateEmptyTexture = 1,
     kLoadScanlinesIntoTextureFromWorkingMemory = 2,
-    kTerminate = 3
+    kRenewTextureHandle = 3,
+    kTerminate = 4
 };
 
 void Init()
@@ -121,8 +124,12 @@ void CreateEmptyTexture()
     glBindTexture(GL_TEXTURE_2D, textureId);
     PrintAllGlError();
 
-    LOGI("glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_imageWidth, m_imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL");
+    LOGI("glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, %d, %d, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL)", m_currImageWidth, m_currImageHeight);
+    auto wcts = std::chrono::high_resolution_clock::now();
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_currImageWidth, m_currImageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL); //(unsigned char*) m_pWorkingMemory);
+    std::chrono::duration<double> wctduration = (std::chrono::high_resolution_clock::now() - wcts);
+
+    LOGI("glTexImage2D() walltime = %f", wctduration.count());
     PrintAllGlError();
 
     m_isLoadingIntoTexture = true;
@@ -148,7 +155,7 @@ void LoadScanlinesIntoTextureFromWorkingMemory()
                      ? kIdealNumberOfScanlinesToUpload
                      : (m_currImageHeight - m_textureLoadingYOffset);
 
-    LOGI("glTexSubImage2D(GL_TEXTURE_2D, 0, 0, %d, m_imageWidth, %d, GL_RGB, GL_UNSIGNED_BYTE, pImage", m_textureLoadingYOffset, height);
+    LOGI("glTexSubImage2D(GL_TEXTURE_2D, 0, 0, %d, %d, %d, GL_RGB, GL_UNSIGNED_BYTE, pImage", m_textureLoadingYOffset, m_currImageWidth, height);
     stbi_uc* pImage = m_pWorkingMemory + (m_textureLoadingYOffset * m_currImageWidth * kNumStbChannels);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, m_textureLoadingYOffset, m_currImageWidth, height, GL_RGB, GL_UNSIGNED_BYTE, pImage);
     PrintAllGlError();
@@ -161,9 +168,28 @@ void LoadScanlinesIntoTextureFromWorkingMemory()
 
         LOGI("glGenerateMipmap(GL_TEXTURE_2D)");
         glGenerateMipmap(GL_TEXTURE_2D);
+        PrintAllGlError();
     }
 
     LOGI("Finished LoadScanlinesIntoTextureFromWorkingMemory()! Loading in progress = %d", m_isLoadingIntoTexture);
+}
+
+// Trying this out to see if it improves performance...
+void RenewTextureHandle()
+{
+    LOGI("Calling RenewTextureHandle()");
+
+    LOGI("glDeleteTextures(1, %d)", m_currTextureIndex);
+    auto wcts = std::chrono::high_resolution_clock::now();
+    glDeleteTextures(1, m_textureIDs + m_currTextureIndex);
+    std::chrono::duration<double> wctduration = (std::chrono::high_resolution_clock::now() - wcts);
+
+    LOGI("glDeleteTextures() walltime = %f", wctduration.count());
+    PrintAllGlError();
+
+    LOGI("glGenTextures(1, %d)", m_currTextureIndex);
+    glGenTextures(1, m_textureIDs + m_currTextureIndex);
+    PrintAllGlError();
 }
 
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
@@ -179,6 +205,10 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
     else if (eventID == kLoadScanlinesIntoTextureFromWorkingMemory)
     {
         LoadScanlinesIntoTextureFromWorkingMemory();
+    }
+    else if (eventID == kRenewTextureHandle)
+    {
+        RenewTextureHandle();
     }
     else if (eventID == kTerminate)
     {
@@ -220,7 +250,7 @@ bool IsLoadingIntoTexture()
 
 void* GetCurrStoredTexturePtr()
 {
-    return (void*)(m_textureIDs[m_currTextureIndex]);
+    return (void*)(intptr_t)(m_textureIDs[m_currTextureIndex]);
 }
 
 int GetCurrStoredImageWidth()

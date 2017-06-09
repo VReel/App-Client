@@ -9,6 +9,7 @@ public class ImageSphere : MonoBehaviour
     // Member Variables
     // **************************
 
+    [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
     [SerializeField] private Search m_search;
     [SerializeField] private Posts m_posts;
@@ -509,7 +510,7 @@ public class ImageSphere : MonoBehaviour
         m_imageObject.GetComponent<ImageSphereAnimation>().SetActive(true);
         m_imageObject.GetComponent<Collider>().enabled = true;
 
-        if (m_imageFlow != null)
+        if (m_imageFlow != null && m_appDirector.GetState() != AppDirector.AppState.kGallery)
         {
             m_imageFlow.OpenWithImageSphere(this);
         }

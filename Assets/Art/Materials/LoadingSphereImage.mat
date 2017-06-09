@@ -23,8 +23,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _Dim: 0
+    - _ExtraBias: 0.5
+    - _ExtrapBias: 0
     - _FlipY: 1
     - _Glossiness: 0.5
     - _Metallic: 0
+    - _MipBias: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}

@@ -23,5 +23,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _Dim: 0
+    - _ExtraBias: 0
+    - _ExtrapBias: 5
     - _FlipY: 0
+    - _MipBias: -5
     m_Colors: []
