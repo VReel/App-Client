@@ -68,6 +68,7 @@ public class ImageSkybox : MonoBehaviour
         m_uploadButton.SetActive(isImageFromDevice && isGalleryState && !isProfileImage);  // Currently the ImageSkybox class is responsible for switching on the Upload button
 
         gameObject.GetComponent<MeshRenderer>().material.mainTexture = m_skyboxTexture;
+        gameObject.GetComponent<MeshRenderer>().material.SetFloat("_FlipY", 1.0f);
 
         // TODO: have the skybox be used instead of just a sphere around the user
         // RenderSettings.skybox = texture; 
