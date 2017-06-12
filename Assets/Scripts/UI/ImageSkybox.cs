@@ -13,6 +13,7 @@ public class ImageSkybox : MonoBehaviour
     [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private GameObject m_uploadButton;
 
+    private Material m_myMaterial;
     private int m_currTextureIndex = -1; // ImageSkybox must track the index of the underlying texture it points to in C++ plugin
     private Texture2D m_skyboxTexture;
     private string m_imageIdentifier; // Points to where the Image came from (S3 Bucket, or Local Device)
@@ -25,6 +26,7 @@ public class ImageSkybox : MonoBehaviour
     {
         m_skyboxTexture = new Texture2D(2,2);
         m_imageIdentifier = "Invalid";
+        m_myMaterial = gameObject.GetComponent<MeshRenderer>().material;
     }
 
     public bool IsTextureValid()
@@ -41,6 +43,16 @@ public class ImageSkybox : MonoBehaviour
     {
         return m_imageIdentifier;
     }       
+
+    public float GetDim()
+    {
+        return m_myMaterial.GetFloat("_Dim");
+    }
+
+    public void SetDim(float dim)
+    {
+        m_myMaterial.SetFloat("_Dim", dim);
+    }
 
     public void SetImage(Texture2D texture, string imageIdentifier, int textureIndex)
     {        
@@ -67,8 +79,8 @@ public class ImageSkybox : MonoBehaviour
         bool isImageFromDevice = m_imageIdentifier.StartsWith(m_imageSphereController.GetTopLevelDirectory());
         m_uploadButton.SetActive(isImageFromDevice && isGalleryState && !isProfileImage);  // Currently the ImageSkybox class is responsible for switching on the Upload button
 
-        gameObject.GetComponent<MeshRenderer>().material.mainTexture = m_skyboxTexture;
-        gameObject.GetComponent<MeshRenderer>().material.SetFloat("_FlipY", 1.0f);
+        m_myMaterial.mainTexture = m_skyboxTexture;
+        m_myMaterial.SetFloat("_FlipY", 1.0f);
 
         // TODO: have the skybox be used instead of just a sphere around the user
         // RenderSettings.skybox = texture; 

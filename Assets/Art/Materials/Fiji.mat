@@ -22,7 +22,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _Dim: 0.603
+    - _Dim: 0.7
     - _ExtraBias: 0
     - _ExtrapBias: 5
     - _FlipY: 0

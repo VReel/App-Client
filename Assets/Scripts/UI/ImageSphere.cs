@@ -477,6 +477,7 @@ public class ImageSphere : MonoBehaviour
 
         // When Image has reached the user then SetSkybox to Thumbnail and grow the sphere
         m_imageObject.transform.position = userPos;
+        m_imageSphereSkybox.SetDim(0); // switch off Dim because no image sphere's have Dim!
         SetSkybox(imageIdentifier);
 
         // Scale to size of SkyBox
@@ -513,6 +514,7 @@ public class ImageSphere : MonoBehaviour
         if (m_imageFlow != null && m_appDirector.GetState() != AppDirector.AppState.kGallery)
         {
             m_imageFlow.OpenWithImageSphere(this);
+            m_menuController.SetSkyboxDimOn(true); // switch dim back on gradually...
         }
     }
 

@@ -13,6 +13,7 @@ public class MenuController : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;  
     [SerializeField] private ImageSphereController m_imageSphereController;
+    [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private GameObject m_menuSubTree;
     [SerializeField] private GameObject m_loginSubMenu;
     [SerializeField] private GameObject m_homeSubMenu;
@@ -27,10 +28,17 @@ public class MenuController : MonoBehaviour
     [SerializeField] private GameObject[] m_menuBarButtons;
 
     private bool m_isMenuActive = true;
+    private CoroutineQueue m_coroutineQueue;
 
     // **************************
     // Public functions
     // **************************
+
+    public void Start() 
+    {
+        m_coroutineQueue = new CoroutineQueue(this);
+        m_coroutineQueue.StartLoop();
+    }
 
     public bool IsMenuActive()
     {
@@ -97,6 +105,17 @@ public class MenuController : MonoBehaviour
     public void SetSubTreeVisible(GameObject subtree, bool visible)
     {
         SetSubTreeVisibleInternal(subtree, visible);
+    }
+
+    public void SetMenuVisible(bool visible)
+    {
+        SetMenuVisibleInternal(visible);
+    }
+
+    public void SetSkyboxDimOn(bool visible)
+    {
+        m_coroutineQueue.Clear();
+        m_coroutineQueue.EnqueueAction(SetSkyboxDimOnInternal(visible));
     }
 
     // **************************
@@ -190,7 +209,7 @@ public class MenuController : MonoBehaviour
         }
     }
 
-    private void SetMenuVisible(bool visible)
+    private void SetMenuVisibleInternal(bool visible)
     {        
         if (m_menuSubTree != null)
         {
@@ -242,4 +261,19 @@ public class MenuController : MonoBehaviour
             collider.enabled = visible; // Handles BoxCollider + MeshCollider components
         }
     }
+
+    private IEnumerator SetSkyboxDimOnInternal(bool dimOn)
+    {
+        const float kMaxDimOn = 0.7f;
+        const float kDuration = 2.0f;
+
+        float lerpDelta = (Time.fixedDeltaTime / kDuration) * kMaxDimOn;
+        float currentDim = m_imageSkybox.GetDim();
+        while (0 <= currentDim && currentDim <= kMaxDimOn)
+        {                        
+            m_imageSkybox.SetDim(currentDim);
+            currentDim += dimOn ? lerpDelta : -lerpDelta;
+            yield return null;
+        }
+    }        
 }
