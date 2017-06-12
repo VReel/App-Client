@@ -24,7 +24,6 @@ public class KeyBoard : MonoBehaviour
     private Text[] m_allTextChars;
     private Text[] m_allSymbolChars;
     private string m_actualText;
-    private string m_blinkText;
 
     // **************************
     // Public functions
@@ -78,7 +77,9 @@ public class KeyBoard : MonoBehaviour
         Hide();
         m_shouldBeShowing = false;
         m_symbolMode = false;
-        m_capitalLeters = false;
+        m_capitalLeters = true;
+
+        UperLowerCase(); // Force Lower case to begin with...
 	}
 	
 	// Update is called once per frame
@@ -100,7 +101,7 @@ public class KeyBoard : MonoBehaviour
 				}
 				else
 				{
-                    m_objectiveTextObject.text = m_blinkText;
+                    m_objectiveTextObject.text = m_actualText + " |";
 				}
 
                 m_blink = !m_blink;
@@ -110,20 +111,17 @@ public class KeyBoard : MonoBehaviour
 
 	public void WriteChar(Text txt)
 	{
-        m_objectiveTextObject.text = m_actualText + txt.text;
-        m_actualText = m_objectiveTextObject.text;
-        m_blinkText = m_objectiveTextObject.text + " |";	
+        m_actualText = m_actualText + txt.text;
+        m_objectiveTextObject.text = m_actualText;
 	}
 
 	public void Erase()
 	{
         if(m_actualText.Length > 0)
 		{
-            m_objectiveTextObject.text = m_actualText.Remove(m_actualText.Length-1);
+            m_actualText = m_actualText.Remove(m_actualText.Length-1);
+            m_objectiveTextObject.text = m_actualText;
 		}
-
-        m_actualText = m_objectiveTextObject.text;
-        m_blinkText = m_objectiveTextObject.text + " |";
 	}
 
     public bool ShouldBeShowing()
@@ -159,7 +157,6 @@ public class KeyBoard : MonoBehaviour
 		}
 
         m_actualText = m_objectiveTextObject.text;
-        m_blinkText = m_objectiveTextObject.text + " |";
 
         m_shouldBeShowing = true;
         Show();
@@ -172,9 +169,8 @@ public class KeyBoard : MonoBehaviour
         var passwordText = m_objectiveTextObject.GetComponent<PasswordText>();
         if (m_defaultText.CompareTo(m_objectiveTextObject.text) == 0 || passwordText != null)
         {
+            m_actualText = "";
             m_objectiveTextObject.text = "";
-            m_actualText = m_objectiveTextObject.text;
-            m_blinkText = m_objectiveTextObject.text + " |";
         }
     }
 
@@ -217,6 +213,11 @@ public class KeyBoard : MonoBehaviour
         
 	public void UperLowerCase()
 	{
+        if(m_symbolMode == true)
+        {
+            return;
+        }
+        
         if(m_capitalLeters == false)
 		{
             for(int i = 0; i < m_numLetters; i++)

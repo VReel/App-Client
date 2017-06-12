@@ -360,15 +360,22 @@ public class ProfileDetails : MonoBehaviour
         m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_handle;
         yield return m_backEndAPI.Register_UpdateHandle(m_handle);
 
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            m_handleObject.GetComponentInChildren<Text>().text = m_handle;
+            m_menuBarProfileButtonObject.GetComponentInChildren<Text>().text = m_handle;
+        }
+
         m_profileDescription = m_profileDescriptionNewText.GetComponentInChildren<Text>().text;
         Helper.TruncateString(ref m_profileDescription, Helper.kMaxCaptionOrDescriptionLength);
         m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_profileDescription;
         yield return m_backEndAPI.Register_UpdateProfileDescription(m_profileDescription);
 
-        m_handleObject.GetComponentInChildren<Text>().text = m_handle; 
-        m_menuBarProfileButtonObject.GetComponentInChildren<Text>().text = m_handle;
-        m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_profileDescription; 
-
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_profileDescription;
+        }
+            
         //TODO: Improve this - such that there's less need to set so many things to active/inactive
         m_profileDetailsTopLevel.SetActive(true);
         m_profileDescriptionUpdateTopLevel.SetActive(false);
