@@ -36,18 +36,24 @@ namespace VRStandardAssets.Menu
 
         public void Start()
         {
-            m_InteractiveItem.OnOver += HandleOver;
-            m_InteractiveItem.OnOut += HandleOut;
-            m_InteractiveItem.OnDown += HandleDown;
-            m_InteractiveItem.OnUp += HandleUp;
+            if (m_InteractiveItem)
+            {
+                m_InteractiveItem.OnOver += HandleOver;
+                m_InteractiveItem.OnOut += HandleOut;
+                m_InteractiveItem.OnDown += HandleDown;
+                m_InteractiveItem.OnUp += HandleUp;
+            }
         }
 
         public void OnDestroy()
         {
-            m_InteractiveItem.OnOver -= HandleOver;
-            m_InteractiveItem.OnOut -= HandleOut;
-            m_InteractiveItem.OnDown -= HandleDown;
-            m_InteractiveItem.OnUp -= HandleUp;
+            if (m_InteractiveItem)
+            {
+                m_InteractiveItem.OnOver -= HandleOver;
+                m_InteractiveItem.OnOut -= HandleOut;
+                m_InteractiveItem.OnDown -= HandleDown;
+                m_InteractiveItem.OnUp -= HandleUp;
+            }
         }
 
         public void OnEnable()

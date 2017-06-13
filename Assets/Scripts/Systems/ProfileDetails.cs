@@ -246,6 +246,8 @@ public class ProfileDetails : MonoBehaviour
 
     private void DownloadThumbnailImage()
     {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadThumbnailImage() loading User Thumbnail Image for: " + m_thumbnailUrl);
+
         if (m_thumbnailUrl != null && m_thumbnailUrl.Length > 0)
         {
             m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kProfilePageSphereIndex, m_thumbnailUrl, m_userId, false);
@@ -262,7 +264,7 @@ public class ProfileDetails : MonoBehaviour
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {            
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadOriginalImageInternal() loading User Original Image!");
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadOriginalImageInternal() loading User Original Image for: " + m_originalUrl);
 
             m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kSkyboxSphereIndex, m_originalUrl, m_userId, true);
         }
@@ -294,6 +296,8 @@ public class ProfileDetails : MonoBehaviour
 
     private void DownloadMenuBarThumbnailImage()
     {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadMenuBarThumbnailImage() loading User Thumbnail Image for: " + m_loggedUserThumbnailUrl);
+
         if (m_loggedUserThumbnailUrl != null && m_loggedUserThumbnailUrl.Length > 0)
         {
             m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kMenuBarProfileSphereIndex, m_loggedUserThumbnailUrl, m_user.m_id, false);
@@ -310,7 +314,7 @@ public class ProfileDetails : MonoBehaviour
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {            
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadMenuBarOriginalImageInternal() loading User Original Image!");
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadMenuBarOriginalImageInternal() loading User Original Image for: " + m_loggedUserOriginalUrl);
 
             m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kSkyboxSphereIndex, m_loggedUserOriginalUrl, m_user.m_id, true);
         }

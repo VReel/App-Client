@@ -23,12 +23,9 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
     [SerializeField] private GameObject m_imageObject;
-    [SerializeField] private GameObject m_handleImageObject;
     [SerializeField] private GameObject m_handleObject;
     [SerializeField] private GameObject m_heartObject;
     [SerializeField] private GameObject m_likesObject;
-    [SerializeField] private GameObject m_captionObject;
-    [SerializeField] private GameObject m_commentCountObject;
     [SerializeField] private bool m_isSmallImageSphere;
 
     private const float kMinShrink = 0.0005f; // Minimum value the sphere will shrink to...
@@ -167,10 +164,6 @@ public class ImageSphere : MonoBehaviour
     public void AddToCommentCount(int addValue)
     {
         m_commentCount += addValue;
-        if (m_commentCountObject != null)
-        {
-            m_commentCountObject.GetComponentInChildren<Text>().text = (m_commentCount + 1).ToString(); //Adding 1 for Caption itself
-        }
     }
 
     public void Hide()
@@ -245,7 +238,7 @@ public class ImageSphere : MonoBehaviour
 
     private void UpdateTextureAndID()
     {
-        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateTextureAndID() called on sphere: " + (m_imageSphereIndex+1) );
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateTextureAndID() called on sphere: " + (m_imageSphereIndex) );
 
         m_imageObject.GetComponent<MeshRenderer>().material.mainTexture = m_imageSphereTexture;
 
@@ -259,21 +252,16 @@ public class ImageSphere : MonoBehaviour
     //TODO: Limit this to only update things that exist in the new Design...
     private void UpdateMetadata()
     {
-        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateMetada() called on sphere: " + (m_imageSphereIndex+1) );
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateMetada() called on sphere: " + (m_imageSphereIndex) );
 
         bool isSphereLoading = m_currTextureIndex == kLoadingTextureIndex;
 
+        /*
         if (m_handleImageObject != null)
         {
             m_handleImageObject.SetActive(false);
             //m_handleImageObject.SetActive(!isSphereLoading && m_handle.Length > 0 && !m_posts.IsProfileType());
             //TODO: Appropriately load image...
-        }
-
-        if (m_handleObject != null)
-        {
-            m_handleObject.SetActive(!isSphereLoading && m_handle.Length > 0 && !m_posts.IsProfileType());
-            m_handleObject.GetComponentInChildren<Text>().text = m_handle;
         }
 
         if (m_captionObject != null)
@@ -286,6 +274,13 @@ public class ImageSphere : MonoBehaviour
         {
             m_commentCountObject.SetActive(!isSphereLoading && m_caption.Length > 0);
             m_commentCountObject.GetComponentInChildren<Text>().text = (m_commentCount + 1).ToString(); //Adding 1 for Caption itself
+        }
+        */
+
+        if (m_handleObject != null)
+        {
+            m_handleObject.SetActive(!isSphereLoading && m_handle.Length > 0 && !m_posts.IsProfileType());
+            m_handleObject.GetComponentInChildren<Text>().text = m_handle;
         }
 
         if (m_likesObject != null)
@@ -303,10 +298,7 @@ public class ImageSphere : MonoBehaviour
         if (m_menuController != null)
         {
             bool isVisible = m_menuController.IsMenuActive() && m_imageObject.GetComponent<MeshRenderer>().enabled;
-            EnableAllInteractableComponentsInObject(m_handleImageObject, isVisible);
             EnableAllInteractableComponentsInObject(m_handleObject, isVisible);
-            EnableAllInteractableComponentsInObject(m_captionObject, isVisible);
-            EnableAllInteractableComponentsInObject(m_commentCountObject, isVisible);
             EnableAllInteractableComponentsInObject(m_likesObject, isVisible);
             EnableAllInteractableComponentsInObject(m_heartObject, isVisible);
         }
@@ -316,10 +308,7 @@ public class ImageSphere : MonoBehaviour
     {
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: HideMetadata() called on sphere");
 
-        if (m_handleImageObject != null) m_handleImageObject.SetActive(false);
         if (m_handleObject != null) m_handleObject.SetActive(false);
-        if (m_captionObject != null) m_captionObject.SetActive(false);
-        if (m_commentCountObject != null) m_commentCountObject.SetActive(false);
         if (m_likesObject != null) m_likesObject.SetActive(false);
         if (m_heartObject != null) m_heartObject.SetActive(false);
     }
@@ -347,7 +336,7 @@ public class ImageSphere : MonoBehaviour
 
     private IEnumerator AnimateSetTexture()
     {   
-        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateSetTexture() began on sphere: " + (m_imageSphereIndex+1) );
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateSetTexture() began on sphere: " + (m_imageSphereIndex) );
 
         HideMetadata();
 
@@ -378,7 +367,7 @@ public class ImageSphere : MonoBehaviour
 
     private IEnumerator AnimateHide()
     {        
-        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateHide() called on sphere: " + (m_imageSphereIndex+1));
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateHide() called on sphere: " + (m_imageSphereIndex));
 
         HideMetadata();
 
@@ -409,7 +398,7 @@ public class ImageSphere : MonoBehaviour
 
     private void OnButtonSelected(VRStandardAssets.Menu.MenuButton button)
     {   
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() called on sphere: " + (m_imageSphereIndex+1));
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() called on sphere: " + (m_imageSphereIndex));
 
         bool willChangeImage = (m_imageIdentifier.Length > 0) && (m_imageSphereSkybox.GetImageIdentifier().CompareTo(m_imageIdentifier) != 0) && (m_currTextureIndex != kLoadingTextureIndex);
         if (!willChangeImage)
@@ -438,7 +427,7 @@ public class ImageSphere : MonoBehaviour
 
     private IEnumerator AnimateSphereTowardsUser(string imageIdentifier)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateSphereTowardsUser() called on sphere: " + (m_imageSphereIndex+1));
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateSphereTowardsUser() called on sphere: " + (m_imageSphereIndex));
 
         SetOriginalImageOnSkybox(imageIdentifier);
         m_imageObject.GetComponent<ImageSphereAnimation>().SetActive(false);
@@ -553,7 +542,7 @@ public class ImageSphere : MonoBehaviour
 
     private void SetSkybox(string imageIdentifier)
     {    
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: SetSkybox() got called on sphere: " + (m_imageSphereIndex+1));
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: SetSkybox() got called on sphere: " + (m_imageSphereIndex));
 
         if (m_imageSphereSkybox != null)
         {            

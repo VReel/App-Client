@@ -107,7 +107,7 @@ public class CppPlugin
     public IEnumerator LoadImageFromPathIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, string filePathAndIdentifier, int textureIndex)
     {
         StringBuilder filePathForCpp = new StringBuilder(filePathAndIdentifier);
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromPathIntoImageSphere() from filePath: " + filePathAndIdentifier + ", with TextureIndex: " + textureIndex);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromPathIntoImageSphere() with sphereIndex : "  + sphereIndex + ", from filePath: " + filePathAndIdentifier + ", with TextureIndex: " + textureIndex);
         yield return null;
 
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadIntoWorkingMemoryFromImagePath(), on background thread!");
@@ -163,13 +163,13 @@ public class CppPlugin
         imageSphereController.SetImageAtIndex(sphereIndex, m_lastTextureOperatedOn, filePathAndIdentifier, textureIndex, true);
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Completed LoadImageFromPathIntoImageSphere() from filePath: " + filePathAndIdentifier + ", with TextureIndex: " + textureIndex);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Completed LoadImageFromPathIntoImageSphere() with sphereIndex : "  + sphereIndex + ", from filePath: " + filePathAndIdentifier + ", with TextureIndex: " + textureIndex);
     }   
            
     public IEnumerator LoadImageFromStreamIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, Stream imageStream, string imageIdentifier, int textureIndex)
     {
         yield return null;
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromStreamIntoImageSphere() for image: " + imageIdentifier + ", with TextureIndex: " + textureIndex);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromStreamIntoImageSphere() with sphereIndex: " + sphereIndex + ", imageIdentifier: " + imageIdentifier + ", with TextureIndex: " + textureIndex);
 
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling ToByteArray(), on background thread!");
         yield return m_threadJob.WaitFor();
@@ -237,7 +237,7 @@ public class CppPlugin
         imageSphereController.SetImageAtIndex(sphereIndex, m_lastTextureOperatedOn, imageIdentifier, textureIndex, true);
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Completed LoadImageFromStreamIntoImageSphere() for image: " + imageIdentifier + ", with TextureIndex: " + textureIndex);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Completed LoadImageFromStreamIntoImageSphere() with sphereIndex: " + sphereIndex + ", imageIdentifier: " + imageIdentifier + ", with TextureIndex: " + textureIndex);
     }  
 
     // **************************
