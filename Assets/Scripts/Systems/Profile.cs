@@ -16,8 +16,6 @@ public class Profile : MonoBehaviour
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private LoadingIcon m_loadingIcon;
     [SerializeField] private GameObject m_newUserText;   
-    [SerializeField] private GameObject m_confirmDeleteButton;
-    [SerializeField] private GameObject m_cancelDeleteButton;
 
     private const string kPreDeleteText = "Sure you want to delete this post? =O";
     private const string kCancelDeleteText = "Delete Cancelled =)";
@@ -90,9 +88,6 @@ public class Profile : MonoBehaviour
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreDelete() called on post: " + m_imageSkybox.GetImageIdentifier());
 
-        m_confirmDeleteButton.SetActive(true);
-        m_cancelDeleteButton.SetActive(true);
-
         m_user.GetUserMessageButton().SetTextAsError(kPreDeleteText);
     }
 
@@ -101,18 +96,12 @@ public class Profile : MonoBehaviour
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelDelete() called");
 
-        m_confirmDeleteButton.SetActive(false);
-        m_cancelDeleteButton.SetActive(false);
-
         m_user.GetUserMessageButton().SetText(kCancelDeleteText);
     }
 
     // TODO: Move this function somewhere else...
     public void Delete()
     {
-        m_confirmDeleteButton.SetActive(false);
-        m_cancelDeleteButton.SetActive(false);
-
         m_coroutineQueue.EnqueueAction(DeletePostInternal(m_imageSkybox.GetImageIdentifier()));
     }
 
