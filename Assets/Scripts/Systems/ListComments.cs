@@ -17,7 +17,7 @@ public class ListComments : MonoBehaviour
     [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private ListUsers m_listUsers;
     [SerializeField] private LoadingIcon m_loadingIcon;
-    [SerializeField] private GameObject m_displayItemsTopLevel; //Top-level object for results
+    //[SerializeField] private GameObject m_displayItemsTopLevel; //Top-level object for results
     [SerializeField] private GameObject m_commentCount;
     [SerializeField] private GameObject[] m_displayItems;
     [SerializeField] private GameObject m_nextButton;
@@ -90,7 +90,7 @@ public class ListComments : MonoBehaviour
 
         m_currImageSphere = imageSphere;
         m_commentCount.GetComponentInChildren<Text>().text = (m_currImageSphere.GetCommentCount() + 1).ToString() + (m_currImageSphere.GetCommentCount() == 1 ? " comment" : " comments");
-        m_displayItemsTopLevel.SetActive(false);
+        //m_displayItemsTopLevel.SetActive(false);
         m_coroutineQueue.EnqueueAction(StoreAndDisplayUserResultsInternal(postId));
     }
 
@@ -127,7 +127,7 @@ public class ListComments : MonoBehaviour
 
     public void CloseListComments()
     {
-        m_displayItemsTopLevel.SetActive(false);
+        //m_displayItemsTopLevel.SetActive(false);
         CloseSubMenus();
     }
         
@@ -292,7 +292,7 @@ public class ListComments : MonoBehaviour
             DisplayUserResultsOnItems();
         }
 
-        m_displayItemsTopLevel.SetActive(true);
+        //m_displayItemsTopLevel.SetActive(true);
         //m_addCommentConfirmation.SetActive(false);
         //m_updateCommentConfirmation.SetActive(false);
     }

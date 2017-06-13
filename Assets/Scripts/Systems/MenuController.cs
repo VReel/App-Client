@@ -16,7 +16,6 @@ public class MenuController : MonoBehaviour
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private GameObject m_menuSubTree;
     [SerializeField] private GameObject m_loginSubMenu;
-    [SerializeField] private GameObject m_homeSubMenu;
     [SerializeField] private GameObject m_searchSubMenu;
     [SerializeField] private GameObject m_profileSubMenu;
     [SerializeField] private GameObject m_gallerySubMenu;
@@ -96,7 +95,6 @@ public class MenuController : MonoBehaviour
     public void SetAllSubMenusActive(bool active)
     {
         m_loginSubMenu.SetActive(active);
-        m_homeSubMenu.SetActive(active);
         m_searchSubMenu.SetActive(active);
         m_profileSubMenu.SetActive(active);
         m_gallerySubMenu.SetActive(active);
@@ -134,14 +132,12 @@ public class MenuController : MonoBehaviour
     }
 
     private void SetExploreSubMenuActive(bool active)
-    {
-        m_homeSubMenu.SetActive(active);
+    {        
         OnButtonSelected(m_menuBarButtons[1]);  // button 1 = Explore button
     }
 
     private void SetFollowingSubMenuActive(bool active)
-    {
-        m_homeSubMenu.SetActive(active);
+    {        
         OnButtonSelected(m_menuBarButtons[2]);  // button 2 = Following button
     }
 
@@ -175,12 +171,10 @@ public class MenuController : MonoBehaviour
             if (button == currButton)
             {
                 menuBarButton.OnButtonSelected();
-                //menuBarButton.GetAdditionalReference().SetActive(true); // Set's MenuSection to Active
             }
             else 
             {
                 menuBarButton.OnButtonDeselected();
-                //menuBarButton.GetAdditionalReference().SetActive(false); // Set's MenuSection to not Active
             }
         }
     }

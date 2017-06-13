@@ -20,7 +20,6 @@ public class Home : MonoBehaviour
     [SerializeField] private User m_user;
     [SerializeField] private Posts m_posts;
     [SerializeField] private ImageSphereController m_imageSphereController;
-    [SerializeField] private GameObject[] m_timelineTypes;
 
     private HomeState m_homeState;
     //private BackEndAPI m_backEndAPI;
@@ -49,8 +48,7 @@ public class Home : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenPublicTimeline() called");
 
-        m_homeState = HomeState.kPublicTimeline;
-        OnButtonSelected(m_timelineTypes[(int)m_homeState]);  // button 0 = Public timeline button
+        m_homeState = HomeState.kPublicTimeline; // TODO: Change to Explore   
 
         m_posts.OpenPublicTimeline();
     }
@@ -64,8 +62,7 @@ public class Home : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenPersonalTimeline() called");
 
-        m_homeState = HomeState.kPersonalTimeline;
-        OnButtonSelected(m_timelineTypes[(int)m_homeState]);  // button 1 = Personal timeline button
+        m_homeState = HomeState.kPersonalTimeline; // TODO: Change to Following
 
         m_posts.OpenPersonalTimeline();
     }             
@@ -89,22 +86,6 @@ public class Home : MonoBehaviour
     // **************************
     // Private/Helper functions
     // **************************
-
-    private void OnButtonSelected(GameObject button)
-    {
-        foreach(GameObject currButton in m_timelineTypes)
-        {       
-            var searchTypeButton = currButton.GetComponent<SelectedButton>();
-            if (button == currButton)
-            {
-                searchTypeButton.OnButtonSelected();
-            }
-            else 
-            {
-                searchTypeButton.OnButtonDeselected();
-            }
-        }
-    }
 
     private IEnumerator ShowHomeTextInternal()
     {
