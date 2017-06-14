@@ -176,7 +176,6 @@ public class ListUsers : MonoBehaviour
         m_appDirector.SetOverlayShowing(true);
         m_menuController.SetImagesAndMenuBarActive(false);
         m_profileDetails.ShowOrHide(false); //Hide
-        m_listComments.CloseListComments();
 
         m_currResultIndex = 0;
         m_userResults.Clear();

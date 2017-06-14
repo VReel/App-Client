@@ -6935,7 +6935,7 @@ Prefab:
     - target: {fileID: 224763758398533146, guid: 8dae737faada54a00ad7520389a304a1,
         type: 2}
       propertyPath: m_LocalPosition.z
-      value: 6.5
+      value: 6.25
       objectReference: {fileID: 0}
     - target: {fileID: 224763758398533146, guid: 8dae737faada54a00ad7520389a304a1,
         type: 2}
@@ -7015,6 +7015,21 @@ Prefab:
     - target: {fileID: 1729693688093792, guid: 8dae737faada54a00ad7520389a304a1, type: 2}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114635388086459160, guid: 8dae737faada54a00ad7520389a304a1,
+        type: 2}
+      propertyPath: m_buttonColourUp.r
+      value: 0.34901962
+      objectReference: {fileID: 0}
+    - target: {fileID: 114635388086459160, guid: 8dae737faada54a00ad7520389a304a1,
+        type: 2}
+      propertyPath: m_buttonColourUp.g
+      value: 0.3529412
+      objectReference: {fileID: 0}
+    - target: {fileID: 114635388086459160, guid: 8dae737faada54a00ad7520389a304a1,
+        type: 2}
+      propertyPath: m_buttonColourUp.b
+      value: 0.36078432
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8dae737faada54a00ad7520389a304a1, type: 2}
@@ -7800,7 +7815,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &340148599
 Transform:
   m_ObjectHideFlags: 0
@@ -9301,7 +9316,7 @@ Prefab:
     - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
         type: 2}
       propertyPath: m_RootOrder
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
         type: 2}
@@ -10199,7 +10214,7 @@ Prefab:
     - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
         type: 2}
@@ -10214,12 +10229,17 @@ Prefab:
     - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
-      value: CommentsSelected
+      value: SetImageFlowPage
       objectReference: {fileID: 0}
     - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_IntArgument
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6d77096d9165e4f12a0b563ced4be6d4, type: 2}
@@ -10310,7 +10330,7 @@ Prefab:
     - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
         type: 2}
       propertyPath: m_RootOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
         type: 2}
@@ -11326,7 +11346,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &667957263
 Transform:
   m_ObjectHideFlags: 0
@@ -13292,26 +13312,15 @@ MonoBehaviour:
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1596}
-        m_MethodName: ConfirmFlagPost
+      - m_Target: {fileID: 395}
+        m_MethodName: FlagPost
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: It's inappropriate
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 395}
-        m_MethodName: SetImageFlowPage
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: inappropriate
           m_BoolArgument: 0
         m_CallState: 2
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
@@ -14040,6 +14049,16 @@ Prefab:
       propertyPath: m_imageSkybox
       value: 
       objectReference: {fileID: 350}
+    - target: {fileID: 114473982667759278, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_commentCountInList
+      value: 
+      objectReference: {fileID: 1464230325}
+    - target: {fileID: 114473982667759278, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_commentCountInSummary
+      value: 
+      objectReference: {fileID: 648593043}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5d68de0858483422a933ef12ea7ca889, type: 2}
   m_IsPrefabParent: 0
@@ -16401,7 +16420,7 @@ Prefab:
     - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
         type: 2}
@@ -16416,12 +16435,17 @@ Prefab:
     - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
-      value: CommentsSelected
+      value: SetImageFlowPage
       objectReference: {fileID: 0}
     - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_IntArgument
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 231542d4898e941a68adc853bcba143d, type: 2}
@@ -19551,7 +19575,7 @@ Prefab:
     - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
         type: 2}
       propertyPath: m_RootOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
         type: 2}
@@ -19812,7 +19836,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 150, y: -14}
+  m_AnchoredPosition: {x: 150, y: -15}
   m_SizeDelta: {x: 250, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!65 &1361870779
@@ -25186,7 +25210,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 150, y: -14}
+  m_AnchoredPosition: {x: 150, y: -15}
   m_SizeDelta: {x: 250, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!65 &1792403953
@@ -30157,7 +30181,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 150, y: -14}
+  m_AnchoredPosition: {x: 150, y: -15}
   m_SizeDelta: {x: 250, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!65 &2137595246
@@ -30359,26 +30383,15 @@ MonoBehaviour:
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1596}
-        m_MethodName: ConfirmFlagPost
+      - m_Target: {fileID: 395}
+        m_MethodName: FlagPost
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: It's spam
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 395}
-        m_MethodName: SetImageFlowPage
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: spam
           m_BoolArgument: 0
         m_CallState: 2
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,

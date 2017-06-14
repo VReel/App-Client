@@ -14,7 +14,6 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private Search m_search;
     [SerializeField] private Posts m_posts;
     [SerializeField] private ListUsers m_listUsers;
-    [SerializeField] private ListComments m_listComments;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private ImageFlow m_imageFlow;
@@ -163,7 +162,6 @@ public class ImageSphere : MonoBehaviour
     public void AddToCommentCount(int addValue)
     {
         m_commentCount += addValue;
-        //TODO: Set new comment count somewhere...
     }
 
     public void Hide()
@@ -221,13 +219,8 @@ public class ImageSphere : MonoBehaviour
             m_listUsers.DisplayLikeResults(m_imageIdentifier);
         }
     }
-
-    public void CommentsSelected()
-    {
-        m_listComments.DisplayCommentResults(m_imageIdentifier, this);
-    }
-
-    public bool IsLoggedUserProfileImage()
+        
+    public bool IsLoggedUserImage()
     {
         return m_user.IsCurrentUser(m_userId);
     }

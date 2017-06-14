@@ -61,7 +61,7 @@ public class ImageFlow : MonoBehaviour
         m_menuController.SetCurrentSubMenuActive(false);
         m_menuController.SetImagesAndMenuBarActive(false);
 
-        m_listComments.PreUpdateUserResults( m_currImageSphere.GetImageIdentifier() );
+        m_listComments.DisplayCommentResults( m_currImageSphere.GetImageIdentifier(), m_currImageSphere );
 
         m_appDirector.SetOverlayShowing(true);
     }
@@ -155,7 +155,7 @@ public class ImageFlow : MonoBehaviour
             m_deleteImagePage.SetActive(false);
             m_reportImagePage.SetActive(false);
         }
-        else if (pageNumber == 6) // Options for other's Profile
+        else if (pageNumber == 6) // Options for others's Profile
         {
             m_imageSummaryPage.SetActive(false);
             m_commentsPage.SetActive(false);
@@ -195,7 +195,7 @@ public class ImageFlow : MonoBehaviour
 
     public void OptionsSelected()
     {        
-        if (m_currImageSphere.IsLoggedUserProfileImage())
+        if (m_currImageSphere.IsLoggedUserImage())
         {
             SetImageFlowPage(5);
         }
@@ -225,7 +225,7 @@ public class ImageFlow : MonoBehaviour
     public void CommentsSelected()
     {
         SetImageFlowPage(1);
-        m_currImageSphere.CommentsSelected();
+        m_listComments.DisplayCommentResults(m_currImageSphere.GetImageIdentifier(), m_currImageSphere);
     }
 
     public void CaptionSelected()
@@ -245,18 +245,32 @@ public class ImageFlow : MonoBehaviour
     {
         if ( m_listComments.PreUpdateComment(commentIndex) )
         {
-            SetImageFlowPage(4);
+            if (m_listComments.IsCaptionSelected(commentIndex))
+            {
+                SetImageFlowPage(2);
+            }
+            else
+            {
+                SetImageFlowPage(4);
+            }
         }
     }
 
     public void CommentHandleSelected(int commentIndex)
     {
-        //TODO: Call a new function in ListComments...
-    }
+        Close();
+        ListComments.CommentResult comment = m_listComments.GetCommentResult(commentIndex);
+        m_profile.OpenProfileWithId(comment.userId, comment.userHandle);
+    }        
         
     public void DeletePost()
     {
         m_coroutineQueue.EnqueueAction(DeletePostInternal(m_imageSkybox.GetImageIdentifier()));
+    }
+
+    public void FlagPost(string flagReason)
+    {           
+        m_coroutineQueue.EnqueueAction(FlagPostInternal(flagReason));
     }
 
     // **************************
@@ -280,16 +294,12 @@ public class ImageFlow : MonoBehaviour
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {            
-            // Report Success in Profile
             // TODO: Report Success!
-            //m_user.GetUserMessageButton().SetText(kSuccessfulDeleteText);
             m_posts.RequestPostRemoval(id);
         }
         else
         {
-            // Report Failure in Profile
             // TODO: Report Failure!
-            //m_user.GetUserMessageButton().SetTextAsError(kFailedDeleteText);
         }
 
         Close();
@@ -302,6 +312,28 @@ public class ImageFlow : MonoBehaviour
         {
             m_profile.OpenProfile();
         }
+
+        m_loadingIcon.Hide();
+    }
+
+    private IEnumerator FlagPostInternal(string flagReason)
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        m_loadingIcon.Display();
+
+        yield return m_backEndAPI.Flag_FlagPost(m_currImageSphere.GetImageIdentifier(), flagReason);
+
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            //TODO: REPORT ON SUCCESS
+        } 
+        else
+        {
+            //TODO: REPORT ON FAILURE
+        }
+
+        SetImageFlowPage(0);
 
         m_loadingIcon.Hide();
     }
