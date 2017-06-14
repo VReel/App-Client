@@ -25,7 +25,7 @@ public class Search : MonoBehaviour
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
     [SerializeField] private MenuController m_menuController;
-    [SerializeField] private Profile m_profile;
+    [SerializeField] private ProfileDetails m_profile;
     [SerializeField] private Posts m_posts;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private KeyBoard m_keyboard;
@@ -112,12 +112,6 @@ public class Search : MonoBehaviour
         return m_searchState;
     }
 
-    public void ShowSearchText()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Search Text!");
-        m_user.GetUserMessageButton().SetText(kSearchText);
-    }
-        
     public void InvalidateWork() // This function is called in order to stop any ongoing work
     {        
         //m_currPostIndex = -1;

@@ -19,7 +19,6 @@ public class AppDirector : MonoBehaviour
     {
         kInit,          // This should only be the state at the very start and never again!
         kLogin,         // User is not yet logged in, they are going through the login flow
-        //kHome,          // User is viewing their home (ie. public or personal timeline)
         kExplore,       // User is viewing the public timeline (ie. public or personal timeline)
         kFollowing,     // User is viewing the personal timeline (ie. public or personal timeline)
         kProfile,       // User is viewing the pictures in their own profile
@@ -31,9 +30,9 @@ public class AppDirector : MonoBehaviour
     [SerializeField] private GameObject m_menuBar;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private ImageSphereController m_imageSphereController;
-    [SerializeField] private Home m_home;
+    [SerializeField] private Posts m_posts;
     [SerializeField] private Search m_search;
-    [SerializeField] private Profile m_profile;
+    [SerializeField] private ProfileDetails m_profile;
     [SerializeField] private Gallery m_gallery;
     [SerializeField] private LoginFlow m_loginFlow;
     [SerializeField] private ProfileDetails m_profileDetails;
@@ -178,6 +177,7 @@ public class AppDirector : MonoBehaviour
         SetMenuBar(false);
 
         m_imageLoader.InvalidateLoading();
+        m_posts.InvalidateWork();
         m_gallery.InvalidateWork();
         m_profile.InvalidateWork();
         m_search.InvalidateWork();
@@ -196,14 +196,12 @@ public class AppDirector : MonoBehaviour
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
-        m_home.InvalidateWork();
+        m_posts.InvalidateWork();
         m_search.InvalidateWork();
         m_profile.InvalidateWork();
         m_gallery.InvalidateWork();
 
-        m_home.ShowHomeText();
-
-        m_home.OpenPublicTimeline();
+        m_posts.OpenPublicTimeline();
         m_appState = AppState.kExplore;
         m_menuController.SetCurrentSubMenuActive(true); //m_menuController.SetExploreSubMenuActive(true);
     }
@@ -217,14 +215,12 @@ public class AppDirector : MonoBehaviour
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
-        m_home.InvalidateWork();
+        m_posts.InvalidateWork();
         m_search.InvalidateWork();
         m_profile.InvalidateWork();
         m_gallery.InvalidateWork();
 
-        m_home.ShowHomeText();
-
-        m_home.OpenPersonalTimeline();
+        m_posts.OpenPersonalTimeline();
         m_appState = AppState.kFollowing;
         m_menuController.SetCurrentSubMenuActive(true); //m_menuController.SetFollowingSubMenuActive(true);
     }
@@ -238,12 +234,10 @@ public class AppDirector : MonoBehaviour
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
-        m_home.InvalidateWork();
+        m_posts.InvalidateWork();
         m_search.InvalidateWork();
         m_profile.InvalidateWork();
         m_gallery.InvalidateWork();
-
-        m_search.ShowSearchText();
 
         m_search.OpenSearch();
         m_appState = AppState.kSearch;
@@ -259,12 +253,10 @@ public class AppDirector : MonoBehaviour
         SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
-        m_home.InvalidateWork();
+        m_posts.InvalidateWork();
         m_search.InvalidateWork();
         m_profile.InvalidateWork();
         m_gallery.InvalidateWork();
-
-        m_profile.ShowProfileText();
 
         m_profile.OpenProfile();
         m_appState = AppState.kProfile;
@@ -279,15 +271,11 @@ public class AppDirector : MonoBehaviour
         m_keyboard.CancelText();
         SetMenuBar(true);
 
-        m_user.GetUserMessageButton().SetIsActiveButton(false);
-
         m_imageLoader.InvalidateLoading();
-        m_home.InvalidateWork();
+        m_posts.InvalidateWork();
         m_search.InvalidateWork();
         m_profile.InvalidateWork();
         m_gallery.InvalidateWork();
-
-        m_gallery.ShowGalleryText();
 
         m_gallery.OpenAndroidGallery();
         m_appState = AppState.kGallery;

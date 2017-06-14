@@ -28,14 +28,6 @@ public class Gallery : MonoBehaviour
     [SerializeField] private GameObject m_captionNewText;
     [SerializeField] private GameObject m_uploadConfirmation;
 
-    private const string kGalleryText = "Gallery"; 
-    private const string kPreUploadText = "Great choice! Write a comment and Share your post! =)"; 
-    private const string kCancelUploadText = "Upload Cancelled =/";
-    private const string kBeganUploadText = "Began Uploading!";
-    private const string kSuccessfulUploadText = "Succesful Upload! =)";
-    private const string kFailedUploadText = "Oh no! We failed to Upload! =(\n Please try again!";
-    private const string kFailedFileReadText = "Reading files Failed!\n Check permissions!";
-
     private string m_imagesTopLevelDirectory;
     private int m_currGalleryImageIndex = 0;
     private List<string> m_galleryImageFilePaths;
@@ -64,12 +56,6 @@ public class Gallery : MonoBehaviour
         m_uploadConfirmation.SetActive(false);
     }
 
-    public void ShowGalleryText()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Gallery Text!");
-        m_user.GetUserMessageButton().SetText(kGalleryText);
-    }
-
     public void InvalidateWork() // This function is called in order to stop any ongoing work
     {
         m_currGalleryImageIndex = -1;
@@ -96,7 +82,6 @@ public class Gallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreUpload() called on post: " + m_imageSkybox.GetImageIdentifier());
 
         m_uploadConfirmation.SetActive(true);
-        m_user.GetUserMessageButton().SetText(kPreUploadText);
         m_uploadButton.SetActive(false);
         m_menuController.SetImagesAndMenuBarActive(false);
         m_appDirector.SetOverlayShowing(true);
@@ -107,7 +92,6 @@ public class Gallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelUpload() called");
 
         m_uploadConfirmation.SetActive(false);
-        m_user.GetUserMessageButton().SetText(kCancelUploadText);
         m_uploadButton.SetActive(true);
         m_menuController.SetImagesAndMenuBarActive(true);
         m_appDirector.SetOverlayShowing(false);
@@ -187,7 +171,6 @@ public class Gallery : MonoBehaviour
         yield return m_appDirector.VerifyInternetConnection();
 
         m_loadingIcon.Display();
-        m_user.GetUserMessageButton().SetText(kBeganUploadText);
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Running UploadImageInternal() for image with path: " + filePath);
 
@@ -260,12 +243,10 @@ public class Gallery : MonoBehaviour
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
             //TODO: SHOW A SUCCESS MESSAGE!
-            m_user.GetUserMessageButton().SetText(kSuccessfulUploadText);
         }
         else
         {   
-            //TODO: SHOW A FAILURE MESSAGE!
-            m_user.GetUserMessageButton().SetTextAsError(kFailedUploadText);
+            //TODO: SHOW A FAILURE MESSAGE! - I Think this will happen naturally...
         }
 
         m_uploadConfirmation.SetActive(false);
@@ -336,8 +317,7 @@ public class Gallery : MonoBehaviour
         {
             if (isDebugBuild) Debug.Log("------- VREEL: Call to GetFiles() failed for: " + baseDirectory);
 
-            // Report Failure in Gallery
-            m_user.GetUserMessageButton().SetTextAsError(kFailedFileReadText);
+            // TODO: REPORT FAILURE IN GALLERY
         }
 
         try
@@ -355,8 +335,7 @@ public class Gallery : MonoBehaviour
         {
             if (isDebugBuild) Debug.Log("------- VREEL: Call to GetDirectories() failed for: " + baseDirectory);
 
-            // Report Failure in Gallery
-            m_user.GetUserMessageButton().SetTextAsError(kFailedFileReadText);
+            // TODO: REPORT FAILURE IN GALLERY
         }
 
         return files;

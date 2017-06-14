@@ -12,7 +12,7 @@ public class ListUsers : MonoBehaviour
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
     [SerializeField] private MenuController m_menuController;
-    [SerializeField] private Profile m_profile;
+    [SerializeField] private ProfileDetails m_profile;
     [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private ListComments m_listComments;
     [SerializeField] private GameObject m_displayItemsTopLevel; //Top-level object for results

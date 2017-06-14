@@ -10,6 +10,9 @@ public class ImageFlow : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;  
     [SerializeField] private User m_user;
+    [SerializeField] private Posts m_posts;
+    [SerializeField] private ProfileDetails m_profile;
+    [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private ListComments m_listComments;
     [SerializeField] private LoadingIcon m_loadingIcon;
@@ -18,7 +21,6 @@ public class ImageFlow : MonoBehaviour
     [SerializeField] private GameObject m_likeCountObject;
     [SerializeField] private GameObject m_commentCountObject;
     [SerializeField] private GameObject m_heartObject;
-    //[SerializeField] private GameObject m_commentObject;    // DO I NEED THIS?
 
     [SerializeField] private GameObject m_imageSubMenu;
     [SerializeField] private GameObject m_imageSummaryPage;
@@ -41,8 +43,10 @@ public class ImageFlow : MonoBehaviour
 
     public void Start()
     {        
-        //m_coroutineQueue = new CoroutineQueue(this);
-        //m_coroutineQueue.StartLoop();
+        m_coroutineQueue = new CoroutineQueue(this);
+        m_coroutineQueue.StartLoop();
+
+        m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
 
         m_imageSubMenu.SetActive(false);
     }
@@ -191,7 +195,7 @@ public class ImageFlow : MonoBehaviour
 
     public void OptionsSelected()
     {        
-        if (m_currImageSphere.IsLoggedUserImage())
+        if (m_currImageSphere.IsLoggedUserProfileImage())
         {
             SetImageFlowPage(5);
         }
@@ -249,6 +253,11 @@ public class ImageFlow : MonoBehaviour
     {
         //TODO: Call a new function in ListComments...
     }
+        
+    public void DeletePost()
+    {
+        m_coroutineQueue.EnqueueAction(DeletePostInternal(m_imageSkybox.GetImageIdentifier()));
+    }
 
     // **************************
     // Private/Helper functions
@@ -259,26 +268,41 @@ public class ImageFlow : MonoBehaviour
         m_currImageSphere.SetImageSummary(m_handleObject, m_captionObject, m_likeCountObject, m_commentCountObject, m_heartObject);
     }
 
-    private IEnumerator SignUpInternal()
+    private IEnumerator DeletePostInternal(string id)
     {
-        //yield return m_appDirector.VerifyInternetConnection();
+        yield return m_appDirector.VerifyInternetConnection();
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: SignUp() called");
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Delete() called on post: " + id);
 
         m_loadingIcon.Display();
 
-        /*
-        yield return m_backEndAPI.Register_CreateUser(
-            m_signUpUsernameInput.text, 
-            m_signUpEmailInput.text, 
-            m_signUpPasswordInput.GetComponent<PasswordText>().GetString(),
-            m_signUpPasswordConfirmationInput.GetComponent<PasswordText>().GetString(),
-            m_user.GetPushNotificationUserID()
-        );
-        */
+        yield return m_backEndAPI.Post_DeletePost(id);
+
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {            
+            // Report Success in Profile
+            // TODO: Report Success!
+            //m_user.GetUserMessageButton().SetText(kSuccessfulDeleteText);
+            m_posts.RequestPostRemoval(id);
+        }
+        else
+        {
+            // Report Failure in Profile
+            // TODO: Report Failure!
+            //m_user.GetUserMessageButton().SetTextAsError(kFailedDeleteText);
+        }
+
+        Close();
+
+        if (m_appDirector.GetState() != AppDirector.AppState.kProfile)
+        {            
+            m_appDirector.RequestProfileState();
+        }
+        else
+        {
+            m_profile.OpenProfile();
+        }
 
         m_loadingIcon.Hide();
-
-        yield break;
     }
 }

@@ -20,7 +20,6 @@ public class User : MonoBehaviour
         
     [SerializeField] private BackEndEnvironment m_backEndEnvironment;
     [SerializeField] private PushNotifications m_pushNotifications;
-    [SerializeField] private MessageButton m_userMessageButton;
     [SerializeField] private GameObject m_errorMessage;
 
     [Serializable]
@@ -109,12 +108,7 @@ public class User : MonoBehaviour
     public string GetPushNotificationUserID()
     {
         return m_pushNotifications.m_oneSignalPlayerID;
-    }
-
-    public MessageButton GetUserMessageButton()
-    {
-        return m_userMessageButton;
-    }
+    }        
 
     public GameObject GetErrorMessage()
     {

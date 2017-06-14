@@ -14,6 +14,7 @@ public class ProfileDetails : MonoBehaviour
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private Posts m_posts;
     [SerializeField] private ListUsers m_listUsers;
+    [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private LoadingIcon m_loadingIcon;
@@ -28,6 +29,7 @@ public class ProfileDetails : MonoBehaviour
     [SerializeField] private GameObject m_profileDescriptionUpdateTopLevel;
     [SerializeField] private GameObject m_profileHandleNewText;
     [SerializeField] private GameObject m_profileDescriptionNewText;
+    [SerializeField] private GameObject m_newUserText;
 
     private string m_userId;
     private string m_handle;
@@ -61,6 +63,12 @@ public class ProfileDetails : MonoBehaviour
         CloseProfileDetails();
     }
 
+    public void Update() //TODO Make this event based instead...
+    {
+        bool noImagesUploaded = m_posts.GetNumPosts() <= 0 && !m_loadingIcon.IsDisplaying() && m_user.IsCurrentUser(m_userId);
+        m_newUserText.SetActive(noImagesUploaded); // If the user has yet to upload any images then show them the New User Text!
+    }
+
     public string GetUserId()
     {
         return m_userId;
@@ -82,6 +90,36 @@ public class ProfileDetails : MonoBehaviour
         m_menuController.SetMenuBarActive(true);
         m_menuBarProfileButtonObject.GetComponentInChildren<Text>().text = m_user.m_handle;
         m_coroutineQueue.EnqueueAction(SetMenuBarProfileDetailsInternal());
+    }
+
+    public void OpenProfile()
+    {
+        if (m_user.IsCurrentUser(m_userId))
+        {
+            m_posts.OpenUserProfile();
+        }
+        else
+        {
+            m_posts.OpenProfileWithID(m_userId, m_handle);
+        }
+
+        m_menuController.SetMenuBarActive(false);
+    }
+
+    public void OpenUserProfile()
+    {
+        m_userId = m_user.m_id;
+        m_handle = m_user.m_handle;
+
+        m_appDirector.RequestProfileState();
+    }
+
+    public void OpenProfileWithId(string userId, string handle)
+    {
+        m_userId = userId;
+        m_handle = handle;
+
+        m_appDirector.RequestProfileState();
     }
 
     public void OpenProfileDetails(string userId)
@@ -107,12 +145,18 @@ public class ProfileDetails : MonoBehaviour
 
     public void DisplayFollowers()
     {
-        m_listUsers.DisplayFollowersResults(m_userId);
+        if (m_followerCount > 0)
+        {
+            m_listUsers.DisplayFollowersResults(m_userId);
+        }
     }
 
     public void DisplayFollowing()
     {
-        m_listUsers.DisplayFollowingResults(m_userId);
+        if (m_followingCount > 0)
+        {
+            m_listUsers.DisplayFollowingResults(m_userId);
+        }
     }
 
     public void CloseProfileDetails()
@@ -195,6 +239,23 @@ public class ProfileDetails : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadMenuBarOriginalImage() called");
 
         m_coroutineQueue.EnqueueAction(DownloadMenuBarOriginalImageInternal());
+    }
+
+
+    public void CloseProfile()
+    {
+        //TODO: Do something more intelligent in order to not lose the state you were in...
+        CloseProfileDetails();
+        m_appDirector.RequestExploreState();
+    }
+        
+    public void InvalidateWork() // This function is called in order to stop any ongoing work
+    {        
+        m_posts.InvalidateWork();
+        if (m_coroutineQueue != null)
+        {
+            m_coroutineQueue.Clear();
+        }
     }
 
     // **************************
@@ -294,6 +355,7 @@ public class ProfileDetails : MonoBehaviour
         }
     }
 
+    //TODO: Remove the duplication of DownloadThumbnailImage()
     private void DownloadMenuBarThumbnailImage()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadMenuBarThumbnailImage() loading User Thumbnail Image for: " + m_loggedUserThumbnailUrl);
@@ -304,6 +366,7 @@ public class ProfileDetails : MonoBehaviour
         }
     }
 
+    //TODO: Remove the duplication of DownloadOriginalImage()
     private IEnumerator DownloadMenuBarOriginalImageInternal()
     {
         yield return m_appDirector.VerifyInternetConnection();
