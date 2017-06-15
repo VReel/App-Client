@@ -39,6 +39,12 @@ public class OptionsFlow : MonoBehaviour
         m_coroutineQueue.StartLoop();
 
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
+
+        m_menuController.RegisterToUseMenuConfig(this);
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = false;
+        menuConfig.imageSpheresVisible = false;
+        menuConfig.subMenuVisible = false;
     }
 
     public void OpenCloseSwitch()
@@ -121,9 +127,7 @@ public class OptionsFlow : MonoBehaviour
         SetOptionsFlowPage(0);
         m_menuOpen = true;
 
-        m_menuController.SetCurrentSubMenuActive(false);
-        m_menuController.SetImagesAndMenuBarActive(false);
-
+        m_menuController.UpdateMenuConfig(this);
         m_appDirector.SetOverlayShowing(true);
     }
 
@@ -133,9 +137,7 @@ public class OptionsFlow : MonoBehaviour
         SetOptionsFlowPage(-1);
         m_menuOpen = false;
 
-        m_menuController.SetCurrentSubMenuActive(true);
-        m_menuController.SetImagesAndMenuBarActive(true);
-
+        m_menuController.UpdateMenuConfig(m_appDirector);
         m_appDirector.SetOverlayShowing(false);
     }
 

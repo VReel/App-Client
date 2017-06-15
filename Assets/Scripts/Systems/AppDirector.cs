@@ -59,9 +59,12 @@ public class AppDirector : MonoBehaviour
         //m_coroutineQueue.StartLoop();       
 
         m_appState = AppState.kInit;
-        m_menuController.SetAllSubMenusActive(false);
 
         m_lostConnectionIcon.SetActive(false);
+
+        m_menuController.RegisterToUseMenuConfig(this);
+        m_menuController.GetMenuConfigForOwner(this).imageSpheresVisible = true;
+        m_menuController.UpdateMenuConfig(this);
     }
 
     public AppState GetState()
@@ -171,10 +174,8 @@ public class AppDirector : MonoBehaviour
     private void SetLoginState()
     {        
         Resources.UnloadUnusedAssets();
-        DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
         m_keyboard.CancelText();
-        SetMenuBar(false);
 
         m_imageLoader.InvalidateLoading();
         m_posts.InvalidateWork();
@@ -184,16 +185,18 @@ public class AppDirector : MonoBehaviour
         m_loginFlow.SetLoginFlowPage(0);
 
         m_appState = AppState.kLogin;
-        m_menuController.SetCurrentSubMenuActive(true); // m_menuController.SetLoginSubMenuActive(true);
+
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = false;
+        menuConfig.subMenuVisible = true;
+        m_menuController.UpdateMenuConfig(this);
     }
 
     private void SetExploreState()
     {
         Resources.UnloadUnusedAssets();
-        DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
         m_keyboard.CancelText();
-        SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
         m_posts.InvalidateWork();
@@ -203,16 +206,18 @@ public class AppDirector : MonoBehaviour
 
         m_posts.OpenPublicTimeline();
         m_appState = AppState.kExplore;
-        m_menuController.SetCurrentSubMenuActive(true); //m_menuController.SetExploreSubMenuActive(true);
+
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = true;
+        menuConfig.subMenuVisible = true;
+        m_menuController.UpdateMenuConfig(this);
     }
 
     private void SetFollowingState()
     {
         Resources.UnloadUnusedAssets();
-        DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
         m_keyboard.CancelText();
-        SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
         m_posts.InvalidateWork();
@@ -222,16 +227,18 @@ public class AppDirector : MonoBehaviour
 
         m_posts.OpenPersonalTimeline();
         m_appState = AppState.kFollowing;
-        m_menuController.SetCurrentSubMenuActive(true); //m_menuController.SetFollowingSubMenuActive(true);
+
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = true;
+        menuConfig.subMenuVisible = true;
+        m_menuController.UpdateMenuConfig(this);
     }
 
     private void SetSearchState()
     {
         Resources.UnloadUnusedAssets();
-        DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
         m_keyboard.CancelText();
-        SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
         m_posts.InvalidateWork();
@@ -241,16 +248,18 @@ public class AppDirector : MonoBehaviour
 
         m_search.OpenSearch();
         m_appState = AppState.kSearch;
-        m_menuController.SetCurrentSubMenuActive(true); //m_menuController.SetSearchSubMenuActive(true);
+
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = true;
+        menuConfig.subMenuVisible = true;
+        m_menuController.UpdateMenuConfig(this);
     }
 
     private void SetProfileState()
     {
         Resources.UnloadUnusedAssets();
-        DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
         m_keyboard.CancelText();
-        SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
         m_posts.InvalidateWork();
@@ -260,16 +269,18 @@ public class AppDirector : MonoBehaviour
 
         m_profile.OpenProfile();
         m_appState = AppState.kProfile;
-        m_menuController.SetCurrentSubMenuActive(true); //m_menuController.SetProfileSubMenuActive(true);
+
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = false;
+        menuConfig.subMenuVisible = true;
+        m_menuController.UpdateMenuConfig(this);
     }        
 
     private void SetGalleryState()
     {
         Resources.UnloadUnusedAssets();
-        DisableAllOptions();
         m_imageSphereController.HideAllImageSpheres();
         m_keyboard.CancelText();
-        SetMenuBar(true);
 
         m_imageLoader.InvalidateLoading();
         m_posts.InvalidateWork();
@@ -279,18 +290,12 @@ public class AppDirector : MonoBehaviour
 
         m_gallery.OpenAndroidGallery();
         m_appState = AppState.kGallery;
-        m_menuController.SetCurrentSubMenuActive(true); //m_menuController.SetGallerySubMenuActive(true);
-    }
 
-    private void DisableAllOptions()
-    {
-        m_menuController.SetAllSubMenusActive(false);
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = true;
+        menuConfig.subMenuVisible = true;
+        m_menuController.UpdateMenuConfig(this);
     }
-
-    private void SetMenuBar(bool active)
-    {
-        m_menuBar.SetActive(active);
-    }       
 
     private void InvertVREnabled() // Unavailable until Oculus update their SDK...
     {        

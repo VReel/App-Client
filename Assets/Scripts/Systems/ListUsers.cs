@@ -57,7 +57,13 @@ public class ListUsers : MonoBehaviour
 
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
 
-        CloseListUsers();
+        m_displayItemsTopLevel.SetActive(false);
+
+        m_menuController.RegisterToUseMenuConfig(this);
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = false;
+        menuConfig.imageSpheresVisible = false;
+        menuConfig.subMenuVisible = false;
 	}            
 
     public void Update()
@@ -125,11 +131,10 @@ public class ListUsers : MonoBehaviour
     }
 
     public void CloseListUsers()
-    {
-        m_appDirector.SetOverlayShowing(false);
+    {        
         m_displayItemsTopLevel.SetActive(false);
-        m_menuController.SetImagesAndMenuBarActive(true);
-        m_profileDetails.ShowOrHide(true); //Show
+        m_menuController.UpdateMenuConfig(m_appDirector);
+        m_appDirector.SetOverlayShowing(false);
     }
 
     public void HandleSelected(int userResultItemIndex)
@@ -174,8 +179,7 @@ public class ListUsers : MonoBehaviour
         yield return m_appDirector.VerifyInternetConnection();
 
         m_appDirector.SetOverlayShowing(true);
-        m_menuController.SetImagesAndMenuBarActive(false);
-        m_profileDetails.ShowOrHide(false); //Hide
+        m_menuController.UpdateMenuConfig(this);
 
         m_currResultIndex = 0;
         m_userResults.Clear();
@@ -262,8 +266,25 @@ public class ListUsers : MonoBehaviour
                 m_displayItems[itemIndex].GetComponentInChildren<Text>().text = m_userResults[userResultIndex].userHandle;
                 m_displayItems[itemIndex].GetComponentInChildren<FollowButton>().FollowOnOffSwitch(m_userResults[userResultIndex].followedByMe);
 
+                //--------------------------------------------------------
+                // TODO: IMPROVE THIS!
                 GameObject followButton = m_displayItems[itemIndex].GetComponentInChildren<FollowButton>().gameObject;
-                m_menuController.SetSubTreeVisible(followButton, !m_user.IsCurrentUser(m_userResults[userResultIndex].userId));
+                bool visible = !m_user.IsCurrentUser(m_userResults[userResultIndex].userId);
+                foreach(var renderer in followButton.GetComponentsInChildren<Renderer>())
+                {                
+                    renderer.enabled = visible; // Handles Mesh + SpriteRenderer components
+                }
+
+                foreach(var ui in followButton.GetComponentsInChildren<UnityEngine.UI.Graphic>())
+                {                
+                    ui.enabled = visible; // Handles Images + Text components
+                }
+
+                foreach(var collider in followButton.GetComponentsInChildren<Collider>())
+                {                
+                    collider.enabled = visible; // Handles BoxCollider + MeshCollider components
+                }
+                //--------------------------------------------------------
             }
             else
             {

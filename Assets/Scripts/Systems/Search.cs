@@ -75,6 +75,12 @@ public class Search : MonoBehaviour
         m_currSearchString = "";
 
         HideAllResults();
+
+        m_menuController.RegisterToUseMenuConfig(this);
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = true;
+        menuConfig.imageSpheresVisible = true;
+        menuConfig.subMenuVisible = true;
 	}      
 
     public void Update()
@@ -179,7 +185,8 @@ public class Search : MonoBehaviour
         }
         ClearSearch();
 
-        m_menuController.SetMenuBarActive(false);
+        m_menuController.GetMenuConfigForOwner(this).menuBarVisible = false;
+        m_menuController.UpdateMenuConfig(this);
 
         if (m_searchState == SearchState.kUserSearch)
         {
@@ -197,7 +204,8 @@ public class Search : MonoBehaviour
 
     public void CloseResultsDisplay()
     {        
-        m_menuController.SetMenuBarActive(true);
+        m_menuController.GetMenuConfigForOwner(this).menuBarVisible = true;
+        m_menuController.UpdateMenuConfig(this);
         OpenTagSearch();
     }
 

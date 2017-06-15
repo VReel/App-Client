@@ -54,6 +54,12 @@ public class Gallery : MonoBehaviour
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
 
         m_uploadConfirmation.SetActive(false);
+
+        m_menuController.RegisterToUseMenuConfig(this);
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = true;
+        menuConfig.imageSpheresVisible = true;
+        menuConfig.subMenuVisible = true;
     }
 
     public void InvalidateWork() // This function is called in order to stop any ongoing work
@@ -83,8 +89,12 @@ public class Gallery : MonoBehaviour
 
         m_uploadConfirmation.SetActive(true);
         m_uploadButton.SetActive(false);
-        m_menuController.SetImagesAndMenuBarActive(false);
         m_appDirector.SetOverlayShowing(true);
+
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = false;
+        menuConfig.imageSpheresVisible = false;
+        m_menuController.UpdateMenuConfig(this);
     }
 
     public void CancelUpload()
@@ -93,8 +103,12 @@ public class Gallery : MonoBehaviour
 
         m_uploadConfirmation.SetActive(false);
         m_uploadButton.SetActive(true);
-        m_menuController.SetImagesAndMenuBarActive(true);
         m_appDirector.SetOverlayShowing(false);
+
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = true;
+        menuConfig.imageSpheresVisible = true;
+        m_menuController.UpdateMenuConfig(this);
     }
         
     public void UploadImage()
@@ -251,7 +265,11 @@ public class Gallery : MonoBehaviour
 
         m_uploadConfirmation.SetActive(false);
         m_loadingIcon.Hide();
-        m_menuController.SetImagesAndMenuBarActive(true);
+
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = true;
+        menuConfig.imageSpheresVisible = true;
+        m_menuController.UpdateMenuConfig(this);
 
         if (profilePic)
         {

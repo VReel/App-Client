@@ -201,7 +201,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &93
 GameObject:
   m_ObjectHideFlags: 0
@@ -1067,7 +1067,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &454
 GameObject:
   m_ObjectHideFlags: 0
@@ -3739,17 +3739,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_swipeEnabled: 1
   m_appDirector: {fileID: 1674}
+  m_user: {fileID: 1796}
   m_imageSphereController: {fileID: 882264440}
   m_imageSkybox: {fileID: 350}
+  m_keyboard: {fileID: 2174}
+  m_reticle: {fileID: 1865}
+  m_input: {fileID: 1864}
   m_menuSubTree: {fileID: 253}
   m_loginSubMenu: {fileID: 18}
   m_searchSubMenu: {fileID: 389}
   m_profileSubMenu: {fileID: 441}
   m_gallerySubMenu: {fileID: 295}
-  m_user: {fileID: 1796}
-  m_keyboard: {fileID: 2174}
-  m_reticle: {fileID: 1865}
-  m_input: {fileID: 1864}
   m_menuBar: {fileID: 134}
   m_menuBarButtons:
   - {fileID: 2099745972}
@@ -7815,7 +7815,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &340148599
 Transform:
   m_ObjectHideFlags: 0

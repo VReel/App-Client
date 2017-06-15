@@ -18,6 +18,8 @@ public class MenuHider : MonoBehaviour
     {
         m_InteractiveItem.OnOver += HandleOver;
         m_InteractiveItem.OnUp += HandleUp;
+
+        m_menuController.RegisterToUseMenuConfig(this);
     }
 
     public void OnDestroy()
@@ -32,7 +34,9 @@ public class MenuHider : MonoBehaviour
 
     private void HandleOver()
     {
-        m_menuController.SetMenuVisible(false);
+        m_menuController.GetMenuConfigForOwner(this).menuVisible = false;
+        m_menuController.UpdateMenuConfig(this);
+
         m_menuController.SetSkyboxDimOn(false);
         gameObject.GetComponent<Collider>().enabled = true; // we switch our box collider back on so that it can still react!
     }
@@ -40,7 +44,11 @@ public class MenuHider : MonoBehaviour
     private void HandleUp()
     {
         m_menuController.SetSkyboxDimOn(true);
-        m_menuController.SetMenuVisible(true);
-        m_menuController.SetImagesAndMenuBarActive(false);
+
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuVisible = true;
+        menuConfig.menuBarVisible = false;
+        menuConfig.imageSpheresVisible = false;
+        m_menuController.UpdateMenuConfig(this);
     }
 }

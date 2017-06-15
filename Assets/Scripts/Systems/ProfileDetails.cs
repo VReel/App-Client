@@ -60,7 +60,11 @@ public class ProfileDetails : MonoBehaviour
 
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
 
-        CloseProfileDetails();
+        m_menuController.RegisterToUseMenuConfig(this);
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = true;
+        menuConfig.subMenuVisible = true;
+        m_menuController.UpdateMenuConfig(this);
     }
 
     public void Update() //TODO Make this event based instead...
@@ -86,13 +90,11 @@ public class ProfileDetails : MonoBehaviour
 
     public void SetMenuBarProfileDetails()
     {
-        //TODO: Improve this - such that there's less need to set so many things to active/inactive
-        m_menuController.SetMenuBarActive(true);
         m_menuBarProfileButtonObject.GetComponentInChildren<Text>().text = m_user.m_handle;
         m_coroutineQueue.EnqueueAction(SetMenuBarProfileDetailsInternal());
     }
 
-    public void OpenProfile()
+    public void OpenProfile() // TODO: Improve the fact that there's OpenProfile()/ OpenUserProfile() / OpenProfileWithId()
     {
         if (m_user.IsCurrentUser(m_userId))
         {
@@ -102,8 +104,6 @@ public class ProfileDetails : MonoBehaviour
         {
             m_posts.OpenProfileWithID(m_userId, m_handle);
         }
-
-        m_menuController.SetMenuBarActive(false);
     }
 
     public void OpenUserProfile()
@@ -159,25 +159,6 @@ public class ProfileDetails : MonoBehaviour
         }
     }
 
-    public void CloseProfileDetails()
-    {
-        m_imageSphereController.HideSphereAtIndex(Helper.kProfilePageSphereIndex, true); // True tells it to ForceHide
-        m_menuController.SetMenuBarActive(true);
-        //m_profileDetailsTopLevel.SetActive(false);
-        //m_profileDescriptionUpdateTopLevel.SetActive(false);
-    }
-
-    //HACK - do this better, Calling it from ListUsers, which is also always showing the ImageSpheres even when it shouldn't...
-    public void ShowOrHide(bool show)
-    {
-        m_profileDetailsTopLevel.SetActive(show);
-
-        if (m_appDirector.GetState() == AppDirector.AppState.kProfile && show) 
-        {
-            m_menuController.SetMenuBarActive(false);
-        }
-    }
-
     public void FollowSelected()
     {
         m_followedByMe = !m_followedByMe;
@@ -203,7 +184,10 @@ public class ProfileDetails : MonoBehaviour
             m_profileHandleNewText.GetComponentInChildren<Text>().text = m_handle;
             m_profileDescriptionNewText.GetComponentInChildren<Text>().text = m_profileDescription;
 
-            m_menuController.SetImagesAndMenuBarActive(false);
+            MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+            menuConfig.menuBarVisible = false;
+            menuConfig.imageSpheresVisible = false;
+            m_menuController.UpdateMenuConfig(this);
             m_appDirector.SetOverlayShowing(true);
         }            
     }
@@ -215,8 +199,11 @@ public class ProfileDetails : MonoBehaviour
         //TODO: Improve this - such that there's less need to set so many things to active/inactive
         m_profileDetailsTopLevel.SetActive(true);
         m_profileDescriptionUpdateTopLevel.SetActive(false);
-        m_menuController.SetImagesAndMenuBarActive(true);
-        m_menuController.SetMenuBarActive(false);
+
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = false;
+        menuConfig.imageSpheresVisible = true;
+        m_menuController.UpdateMenuConfig(this);
         m_appDirector.SetOverlayShowing(false);
     }
 
@@ -241,11 +228,10 @@ public class ProfileDetails : MonoBehaviour
         m_coroutineQueue.EnqueueAction(DownloadMenuBarOriginalImageInternal());
     }
 
-
     public void CloseProfile()
     {
         //TODO: Do something more intelligent in order to not lose the state you were in...
-        CloseProfileDetails();
+        m_imageSphereController.HideSphereAtIndex(Helper.kProfilePageSphereIndex, true); // True tells it to ForceHide
         m_appDirector.RequestExploreState();
     }
         
@@ -446,8 +432,11 @@ public class ProfileDetails : MonoBehaviour
         //TODO: Improve this - such that there's less need to set so many things to active/inactive
         m_profileDetailsTopLevel.SetActive(true);
         m_profileDescriptionUpdateTopLevel.SetActive(false);
-        m_menuController.SetImagesAndMenuBarActive(true);
-        m_menuController.SetMenuBarActive(false);
+
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = false;
+        menuConfig.imageSpheresVisible = true;
+        m_menuController.UpdateMenuConfig(this);
         m_appDirector.SetOverlayShowing(false);
 
         m_loadingIcon.Hide();

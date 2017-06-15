@@ -49,6 +49,12 @@ public class ImageFlow : MonoBehaviour
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
 
         m_imageSubMenu.SetActive(false);
+
+        m_menuController.RegisterToUseMenuConfig(this);
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = false;
+        menuConfig.imageSpheresVisible = false;
+        menuConfig.subMenuVisible = false;
     }
 
     public void OpenWithImageSphere(ImageSphere imageSphere)
@@ -58,11 +64,9 @@ public class ImageFlow : MonoBehaviour
         SetImageFlowPage(0);
         SetImageSummary();
 
-        m_menuController.SetCurrentSubMenuActive(false);
-        m_menuController.SetImagesAndMenuBarActive(false);
-
         m_listComments.DisplayCommentResults( m_currImageSphere.GetImageIdentifier(), m_currImageSphere );
 
+        m_menuController.UpdateMenuConfig(this);
         m_appDirector.SetOverlayShowing(true);
     }
 
@@ -70,8 +74,7 @@ public class ImageFlow : MonoBehaviour
     {
         m_imageSubMenu.SetActive(false);
 
-        m_menuController.SetImagesAndMenuBarActive(true);
-
+        m_menuController.UpdateMenuConfig(m_appDirector);
         m_appDirector.SetOverlayShowing(false);
     }
 
