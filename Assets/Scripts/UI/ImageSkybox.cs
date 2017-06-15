@@ -72,17 +72,15 @@ public class ImageSkybox : MonoBehaviour
         m_currTextureIndex = textureIndex;
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, true);
 
-        // TODO: Change these such that it checks the UserId of a post instead, to see if the user it belongs to is the Profile User.
-        bool isProfileState = m_appDirector.GetState() == AppDirector.AppState.kProfile;
         bool isGalleryState = m_appDirector.GetState() == AppDirector.AppState.kGallery;
         bool isProfileImage = m_profileDetails.IsUser(imageIdentifier); // Identifier is of the User for Profile Pictures
         bool isImageFromDevice = m_imageIdentifier.StartsWith(m_imageSphereController.GetTopLevelDirectory());
-        m_uploadButton.SetActive(isImageFromDevice && isGalleryState && !isProfileImage);  // Currently the ImageSkybox class is responsible for switching on the Upload button
+        m_uploadButton.SetActive(isImageFromDevice && isGalleryState && !isProfileImage);  // TODO: Move the UploadButton's activation over to Gallery
 
         m_myMaterial.mainTexture = m_skyboxTexture;
         m_myMaterial.SetFloat("_FlipY", 1.0f);
 
-        // TODO: have the skybox be used instead of just a sphere around the user
+        // TODO: have the skybox be used instead of just a sphere around the user?
         // RenderSettings.skybox = texture; 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Changed skybox to = " + m_imageIdentifier + ", with TextureID = " + m_currTextureIndex);
     }

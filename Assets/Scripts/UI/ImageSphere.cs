@@ -498,11 +498,11 @@ public class ImageSphere : MonoBehaviour
                 bool isProfilePageImage = m_profileDetails.IsUser(imageIdentifier); 
                 if (isProfilePageImage) // Image Identifier is of the User for Profile Pictures
                 {
-                    m_profileDetails.DownloadOriginalImage();
+                    m_profileDetails.DownloadOriginalImage(ProfileDetails.ImageSphereType.kProfile);
                 }
                 else if (isLoggedUserImage)
                 {
-                    m_profileDetails.DownloadMenuBarOriginalImage();
+                    m_profileDetails.DownloadOriginalImage(ProfileDetails.ImageSphereType.kMenuBar);
                 }
             }
             else

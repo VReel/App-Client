@@ -266,25 +266,8 @@ public class ListUsers : MonoBehaviour
                 m_displayItems[itemIndex].GetComponentInChildren<Text>().text = m_userResults[userResultIndex].userHandle;
                 m_displayItems[itemIndex].GetComponentInChildren<FollowButton>().FollowOnOffSwitch(m_userResults[userResultIndex].followedByMe);
 
-                //--------------------------------------------------------
-                // TODO: IMPROVE THIS!
-                GameObject followButton = m_displayItems[itemIndex].GetComponentInChildren<FollowButton>().gameObject;
                 bool visible = !m_user.IsCurrentUser(m_userResults[userResultIndex].userId);
-                foreach(var renderer in followButton.GetComponentsInChildren<Renderer>())
-                {                
-                    renderer.enabled = visible; // Handles Mesh + SpriteRenderer components
-                }
-
-                foreach(var ui in followButton.GetComponentsInChildren<UnityEngine.UI.Graphic>())
-                {                
-                    ui.enabled = visible; // Handles Images + Text components
-                }
-
-                foreach(var collider in followButton.GetComponentsInChildren<Collider>())
-                {                
-                    collider.enabled = visible; // Handles BoxCollider + MeshCollider components
-                }
-                //--------------------------------------------------------
+                m_displayItems[itemIndex].GetComponentInChildren<FollowButton>().SetVisible(visible);
             }
             else
             {
