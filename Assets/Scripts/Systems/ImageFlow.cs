@@ -307,14 +307,7 @@ public class ImageFlow : MonoBehaviour
 
         Close();
 
-        if (m_appDirector.GetState() != AppDirector.AppState.kProfile)
-        {            
-            m_appDirector.RequestProfileState();
-        }
-        else
-        {
-            m_profile.OpenProfile();
-        }
+        m_profile.OpenUserProfile();
 
         m_loadingIcon.Hide();
     }

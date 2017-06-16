@@ -267,7 +267,7 @@ public class AppDirector : MonoBehaviour
         m_profile.InvalidateWork();
         m_gallery.InvalidateWork();
 
-        m_profile.OpenProfile();
+        //m_profile.OpenUserProfile(); - ProfileState can either be User or Other's so its not opened through RequestProfileState();
         m_appState = AppState.kProfile;
 
         MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);

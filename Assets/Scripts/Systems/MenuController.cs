@@ -105,8 +105,8 @@ public class MenuController : MonoBehaviour
         m_currMenuConfigIndex = GetMenuConfigIndexForOwner(owner);
 
         m_menuConfigChanged.menuVisibleChanged = m_menuConfigList[m_currMenuConfigIndex].menuVisible != m_lastMenuConfig.menuVisible;
-        m_menuConfigChanged.menuBarVisibleChanged = m_menuConfigList[m_currMenuConfigIndex].menuBarVisible != m_lastMenuConfig.menuBarVisible;
-        m_menuConfigChanged.imageSpheresVisibleChanged = m_menuConfigList[m_currMenuConfigIndex].imageSpheresVisible != m_lastMenuConfig.imageSpheresVisible;
+        m_menuConfigChanged.menuBarVisibleChanged = m_menuConfigList[m_currMenuConfigIndex].menuBarVisible != m_lastMenuConfig.menuBarVisible || !m_lastMenuConfig.menuVisible;
+        m_menuConfigChanged.imageSpheresVisibleChanged = m_menuConfigList[m_currMenuConfigIndex].imageSpheresVisible != m_lastMenuConfig.imageSpheresVisible || !m_lastMenuConfig.menuVisible;
 
         RefreshMenuBasedOnConfig();
     }     

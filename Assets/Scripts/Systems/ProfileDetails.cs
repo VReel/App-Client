@@ -100,24 +100,14 @@ public class ProfileDetails : MonoBehaviour
         m_coroutineQueue.EnqueueAction(SetMenuBarProfileDetailsInternal());
     }
 
-    public void OpenProfile() // TODO: Improve the fact that there's OpenProfile()/ OpenUserProfile() / OpenProfileWithId()
-    {
-        if (m_user.IsCurrentUser(m_userId))
-        {
-            m_posts.OpenUserProfile();
-        }
-        else
-        {
-            m_posts.OpenProfileWithID(m_userId, m_handle);
-        }
-    }
-
     public void OpenUserProfile()
     {
         m_userId = m_user.m_id;
         m_handle = m_user.m_handle;
 
         m_appDirector.RequestProfileState();
+
+        OpenProfileInternal();
     }
 
     public void OpenProfileWithId(string userId, string handle)
@@ -126,6 +116,8 @@ public class ProfileDetails : MonoBehaviour
         m_handle = handle;
 
         m_appDirector.RequestProfileState();
+
+        OpenProfileInternal();
     }
 
     public void OpenProfileDetails(string userId)
@@ -243,6 +235,18 @@ public class ProfileDetails : MonoBehaviour
     // **************************
     // Private/Helper functions
     // **************************
+
+    private void OpenProfileInternal()
+    {
+        if (m_user.IsCurrentUser(m_userId))
+        {
+            m_posts.OpenUserProfile();
+        }
+        else
+        {
+            m_posts.OpenProfileWithID(m_userId, m_handle);
+        }
+    }
 
     private IEnumerator SetMenuBarProfileDetailsInternal()
     {
