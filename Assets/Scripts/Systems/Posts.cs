@@ -40,9 +40,6 @@ public class Posts : MonoBehaviour
         kHashTag
     };
 
-    private const string kPublicTimelineText = "Public Timeline";
-    private const string kPersonalTimelineText = "Personal Timeline";
-
     private PostsType m_postsType;
     private string m_currUserOrTagId;
 
@@ -112,9 +109,6 @@ public class Posts : MonoBehaviour
         m_postsType = PostsType.kPublicTimeline;
         m_currUserOrTagId = "";
         OpenPosts();
-
-        m_user.GetUserMessageButton().SetIsActiveButton(false);
-        m_user.GetUserMessageButton().SetText(kPublicTimelineText);
     }    
 
     public void OpenPersonalTimeline()
@@ -124,9 +118,6 @@ public class Posts : MonoBehaviour
         m_postsType = PostsType.kPersonalTimeline;
         m_currUserOrTagId = "";
         OpenPosts();
-
-        m_user.GetUserMessageButton().SetIsActiveButton(false);
-        m_user.GetUserMessageButton().SetText(kPersonalTimelineText);
     }    
 
     public void OpenUserProfile()
@@ -138,9 +129,6 @@ public class Posts : MonoBehaviour
         OpenPosts();
 
         m_profileDetails.OpenProfileDetails(m_currUserOrTagId);
-
-        m_user.GetUserMessageButton().SetIsActiveButton(true, m_currUserOrTagId);
-        m_user.GetUserMessageButton().SetText(m_user.m_handle + "'s Profile");
     }    
 
     public void OpenProfileWithID(string userID, string userHandle)
@@ -152,9 +140,6 @@ public class Posts : MonoBehaviour
         OpenPosts();
 
         m_profileDetails.OpenProfileDetails(m_currUserOrTagId);
-
-        m_user.GetUserMessageButton().SetIsActiveButton(true, m_currUserOrTagId);
-        m_user.GetUserMessageButton().SetText(userHandle + "'s Profile");
     } 
 
     public void OpenHashTag(string hashTagID, string hashTag)
@@ -164,9 +149,6 @@ public class Posts : MonoBehaviour
         m_postsType = PostsType.kHashTag;
         m_currUserOrTagId = hashTagID;
         OpenPosts();
-
-        m_user.GetUserMessageButton().SetIsActiveButton(false);
-        m_user.GetUserMessageButton().SetText(hashTag);
     } 
 
     public void NextPosts()

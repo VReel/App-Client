@@ -20,10 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4000011440562332}
   - component: {fileID: 114000010992105398}
-  - component: {fileID: 114573011983584352}
-  - component: {fileID: 114226931658115104}
   - component: {fileID: 114442138023372698}
-  - component: {fileID: 114117867673687516}
   - component: {fileID: 114000011095986410}
   - component: {fileID: 114845924773027162}
   - component: {fileID: 114311446783507650}
@@ -31,8 +28,9 @@ GameObject:
   - component: {fileID: 114351951387023894}
   - component: {fileID: 114473982667759278}
   - component: {fileID: 114642208069209930}
-  - component: {fileID: 114973282506974786}
   - component: {fileID: 114968044725641736}
+  - component: {fileID: 114973282506974786}
+  - component: {fileID: 114573011983584352}
   m_Layer: 0
   m_Name: Systems
   m_TagString: Untagged
@@ -68,11 +66,12 @@ MonoBehaviour:
   m_menuBar: {fileID: 0}
   m_menuController: {fileID: 0}
   m_imageSphereController: {fileID: 0}
-  m_home: {fileID: 114226931658115104}
+  m_posts: {fileID: 114311446783507650}
   m_search: {fileID: 114442138023372698}
-  m_profile: {fileID: 114117867673687516}
+  m_profile: {fileID: 114245341742605446}
   m_gallery: {fileID: 114000011095986410}
   m_loginFlow: {fileID: 0}
+  m_profileDetails: {fileID: 114245341742605446}
   m_imageLoader: {fileID: 114845924773027162}
   m_keyboard: {fileID: 0}
   m_internetReachabilityVerifier: {fileID: 114573011983584352}
@@ -90,50 +89,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_appDirector: {fileID: 114000010992105398}
   m_user: {fileID: 0}
+  m_menuController: {fileID: 0}
+  m_profileDetails: {fileID: 0}
   m_imageLoader: {fileID: 114845924773027162}
   m_imageSphereController: {fileID: 0}
   m_imageSkybox: {fileID: 0}
   m_loadingIcon: {fileID: 0}
+  m_uploadButton: {fileID: 0}
   m_noGalleryImagesText: {fileID: 0}
   m_captionNewText: {fileID: 0}
   m_uploadConfirmation: {fileID: 0}
---- !u!114 &114117867673687516
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000011890564500}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 280b79e70aa5b40dd92295d36b8005b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_appDirector: {fileID: 114000010992105398}
-  m_user: {fileID: 0}
-  m_posts: {fileID: 114311446783507650}
-  m_imageSkybox: {fileID: 0}
-  m_loadingIcon: {fileID: 0}
-  m_newUserText: {fileID: 0}
-  m_confirmDeleteButton: {fileID: 0}
-  m_cancelDeleteButton: {fileID: 0}
---- !u!114 &114226931658115104
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000011890564500}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e34a5e813e19f40479bdaaab55c04dcf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_appDirector: {fileID: 114000010992105398}
-  m_user: {fileID: 0}
-  m_posts: {fileID: 114311446783507650}
-  m_imageSphereController: {fileID: 0}
-  m_timelineTypes:
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!114 &114245341742605446
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -147,19 +112,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_appDirector: {fileID: 114000010992105398}
   m_user: {fileID: 0}
+  m_menuController: {fileID: 0}
   m_posts: {fileID: 114311446783507650}
   m_listUsers: {fileID: 114351951387023894}
+  m_imageSkybox: {fileID: 0}
   m_imageLoader: {fileID: 114845924773027162}
   m_imageSphereController: {fileID: 0}
   m_loadingIcon: {fileID: 0}
+  m_menuBarProfileButtonObject: {fileID: 0}
   m_profileDetailsTopLevel: {fileID: 0}
+  m_editProfileButtonObject: {fileID: 0}
   m_followButtonObject: {fileID: 0}
   m_handleObject: {fileID: 0}
   m_followerCountObject: {fileID: 0}
   m_followingCountObject: {fileID: 0}
   m_profileDescriptionObject: {fileID: 0}
   m_profileDescriptionUpdateTopLevel: {fileID: 0}
+  m_profileHandleNewText: {fileID: 0}
   m_profileDescriptionNewText: {fileID: 0}
+  m_newUserText: {fileID: 0}
 --- !u!114 &114311446783507650
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -173,6 +144,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_appDirector: {fileID: 114000010992105398}
   m_user: {fileID: 0}
+  m_profileDetails: {fileID: 0}
   m_imageLoader: {fileID: 114845924773027162}
   m_imageSphereController: {fileID: 0}
   m_loadingIcon: {fileID: 0}
@@ -189,7 +161,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_appDirector: {fileID: 114000010992105398}
   m_user: {fileID: 0}
-  m_search: {fileID: 114442138023372698}
+  m_menuController: {fileID: 0}
+  m_profile: {fileID: 114245341742605446}
   m_profileDetails: {fileID: 114245341742605446}
   m_listComments: {fileID: 114473982667759278}
   m_displayItemsTopLevel: {fileID: 0}
@@ -204,6 +177,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  m_title: {fileID: 0}
   m_nextButton: {fileID: 0}
   m_previousButton: {fileID: 0}
 --- !u!114 &114442138023372698
@@ -219,9 +193,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_appDirector: {fileID: 114000010992105398}
   m_user: {fileID: 0}
+  m_menuController: {fileID: 0}
+  m_profile: {fileID: 114245341742605446}
   m_posts: {fileID: 114311446783507650}
   m_imageSphereController: {fileID: 0}
   m_keyboard: {fileID: 0}
+  m_searchTitle: {fileID: 0}
+  m_resultTopLevel: {fileID: 0}
+  m_buttonsTopLevel: {fileID: 0}
+  m_searchInput: {fileID: 0}
   m_searchTypes:
   - {fileID: 0}
   - {fileID: 0}
@@ -236,7 +216,6 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  m_searchInput: {fileID: 0}
 --- !u!114 &114473982667759278
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -254,7 +233,7 @@ MonoBehaviour:
   m_profileDetails: {fileID: 114245341742605446}
   m_listUsers: {fileID: 114351951387023894}
   m_loadingIcon: {fileID: 0}
-  m_displayItemsTopLevel: {fileID: 0}
+  m_commentCount: {fileID: 0}
   m_displayItems:
   - {fileID: 0}
   - {fileID: 0}
@@ -263,15 +242,10 @@ MonoBehaviour:
   - {fileID: 0}
   m_nextButton: {fileID: 0}
   m_previousButton: {fileID: 0}
-  m_addCommentConfirmation: {fileID: 0}
+  m_captionUpdateText: {fileID: 0}
   m_commentNewText: {fileID: 0}
-  m_updateCommentConfirmation: {fileID: 0}
   m_commentUpdateText: {fileID: 0}
-  m_deleteCommentOption: {fileID: 0}
-  m_deleteCommentConfirmation: {fileID: 0}
-  m_flagPostConfirmation: {fileID: 0}
-  m_flagReasonText: {fileID: 0}
-  m_flagPostResult: {fileID: 0}
+  m_imageSummaryCaption: {fileID: 0}
 --- !u!114 &114573011983584352
 MonoBehaviour:
   m_ObjectHideFlags: 1

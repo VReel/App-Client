@@ -1,14 +1,16 @@
 #include <jni.h>
 #include <string>
 #include <cstdio>
+#include <ctime>
+#include <chrono>
 #include <android/log.h>
-#include <GLES2/gl2.h>
+#include <GLES3/gl3.h>
 #include "Unity/IUnityGraphics.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 #define  LOG_TAG    "----------------- VREEL: CppPlugin - "
-#define  LOGI(...) __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
+#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 
 // **************************
 // Member Variables
@@ -26,6 +28,7 @@ stbi_uc* m_pWorkingMemory = NULL;
 int m_currImageWidth = 0;
 int m_currImageHeight = 0;
 
+const int kNumStbChannels = 3;
 int m_maxPixelsUploadedPerFrame = 1 * 1024 * 1024;
 bool m_isLoadingIntoTexture = false;
 GLint m_textureLoadingYOffset = 0;
@@ -57,19 +60,6 @@ static void CheckGlError(const char* op)
     }
 }
 
-// Image pixels coming from stb_image.h are upside-down and back-to-front, this function corrects that
-void TransferAndCorrectAlignmentFromSrcToDest(int* pImage, int* pDest, int width, int height)
-{
-    int numPixels = width*height;
-    for(int* pSrc = pImage + (numPixels-1); pSrc >= pImage; pSrc -= width)
-    {
-        for (int* pScanLine = pSrc - (width-1); pScanLine <= pSrc; ++pScanLine)
-        {
-            *pDest = *pScanLine;
-            ++pDest;
-        }
-    }
-}
 
 // **************************
 // Private functions - accessed through OnRenderEvent()
@@ -81,9 +71,8 @@ enum RenderFunctions
     kInit = 0,
     kCreateEmptyTexture = 1,
     kLoadScanlinesIntoTextureFromWorkingMemory = 2,
-    kTerminate = 3,
-
-    kFBO = 4
+    kRenewTextureHandle = 3,
+    kTerminate = 4
 };
 
 void Init()
@@ -101,8 +90,6 @@ void Init()
         {
             LOGI("Genned texture to Handle = %u \n", m_textureIDs[i]);
         }
-
-        m_pWorkingMemory = new stbi_uc[kMaxImageWidth * kMaxImageHeight * sizeof(int32_t)];
 
         LOGI("Finished Init()!");
     }
@@ -123,7 +110,6 @@ void Terminate()
         PrintAllGlError();
 
         delete[] m_textureIDs;
-        delete[] m_pWorkingMemory;
 
         LOGI("Finished Terminate()!");
     }
@@ -138,8 +124,12 @@ void CreateEmptyTexture()
     glBindTexture(GL_TEXTURE_2D, textureId);
     PrintAllGlError();
 
-    LOGI("glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_imageWidth, m_imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL");
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_currImageWidth, m_currImageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); //(unsigned char*) m_pWorkingMemory);
+    LOGI("glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, %d, %d, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL)", m_currImageWidth, m_currImageHeight);
+    auto wcts = std::chrono::high_resolution_clock::now();
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_currImageWidth, m_currImageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL); //(unsigned char*) m_pWorkingMemory);
+    std::chrono::duration<double> wctduration = (std::chrono::high_resolution_clock::now() - wcts);
+
+    LOGI("glTexImage2D() walltime = %f", wctduration.count());
     PrintAllGlError();
 
     m_isLoadingIntoTexture = true;
@@ -165,66 +155,42 @@ void LoadScanlinesIntoTextureFromWorkingMemory()
                      ? kIdealNumberOfScanlinesToUpload
                      : (m_currImageHeight - m_textureLoadingYOffset);
 
-    LOGI("glTexSubImage2D(GL_TEXTURE_2D, 0, 0, %d, m_imageWidth, %d, GL_RGBA, GL_UNSIGNED_BYTE, pImage", m_textureLoadingYOffset, height);
-    unsigned int* pImage = (unsigned int*) m_pWorkingMemory + (m_textureLoadingYOffset * m_currImageWidth);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, m_textureLoadingYOffset, m_currImageWidth, height, GL_RGBA, GL_UNSIGNED_BYTE, pImage);
+    LOGI("glTexSubImage2D(GL_TEXTURE_2D, 0, 0, %d, %d, %d, GL_RGB, GL_UNSIGNED_BYTE, pImage", m_textureLoadingYOffset, m_currImageWidth, height);
+    stbi_uc* pImage = m_pWorkingMemory + (m_textureLoadingYOffset * m_currImageWidth * kNumStbChannels);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, m_textureLoadingYOffset, m_currImageWidth, height, GL_RGB, GL_UNSIGNED_BYTE, pImage);
     PrintAllGlError();
 
     m_textureLoadingYOffset += kIdealNumberOfScanlinesToUpload;
     if (m_textureLoadingYOffset > m_currImageHeight)
     {
         m_isLoadingIntoTexture = false;
+        stbi_image_free(m_pWorkingMemory);
+
+        LOGI("glGenerateMipmap(GL_TEXTURE_2D)");
+        glGenerateMipmap(GL_TEXTURE_2D);
+        PrintAllGlError();
     }
 
     LOGI("Finished LoadScanlinesIntoTextureFromWorkingMemory()! Loading in progress = %d", m_isLoadingIntoTexture);
 }
 
-
-
-
-void MyFBO()
+// Trying this out to see if it improves performance...
+void RenewTextureHandle()
 {
-    LOGI("Calling MyFBO()!");
+    LOGI("Calling RenewTextureHandle()");
 
-    LOGI("Setup FBO");
-    GLuint textureId = m_textureIDs[m_currTextureIndex];
-    GLuint FFrameBuffer = 0;
-    glGenFramebuffers( 1, &FFrameBuffer );
-    glBindFramebuffer( GL_FRAMEBUFFER, FFrameBuffer );
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureId, 0 );
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    LOGI("glDeleteTextures(1, %d)", m_currTextureIndex);
+    auto wcts = std::chrono::high_resolution_clock::now();
+    glDeleteTextures(1, m_textureIDs + m_currTextureIndex);
+    std::chrono::duration<double> wctduration = (std::chrono::high_resolution_clock::now() - wcts);
+
+    LOGI("glDeleteTextures() walltime = %f", wctduration.count());
     PrintAllGlError();
 
-    LOGI("Render to FBO");
-    glBindFramebuffer( GL_FRAMEBUFFER, FFrameBuffer );
-    glViewport( 0, 0, m_currImageWidth, m_currImageHeight );
-    //your rendering code goes here - it will draw directly into the texture
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    LOGI("glGenTextures(1, %d)", m_currTextureIndex);
+    glGenTextures(1, m_textureIDs + m_currTextureIndex);
     PrintAllGlError();
-
-    LOGI("Cleanup FBO");
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 ); // Render to screen? If so I don't need it
-    glDeleteFramebuffers( 1, &FFrameBuffer );
-    PrintAllGlError();
-
-    /*
-    // The depth buffer
-    GLuint depthrenderbuffer;
-    glGenRenderbuffers(1, &depthrenderbuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 1024, 768);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
-
-
-
-     // Set the list of draw buffers.
-    GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-    glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
-     */
 }
-
-
-
 
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
 {
@@ -240,14 +206,13 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
     {
         LoadScanlinesIntoTextureFromWorkingMemory();
     }
+    else if (eventID == kRenewTextureHandle)
+    {
+        RenewTextureHandle();
+    }
     else if (eventID == kTerminate)
     {
         Terminate();
-    }
-
-    else if (eventID == kFBO)
-    {
-        MyFBO();
     }
 }
 
@@ -285,7 +250,7 @@ bool IsLoadingIntoTexture()
 
 void* GetCurrStoredTexturePtr()
 {
-    return (void*)(m_textureIDs[m_currTextureIndex]);
+    return (void*)(intptr_t)(m_textureIDs[m_currTextureIndex]);
 }
 
 int GetCurrStoredImageWidth()
@@ -305,9 +270,7 @@ bool LoadIntoWorkingMemoryFromImagePath(char* pFileName)
     int type = -1;
     m_currImageWidth = m_currImageHeight = 0;
 
-    stbi_uc* pImage = stbi_load(pFileName, &m_currImageWidth, &m_currImageHeight, &type, 4); // Forcing 4-components per pixel RGBA
-    TransferAndCorrectAlignmentFromSrcToDest((int*) pImage, (int*) m_pWorkingMemory, m_currImageWidth, m_currImageHeight);
-    stbi_image_free(pImage);
+    m_pWorkingMemory = stbi_load(pFileName, &m_currImageWidth, &m_currImageHeight, &type, kNumStbChannels); // Forcing 4-components per pixel RGBA
 
     LOGI("Image Loaded has Width = %d, Height = %d, Type = %d\n", m_currImageWidth, m_currImageHeight, type);
     if (m_currImageWidth * m_currImageHeight > kMaxImageWidth * kMaxImageHeight)
@@ -327,9 +290,7 @@ bool LoadIntoWorkingMemoryFromImageData(void* pRawData, int dataLength)
     int type = -1;
     m_currImageWidth = m_currImageHeight = 0;
 
-    stbi_uc* pImage = stbi_load_from_memory((stbi_uc*) pRawData, dataLength, &m_currImageWidth, &m_currImageHeight, &type, 4); // Forcing 4-components per pixel RGBA
-    TransferAndCorrectAlignmentFromSrcToDest((int*) pImage, (int*) m_pWorkingMemory, m_currImageWidth, m_currImageHeight);
-    stbi_image_free(pImage);
+    m_pWorkingMemory = stbi_load_from_memory((stbi_uc*) pRawData, dataLength, &m_currImageWidth, &m_currImageHeight, &type, kNumStbChannels); // Forcing 4-components per pixel RGBA
 
     LOGI("Image Loaded has Width = %d, Height = %d, Type = %d\n", m_currImageWidth, m_currImageHeight, type);
     if (m_currImageWidth * m_currImageHeight > kMaxImageWidth * kMaxImageHeight)

@@ -59,8 +59,9 @@ public class SelectArrow : MonoBehaviour
             }
         }
 
-        if (m_appDirector.GetState() == AppDirector.AppState.kInit || 
-            m_appDirector.GetState() == AppDirector.AppState.kLogin)
+        if (m_appDirector.GetState() == AppDirector.AppState.kInit  || 
+            m_appDirector.GetState() == AppDirector.AppState.kLogin ||
+            m_appDirector.GetOverlayShowing())
         {
             return false;
         }
@@ -121,10 +122,13 @@ public class SelectArrow : MonoBehaviour
 
     private bool IsPostsActive()
     {
-        return (m_appDirector.GetState() == AppDirector.AppState.kExplore   ||
-                m_appDirector.GetState() == AppDirector.AppState.kFollowing ||
-                m_appDirector.GetState() == AppDirector.AppState.kProfile   ||
-               (m_appDirector.GetState() == AppDirector.AppState.kSearch && m_search.GetSearchState() == Search.SearchState.kUserDisplay) ||
-               (m_appDirector.GetState() == AppDirector.AppState.kSearch && m_search.GetSearchState() == Search.SearchState.kTagDisplay));
+        bool isPostsActive = 
+             m_appDirector.GetState() == AppDirector.AppState.kExplore   ||
+              m_appDirector.GetState() == AppDirector.AppState.kFollowing ||
+                m_appDirector.GetState() == AppDirector.AppState.kProfile ||
+              /* (m_appDirector.GetState() == AppDirector.AppState.kSearch && m_search.GetSearchState() == Search.SearchState.kUserDisplay) || */
+              (m_appDirector.GetState() == AppDirector.AppState.kSearch && m_search.GetSearchState() == Search.SearchState.kTagDisplay);
+
+        return isPostsActive;
     }
 }

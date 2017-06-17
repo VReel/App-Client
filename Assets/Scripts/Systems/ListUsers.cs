@@ -12,7 +12,7 @@ public class ListUsers : MonoBehaviour
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
     [SerializeField] private MenuController m_menuController;
-    [SerializeField] private Profile m_profile;
+    [SerializeField] private ProfileDetails m_profile;
     [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private ListComments m_listComments;
     [SerializeField] private GameObject m_displayItemsTopLevel; //Top-level object for results
@@ -57,7 +57,13 @@ public class ListUsers : MonoBehaviour
 
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
 
-        CloseListUsers();
+        m_displayItemsTopLevel.SetActive(false);
+
+        m_menuController.RegisterToUseMenuConfig(this);
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = false;
+        menuConfig.imageSpheresVisible = false;
+        menuConfig.subMenuVisible = false;
 	}            
 
     public void Update()
@@ -125,10 +131,10 @@ public class ListUsers : MonoBehaviour
     }
 
     public void CloseListUsers()
-    {
+    {        
         m_displayItemsTopLevel.SetActive(false);
-        m_menuController.SetImagesAndMenuBarActive(true);
-        m_profileDetails.ShowOrHide(true); //Show
+        m_menuController.UpdateMenuConfig(m_appDirector);
+        m_appDirector.SetOverlayShowing(false);
     }
 
     public void HandleSelected(int userResultItemIndex)
@@ -172,9 +178,8 @@ public class ListUsers : MonoBehaviour
     {
         yield return m_appDirector.VerifyInternetConnection();
 
-        m_menuController.SetImagesAndMenuBarActive(false);
-        m_profileDetails.ShowOrHide(false); //Hide
-        m_listComments.CloseListComments();
+        m_appDirector.SetOverlayShowing(true);
+        m_menuController.UpdateMenuConfig(this);
 
         m_currResultIndex = 0;
         m_userResults.Clear();
@@ -261,8 +266,8 @@ public class ListUsers : MonoBehaviour
                 m_displayItems[itemIndex].GetComponentInChildren<Text>().text = m_userResults[userResultIndex].userHandle;
                 m_displayItems[itemIndex].GetComponentInChildren<FollowButton>().FollowOnOffSwitch(m_userResults[userResultIndex].followedByMe);
 
-                GameObject followButton = m_displayItems[itemIndex].GetComponentInChildren<FollowButton>().gameObject;
-                m_menuController.SetSubTreeVisible(followButton, !m_user.IsCurrentUser(m_userResults[userResultIndex].userId));
+                bool visible = !m_user.IsCurrentUser(m_userResults[userResultIndex].userId);
+                m_displayItems[itemIndex].GetComponentInChildren<FollowButton>().SetVisible(visible);
             }
             else
             {

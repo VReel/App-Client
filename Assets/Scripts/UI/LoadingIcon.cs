@@ -32,6 +32,11 @@ public class LoadingIcon : MonoBehaviour
         UpdateIconVisibility();
     }
 
+    public bool IsDisplaying()
+    {
+        return m_iconDisplayCount > 0;
+    }
+
     // **************************
     // Private/Helper functions
     // **************************

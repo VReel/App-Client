@@ -4,7 +4,7 @@
 
 public class SelectedButton : MonoBehaviour
 {        
-    [SerializeField] private GameObject m_additionalReference; // Stores additional reference for controlling class to use
+    //[SerializeField] private GameObject m_additionalReference; // UNCOMMENT IF NEEDED
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
     [SerializeField] private Color m_buttonColourSelected;
 
@@ -15,10 +15,12 @@ public class SelectedButton : MonoBehaviour
         return m_isSelected;
     }
 
+    /*
     public GameObject GetAdditionalReference()
     {
         return m_additionalReference;
     }
+    */
 
     public void ButtonSelected(bool selected)
     {
@@ -38,7 +40,7 @@ public class SelectedButton : MonoBehaviour
         if (m_menuButton != null)
         {
             m_menuButton.SetForceColour(true, m_buttonColourSelected);
-            m_menuButton.RefreshButtonColor();
+            m_menuButton.RefreshColour();
         }
     }
 
@@ -48,7 +50,7 @@ public class SelectedButton : MonoBehaviour
         if (m_menuButton != null)
         {
             m_menuButton.SetForceColour(false, m_buttonColourSelected);
-            m_menuButton.RefreshButtonColor();
+            m_menuButton.RefreshColour();
         }
     }
 }

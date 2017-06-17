@@ -12,8 +12,8 @@ public class ImageSkybox : MonoBehaviour
     [SerializeField] private Posts m_posts;
     [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private GameObject m_uploadButton;
-    [SerializeField] private GameObject m_deleteButton;
 
+    private Material m_myMaterial;
     private int m_currTextureIndex = -1; // ImageSkybox must track the index of the underlying texture it points to in C++ plugin
     private Texture2D m_skyboxTexture;
     private string m_imageIdentifier; // Points to where the Image came from (S3 Bucket, or Local Device)
@@ -26,6 +26,7 @@ public class ImageSkybox : MonoBehaviour
     {
         m_skyboxTexture = new Texture2D(2,2);
         m_imageIdentifier = "Invalid";
+        m_myMaterial = gameObject.GetComponent<MeshRenderer>().material;
     }
 
     public bool IsTextureValid()
@@ -42,6 +43,16 @@ public class ImageSkybox : MonoBehaviour
     {
         return m_imageIdentifier;
     }       
+
+    public float GetDim()
+    {
+        return m_myMaterial.GetFloat("_Dim");
+    }
+
+    public void SetDim(float dim)
+    {
+        m_myMaterial.SetFloat("_Dim", dim);
+    }
 
     public void SetImage(Texture2D texture, string imageIdentifier, int textureIndex)
     {        
@@ -61,17 +72,15 @@ public class ImageSkybox : MonoBehaviour
         m_currTextureIndex = textureIndex;
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, true);
 
-        // TODO: Change these such that it checks the UserId of a post instead, to see if the user it belongs to is the Profile User.
-        bool isProfileState = m_appDirector.GetState() == AppDirector.AppState.kProfile;
         bool isGalleryState = m_appDirector.GetState() == AppDirector.AppState.kGallery;
         bool isProfileImage = m_profileDetails.IsUser(imageIdentifier); // Identifier is of the User for Profile Pictures
         bool isImageFromDevice = m_imageIdentifier.StartsWith(m_imageSphereController.GetTopLevelDirectory());
-        m_uploadButton.SetActive(isImageFromDevice && isGalleryState && !isProfileImage);  // Currently the ImageSkybox class is responsible for switching on the Upload button
-        m_deleteButton.SetActive(!isImageFromDevice && isProfileState && !isProfileImage); // and the Delete button, when its possible to select either
+        m_uploadButton.SetActive(isImageFromDevice && isGalleryState && !isProfileImage);  // TODO: Move the UploadButton's activation over to Gallery
 
-        gameObject.GetComponent<MeshRenderer>().material.mainTexture = m_skyboxTexture;
+        m_myMaterial.mainTexture = m_skyboxTexture;
+        m_myMaterial.SetFloat("_FlipY", 1.0f);
 
-        // TODO: have the skybox be used instead of just a sphere around the user
+        // TODO: have the skybox be used instead of just a sphere around the user?
         // RenderSettings.skybox = texture; 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Changed skybox to = " + m_imageIdentifier + ", with TextureID = " + m_currTextureIndex);
     }

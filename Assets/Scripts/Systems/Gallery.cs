@@ -28,14 +28,6 @@ public class Gallery : MonoBehaviour
     [SerializeField] private GameObject m_captionNewText;
     [SerializeField] private GameObject m_uploadConfirmation;
 
-    private const string kGalleryText = "Gallery"; 
-    private const string kPreUploadText = "Great choice! Write a comment and Share your post! =)"; 
-    private const string kCancelUploadText = "Upload Cancelled =/";
-    private const string kBeganUploadText = "Began Uploading!";
-    private const string kSuccessfulUploadText = "Succesful Upload! =)";
-    private const string kFailedUploadText = "Oh no! We failed to Upload! =(\n Please try again!";
-    private const string kFailedFileReadText = "Reading files Failed!\n Check permissions!";
-
     private string m_imagesTopLevelDirectory;
     private int m_currGalleryImageIndex = 0;
     private List<string> m_galleryImageFilePaths;
@@ -62,12 +54,12 @@ public class Gallery : MonoBehaviour
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
 
         m_uploadConfirmation.SetActive(false);
-    }
 
-    public void ShowGalleryText()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Gallery Text!");
-        m_user.GetUserMessageButton().SetText(kGalleryText);
+        m_menuController.RegisterToUseMenuConfig(this);
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = true;
+        menuConfig.imageSpheresVisible = true;
+        menuConfig.subMenuVisible = true;
     }
 
     public void InvalidateWork() // This function is called in order to stop any ongoing work
@@ -96,9 +88,13 @@ public class Gallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreUpload() called on post: " + m_imageSkybox.GetImageIdentifier());
 
         m_uploadConfirmation.SetActive(true);
-        m_user.GetUserMessageButton().SetText(kPreUploadText);
         m_uploadButton.SetActive(false);
-        m_menuController.SetImagesAndMenuBarActive(false);
+        m_appDirector.SetOverlayShowing(true);
+
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = false;
+        menuConfig.imageSpheresVisible = false;
+        m_menuController.UpdateMenuConfig(this);
     }
 
     public void CancelUpload()
@@ -106,9 +102,13 @@ public class Gallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelUpload() called");
 
         m_uploadConfirmation.SetActive(false);
-        m_user.GetUserMessageButton().SetText(kCancelUploadText);
         m_uploadButton.SetActive(true);
-        m_menuController.SetImagesAndMenuBarActive(true);
+        m_appDirector.SetOverlayShowing(false);
+
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = true;
+        menuConfig.imageSpheresVisible = true;
+        m_menuController.UpdateMenuConfig(this);
     }
         
     public void UploadImage()
@@ -185,7 +185,6 @@ public class Gallery : MonoBehaviour
         yield return m_appDirector.VerifyInternetConnection();
 
         m_loadingIcon.Display();
-        m_user.GetUserMessageButton().SetText(kBeganUploadText);
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Running UploadImageInternal() for image with path: " + filePath);
 
@@ -258,17 +257,19 @@ public class Gallery : MonoBehaviour
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
             //TODO: SHOW A SUCCESS MESSAGE!
-            m_user.GetUserMessageButton().SetText(kSuccessfulUploadText);
         }
         else
         {   
-            //TODO: SHOW A FAILURE MESSAGE!
-            m_user.GetUserMessageButton().SetTextAsError(kFailedUploadText);
+            //TODO: SHOW A FAILURE MESSAGE! - I Think this will happen naturally...
         }
 
         m_uploadConfirmation.SetActive(false);
         m_loadingIcon.Hide();
-        m_menuController.SetImagesAndMenuBarActive(true);
+
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = true;
+        menuConfig.imageSpheresVisible = true;
+        m_menuController.UpdateMenuConfig(this);
 
         if (profilePic)
         {
@@ -334,8 +335,7 @@ public class Gallery : MonoBehaviour
         {
             if (isDebugBuild) Debug.Log("------- VREEL: Call to GetFiles() failed for: " + baseDirectory);
 
-            // Report Failure in Gallery
-            m_user.GetUserMessageButton().SetTextAsError(kFailedFileReadText);
+            // TODO: REPORT FAILURE IN GALLERY
         }
 
         try
@@ -353,8 +353,7 @@ public class Gallery : MonoBehaviour
         {
             if (isDebugBuild) Debug.Log("------- VREEL: Call to GetDirectories() failed for: " + baseDirectory);
 
-            // Report Failure in Gallery
-            m_user.GetUserMessageButton().SetTextAsError(kFailedFileReadText);
+            // TODO: REPORT FAILURE IN GALLERY
         }
 
         return files;

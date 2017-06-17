@@ -9,23 +9,21 @@ public class ImageSphere : MonoBehaviour
     // Member Variables
     // **************************
 
+    [SerializeField] private AppDirector m_appDirector;
+    [SerializeField] private User m_user;
     [SerializeField] private Search m_search;
     [SerializeField] private Posts m_posts;
     [SerializeField] private ListUsers m_listUsers;
-    [SerializeField] private ListComments m_listComments;
     [SerializeField] private MenuController m_menuController;
-    [SerializeField] private Profile m_profile;
     [SerializeField] private ProfileDetails m_profileDetails;
+    [SerializeField] private ImageFlow m_imageFlow;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
     [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
     [SerializeField] private GameObject m_imageObject;
-    [SerializeField] private GameObject m_handleImageObject;
     [SerializeField] private GameObject m_handleObject;
     [SerializeField] private GameObject m_heartObject;
     [SerializeField] private GameObject m_likesObject;
-    [SerializeField] private GameObject m_captionObject;
-    [SerializeField] private GameObject m_commentCountObject;
     [SerializeField] private bool m_isSmallImageSphere;
 
     private const float kMinShrink = 0.0005f; // Minimum value the sphere will shrink to...
@@ -123,10 +121,47 @@ public class ImageSphere : MonoBehaviour
         }
     }
 
+    public void SetImageSummary(GameObject handleObject, GameObject captionObject, GameObject likeCountObject, GameObject commentCountObject, GameObject heartObject)
+    {
+        if (handleObject != null)
+        {
+            handleObject.SetActive(m_handle.Length > 0);
+            handleObject.GetComponentInChildren<Text>().text = m_handle;
+        }
+
+        if (captionObject != null)
+        {
+            captionObject.SetActive(m_caption.Length > 0);
+            captionObject.GetComponentInChildren<Text>().text = m_caption;
+        }
+
+        if (likeCountObject != null)
+        {
+            likeCountObject.SetActive(m_numLikes >= 0);
+            likeCountObject.GetComponentInChildren<Text>().text = m_numLikes.ToString() + (m_numLikes == 1 ? " like" : " likes");
+        }
+
+        if (commentCountObject != null)
+        {
+            commentCountObject.SetActive(m_caption.Length > 0);
+            commentCountObject.GetComponentInChildren<Text>().text = (m_commentCount + 1).ToString() + (m_commentCount == 1 ? " comment" : " comments"); //Adding 1 for Caption itself
+        }
+
+        if (heartObject != null)
+        {
+            heartObject.SetActive(m_numLikes >= 0);
+            heartObject.GetComponentInChildren<SelectedButton>().ButtonSelected(m_heartOn);
+        }
+    }
+
+    public int GetCommentCount()
+    {
+        return m_commentCount;
+    }
+
     public void AddToCommentCount(int addValue)
     {
         m_commentCount += addValue;
-        m_commentCountObject.GetComponentInChildren<Text>().text = (m_commentCount + 1).ToString(); //Adding 1 for Caption itself
     }
 
     public void Hide()
@@ -154,7 +189,7 @@ public class ImageSphere : MonoBehaviour
 
     public void HandleSelected()
     {
-        m_profile.OpenProfileWithId(m_userId, m_handle);
+        m_profileDetails.OpenProfileWithId(m_userId, m_handle);
     }
 
     public void HeartSelected()
@@ -167,6 +202,16 @@ public class ImageSphere : MonoBehaviour
         m_posts.LikeOrUnlikePost(m_imageIdentifier, m_heartOn);
     }
 
+    public void HeartSelectedWithObject(GameObject heartObject, GameObject likeCountObject)
+    {
+        m_heartOn = !m_heartOn;
+        m_numLikes = m_heartOn ? m_numLikes+1 : m_numLikes-1;
+
+        heartObject.GetComponentInChildren<SelectedButton>().ButtonSelected(m_heartOn);
+        likeCountObject.GetComponentInChildren<Text>().text = m_numLikes.ToString() + " likes";
+        m_posts.LikeOrUnlikePost(m_imageIdentifier, m_heartOn);
+    }
+
     public void LikesSelected()
     {
         if (m_numLikes > 0)
@@ -174,10 +219,10 @@ public class ImageSphere : MonoBehaviour
             m_listUsers.DisplayLikeResults(m_imageIdentifier);
         }
     }
-
-    public void CaptionSelected()
+        
+    public bool IsLoggedUserImage()
     {
-        m_listComments.DisplayCommentResults(m_imageIdentifier, this);
+        return m_user.IsCurrentUser(m_userId);
     }
 
     // **************************
@@ -186,7 +231,7 @@ public class ImageSphere : MonoBehaviour
 
     private void UpdateTextureAndID()
     {
-        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateTextureAndID() called on sphere: " + (m_imageSphereIndex+1) );
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateTextureAndID() called on sphere: " + (m_imageSphereIndex) );
 
         m_imageObject.GetComponent<MeshRenderer>().material.mainTexture = m_imageSphereTexture;
 
@@ -199,33 +244,14 @@ public class ImageSphere : MonoBehaviour
 
     private void UpdateMetadata()
     {
-        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateMetada() called on sphere: " + (m_imageSphereIndex+1) );
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateMetada() called on sphere: " + (m_imageSphereIndex) );
 
         bool isSphereLoading = m_currTextureIndex == kLoadingTextureIndex;
-
-        if (m_handleImageObject != null)
-        {
-            m_handleImageObject.SetActive(false);
-            //m_handleImageObject.SetActive(!isSphereLoading && m_handle.Length > 0 && !m_posts.IsProfileType());
-            //TODO: Appropriately load image...
-        }
 
         if (m_handleObject != null)
         {
             m_handleObject.SetActive(!isSphereLoading && m_handle.Length > 0 && !m_posts.IsProfileType());
             m_handleObject.GetComponentInChildren<Text>().text = m_handle;
-        }
-
-        if (m_captionObject != null)
-        {
-            m_captionObject.SetActive(!isSphereLoading && m_caption.Length > 0);
-            m_captionObject.GetComponentInChildren<Text>().text = m_caption;
-        }
-
-        if (m_commentCountObject != null)
-        {
-            m_commentCountObject.SetActive(!isSphereLoading && m_caption.Length > 0);
-            m_commentCountObject.GetComponentInChildren<Text>().text = (m_commentCount + 1).ToString(); //Adding 1 for Caption itself
         }
 
         if (m_likesObject != null)
@@ -243,10 +269,7 @@ public class ImageSphere : MonoBehaviour
         if (m_menuController != null)
         {
             bool isVisible = m_menuController.IsMenuActive() && m_imageObject.GetComponent<MeshRenderer>().enabled;
-            EnableAllInteractableComponentsInObject(m_handleImageObject, isVisible);
             EnableAllInteractableComponentsInObject(m_handleObject, isVisible);
-            EnableAllInteractableComponentsInObject(m_captionObject, isVisible);
-            EnableAllInteractableComponentsInObject(m_commentCountObject, isVisible);
             EnableAllInteractableComponentsInObject(m_likesObject, isVisible);
             EnableAllInteractableComponentsInObject(m_heartObject, isVisible);
         }
@@ -256,10 +279,7 @@ public class ImageSphere : MonoBehaviour
     {
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: HideMetadata() called on sphere");
 
-        if (m_handleImageObject != null) m_handleImageObject.SetActive(false);
         if (m_handleObject != null) m_handleObject.SetActive(false);
-        if (m_captionObject != null) m_captionObject.SetActive(false);
-        if (m_commentCountObject != null) m_commentCountObject.SetActive(false);
         if (m_likesObject != null) m_likesObject.SetActive(false);
         if (m_heartObject != null) m_heartObject.SetActive(false);
     }
@@ -287,7 +307,7 @@ public class ImageSphere : MonoBehaviour
 
     private IEnumerator AnimateSetTexture()
     {   
-        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateSetTexture() began on sphere: " + (m_imageSphereIndex+1) );
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateSetTexture() began on sphere: " + (m_imageSphereIndex) );
 
         HideMetadata();
 
@@ -318,7 +338,7 @@ public class ImageSphere : MonoBehaviour
 
     private IEnumerator AnimateHide()
     {        
-        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateHide() called on sphere: " + (m_imageSphereIndex+1));
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateHide() called on sphere: " + (m_imageSphereIndex));
 
         HideMetadata();
 
@@ -349,17 +369,16 @@ public class ImageSphere : MonoBehaviour
 
     private void OnButtonSelected(VRStandardAssets.Menu.MenuButton button)
     {   
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() called on sphere: " + (m_imageSphereIndex+1));
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() (m_imageIdentifier.Length > 0): " + (m_imageIdentifier.Length > 0));
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() (m_imageSphereSkybox.GetImageIdentifier().CompareTo(m_imageIdentifier) != 0): " + (m_imageSphereSkybox.GetImageIdentifier().CompareTo(m_imageIdentifier) != 0));
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() (m_currTextureIndex != kLoadingTextureIndex): " + (m_currTextureIndex != kLoadingTextureIndex));
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() called on sphere: " + (m_imageSphereIndex));
 
         bool willChangeImage = (m_imageIdentifier.Length > 0) && (m_imageSphereSkybox.GetImageIdentifier().CompareTo(m_imageIdentifier) != 0) && (m_currTextureIndex != kLoadingTextureIndex);
         if (!willChangeImage)
         {
+            if (!m_isSmallImageSphere && m_appDirector.GetState() != AppDirector.AppState.kGallery)
+            {
+                m_imageFlow.OpenWithImageSphere(this);
+            }
+            
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() will not ChangeImage");
             return;
         }
@@ -372,16 +391,16 @@ public class ImageSphere : MonoBehaviour
         }
         else
         {
-            SetOriginalImageOnSkybox(m_workingImageIdentifier);
+            DownloadAndSetOriginalImageOnSkybox(m_workingImageIdentifier);
             SetSkybox(m_workingImageIdentifier);
         }            
     }
 
     private IEnumerator AnimateSphereTowardsUser(string imageIdentifier)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateSphereTowardsUser() called on sphere: " + (m_imageSphereIndex+1));
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: AnimateSphereTowardsUser() called on sphere: " + (m_imageSphereIndex));
 
-        SetOriginalImageOnSkybox(imageIdentifier);
+        DownloadAndSetOriginalImageOnSkybox(imageIdentifier);
         m_imageObject.GetComponent<ImageSphereAnimation>().SetActive(false);
         m_imageObject.GetComponent<Collider>().enabled = false;
 
@@ -418,6 +437,7 @@ public class ImageSphere : MonoBehaviour
 
         // When Image has reached the user then SetSkybox to Thumbnail and grow the sphere
         m_imageObject.transform.position = userPos;
+        m_imageSphereSkybox.SetDim(0); // switch off Dim because no image sphere's have Dim!
         SetSkybox(imageIdentifier);
 
         // Scale to size of SkyBox
@@ -450,6 +470,13 @@ public class ImageSphere : MonoBehaviour
         m_imageObject.transform.localScale = initialScale;
         m_imageObject.GetComponent<ImageSphereAnimation>().SetActive(true);
         m_imageObject.GetComponent<Collider>().enabled = true;
+
+        m_menuController.SetSkyboxDimOn(true); // switch dim back on gradually...
+
+        if (!m_isSmallImageSphere && m_appDirector.GetState() != AppDirector.AppState.kGallery)
+        {
+            m_imageFlow.OpenWithImageSphere(this);
+        }
     }
 
     private float ExponentialProgress(float progress)
@@ -460,7 +487,7 @@ public class ImageSphere : MonoBehaviour
         return result;
     }
 
-    private void SetOriginalImageOnSkybox(string imageIdentifier)
+    private void DownloadAndSetOriginalImageOnSkybox(string imageIdentifier)
     {                
         bool isImageFromDevice = imageIdentifier.StartsWith(m_imageSphereController.GetTopLevelDirectory());
         if (!isImageFromDevice)
@@ -471,11 +498,11 @@ public class ImageSphere : MonoBehaviour
                 bool isProfilePageImage = m_profileDetails.IsUser(imageIdentifier); 
                 if (isProfilePageImage) // Image Identifier is of the User for Profile Pictures
                 {
-                    m_profileDetails.DownloadOriginalImage();
+                    m_profileDetails.DownloadOriginalImage(ProfileDetails.ImageSphereType.kProfile);
                 }
                 else if (isLoggedUserImage)
                 {
-                    m_profileDetails.DownloadMenuBarOriginalImage();
+                    m_profileDetails.DownloadOriginalImage(ProfileDetails.ImageSphereType.kMenuBar);
                 }
             }
             else
@@ -487,7 +514,7 @@ public class ImageSphere : MonoBehaviour
 
     private void SetSkybox(string imageIdentifier)
     {    
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: SetSkybox() got called on sphere: " + (m_imageSphereIndex+1));
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: SetSkybox() got called on sphere: " + (m_imageSphereIndex));
 
         if (m_imageSphereSkybox != null)
         {            

@@ -3,7 +3,6 @@ using UnityEngine.UI;               // Text
 using System.Collections;           // IEnumerator
 using System.Collections.Generic;   // List
 
-//TODO: If this doesn't change much, then it should be merged into ListUsers somehow...
 public class ListComments : MonoBehaviour 
 {   
     // **************************
@@ -13,23 +12,17 @@ public class ListComments : MonoBehaviour
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
     [SerializeField] private Posts m_posts;
-    //[SerializeField] private Search m_search;
-    [SerializeField] private ProfileDetails m_profileDetails;
-    [SerializeField] private ListUsers m_listUsers;
     [SerializeField] private LoadingIcon m_loadingIcon;
-    [SerializeField] private GameObject m_displayItemsTopLevel; //Top-level object for results
+    [SerializeField] private GameObject m_commentCountInList;
+    [SerializeField] private GameObject m_commentCountInSummary;
     [SerializeField] private GameObject[] m_displayItems;
     [SerializeField] private GameObject m_nextButton;
     [SerializeField] private GameObject m_previousButton;
-    [SerializeField] private GameObject m_addCommentConfirmation;
+
+    [SerializeField] private GameObject m_captionUpdateText;
     [SerializeField] private GameObject m_commentNewText;
-    [SerializeField] private GameObject m_updateCommentConfirmation;
     [SerializeField] private GameObject m_commentUpdateText;
-    [SerializeField] private GameObject m_deleteCommentOption;
-    [SerializeField] private GameObject m_deleteCommentConfirmation;
-    [SerializeField] private GameObject m_flagPostConfirmation;
-    [SerializeField] private GameObject m_flagReasonText;
-    [SerializeField] private GameObject m_flagPostResult;
+    [SerializeField] private GameObject m_imageSummaryCaption;
 
     public class CommentResult
     {
@@ -38,10 +31,7 @@ public class ListComments : MonoBehaviour
         public bool edited { get; set; }
         public string userId { get; set; }
         public string userHandle { get; set; }
-    }        
-
-    private const string kFlagSuccessText = "Thank you for letting us know! We'll investigate your report!";
-    private const string kFlagFailureText = "Hmm, something went wrong, please try again later!";
+    }
 
     private string m_postId = null;
     private int m_currResultIndex = 0;
@@ -65,9 +55,19 @@ public class ListComments : MonoBehaviour
         m_coroutineQueue.StartLoop();
 
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
-
-        CloseListComments();
 	}            
+
+    public CommentResult GetCommentResult(int commentIndex)
+    {
+        int actualResultIndex = m_currResultIndex + commentIndex;
+        return m_commentResults[actualResultIndex];
+    }
+
+    public bool IsCaptionSelected(int commentIndex)
+    {
+        int actualCommentIndex = m_currResultIndex + m_currSelectedCommentIndex;
+        return actualCommentIndex == 0;
+    }
 
     public void Update()
     {
@@ -80,7 +80,10 @@ public class ListComments : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: DisplayCommentResults() called for post ID: " + postId);
 
         m_currImageSphere = imageSphere;
-        m_coroutineQueue.EnqueueAction(StoreAndDisplayUserResultsInternal(postId));
+        string commentCountText = (m_currImageSphere.GetCommentCount() + 1).ToString() + (m_currImageSphere.GetCommentCount() == 1 ? " comment" : " comments");
+        m_commentCountInList.GetComponentInChildren<Text>().text = commentCountText;
+        m_commentCountInSummary.GetComponentInChildren<Text>().text = commentCountText;
+        m_coroutineQueue.EnqueueAction(StoreAndDisplayCommentResultsInternal(postId));
     }
 
     public void NextCommentResults()
@@ -95,10 +98,10 @@ public class ListComments : MonoBehaviour
 
         if (m_nextPageOfResults != null)
         {   // By calling this every time a user presses the next button, we ensure he can never miss out on posts and don't overload the API            
-            m_coroutineQueue.EnqueueAction(StoreUserResultsFromNextPage());
+            m_coroutineQueue.EnqueueAction(StoreCommentResultsFromNextPage());
         }
 
-        DisplayUserResultsOnItems();
+        DisplayCommentResultsOnItems();
     }
 
     public void PreviousCommentResults()
@@ -111,112 +114,46 @@ public class ListComments : MonoBehaviour
         m_currResultIndex = Mathf.Clamp(m_currResultIndex - numResultsToDisplay, 0, numCommentResults);
         m_coroutineQueue.Clear(); // Ensures we don't repeat operations
 
-        DisplayUserResultsOnItems();
-    }
-
-    public void CloseListComments()
-    {
-        m_displayItemsTopLevel.SetActive(false);
-        CloseSubMenus();
+        DisplayCommentResultsOnItems();
     }
         
-    public void PreAddComment()
+    public bool PreUpdateComment(int commentIndex)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreAddComment() called on post: " + m_postId);
+        m_currSelectedCommentIndex = commentIndex;
+        int actualCommentIndex = m_currResultIndex + m_currSelectedCommentIndex;
 
-        CloseSubMenus();
-        m_addCommentConfirmation.SetActive(true);
-    }
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreUpdateComment() called on comment: " + m_commentResults[actualCommentIndex].commentId);
 
-    public void CancelAddComment()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelUpload() called");
-
-        m_addCommentConfirmation.SetActive(false);
-    }
-
-    public void ConfirmAddComment()
-    {
-        m_coroutineQueue.EnqueueAction(ConfirmAddCommentInternal());
-    }
-
-    public void PreUpdateComment(int commentBoxIndex)
-    {
-        m_currSelectedCommentIndex = commentBoxIndex;
-        int commentIndex = m_currResultIndex + m_currSelectedCommentIndex;
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreUpdateComment() called on comment: " + m_commentResults[commentIndex].commentId);
-
-        bool updateCommentAvailable = m_user.IsCurrentUser(m_commentResults[commentIndex].userId);
+        bool updateCommentAvailable = m_user.IsCurrentUser(m_commentResults[actualCommentIndex].userId);
         if (updateCommentAvailable)
         {
-            CloseSubMenus();
-            m_deleteCommentOption.SetActive(commentIndex > 0);
-            m_updateCommentConfirmation.SetActive(true);
+            if (actualCommentIndex == 0) //if its the caption
+            {
+                m_captionUpdateText.GetComponentInChildren<Text>().text = m_commentResults[actualCommentIndex].text;
+            }
+            else
+            {
+                m_commentUpdateText.GetComponentInChildren<Text>().text = m_commentResults[actualCommentIndex].text;
+            }
         }
-    }
 
-    public void CancelUpdateComment()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelUpdateComment() called");
-
-        m_updateCommentConfirmation.SetActive(false);
+        return updateCommentAvailable;
     }
 
     public void ConfirmUpdateComment()
     {     
         m_coroutineQueue.EnqueueAction(ConfirmUpdateCommentInternal());
-    }
+    }        
 
-    public void PreDeleteComment()
+    public void ConfirmAddComment()
     {
-        int commentIndex = m_currResultIndex + m_currSelectedCommentIndex;
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreDeleteComment() called on comment: " + m_commentResults[commentIndex].commentId);
-
-        CloseSubMenus();
-        m_deleteCommentConfirmation.SetActive(true);
+        m_coroutineQueue.EnqueueAction(ConfirmAddCommentInternal());
     }
-
-    public void CancelDeleteComment()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelDeleteComment() called");
-
-        m_deleteCommentConfirmation.SetActive(false);
-    }
-
+        
     public void ConfirmDeleteComment()
     {     
         m_coroutineQueue.EnqueueAction(ConfirmDeleteCommentInternal());
-    }
-
-    public void PreFlagPost()
-    {        
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreFlagPost() called on post: " + m_postId);
-
-        CloseSubMenus();
-        m_flagPostConfirmation.SetActive(true);
-    }
-
-    public void CancelFlagPost()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelFlagPost() called");
-
-        m_flagPostConfirmation.SetActive(false);
-    }
-
-    public void ConfirmFlagPost()
-    {     
-        m_coroutineQueue.EnqueueAction(ConfirmFlagPostInternal());
-    }
-
-    /*
-    public void HandleSelected(int userResultItemIndex)
-    {
-        CloseListComments();
-        int actualResultIndex = m_currResultIndex + userResultItemIndex;
-        m_search.OpenSearchAndProfileWithId(m_userResults[actualResultIndex].userId, m_userResults[actualResultIndex].userHandle);
-    }
-    */
+    }        
      
     // **************************
     // Private/Helper functions
@@ -238,32 +175,14 @@ public class ListComments : MonoBehaviour
         int numLikeResults = m_commentResults.Count;
         return m_currResultIndex >= (numLikeResults - numDisplayItems);       
     }        
-
-    public void CloseSubMenus()
-    {
-        m_addCommentConfirmation.SetActive(false);
-        m_updateCommentConfirmation.SetActive(false);
-        m_deleteCommentConfirmation.SetActive(false);
-        m_flagPostConfirmation.SetActive(false);
-        m_flagPostResult.SetActive(false);
-    }
         
-    public IEnumerator StoreAndDisplayUserResultsInternal(string postId)
+    private IEnumerator StoreAndDisplayCommentResultsInternal(string postId)
     {
         yield return m_appDirector.VerifyInternetConnection();
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: A");
-
-        //m_profileDetails.CloseProfileDetails();
-        m_listUsers.CloseListUsers();
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: B");
 
         m_currResultIndex = 0;
         m_commentResults.Clear();
         m_postId = postId;
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: C");
 
         yield return GetResults();
 
@@ -271,21 +190,13 @@ public class ListComments : MonoBehaviour
         {            
             StoreCaption();
 
-            StoreNewUserResults();
+            StoreNewCommentResults();
 
-            DisplayUserResultsOnItems();
-
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: D");
+            DisplayCommentResultsOnItems();
         }
-
-        m_displayItemsTopLevel.SetActive(true);
-        m_addCommentConfirmation.SetActive(false);
-        m_updateCommentConfirmation.SetActive(false);
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: E");
     }
 
-    private IEnumerator StoreUserResultsFromNextPage()
+    private IEnumerator StoreCommentResultsFromNextPage()
     {
         yield return m_appDirector.VerifyInternetConnection();
 
@@ -293,7 +204,7 @@ public class ListComments : MonoBehaviour
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
-            StoreNewUserResults();
+            StoreNewCommentResults();
         }
     }
 
@@ -316,7 +227,7 @@ public class ListComments : MonoBehaviour
         m_commentResults.Add(newCommentResult);
     }
 
-    private void StoreNewUserResults()
+    private void StoreNewCommentResults()
     {
         VReelJSON.Model_Comments comments = m_backEndAPI.GetCommentsResult();
         if (comments != null)
@@ -341,7 +252,7 @@ public class ListComments : MonoBehaviour
         }
     }
 
-    private void DisplayUserResultsOnItems()
+    private void DisplayCommentResultsOnItems()
     {
         int startingPostIndex = m_currResultIndex;
         int numResultsToDisplay = GetNumDisplayItems();
@@ -352,13 +263,44 @@ public class ListComments : MonoBehaviour
         {
             if (userResultIndex < m_commentResults.Count)
             {                                   
+                // NOTE: The reliance on an expected order for Text components is not the best way to do this...
                 m_displayItems[itemIndex].SetActive(true);
-                m_displayItems[itemIndex].GetComponentInChildren<Text>().text = m_commentResults[userResultIndex].userHandle + ":\t" + m_commentResults[userResultIndex].text;
+                Text[] textItems = m_displayItems[itemIndex].GetComponentsInChildren<Text>(); 
+                textItems[0].text = m_commentResults[userResultIndex].userHandle;
+                textItems[1].text = m_commentResults[userResultIndex].text;
             }
             else
             {
                 m_displayItems[itemIndex].SetActive(false);
             }
+        }
+    }
+
+    private IEnumerator ConfirmUpdateCommentInternal()
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        int actualCommentIndex = m_currResultIndex + m_currSelectedCommentIndex;
+        string commentText = (actualCommentIndex == 0 ? m_captionUpdateText : m_commentUpdateText).GetComponentInChildren<Text>().text;
+        if (actualCommentIndex == 0) // actualCommentIndex = 0 is the Caption
+        {
+            yield return m_backEndAPI.Post_UpdatePost(m_postId, commentText);
+        }
+        else //Any other CommentIndex represents an actual Comment
+        {
+            yield return m_backEndAPI.Comment_UpdateComment(m_commentResults[actualCommentIndex].commentId, commentText);
+        }
+
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {            
+            m_commentResults[actualCommentIndex].text = commentText;
+            if (actualCommentIndex == 0) //if its the caption
+            {
+                m_posts.RefreshPostData(m_postId);
+                m_imageSummaryCaption.GetComponentInChildren<Text>().text = commentText;
+            }
+
+            DisplayCommentResultsOnItems();
         }
     }
 
@@ -380,83 +322,32 @@ public class ListComments : MonoBehaviour
 
             m_commentResults.Add(newCommentResult);
 
-            DisplayUserResultsOnItems();
+            DisplayCommentResultsOnItems();
 
             m_currImageSphere.AddToCommentCount(1);
+            string commentCountText = (m_currImageSphere.GetCommentCount() + 1).ToString() + (m_currImageSphere.GetCommentCount() == 1 ? " comment" : " comments");
+            m_commentCountInList.GetComponentInChildren<Text>().text = commentCountText;
+            m_commentCountInSummary.GetComponentInChildren<Text>().text = commentCountText;
         }
-
-        CloseSubMenus();
-    }
-
-    private IEnumerator ConfirmUpdateCommentInternal()
-    {
-        yield return m_appDirector.VerifyInternetConnection();
-
-        string commentText = m_commentUpdateText.GetComponentInChildren<Text>().text;
-        int commentIndex = m_currResultIndex + m_currSelectedCommentIndex;
-        if (commentIndex == 0) // CommentIndex = 0 is the Caption
-        {
-            yield return m_backEndAPI.Post_UpdatePost(m_postId, commentText);
-        }
-        else //Any other CommentIndex represents an actual Comment
-        {
-            yield return m_backEndAPI.Comment_UpdateComment(m_commentResults[commentIndex].commentId, commentText);
-        }
-
-        if (m_backEndAPI.IsLastAPICallSuccessful())
-        {
-            m_commentResults[commentIndex].text = commentText;
-            if (commentIndex == 0) //if its the caption
-            {
-                m_posts.RefreshPostData(m_postId);
-            }
-
-            DisplayUserResultsOnItems();
-        }
-
-        CloseSubMenus();
-    }
+    }        
 
     private IEnumerator ConfirmDeleteCommentInternal()
     {
         yield return m_appDirector.VerifyInternetConnection();
 
-        int commentIndex = m_currResultIndex + m_currSelectedCommentIndex;
-        yield return m_backEndAPI.Comment_DeleteComment(m_commentResults[commentIndex].commentId);
+        int actualCommentIndex = m_currResultIndex + m_currSelectedCommentIndex;
+        yield return m_backEndAPI.Comment_DeleteComment(m_commentResults[actualCommentIndex].commentId);
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
-            m_commentResults.RemoveAt(commentIndex);
+            m_commentResults.RemoveAt(actualCommentIndex);
 
-            DisplayUserResultsOnItems();
+            DisplayCommentResultsOnItems();
 
             m_currImageSphere.AddToCommentCount(-1);
+            string commentCountText = (m_currImageSphere.GetCommentCount() + 1).ToString() + (m_currImageSphere.GetCommentCount() == 1 ? " comment" : " comments");
+            m_commentCountInList.GetComponentInChildren<Text>().text = commentCountText;
+            m_commentCountInSummary.GetComponentInChildren<Text>().text = commentCountText;
         }
-
-        CloseSubMenus();
-    }
-
-    private IEnumerator ConfirmFlagPostInternal()
-    {
-        yield return m_appDirector.VerifyInternetConnection();
-
-        m_loadingIcon.Display();
-
-        string flagReasonText = m_flagReasonText.GetComponentInChildren<Text>().text;
-        yield return m_backEndAPI.Flag_FlagPost(m_postId, flagReasonText);
-
-        if (m_backEndAPI.IsLastAPICallSuccessful())
-        {
-            m_flagPostResult.GetComponentInChildren<Text>().text = kFlagSuccessText;
-        } 
-        else
-        {
-            m_flagPostResult.GetComponentInChildren<Text>().text = kFlagFailureText;
-        }
-
-        m_flagPostConfirmation.SetActive(false);
-        m_flagPostResult.SetActive(true);
-
-        m_loadingIcon.Hide();
     }
 }

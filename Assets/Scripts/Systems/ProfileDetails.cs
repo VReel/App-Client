@@ -2,18 +2,25 @@
 using UnityEngine.UI;           //Text
 using System.Collections;       //IEnumerator
 
-//TODO: Merge this into Profile.cs...
+//TODO: Rename this as Profile.cs...
 public class ProfileDetails : MonoBehaviour 
 {
     // **************************
     // Member Variables
     // **************************
 
+    public enum ImageSphereType
+    {
+        kProfile,    // This sphere is on the Profile page
+        kMenuBar     // This sphere appears on the MenuBar 
+    }
+
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private Posts m_posts;
     [SerializeField] private ListUsers m_listUsers;
+    [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private LoadingIcon m_loadingIcon;
@@ -28,6 +35,7 @@ public class ProfileDetails : MonoBehaviour
     [SerializeField] private GameObject m_profileDescriptionUpdateTopLevel;
     [SerializeField] private GameObject m_profileHandleNewText;
     [SerializeField] private GameObject m_profileDescriptionNewText;
+    [SerializeField] private GameObject m_newUserText;
 
     private string m_userId;
     private string m_handle;
@@ -58,7 +66,17 @@ public class ProfileDetails : MonoBehaviour
 
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
 
-        CloseProfileDetails();
+        m_menuController.RegisterToUseMenuConfig(this);
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = true;
+        menuConfig.subMenuVisible = true;
+        m_menuController.UpdateMenuConfig(this);
+    }
+
+    public void Update() //TODO Make this event based instead...
+    {
+        bool noImagesUploaded = m_posts.GetNumPosts() <= 0 && !m_loadingIcon.IsDisplaying() && m_user.IsCurrentUser(m_userId);
+        m_newUserText.SetActive(noImagesUploaded); // If the user has yet to upload any images then show them the New User Text!
     }
 
     public string GetUserId()
@@ -78,9 +96,28 @@ public class ProfileDetails : MonoBehaviour
 
     public void SetMenuBarProfileDetails()
     {
-        m_menuController.SetMenuBarActive(true);
         m_menuBarProfileButtonObject.GetComponentInChildren<Text>().text = m_user.m_handle;
         m_coroutineQueue.EnqueueAction(SetMenuBarProfileDetailsInternal());
+    }
+
+    public void OpenUserProfile()
+    {
+        m_userId = m_user.m_id;
+        m_handle = m_user.m_handle;
+
+        m_appDirector.RequestProfileState();
+
+        OpenProfileInternal();
+    }
+
+    public void OpenProfileWithId(string userId, string handle)
+    {
+        m_userId = userId;
+        m_handle = handle;
+
+        m_appDirector.RequestProfileState();
+
+        OpenProfileInternal();
     }
 
     public void OpenProfileDetails(string userId)
@@ -106,30 +143,17 @@ public class ProfileDetails : MonoBehaviour
 
     public void DisplayFollowers()
     {
-        m_listUsers.DisplayFollowersResults(m_userId);
+        if (m_followerCount > 0)
+        {
+            m_listUsers.DisplayFollowersResults(m_userId);
+        }
     }
 
     public void DisplayFollowing()
     {
-        m_listUsers.DisplayFollowingResults(m_userId);
-    }
-
-    public void CloseProfileDetails()
-    {
-        m_imageSphereController.HideSphereAtIndex(Helper.kProfilePageSphereIndex, true); // True tells it to ForceHide
-        m_menuController.SetMenuBarActive(true);
-        //m_profileDetailsTopLevel.SetActive(false);
-        //m_profileDescriptionUpdateTopLevel.SetActive(false);
-    }
-
-    //HACK - do this better, Calling it from ListUsers, which is also always showing the ImageSpheres even when it shouldn't...
-    public void ShowOrHide(bool show)
-    {
-        m_profileDetailsTopLevel.SetActive(show);
-
-        if (m_appDirector.GetState() == AppDirector.AppState.kProfile && show) 
+        if (m_followingCount > 0)
         {
-            m_menuController.SetMenuBarActive(false);
+            m_listUsers.DisplayFollowingResults(m_userId);
         }
     }
 
@@ -157,18 +181,26 @@ public class ProfileDetails : MonoBehaviour
             m_profileHandleNewText.GetComponentInChildren<Text>().text = m_handle;
             m_profileDescriptionNewText.GetComponentInChildren<Text>().text = m_profileDescription;
 
-            m_menuController.SetImagesAndMenuBarActive(false);
+            MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+            menuConfig.menuBarVisible = false;
+            menuConfig.imageSpheresVisible = false;
+            m_menuController.UpdateMenuConfig(this);
+            m_appDirector.SetOverlayShowing(true);
         }            
     }
 
     public void CancelUpdateProfileDescription()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelUpdateProfileDescription() called");
-
+               
         m_profileDetailsTopLevel.SetActive(true);
         m_profileDescriptionUpdateTopLevel.SetActive(false);
-        m_menuController.SetImagesAndMenuBarActive(true);
-        m_menuController.SetMenuBarActive(false);
+
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = false;
+        menuConfig.imageSpheresVisible = true;
+        m_menuController.UpdateMenuConfig(this);
+        m_appDirector.SetOverlayShowing(false);
     }
 
     public void AcceptUpdateProfileDescription()
@@ -178,23 +210,43 @@ public class ProfileDetails : MonoBehaviour
         m_coroutineQueue.EnqueueAction(UpdateProfileDescriptionInternal());
     }
 
-    public void DownloadOriginalImage()
+    public void DownloadOriginalImage(ImageSphereType imageSphereType)
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadOriginalImage() called");
 
-        m_coroutineQueue.EnqueueAction(DownloadOriginalImageInternal());
+        m_coroutineQueue.EnqueueAction(DownloadOriginalImageInternal(imageSphereType));
     }
 
-    public void DownloadMenuBarOriginalImage()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadMenuBarOriginalImage() called");
-
-        m_coroutineQueue.EnqueueAction(DownloadMenuBarOriginalImageInternal());
+    public void CloseProfile()
+    {        
+        m_imageSphereController.HideSphereAtIndex(Helper.kProfilePageSphereIndex, true); // True tells it to ForceHide
+        m_appDirector.RequestExploreState(); //TODO: Do something more intelligent in order to not lose the state you were in...
+    }
+        
+    public void InvalidateWork() // This function is called in order to stop any ongoing work
+    {        
+        m_posts.InvalidateWork();
+        if (m_coroutineQueue != null)
+        {
+            m_coroutineQueue.Clear();
+        }
     }
 
     // **************************
     // Private/Helper functions
     // **************************
+
+    private void OpenProfileInternal()
+    {
+        if (m_user.IsCurrentUser(m_userId))
+        {
+            m_posts.OpenUserProfile();
+        }
+        else
+        {
+            m_posts.OpenProfileWithID(m_userId, m_handle);
+        }
+    }
 
     private IEnumerator SetMenuBarProfileDetailsInternal()
     {
@@ -206,7 +258,7 @@ public class ProfileDetails : MonoBehaviour
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
-            DownloadMenuBarThumbnailImage();
+            DownloadThumbnailImage(ImageSphereType.kMenuBar);
         }
         else
         {
@@ -231,7 +283,7 @@ public class ProfileDetails : MonoBehaviour
 
             m_followButtonObject.GetComponentInChildren<FollowButton>().FollowOnOffSwitch(m_followedByMe);
 
-            DownloadThumbnailImage();
+            DownloadThumbnailImage(ImageSphereType.kProfile);
         }
         else
         {
@@ -239,15 +291,23 @@ public class ProfileDetails : MonoBehaviour
         }
     }
 
-    private void DownloadThumbnailImage()
-    {
-        if (m_thumbnailUrl != null && m_thumbnailUrl.Length > 0)
+    private void DownloadThumbnailImage(ImageSphereType imageSphereType)
+    {        
+        if (imageSphereType == ImageSphereType.kProfile && m_thumbnailUrl != null && m_thumbnailUrl.Length > 0)
         {
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadThumbnailImage() loading User Thumbnail Image for: " + m_thumbnailUrl);
+
             m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kProfilePageSphereIndex, m_thumbnailUrl, m_userId, false);
+        }
+        else if (imageSphereType == ImageSphereType.kMenuBar && m_loggedUserThumbnailUrl != null && m_loggedUserThumbnailUrl.Length > 0)
+        {
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadThumbnailImage() loading User Thumbnail Image for: " + m_loggedUserThumbnailUrl);
+
+            m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kMenuBarProfileSphereIndex, m_loggedUserThumbnailUrl, m_user.m_id, false);
         }
     }
         
-    private IEnumerator DownloadOriginalImageInternal()
+    private IEnumerator DownloadOriginalImageInternal(ImageSphereType imageSphereType)
     {
         yield return m_appDirector.VerifyInternetConnection();
 
@@ -256,10 +316,19 @@ public class ProfileDetails : MonoBehaviour
         yield return RefreshProfileData();
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
-        {            
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadOriginalImageInternal() loading User Original Image!");
+        {   
+            if (imageSphereType == ImageSphereType.kProfile)
+            {
+                if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadOriginalImageInternal() loading User Original Image for: " + m_originalUrl);
 
-            m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kSkyboxSphereIndex, m_originalUrl, m_userId, true);
+                m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kSkyboxSphereIndex, m_originalUrl, m_userId, true);
+            }
+            else if (imageSphereType == ImageSphereType.kMenuBar)
+            {
+                if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadOriginalImageInternal() loading User Original Image for: " + m_loggedUserOriginalUrl);
+
+                m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kSkyboxSphereIndex, m_loggedUserOriginalUrl, m_user.m_id, true);
+            }
         }
 
         m_loadingIcon.Hide();
@@ -285,32 +354,6 @@ public class ProfileDetails : MonoBehaviour
             m_thumbnailUrl = m_backEndAPI.GetUserResult().data.attributes.thumbnail_url;
             m_originalUrl = m_backEndAPI.GetUserResult().data.attributes.original_url;
         }
-    }
-
-    private void DownloadMenuBarThumbnailImage()
-    {
-        if (m_loggedUserThumbnailUrl != null && m_loggedUserThumbnailUrl.Length > 0)
-        {
-            m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kMenuBarProfileSphereIndex, m_loggedUserThumbnailUrl, m_user.m_id, false);
-        }
-    }
-
-    private IEnumerator DownloadMenuBarOriginalImageInternal()
-    {
-        yield return m_appDirector.VerifyInternetConnection();
-
-        m_loadingIcon.Display();
-
-        yield return RefreshLoggedProfileData();
-
-        if (m_backEndAPI.IsLastAPICallSuccessful())
-        {            
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadMenuBarOriginalImageInternal() loading User Original Image!");
-
-            m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kSkyboxSphereIndex, m_loggedUserOriginalUrl, m_user.m_id, true);
-        }
-
-        m_loadingIcon.Hide();
     }
 
     private IEnumerator RefreshLoggedProfileData() // NOTE: Since URL's have a lifetime, we need to refresh the data at certain points...
@@ -353,21 +396,32 @@ public class ProfileDetails : MonoBehaviour
         m_handle = m_profileHandleNewText.GetComponentInChildren<Text>().text;
         Helper.TruncateString(ref m_handle, Helper.kMaxCaptionOrDescriptionLength);
         m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_handle;
+
         yield return m_backEndAPI.Register_UpdateHandle(m_handle);
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            m_handleObject.GetComponentInChildren<Text>().text = m_handle;
+            m_menuBarProfileButtonObject.GetComponentInChildren<Text>().text = m_handle;
+        }
 
         m_profileDescription = m_profileDescriptionNewText.GetComponentInChildren<Text>().text;
         Helper.TruncateString(ref m_profileDescription, Helper.kMaxCaptionOrDescriptionLength);
         m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_profileDescription;
+
         yield return m_backEndAPI.Register_UpdateProfileDescription(m_profileDescription);
-
-        m_handleObject.GetComponentInChildren<Text>().text = m_handle; 
-        m_menuBarProfileButtonObject.GetComponentInChildren<Text>().text = m_handle;
-        m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_profileDescription; 
-
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            m_profileDescriptionObject.GetComponentInChildren<Text>().text = m_profileDescription;
+        }
+            
         m_profileDetailsTopLevel.SetActive(true);
         m_profileDescriptionUpdateTopLevel.SetActive(false);
-        m_menuController.SetImagesAndMenuBarActive(true);
-        m_menuController.SetMenuBarActive(false);
+
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = false;
+        menuConfig.imageSpheresVisible = true;
+        m_menuController.UpdateMenuConfig(this);
+        m_appDirector.SetOverlayShowing(false);
 
         m_loadingIcon.Hide();
     }

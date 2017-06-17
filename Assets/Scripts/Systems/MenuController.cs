@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
-using UnityEngine.VR;       // VRSettings
-using UnityEngine.UI;       // Text
-using System.Collections;   // IEnumerator
+using UnityEngine.VR;               // VRSettings
+using UnityEngine.UI;               // Text
+using System.Collections;           // IEnumerator
+using System.Collections.Generic;   // List
 
 public class MenuController : MonoBehaviour 
 {
@@ -12,36 +13,162 @@ public class MenuController : MonoBehaviour
     public bool m_swipeEnabled = true;      // When on, swiping switches the menu on/off
 
     [SerializeField] private AppDirector m_appDirector;  
-    [SerializeField] private ImageSphereController m_imageSphereController;
-    [SerializeField] private GameObject m_menuSubTree;
-    [SerializeField] private GameObject m_loginSubMenu;
-    [SerializeField] private GameObject m_homeSubMenu;
-    [SerializeField] private GameObject m_searchSubMenu;
-    [SerializeField] private GameObject m_profileSubMenu;
-    [SerializeField] private GameObject m_gallerySubMenu;
     [SerializeField] private User m_user;
+    [SerializeField] private ImageSphereController m_imageSphereController;
+    [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private KeyBoard m_keyboard;
     [SerializeField] private VRStandardAssets.Utils.Reticle m_reticle;
     [SerializeField] private VRStandardAssets.Utils.VRInput m_input;
+    [SerializeField] private GameObject m_menuSubTree;
+    [SerializeField] private GameObject m_loginSubMenu;
+    [SerializeField] private GameObject m_searchSubMenu;
+    [SerializeField] private GameObject m_profileSubMenu;
+    [SerializeField] private GameObject m_gallerySubMenu;
     [SerializeField] private GameObject m_menuBar;
     [SerializeField] private GameObject[] m_menuBarButtons;
 
-    private bool m_isMenuActive = true;
+    public class MenuConfig
+    {
+        public MonoBehaviour owner { get; set; }
+        public bool menuVisible { get; set; }
+        public bool menuBarVisible { get; set; }
+        public bool imageSpheresVisible { get; set; }
+        public bool subMenuVisible { get; set; }
+    }
+
+    private class MenuConfigChanged // Doing lots of redundant GetComponentsInChildren() calls is unnecessarily expensive, this struct removes that
+    {
+        public bool menuVisibleChanged { get; set; }
+        public bool menuBarVisibleChanged { get; set; }
+        public bool imageSpheresVisibleChanged { get; set; }
+    }
+
+    private int m_currMenuConfigIndex;
+    private List<MenuConfig> m_menuConfigList;
+    private MenuConfig m_lastMenuConfig;
+    private MenuConfigChanged m_menuConfigChanged;
+    private CoroutineQueue m_coroutineQueue;
 
     // **************************
     // Public functions
     // **************************
 
-    public bool IsMenuActive()
+    public void Start() 
     {
-        return m_isMenuActive;
+        m_coroutineQueue = new CoroutineQueue(this);
+        m_coroutineQueue.StartLoop();
+
+        if (m_menuConfigList == null)
+        {
+            m_menuConfigList = new List<MenuConfig>();
+        }
+
+        m_lastMenuConfig = new MenuConfig();
+        m_lastMenuConfig.owner = null;
+        m_lastMenuConfig.menuVisible = true; // We don't want keyboard.Hide() to get called early on...
+        m_lastMenuConfig.menuBarVisible = false;
+        m_lastMenuConfig.imageSpheresVisible = false;
+        m_lastMenuConfig.subMenuVisible = false;
+
+        m_menuConfigChanged = new MenuConfigChanged();
     }
 
-    public void SetCurrentSubMenuActive(bool active)
+    public bool IsMenuActive()
+    {
+        return m_menuConfigList[m_currMenuConfigIndex].menuVisible;
+    }
+        
+    public void RegisterToUseMenuConfig(MonoBehaviour owner)
+    {
+        if (m_menuConfigList == null)
+        {
+            m_menuConfigList = new List<MenuConfig>();
+        }
+
+        MenuConfig newMenuConfig = new MenuConfig();
+        newMenuConfig.owner = owner;
+        newMenuConfig.menuVisible = true;
+        newMenuConfig.menuBarVisible = false;
+        newMenuConfig.imageSpheresVisible = false;
+        newMenuConfig.subMenuVisible = false;
+        m_menuConfigList.Add( newMenuConfig );
+    }
+
+    public MenuConfig GetMenuConfigForOwner(MonoBehaviour owner)
+    {
+        int index = GetMenuConfigIndexForOwner(owner);
+        return m_menuConfigList[index];
+    }
+
+    public void UpdateMenuConfig(MonoBehaviour owner)
+    {
+        m_currMenuConfigIndex = GetMenuConfigIndexForOwner(owner);
+
+        m_menuConfigChanged.menuVisibleChanged = m_menuConfigList[m_currMenuConfigIndex].menuVisible != m_lastMenuConfig.menuVisible;
+        m_menuConfigChanged.menuBarVisibleChanged = m_menuConfigList[m_currMenuConfigIndex].menuBarVisible != m_lastMenuConfig.menuBarVisible || !m_lastMenuConfig.menuVisible;
+        m_menuConfigChanged.imageSpheresVisibleChanged = m_menuConfigList[m_currMenuConfigIndex].imageSpheresVisible != m_lastMenuConfig.imageSpheresVisible || !m_lastMenuConfig.menuVisible;
+
+        RefreshMenuBasedOnConfig();
+    }     
+
+    public void SetSkyboxDimOn(bool visible)
+    {
+        m_coroutineQueue.Clear();
+        m_coroutineQueue.EnqueueAction(SetSkyboxDimOnInternal(visible));
+    }
+
+    // **************************
+    // Private/Helper functions
+    // **************************   
+
+    private int GetMenuConfigIndexForOwner(MonoBehaviour owner)
+    {        
+        for (int menuConfigIndex = 0; menuConfigIndex < m_menuConfigList.Count; menuConfigIndex++)
+        {
+            if (m_menuConfigList[menuConfigIndex].owner == owner)
+            {
+                return menuConfigIndex;
+            }
+        }
+
+        return -1;
+    }                
+
+    private void RefreshMenuBasedOnConfig()
+    {
+        m_lastMenuConfig.owner = m_menuConfigList[m_currMenuConfigIndex].owner;
+        m_lastMenuConfig.menuVisible = m_menuConfigList[m_currMenuConfigIndex].menuVisible;
+        m_lastMenuConfig.menuBarVisible = m_menuConfigList[m_currMenuConfigIndex].menuBarVisible;
+        m_lastMenuConfig.imageSpheresVisible = m_menuConfigList[m_currMenuConfigIndex].imageSpheresVisible;
+        m_lastMenuConfig.subMenuVisible = m_menuConfigList[m_currMenuConfigIndex].subMenuVisible;
+
+        if (m_menuConfigChanged.menuVisibleChanged) 
+        {
+            SetMenuVisible(m_menuConfigList[m_currMenuConfigIndex].menuVisible);
+        }
+
+        if (m_menuConfigChanged.menuBarVisibleChanged) 
+        {
+            SetSubTreeVisible(m_menuBar.gameObject, m_menuConfigList[m_currMenuConfigIndex].menuBarVisible);
+        }
+
+        if (m_menuConfigChanged.imageSpheresVisibleChanged) 
+        {
+            SetSubTreeVisible(m_imageSphereController.gameObject, m_menuConfigList[m_currMenuConfigIndex].imageSpheresVisible);
+        }
+
+        SetCurrentSubMenuActive(m_menuConfigList[m_currMenuConfigIndex].subMenuVisible);
+    }     
+        
+    private void SetCurrentSubMenuActive(bool active)
     {
         SetAllSubMenusActive(false);
 
-        if (m_appDirector.GetState() == AppDirector.AppState.kLogin)
+        if ((m_appDirector.GetState() == AppDirector.AppState.kInit))
+        {
+            // Empty on purpose
+        }
+        else if (m_appDirector.GetState() == AppDirector.AppState.kLogin)
         {
             SetLoginSubMenuActive(active);
         }
@@ -65,43 +192,19 @@ public class MenuController : MonoBehaviour
         {
             SetGallerySubMenuActive(active);
         }
+        else
+        {
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - SetCurrentSubMenuActive() called but invalid AppDirector State is set");
+        }
     }
 
-    //TODO: BE MORE RESTRICTIVE WITH THE ABILITY FOR OTHER CLASSES TO JUST ACTIVATE/DEACTIVATE UI!
-    public void SetMenuBarActive(bool active)
-    {
-        //m_menuBar.SetActive(active);
-        SetSubTreeVisible(m_menuBar.gameObject, active);
-    }
-
-    public void SetImagesActive(bool active)
-    {
-        SetSubTreeVisible(m_imageSphereController.gameObject, active);
-    }
-
-    public void SetImagesAndMenuBarActive(bool active)
-    {
-        SetImagesActive(active);
-        SetMenuBarActive(active);
-    }
-                
-    public void SetAllSubMenusActive(bool active)
+    private void SetAllSubMenusActive(bool active)
     {
         m_loginSubMenu.SetActive(active);
-        m_homeSubMenu.SetActive(active);
         m_searchSubMenu.SetActive(active);
         m_profileSubMenu.SetActive(active);
         m_gallerySubMenu.SetActive(active);
     }
-
-    public void SetSubTreeVisible(GameObject subtree, bool visible)
-    {
-        SetSubTreeVisibleInternal(subtree, visible);
-    }
-
-    // **************************
-    // Private/Helper functions
-    // **************************
 
     private void SetLoginSubMenuActive(bool active)
     {
@@ -115,14 +218,12 @@ public class MenuController : MonoBehaviour
     }
 
     private void SetExploreSubMenuActive(bool active)
-    {
-        m_homeSubMenu.SetActive(active);
+    {        
         OnButtonSelected(m_menuBarButtons[1]);  // button 1 = Explore button
     }
 
     private void SetFollowingSubMenuActive(bool active)
-    {
-        m_homeSubMenu.SetActive(active);
+    {        
         OnButtonSelected(m_menuBarButtons[2]);  // button 2 = Following button
     }
 
@@ -156,12 +257,10 @@ public class MenuController : MonoBehaviour
             if (button == currButton)
             {
                 menuBarButton.OnButtonSelected();
-                //menuBarButton.GetAdditionalReference().SetActive(true); // Set's MenuSection to Active
             }
             else 
             {
                 menuBarButton.OnButtonDeselected();
-                //menuBarButton.GetAdditionalReference().SetActive(false); // Set's MenuSection to not Active
             }
         }
     }
@@ -220,11 +319,9 @@ public class MenuController : MonoBehaviour
                 m_keyboard.Hide();
             }                
         }
-
-        m_isMenuActive = visible;
     }
 
-    private void SetSubTreeVisibleInternal(GameObject subtree, bool visible)
+    private void SetSubTreeVisible(GameObject subtree, bool visible)
     {
         //We Trawl through all the subobjects, hiding all meshes, images and colliders!
         foreach(var renderer in subtree.GetComponentsInChildren<Renderer>())
@@ -242,4 +339,19 @@ public class MenuController : MonoBehaviour
             collider.enabled = visible; // Handles BoxCollider + MeshCollider components
         }
     }
+
+    private IEnumerator SetSkyboxDimOnInternal(bool dimOn)
+    {
+        const float kMaxDimOn = 0.7f;
+        const float kDuration = 2.0f;
+
+        float lerpDelta = (Time.fixedDeltaTime / kDuration) * kMaxDimOn;
+        float currentDim = m_imageSkybox.GetDim();
+        while (0 <= currentDim && currentDim <= kMaxDimOn)
+        {                        
+            m_imageSkybox.SetDim(currentDim);
+            currentDim += dimOn ? lerpDelta : -lerpDelta;
+            yield return null;
+        }
+    }        
 }

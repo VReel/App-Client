@@ -18,18 +18,23 @@ public class Search : MonoBehaviour
         kNone = -1,           // This should only be the state at the start when opening the Search menu
         kUserSearch =  0,     // Searching for a User
         kTagSearch =  1,      // Searching for a HashTag
-        kUserDisplay =  2,    // Displaying a User
+        //kUserDisplay =  2,    // Displaying a User
         kTagDisplay =  3      // Displaying a HashTag
     }
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
+    [SerializeField] private MenuController m_menuController;
+    [SerializeField] private ProfileDetails m_profile;
     [SerializeField] private Posts m_posts;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private KeyBoard m_keyboard;
+    [SerializeField] private GameObject m_searchTitle;
+    [SerializeField] private GameObject m_resultTopLevel;
+    [SerializeField] private GameObject m_buttonsTopLevel;
+    [SerializeField] private GameObject m_searchInput;
     [SerializeField] private GameObject[] m_searchTypes;
     [SerializeField] private GameObject[] m_resultObjects;
-    [SerializeField] private GameObject m_searchInput;
 
     public class Result
     {
@@ -70,6 +75,12 @@ public class Search : MonoBehaviour
         m_currSearchString = "";
 
         HideAllResults();
+
+        m_menuController.RegisterToUseMenuConfig(this);
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = true;
+        menuConfig.imageSpheresVisible = true;
+        menuConfig.subMenuVisible = true;
 	}      
 
     public void Update()
@@ -107,12 +118,6 @@ public class Search : MonoBehaviour
         return m_searchState;
     }
 
-    public void ShowSearchText()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Setting Search Text!");
-        m_user.GetUserMessageButton().SetText(kSearchText);
-    }
-        
     public void InvalidateWork() // This function is called in order to stop any ongoing work
     {        
         //m_currPostIndex = -1;
@@ -128,7 +133,7 @@ public class Search : MonoBehaviour
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenSearch() called");
 
-        ResetSearch();
+        OpenUserSearch();
     }       
 
     public void OpenUserSearch()
@@ -144,7 +149,7 @@ public class Search : MonoBehaviour
         m_searchState = SearchState.kUserSearch;
         OnButtonSelected(m_searchTypes[(int)m_searchState]);  // button 0 = Profile search button
         m_searchInputText.text = "";
-        m_searchInput.SetActive(true);
+        m_buttonsTopLevel.SetActive(true);
         HideAllResults();
     }
 
@@ -161,7 +166,7 @@ public class Search : MonoBehaviour
         m_searchState = SearchState.kTagSearch;
         OnButtonSelected(m_searchTypes[(int)m_searchState]);  // button 1 = Tag search button
         m_searchInputText.text = "";
-        m_searchInput.SetActive(true);
+        m_buttonsTopLevel.SetActive(true);
         HideAllResults();
     }        
 
@@ -180,22 +185,28 @@ public class Search : MonoBehaviour
         }
         ClearSearch();
 
+        m_menuController.GetMenuConfigForOwner(this).menuBarVisible = false;
+        m_menuController.UpdateMenuConfig(this);
+
         if (m_searchState == SearchState.kUserSearch)
         {
-            if(m_user.IsCurrentUser(m_results[index].id))
-            {
-                m_appDirector.RequestProfileState();
-                return;
-            }
-
-            m_searchState = SearchState.kUserDisplay;
-            m_posts.OpenProfileWithID(m_results[index].id, m_results[index].text);
+            m_profile.OpenProfileWithId(m_results[index].id, m_results[index].text);
         }
         else if (m_searchState == SearchState.kTagSearch)
         {
+            m_searchTitle.SetActive(true);
+            m_searchTitle.GetComponentInChildren<Text>().text = m_results[index].text;
+
             m_searchState = SearchState.kTagDisplay;
             m_posts.OpenHashTag(m_results[index].id, m_results[index].text);
-        }
+        }            
+    }
+
+    public void CloseResultsDisplay()
+    {        
+        m_menuController.GetMenuConfigForOwner(this).menuBarVisible = true;
+        m_menuController.UpdateMenuConfig(this);
+        OpenTagSearch();
     }
 
     /*
@@ -225,20 +236,6 @@ public class Search : MonoBehaviour
     }
     */
 
-    public void HideProfileOrTag()
-    {
-        m_imageSphereController.HideAllImageSpheres();
-
-        if (m_searchState == SearchState.kUserDisplay)
-        {
-            m_searchState = SearchState.kUserSearch;
-        }
-        else if (m_searchState == SearchState.kTagDisplay)
-        {
-            m_searchState = SearchState.kTagSearch;
-        }     
-    }
-
     // **************************
     // Private/Helper functions
     // **************************
@@ -252,7 +249,7 @@ public class Search : MonoBehaviour
     private void ClearSearch()
     {
         OnButtonSelected(null); // Deselect all buttons
-        m_searchInput.SetActive(false);
+        m_buttonsTopLevel.SetActive(false);
         m_currSearchString = "";
     }
 
@@ -264,6 +261,8 @@ public class Search : MonoBehaviour
         {
             m_resultObjects[resultIndex].SetActive(false);
         }
+        m_resultTopLevel.SetActive(false);
+        m_searchTitle.SetActive(false);
     }
 
     private void OnButtonSelected(GameObject button)
@@ -318,6 +317,9 @@ public class Search : MonoBehaviour
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetUserResults()");
 
+        m_searchTitle.SetActive(false);
+        m_resultTopLevel.SetActive(true);
+
         int numUsers = m_backEndAPI.GetUsersResult().data.Count;
         for (int index = 0; index < GetNumResultObjects(); index++)
         {            
@@ -339,6 +341,9 @@ public class Search : MonoBehaviour
     private void SetTagResults()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetTagResults()");
+
+        m_searchTitle.SetActive(false);
+        m_resultTopLevel.SetActive(true);
 
         int numTags = m_backEndAPI.GetTagsResult().data.Count;
         for (int index = 0; index < GetNumResultObjects(); index++)

@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-//TODO: If this remains as it is, then it can be merged into the same class as the HeartButton...
 public class FollowButton : MonoBehaviour
 {        
     // **************************
@@ -30,7 +29,7 @@ public class FollowButton : MonoBehaviour
         if (m_isOn)
         {
             m_menuButton.SetForceColour(true, m_buttonColourSelected);
-            m_menuButton.RefreshButtonColor();
+            m_menuButton.RefreshColour();
   
             m_followText.color = m_buttonColourSelected;
             m_followText.text = "Following";
@@ -38,10 +37,28 @@ public class FollowButton : MonoBehaviour
         else
         {
             m_menuButton.SetForceColour(false, m_buttonColourSelected);
-            m_menuButton.RefreshButtonColor();
+            m_menuButton.RefreshColour();
 
             m_followText.color = m_buttonColourDeselected;
             m_followText.text = "Follow +";
+        }
+    }
+
+    public void SetVisible(bool visible)
+    {
+        foreach(var renderer in gameObject.GetComponentsInChildren<Renderer>())
+        {                
+            renderer.enabled = visible; // Handles Mesh + SpriteRenderer components
+        }
+
+        foreach(var ui in gameObject.GetComponentsInChildren<UnityEngine.UI.Graphic>())
+        {                
+            ui.enabled = visible; // Handles Images + Text components
+        }
+
+        foreach(var collider in gameObject.GetComponentsInChildren<Collider>())
+        {                
+            collider.enabled = visible; // Handles BoxCollider + MeshCollider components
         }
     }
 }
