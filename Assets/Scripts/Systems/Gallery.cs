@@ -7,7 +7,7 @@ using System.Collections;           //IEnumerator
 using System.Collections.Generic;   //List
 using System.Threading;             //Threading
 
-//using System.Drawing;
+using UnityEngine.Serialization;
 
 public class Gallery : MonoBehaviour 
 {    
@@ -18,7 +18,8 @@ public class Gallery : MonoBehaviour
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
     [SerializeField] private MenuController m_menuController;
-    [SerializeField] private ProfileDetails m_profileDetails;
+    [FormerlySerializedAs("m_profileDetails")]
+    [SerializeField] private Profile m_profile;
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
@@ -273,7 +274,7 @@ public class Gallery : MonoBehaviour
 
         if (profilePic)
         {
-            m_profileDetails.SetMenuBarProfileDetails();
+            m_profile.SetMenuBarProfileDetails();
         }
     }
 

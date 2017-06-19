@@ -25,7 +25,7 @@ public class Search : MonoBehaviour
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
     [SerializeField] private MenuController m_menuController;
-    [SerializeField] private ProfileDetails m_profile;
+    [SerializeField] private Profile m_profile;
     [SerializeField] private Posts m_posts;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private KeyBoard m_keyboard;

@@ -11,7 +11,7 @@ public class Posts : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
-    [SerializeField] private ProfileDetails m_profileDetails;
+    [SerializeField] private Profile m_profile;
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private LoadingIcon m_loadingIcon;
@@ -128,7 +128,7 @@ public class Posts : MonoBehaviour
         m_currUserOrTagId = m_user.m_id;
         OpenPosts();
 
-        m_profileDetails.OpenProfileDetails(m_currUserOrTagId);
+        m_profile.OpenProfileDetails(m_currUserOrTagId);
     }    
 
     public void OpenProfileWithID(string userID, string userHandle)
@@ -139,7 +139,7 @@ public class Posts : MonoBehaviour
         m_currUserOrTagId = userID;
         OpenPosts();
 
-        m_profileDetails.OpenProfileDetails(m_currUserOrTagId);
+        m_profile.OpenProfileDetails(m_currUserOrTagId);
     } 
 
     public void OpenHashTag(string hashTagID, string hashTag)

@@ -32,10 +32,9 @@ public class AppDirector : MonoBehaviour
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private Posts m_posts;
     [SerializeField] private Search m_search;
-    [SerializeField] private ProfileDetails m_profile;
+    [SerializeField] private Profile m_profile;
     [SerializeField] private Gallery m_gallery;
     [SerializeField] private LoginFlow m_loginFlow;
-    [SerializeField] private ProfileDetails m_profileDetails;
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private KeyBoard m_keyboard;
     [SerializeField] private InternetReachabilityVerifier m_internetReachabilityVerifier;
@@ -91,7 +90,7 @@ public class AppDirector : MonoBehaviour
         else if ( (m_appState == AppDirector.AppState.kLogin || m_appState == AppDirector.AppState.kInit) && m_user.IsLoggedIn() && m_user.m_handle.Length > 0)
         {
             RequestExploreState();
-            m_profileDetails.SetMenuBarProfileDetails();
+            m_profile.SetMenuBarProfileDetails();
         }
     }
         

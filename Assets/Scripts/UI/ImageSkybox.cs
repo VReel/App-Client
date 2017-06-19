@@ -10,7 +10,7 @@ public class ImageSkybox : MonoBehaviour
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private Posts m_posts;
-    [SerializeField] private ProfileDetails m_profileDetails;
+    [SerializeField] private Profile m_profile;
     [SerializeField] private GameObject m_uploadButton;
 
     private Material m_myMaterial;
@@ -73,7 +73,7 @@ public class ImageSkybox : MonoBehaviour
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, true);
 
         bool isGalleryState = m_appDirector.GetState() == AppDirector.AppState.kGallery;
-        bool isProfileImage = m_profileDetails.IsUser(imageIdentifier); // Identifier is of the User for Profile Pictures
+        bool isProfileImage = m_profile.IsUser(imageIdentifier); // Identifier is of the User for Profile Pictures
         bool isImageFromDevice = m_imageIdentifier.StartsWith(m_imageSphereController.GetTopLevelDirectory());
         m_uploadButton.SetActive(isImageFromDevice && isGalleryState && !isProfileImage);  // TODO: Move the UploadButton's activation over to Gallery
 
