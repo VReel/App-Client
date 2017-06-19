@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
-using Amazon;
-using Amazon.CognitoIdentity;           // CognitoAWSCredentials
-using Amazon.MobileAnalytics.MobileAnalyticsManager; // MobileAnalyticsManager
 using System.Collections;               // IEnumerator
+using mixpanel;                         // Mixpanel
 
+//TODO: Add Mixpanel.Identify() and Mixpanel.Alias()
 public class Analytics : MonoBehaviour 
 {
     // **************************
@@ -14,7 +13,6 @@ public class Analytics : MonoBehaviour
     [SerializeField] private User m_user;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
 
-    private MobileAnalyticsManager m_analyticsManager;
     private CoroutineQueue m_coroutineQueue;
 
     // **************************
@@ -22,71 +20,39 @@ public class Analytics : MonoBehaviour
     // **************************
 
     public void Start()
-    {                
-        UnityInitializer.AttachToGameObject(this.gameObject);
-
-        //TODO: Move this pool over to EUWest1!
-        var credentials = new CognitoAWSCredentials(
-            "us-east-1:76e86965-28da-4906-bf7d-ed48c4e50477", // Amazon Cognito Identity Pool ID
-            RegionEndpoint.USEast1 // Cognito Identity Region
-        ); 
-        
-        m_analyticsManager = MobileAnalyticsManager.GetOrCreateInstance(
-            "410c9ef3e9d94a74afaa2d5bb96426f9", // Amazon Mobile Analytics App ID
-            credentials,
-            RegionEndpoint.USEast1 // Cognito Identity Region
-        ); 
-
+    {       
         m_coroutineQueue = new CoroutineQueue( this );
         m_coroutineQueue.StartLoop();
     }
 
     public void ProfileSelected()
-    {
-        CustomEvent customEvent = new CustomEvent("ProfileSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
-
-        m_analyticsManager.RecordEvent(customEvent);
+    {     
+        Mixpanel.Track("ProfileSelected");
     }
 
     public void ExploreSelected()
     {
-        CustomEvent customEvent = new CustomEvent("ExploreSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("ExploreSelected");
     }
 
     public void FollowingSelected()
     {
-        CustomEvent customEvent = new CustomEvent("FollowingSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("FollowingSelected");
     }
 
     public void SearchSelected()
     {
-        CustomEvent customEvent = new CustomEvent("SearchSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("FollowingSelected");
     }             
 
     public void GallerySelected()
     {
-        CustomEvent customEvent = new CustomEvent("GallerySelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("GallerySelected");
     }
 
     public void OptionsSelected()
     {
-        CustomEvent customEvent = new CustomEvent("OptionsSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("OptionsSelected");
     }
 
     public void LoginSelected()
@@ -96,178 +62,133 @@ public class Analytics : MonoBehaviour
 
     public void LogoutSelected()
     {
-        CustomEvent customEvent = new CustomEvent("LogoutSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("LogoutSelected");
     }
 
     public void PublicTimelineSelected()
     {
-        CustomEvent customEvent = new CustomEvent("PublicTimelineSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("PublicTimelineSelected");
     }
 
     public void PersonalTimelineSelected()
     {
-        CustomEvent customEvent = new CustomEvent("PersonalTimelineSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("PersonalTimelineSelected");
     }
 
     public void SearchForProfileSelected()
     {
-        CustomEvent customEvent = new CustomEvent("SearchForProfileSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("SearchForProfileSelected");
     }
 
     public void SearchForTagSelected()
     {
-        CustomEvent customEvent = new CustomEvent("SearchForTagSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("SearchForTagSelected");
     }       
 
     public void ImageSphereSelected(int sphereNumber)
     {
-        CustomEvent customEvent = new CustomEvent("ImageSphereSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
+        var properties = new Value();
+        properties["SphereNumber"] = sphereNumber;
+        SetAppState(properties);
 
-        SetAppState(customEvent);
-
-        customEvent.AddAttribute("SphereNumber", sphereNumber.ToString());
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("ProfileSelected", properties);
     }
 
     public void HandleSelected(int sphereNumber)
     {
-        CustomEvent customEvent = new CustomEvent("HandleSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
+        var properties = new Value();
+        properties["SphereNumber"] = sphereNumber;
+        SetAppState(properties);
 
-        SetAppState(customEvent);
-
-        customEvent.AddAttribute("SphereNumber", sphereNumber.ToString());
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("HandleSelected", properties);
     }
 
     public void HeartSelected(int sphereNumber)
     {
-        CustomEvent customEvent = new CustomEvent("HeartSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
+        var properties = new Value();
+        properties["SphereNumber"] = sphereNumber;
+        SetAppState(properties);
 
-        SetAppState(customEvent);
-
-        customEvent.AddAttribute("SphereNumber", sphereNumber.ToString());
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("HeartSelected", properties);
     }
 
     public void LikeSelected(int sphereNumber)
     {
-        CustomEvent customEvent = new CustomEvent("LikeSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
+        var properties = new Value();
+        properties["SphereNumber"] = sphereNumber;
+        SetAppState(properties);
 
-        SetAppState(customEvent);
-
-        customEvent.AddAttribute("SphereNumber", sphereNumber.ToString());
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("LikeSelected", properties);
     }
 
     public void CaptionSelected(int sphereNumber)
     {
-        CustomEvent customEvent = new CustomEvent("CaptionSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
+        var properties = new Value();
+        properties["SphereNumber"] = sphereNumber;
+        SetAppState(properties);
 
-        SetAppState(customEvent);
-
-        customEvent.AddAttribute("SphereNumber", sphereNumber.ToString());
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("CaptionSelected", properties);
     }
 
     public void FollowSelected()
     {
-        CustomEvent customEvent = new CustomEvent("FollowSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
+        var properties = new Value();
+        SetAppState(properties);
 
-        SetAppState(customEvent);
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("FollowSelected", properties);
     }
 
     public void CommentUploaded()
     {
-        CustomEvent customEvent = new CustomEvent("CommentUploaded");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
+        var properties = new Value();
+        SetAppState(properties);
 
-        SetAppState(customEvent);
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("CommentUploaded", properties);
     }
 
     public void PreviousArrowSelected()
     {
-        CustomEvent customEvent = new CustomEvent("PreviousArrowSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
+        var properties = new Value();
+        SetAppState(properties);
 
-        SetAppState(customEvent);
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("PreviousArrowSelected", properties);
     }
 
     public void NextArrowSelected()
     {
-        CustomEvent customEvent = new CustomEvent("NextArrowSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
+        var properties = new Value();
+        SetAppState(properties);
 
-        SetAppState(customEvent);
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("NextArrowSelected", properties);
     }
 
     public void ImageUploaded()
     {
-        CustomEvent customEvent = new CustomEvent("ImageUploaded");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
-
+        var properties = new Value();
         if (m_imageSphereSkybox.IsTextureValid())
         {
-            customEvent.AddMetric("TextureWidth", m_imageSphereSkybox.GetTexture().width);
-            customEvent.AddMetric("TextureHeight", m_imageSphereSkybox.GetTexture().height);
+            properties["TextureWidth"] = m_imageSphereSkybox.GetTexture().width;
+            properties["TextureHeight"] = m_imageSphereSkybox.GetTexture().height;
         }
 
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("ImageUploaded", properties);
     }
         
     public void ProfileImageUploaded()
     {
-        CustomEvent customEvent = new CustomEvent("ProfileImageUploaded");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
-
+        var properties = new Value();
         if (m_imageSphereSkybox.IsTextureValid())
         {
-            customEvent.AddMetric("TextureWidth", m_imageSphereSkybox.GetTexture().width);
-            customEvent.AddMetric("TextureHeight", m_imageSphereSkybox.GetTexture().height);
+            properties["TextureWidth"] = m_imageSphereSkybox.GetTexture().width;
+            properties["TextureHeight"] = m_imageSphereSkybox.GetTexture().height;
         }
 
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("ProfileImageUploaded", properties);
     }
 
     public void ImageDeleted()
     {
-        CustomEvent customEvent = new CustomEvent("ImageDeleted");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
-
-        m_analyticsManager.RecordEvent(customEvent);
+        Mixpanel.Track("ImageDeleted");
     }
 
     // **************************
@@ -281,50 +202,32 @@ public class Analytics : MonoBehaviour
             yield return null;
         }
 
-        CustomEvent customEvent = new CustomEvent("LoginSelected");
-        customEvent.AddAttribute("UserEmail", m_user.m_email);
+        // If this does not have any properties, then it should not be in a coroutine!
 
-        m_analyticsManager.RecordEvent(customEvent);
-    }
+        Mixpanel.Track("LoginSelected");
+    }        
 
-    // You want this session management code only in one game object
-    // that persists through the game life cycles using “DontDestroyOnLoad (transform.gameObject);”
-    private void OnApplicationFocus(bool focus) 
-    {
-        if (m_analyticsManager != null) 
-        {
-            if (focus) 
-            {
-                m_analyticsManager.ResumeSession();
-            } 
-            else 
-            {    
-                m_analyticsManager.PauseSession();
-            }
-        }
-    }
-
-    private void SetAppState(CustomEvent customEvent)
+    private void SetAppState(Value properties)
     {
         if (m_appDirector.GetState() == AppDirector.AppState.kExplore)
         {
-            customEvent.AddAttribute("AppState", "Explore");
+            properties["AppState"] = "Explore";
         }
         else if (m_appDirector.GetState() == AppDirector.AppState.kFollowing)
         {
-            customEvent.AddAttribute("AppState", "Following");
+            properties["AppState"] = "Following";
         }
         else if (m_appDirector.GetState() == AppDirector.AppState.kSearch)
         {
-            customEvent.AddAttribute("AppState", "Search");
+            properties["AppState"] = "Search";
         }
         else if (m_appDirector.GetState() == AppDirector.AppState.kGallery)
         {
-            customEvent.AddAttribute("AppState", "Profile");
+            properties["AppState"] = "Profile";
         }
         else if (m_appDirector.GetState() == AppDirector.AppState.kGallery)
         {
-            customEvent.AddAttribute("AppState", "Gallery");
+            properties["AppState"] = "Gallery";
         }
     }
 }
