@@ -2,8 +2,7 @@
 using UnityEngine.UI;           //Text
 using System.Collections;       //IEnumerator
 
-//TODO: Rename this as Profile.cs...
-public class ProfileDetails : MonoBehaviour 
+public class Profile : MonoBehaviour 
 {
     // **************************
     // Member Variables
@@ -29,9 +28,9 @@ public class ProfileDetails : MonoBehaviour
     [SerializeField] private GameObject m_editProfileButtonObject;
     [SerializeField] private GameObject m_followButtonObject;
     [SerializeField] private GameObject m_handleObject;
+    [SerializeField] private GameObject m_profileDescriptionObject;
     [SerializeField] private GameObject m_followerCountObject;
     [SerializeField] private GameObject m_followingCountObject;
-    [SerializeField] private GameObject m_profileDescriptionObject;
     [SerializeField] private GameObject m_profileDescriptionUpdateTopLevel;
     [SerializeField] private GameObject m_profileHandleNewText;
     [SerializeField] private GameObject m_profileDescriptionNewText;

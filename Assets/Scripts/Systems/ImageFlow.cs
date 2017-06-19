@@ -11,7 +11,7 @@ public class ImageFlow : MonoBehaviour
     [SerializeField] private AppDirector m_appDirector;  
     [SerializeField] private User m_user;
     [SerializeField] private Posts m_posts;
-    [SerializeField] private ProfileDetails m_profile;
+    [SerializeField] private Profile m_profile;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private ListComments m_listComments;

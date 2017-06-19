@@ -201,7 +201,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &93
 GameObject:
   m_ObjectHideFlags: 0
@@ -797,7 +797,7 @@ MonoBehaviour:
   m_appDirector: {fileID: 1674}
   m_imageSphereController: {fileID: 882264440}
   m_posts: {fileID: 2030}
-  m_profileDetails: {fileID: 2032}
+  m_profile: {fileID: 856211864}
   m_uploadButton: {fileID: 155}
 --- !u!1 &357
 GameObject:
@@ -906,7 +906,7 @@ MonoBehaviour:
   m_appDirector: {fileID: 1674}
   m_user: {fileID: 1796}
   m_posts: {fileID: 2030}
-  m_profile: {fileID: 2032}
+  m_profile: {fileID: 856211864}
   m_imageSkybox: {fileID: 350}
   m_menuController: {fileID: 2000}
   m_listComments: {fileID: 1596}
@@ -1033,7 +1033,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &442
 GameObject:
   m_ObjectHideFlags: 0
@@ -1067,7 +1067,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &454
 GameObject:
   m_ObjectHideFlags: 0
@@ -3781,12 +3781,6 @@ MonoBehaviour:
     type: 2}
   m_PrefabInternal: {fileID: 856211863}
   m_Script: {fileID: 11500000, guid: db47341038ced4254beb91c01d66a9cc, type: 3}
---- !u!114 &2032 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114245341742605446, guid: 5d68de0858483422a933ef12ea7ca889,
-    type: 2}
-  m_PrefabInternal: {fileID: 856211863}
-  m_Script: {fileID: 11500000, guid: 21616f283c41343d6b35265775d9df81, type: 3}
 --- !u!114 &2033 stripped
 MonoBehaviour:
   m_PrefabParentObject: {fileID: 114351951387023894, guid: 5d68de0858483422a933ef12ea7ca889,
@@ -5080,7 +5074,7 @@ Prefab:
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 2032}
+      objectReference: {fileID: 856211864}
     - target: {fileID: 1437084152338434, guid: e6167b1895f454c2ea70ad98eee7494f, type: 2}
       propertyPath: m_Name
       value: BackArrow
@@ -5473,7 +5467,7 @@ MonoBehaviour:
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2032}
+      - m_Target: {fileID: 856211864}
         m_MethodName: DisplayFollowing
         m_Mode: 1
         m_Arguments:
@@ -9372,7 +9366,7 @@ Prefab:
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 2032}
+      objectReference: {fileID: 856211864}
     - target: {fileID: 1437084152338434, guid: e6167b1895f454c2ea70ad98eee7494f, type: 2}
       propertyPath: m_Name
       value: BackArrow
@@ -10678,7 +10672,7 @@ Prefab:
         type: 2}
       propertyPath: m_profileDetails
       value: 
-      objectReference: {fileID: 2032}
+      objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_IsActive
       value: 0
@@ -10732,7 +10726,7 @@ Prefab:
         type: 2}
       propertyPath: m_profile
       value: 
-      objectReference: {fileID: 2032}
+      objectReference: {fileID: 856211864}
     - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
         type: 2}
       propertyPath: m_handleImageObject
@@ -12053,7 +12047,7 @@ Prefab:
         type: 2}
       propertyPath: m_profileDetails
       value: 
-      objectReference: {fileID: 2032}
+      objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_IsActive
       value: 0
@@ -12107,7 +12101,7 @@ Prefab:
         type: 2}
       propertyPath: m_profile
       value: 
-      objectReference: {fileID: 2032}
+      objectReference: {fileID: 856211864}
     - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
         type: 2}
       propertyPath: m_handleImageObject
@@ -12291,7 +12285,7 @@ MonoBehaviour:
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2032}
+      - m_Target: {fileID: 856211864}
         m_MethodName: PreUpdateProfileDescription
         m_Mode: 1
         m_Arguments:
@@ -13407,7 +13401,7 @@ MonoBehaviour:
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2032}
+      - m_Target: {fileID: 856211864}
         m_MethodName: DisplayFollowers
         m_Mode: 1
         m_Arguments:
@@ -13806,58 +13800,47 @@ Prefab:
       propertyPath: m_timelineTypes.Array.data[1]
       value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 114245341742605446, guid: 5d68de0858483422a933ef12ea7ca889,
-        type: 2}
+    - target: {fileID: 0}
       propertyPath: m_user
       value: 
       objectReference: {fileID: 1796}
-    - target: {fileID: 114245341742605446, guid: 5d68de0858483422a933ef12ea7ca889,
-        type: 2}
+    - target: {fileID: 0}
       propertyPath: m_imageSphereController
       value: 
       objectReference: {fileID: 882264440}
-    - target: {fileID: 114245341742605446, guid: 5d68de0858483422a933ef12ea7ca889,
-        type: 2}
+    - target: {fileID: 0}
       propertyPath: m_loadingIcon
       value: 
       objectReference: {fileID: 2248}
-    - target: {fileID: 114245341742605446, guid: 5d68de0858483422a933ef12ea7ca889,
-        type: 2}
+    - target: {fileID: 0}
       propertyPath: m_profileDetailsTopLevel
       value: 
       objectReference: {fileID: 444}
-    - target: {fileID: 114245341742605446, guid: 5d68de0858483422a933ef12ea7ca889,
-        type: 2}
+    - target: {fileID: 0}
       propertyPath: m_followButtonObject
       value: 
       objectReference: {fileID: 1557615321}
-    - target: {fileID: 114245341742605446, guid: 5d68de0858483422a933ef12ea7ca889,
-        type: 2}
+    - target: {fileID: 0}
       propertyPath: m_handleObject
       value: 
       objectReference: {fileID: 751486996}
-    - target: {fileID: 114245341742605446, guid: 5d68de0858483422a933ef12ea7ca889,
-        type: 2}
+    - target: {fileID: 0}
       propertyPath: m_followerCountObject
       value: 
       objectReference: {fileID: 435461095}
-    - target: {fileID: 114245341742605446, guid: 5d68de0858483422a933ef12ea7ca889,
-        type: 2}
+    - target: {fileID: 0}
       propertyPath: m_followingCountObject
       value: 
       objectReference: {fileID: 371178660}
-    - target: {fileID: 114245341742605446, guid: 5d68de0858483422a933ef12ea7ca889,
-        type: 2}
+    - target: {fileID: 0}
       propertyPath: m_profileDescriptionObject
       value: 
       objectReference: {fileID: 633118424}
-    - target: {fileID: 114245341742605446, guid: 5d68de0858483422a933ef12ea7ca889,
-        type: 2}
+    - target: {fileID: 0}
       propertyPath: m_profileDescriptionUpdateTopLevel
       value: 
       objectReference: {fileID: 91}
-    - target: {fileID: 114245341742605446, guid: 5d68de0858483422a933ef12ea7ca889,
-        type: 2}
+    - target: {fileID: 0}
       propertyPath: m_profileDescriptionNewText
       value: 
       objectReference: {fileID: 895010030}
@@ -13955,7 +13938,7 @@ Prefab:
         type: 2}
       propertyPath: m_profileDetails
       value: 
-      objectReference: {fileID: 2032}
+      objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_menuController
       value: 
@@ -13964,33 +13947,29 @@ Prefab:
         type: 2}
       propertyPath: m_profileDetails
       value: 
-      objectReference: {fileID: 2032}
-    - target: {fileID: 114245341742605446, guid: 5d68de0858483422a933ef12ea7ca889,
-        type: 2}
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
       propertyPath: m_menuBarProfileButtonObject
       value: 
       objectReference: {fileID: 2099745972}
-    - target: {fileID: 114245341742605446, guid: 5d68de0858483422a933ef12ea7ca889,
-        type: 2}
+    - target: {fileID: 0}
       propertyPath: m_menuController
       value: 
       objectReference: {fileID: 2000}
     - target: {fileID: 0}
       propertyPath: m_profileDetails
       value: 
-      objectReference: {fileID: 2032}
+      objectReference: {fileID: 0}
     - target: {fileID: 114000011095986410, guid: 5d68de0858483422a933ef12ea7ca889,
         type: 2}
       propertyPath: m_profileDetails
       value: 
-      objectReference: {fileID: 2032}
-    - target: {fileID: 114245341742605446, guid: 5d68de0858483422a933ef12ea7ca889,
-        type: 2}
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
       propertyPath: m_editProfileButtonObject
       value: 
       objectReference: {fileID: 722018689}
-    - target: {fileID: 114245341742605446, guid: 5d68de0858483422a933ef12ea7ca889,
-        type: 2}
+    - target: {fileID: 0}
       propertyPath: m_profileHandleNewText
       value: 
       objectReference: {fileID: 1197327762}
@@ -14039,13 +14018,11 @@ Prefab:
       propertyPath: m_imageSummaryCaption
       value: 
       objectReference: {fileID: 1239925253}
-    - target: {fileID: 114245341742605446, guid: 5d68de0858483422a933ef12ea7ca889,
-        type: 2}
+    - target: {fileID: 0}
       propertyPath: m_newUserText
       value: 
       objectReference: {fileID: 14}
-    - target: {fileID: 114245341742605446, guid: 5d68de0858483422a933ef12ea7ca889,
-        type: 2}
+    - target: {fileID: 0}
       propertyPath: m_imageSkybox
       value: 
       objectReference: {fileID: 350}
@@ -14059,9 +14036,110 @@ Prefab:
       propertyPath: m_commentCountInSummary
       value: 
       objectReference: {fileID: 648593043}
+    - target: {fileID: 114000010992105398, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_profile
+      value: 
+      objectReference: {fileID: 856211864}
+    - target: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_user
+      value: 
+      objectReference: {fileID: 1796}
+    - target: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_menuController
+      value: 
+      objectReference: {fileID: 2000}
+    - target: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_imageSkybox
+      value: 
+      objectReference: {fileID: 350}
+    - target: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_imageSphereController
+      value: 
+      objectReference: {fileID: 882264440}
+    - target: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_loadingIcon
+      value: 
+      objectReference: {fileID: 2248}
+    - target: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_menuBarProfileButtonObject
+      value: 
+      objectReference: {fileID: 2099745972}
+    - target: {fileID: 114000011095986410, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_profile
+      value: 
+      objectReference: {fileID: 856211864}
+    - target: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_profileDetailsTopLevel
+      value: 
+      objectReference: {fileID: 444}
+    - target: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_editProfileButtonObject
+      value: 
+      objectReference: {fileID: 722018689}
+    - target: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_followButtonObject
+      value: 
+      objectReference: {fileID: 1557615321}
+    - target: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_followerCountObject
+      value: 
+      objectReference: {fileID: 846494839}
+    - target: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_followingCountObject
+      value: 
+      objectReference: {fileID: 119143892}
+    - target: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_profileDescriptionUpdateTopLevel
+      value: 
+      objectReference: {fileID: 91}
+    - target: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_newUserText
+      value: 
+      objectReference: {fileID: 14}
+    - target: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_handleObject
+      value: 
+      objectReference: {fileID: 751486996}
+    - target: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_profileDescriptionObject
+      value: 
+      objectReference: {fileID: 633118424}
+    - target: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_profileHandleNewText
+      value: 
+      objectReference: {fileID: 1197327762}
+    - target: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_profileDescriptionNewText
+      value: 
+      objectReference: {fileID: 895010030}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5d68de0858483422a933ef12ea7ca889, type: 2}
   m_IsPrefabParent: 0
+--- !u!114 &856211864 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+    type: 2}
+  m_PrefabInternal: {fileID: 856211863}
+  m_Script: {fileID: 11500000, guid: 7097fc6f375ac4ee3870b0d5533ab828, type: 3}
 --- !u!1 &862681439
 GameObject:
   m_ObjectHideFlags: 0
@@ -14250,7 +14328,7 @@ Prefab:
         type: 2}
       propertyPath: m_profileDetails
       value: 
-      objectReference: {fileID: 2032}
+      objectReference: {fileID: 0}
     - target: {fileID: 4570986163801948, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -14274,7 +14352,7 @@ Prefab:
         type: 2}
       propertyPath: m_profile
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 856211864}
     - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
         type: 2}
       propertyPath: m_appDirector
@@ -14354,11 +14432,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400010, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
@@ -15267,7 +15345,7 @@ MonoBehaviour:
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2032}
+      - m_Target: {fileID: 856211864}
         m_MethodName: AcceptUpdateProfileDescription
         m_Mode: 1
         m_Arguments:
@@ -21297,7 +21375,7 @@ MonoBehaviour:
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2032}
+      - m_Target: {fileID: 856211864}
         m_MethodName: FollowSelected
         m_Mode: 1
         m_Arguments:
@@ -23946,12 +24024,12 @@ Prefab:
         type: 2}
       propertyPath: m_profile
       value: 
-      objectReference: {fileID: 2032}
+      objectReference: {fileID: 856211864}
     - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
         type: 2}
       propertyPath: m_profileDetails
       value: 
-      objectReference: {fileID: 2032}
+      objectReference: {fileID: 0}
     - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
         type: 2}
       propertyPath: m_imageFlow
@@ -26872,7 +26950,7 @@ Prefab:
         type: 2}
       propertyPath: m_profileDetails
       value: 
-      objectReference: {fileID: 2032}
+      objectReference: {fileID: 0}
     - target: {fileID: 4570986163801948, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -26912,7 +26990,7 @@ Prefab:
         type: 2}
       propertyPath: m_profile
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 856211864}
     - target: {fileID: 1686319763526636, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
       propertyPath: m_IsActive
       value: 0
@@ -29599,7 +29677,7 @@ MonoBehaviour:
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2032}
+      - m_Target: {fileID: 856211864}
         m_MethodName: OpenUserProfile
         m_Mode: 1
         m_Arguments:

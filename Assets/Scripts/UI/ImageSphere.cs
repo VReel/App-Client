@@ -15,7 +15,7 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private Posts m_posts;
     [SerializeField] private ListUsers m_listUsers;
     [SerializeField] private MenuController m_menuController;
-    [SerializeField] private ProfileDetails m_profileDetails;
+    [SerializeField] private Profile m_profile;
     [SerializeField] private ImageFlow m_imageFlow;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
@@ -189,7 +189,7 @@ public class ImageSphere : MonoBehaviour
 
     public void HandleSelected()
     {
-        m_profileDetails.OpenProfileWithId(m_userId, m_handle);
+        m_profile.OpenProfileWithId(m_userId, m_handle);
     }
 
     public void HeartSelected()
@@ -494,15 +494,15 @@ public class ImageSphere : MonoBehaviour
         {
             if (m_isSmallImageSphere) // Only small image Spheres query ProfileDetails...
             {
-                bool isLoggedUserImage = m_profileDetails.IsLoggedUser(imageIdentifier);
-                bool isProfilePageImage = m_profileDetails.IsUser(imageIdentifier); 
+                bool isLoggedUserImage = m_profile.IsLoggedUser(imageIdentifier);
+                bool isProfilePageImage = m_profile.IsUser(imageIdentifier); 
                 if (isProfilePageImage) // Image Identifier is of the User for Profile Pictures
                 {
-                    m_profileDetails.DownloadOriginalImage(ProfileDetails.ImageSphereType.kProfile);
+                    m_profile.DownloadOriginalImage(Profile.ImageSphereType.kProfile);
                 }
                 else if (isLoggedUserImage)
                 {
-                    m_profileDetails.DownloadOriginalImage(ProfileDetails.ImageSphereType.kMenuBar);
+                    m_profile.DownloadOriginalImage(Profile.ImageSphereType.kMenuBar);
                 }
             }
             else
