@@ -187,6 +187,11 @@ public class ImageSphere : MonoBehaviour
         m_imageObject.transform.localScale = new Vector3(kMinShrink, kMinShrink, kMinShrink);
     }
 
+    public void ImageSelected()
+    {
+        ImageSelectedInternal();
+    }
+
     public void HandleSelected()
     {
         m_profile.OpenProfileWithId(m_userId, m_handle);
@@ -357,17 +362,7 @@ public class ImageSphere : MonoBehaviour
         m_imageIdentifier = "";
     }
         
-    private void OnEnable ()
-    {
-        m_menuButton.OnButtonSelected += OnButtonSelected;
-    }
-
-    private void OnDisable ()
-    {
-        m_menuButton.OnButtonSelected -= OnButtonSelected;
-    }        
-
-    private void OnButtonSelected(VRStandardAssets.Menu.MenuButton button)
+    private void ImageSelectedInternal()
     {   
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() called on sphere: " + (m_imageSphereIndex));
 

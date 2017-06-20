@@ -29,32 +29,32 @@ public class Analytics : MonoBehaviour
 
     public void ProfileSelected()
     {     
-        Mixpanel.Track("ProfileSelected");
+        Mixpanel.Track("User's Own Profile Opened");
     }
 
     public void ExploreSelected()
     {
-        Mixpanel.Track("ExploreSelected");
+        Mixpanel.Track("Explore Tab Opened");
     }
 
     public void FollowingSelected()
     {
-        Mixpanel.Track("FollowingSelected");
+        Mixpanel.Track("Following Tab Opened");
     }
 
     public void SearchSelected()
     {
-        Mixpanel.Track("FollowingSelected");
+        Mixpanel.Track("Search Tab Opened");
     }             
 
     public void GallerySelected()
     {
-        Mixpanel.Track("GallerySelected");
+        Mixpanel.Track("Gallery Tab Opened");
     }
 
     public void OptionsSelected()
     {
-        Mixpanel.Track("OptionsSelected");
+        Mixpanel.Track("Options Opened");
     }
 
     public void LoginSelected()
@@ -71,7 +71,7 @@ public class Analytics : MonoBehaviour
 
     public void PreSignUpSelected()
     {
-        Mixpanel.Track("PreSignUpSelected");
+        Mixpanel.Track("New User Began Signup");
     }
 
     public void SignUpSelected()
@@ -80,24 +80,14 @@ public class Analytics : MonoBehaviour
         m_coroutineQueue.EnqueueAction(SignUpSelectedInternal());
     }
 
-    public void PublicTimelineSelected()
-    {
-        Mixpanel.Track("PublicTimelineSelected");
-    }
-
-    public void PersonalTimelineSelected()
-    {
-        Mixpanel.Track("PersonalTimelineSelected");
-    }
-
     public void SearchForProfileSelected()
     {
-        Mixpanel.Track("SearchForProfileSelected");
+        Mixpanel.Track("Began Searching For User Profile");
     }
 
     public void SearchForTagSelected()
     {
-        Mixpanel.Track("SearchForTagSelected");
+        Mixpanel.Track("Began Searching For Tag");
     }       
 
     public void ImageSphereSelected(int sphereNumber)
@@ -106,7 +96,7 @@ public class Analytics : MonoBehaviour
         properties["SphereNumber"] = sphereNumber;
         SetAppState(properties);
 
-        Mixpanel.Track("ProfileSelected", properties);
+        Mixpanel.Track("Post Image Selected For Viewing", properties);
     }
 
     public void HandleSelected(int sphereNumber)
@@ -115,7 +105,7 @@ public class Analytics : MonoBehaviour
         properties["SphereNumber"] = sphereNumber;
         SetAppState(properties);
 
-        Mixpanel.Track("HandleSelected", properties);
+        Mixpanel.Track("Profile Opened From Post", properties);
     }
 
     public void HeartSelected(int sphereNumber)
@@ -124,7 +114,7 @@ public class Analytics : MonoBehaviour
         properties["SphereNumber"] = sphereNumber;
         SetAppState(properties);
 
-        Mixpanel.Track("HeartSelected", properties);
+        Mixpanel.Track("Post Liked", properties);
     }
 
     public void LikeSelected(int sphereNumber)
@@ -133,7 +123,7 @@ public class Analytics : MonoBehaviour
         properties["SphereNumber"] = sphereNumber;
         SetAppState(properties);
 
-        Mixpanel.Track("LikeSelected", properties);
+        Mixpanel.Track("Post Likes Opened", properties);
     }
 
     public void CaptionSelected(int sphereNumber)
@@ -142,7 +132,16 @@ public class Analytics : MonoBehaviour
         properties["SphereNumber"] = sphereNumber;
         SetAppState(properties);
 
-        Mixpanel.Track("CaptionSelected", properties);
+        Mixpanel.Track("Caption Selected For Editing", properties);
+    }
+
+    public void CommentSelected(int sphereNumber)
+    {
+        var properties = new Value();
+        properties["SphereNumber"] = sphereNumber;
+        SetAppState(properties);
+
+        Mixpanel.Track("Post Comments Opened", properties);
     }
 
     public void FollowSelected()
@@ -150,7 +149,7 @@ public class Analytics : MonoBehaviour
         var properties = new Value();
         SetAppState(properties);
 
-        Mixpanel.Track("FollowSelected", properties);
+        Mixpanel.Track("Began Following User", properties);
     }
 
     public void CommentUploaded()
@@ -158,7 +157,7 @@ public class Analytics : MonoBehaviour
         var properties = new Value();
         SetAppState(properties);
 
-        Mixpanel.Track("CommentUploaded", properties);
+        Mixpanel.Track("New Comment Added To Post", properties);
     }
 
     public void PreviousArrowSelected()
@@ -166,7 +165,7 @@ public class Analytics : MonoBehaviour
         var properties = new Value();
         SetAppState(properties);
 
-        Mixpanel.Track("PreviousArrowSelected", properties);
+        Mixpanel.Track("Previous Posts Selected", properties);
     }
 
     public void NextArrowSelected()
@@ -174,7 +173,7 @@ public class Analytics : MonoBehaviour
         var properties = new Value();
         SetAppState(properties);
 
-        Mixpanel.Track("NextArrowSelected", properties);
+        Mixpanel.Track("Next Posts Selected", properties);
     }
 
     public void ImageUploaded()
@@ -186,7 +185,7 @@ public class Analytics : MonoBehaviour
             properties["TextureHeight"] = m_imageSphereSkybox.GetTexture().height;
         }
 
-        Mixpanel.Track("ImageUploaded", properties);
+        Mixpanel.Track("Created New Post", properties);
     }
         
     public void ProfileImageUploaded()
@@ -198,12 +197,12 @@ public class Analytics : MonoBehaviour
             properties["TextureHeight"] = m_imageSphereSkybox.GetTexture().height;
         }
 
-        Mixpanel.Track("ProfileImageUploaded", properties);
+        Mixpanel.Track("Updated Profile Picture", properties);
     }
 
     public void ImageDeleted()
     {
-        Mixpanel.Track("ImageDeleted");
+        Mixpanel.Track("Deleted Post");
     }
 
     // **************************
@@ -219,7 +218,7 @@ public class Analytics : MonoBehaviour
 
         Mixpanel.Identify(m_user.m_id);
 
-        Mixpanel.Track("OpenedApp");
+        Mixpanel.Track("Opened App");
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.IdentifyInternal() Identify: " + m_user.m_id);
     }
@@ -233,14 +232,14 @@ public class Analytics : MonoBehaviour
 
         Mixpanel.Identify(m_user.m_id);
 
-        Mixpanel.Track("LoginSelected");
+        Mixpanel.Track("Logged In");
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.LoginSelectedInternal() Identify: " + m_user.m_id);
     }
 
     private IEnumerator LogoutSelectedInternal()
     {
-        Mixpanel.Track("LogoutSelected"); 
+        Mixpanel.Track("Logged Out"); 
 
         //Mixpanel.FlushQueue();
 
@@ -250,7 +249,7 @@ public class Analytics : MonoBehaviour
             yield return null;
         }
 
-        //Mixpanel.Reset();
+        Mixpanel.Reset();
 
         //Mixpanel.FlushQueue();
 
@@ -265,12 +264,12 @@ public class Analytics : MonoBehaviour
         }
             
         Mixpanel.Alias(m_user.m_id);
-        Mixpanel.Identify(m_user.m_id);
+        //Mixpanel.Identify(m_user.m_id);
 
         Mixpanel.people.Name = m_user.m_handle;
         Mixpanel.people.Email = m_user.m_email;
 
-        Mixpanel.Track("SignUpSelected");
+        Mixpanel.Track("New User Signed Up!");
 
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.SignUpSelectedInternal() CurrentDistinctID AFTER: " + mixpanel.platform.MixpanelUnityPlatform.get_distinct_id());
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.SignUpSelectedInternal() Alias and Identify: " + m_user.m_id);

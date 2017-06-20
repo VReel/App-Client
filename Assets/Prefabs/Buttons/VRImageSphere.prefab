@@ -268,9 +268,9 @@ MonoBehaviour:
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: ImageSphereSelected
-        m_Mode: 3
+      - m_Target: {fileID: 114624011454915914}
+        m_MethodName: ImageSelected
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -534,10 +534,8 @@ MonoBehaviour:
   m_search: {fileID: 0}
   m_posts: {fileID: 0}
   m_listUsers: {fileID: 0}
-  m_listComments: {fileID: 0}
   m_menuController: {fileID: 0}
   m_profile: {fileID: 0}
-  m_profileDetails: {fileID: 0}
   m_imageFlow: {fileID: 0}
   m_imageSphereController: {fileID: 0}
   m_imageSphereSkybox: {fileID: 0}

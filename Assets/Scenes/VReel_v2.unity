@@ -7131,6 +7131,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 2027}
+        m_MethodName: FollowSelected
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
 --- !u!114 &270767723
@@ -10560,6 +10571,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 1711153429}
     m_Modifications:
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4000013823248658, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
       propertyPath: m_LocalPosition.x
       value: 3.2
@@ -10598,13 +10614,8 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
         type: 2}
-      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 2027}
-    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
-        type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ImageSphereSelected
+      value: ImageSelected
       objectReference: {fileID: 0}
     - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
         type: 2}
@@ -10794,6 +10805,41 @@ Prefab:
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_IntArgument
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 604528701}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 2027}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: ImageSphereSelected
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_IntArgument
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
   m_IsPrefabParent: 0
@@ -10807,6 +10853,12 @@ GameObject:
   m_PrefabParentObject: {fileID: 1000012268248768, guid: 3fa0b101a9bac43fa9da60da65baf719,
     type: 2}
   m_PrefabInternal: {fileID: 604528698}
+--- !u!114 &604528701 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
+    type: 2}
+  m_PrefabInternal: {fileID: 604528698}
+  m_Script: {fileID: 11500000, guid: 2f0190d82f08d41738d620591496232b, type: 3}
 --- !u!1 &604528702 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 1961260356012542, guid: 3fa0b101a9bac43fa9da60da65baf719,
@@ -11978,6 +12030,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 1728758116}
     m_Modifications:
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4000013823248658, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -12051,13 +12108,8 @@ Prefab:
       objectReference: {fileID: 2030}
     - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
         type: 2}
-      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 2027}
-    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
-        type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ImageSphereSelected
+      value: ImageSelected
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Target
@@ -12200,6 +12252,36 @@ Prefab:
       value: HeartSelected
       objectReference: {fileID: 0}
     - target: {fileID: 114609538803917378, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_IntArgument
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 2027}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: ImageSphereSelected
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_IntArgument
       value: 2
@@ -14228,6 +14310,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 1693808389}
     m_Modifications:
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4000013823248658, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
       propertyPath: m_LocalPosition.x
       value: -0.25
@@ -14358,13 +14445,8 @@ Prefab:
       objectReference: {fileID: 350}
     - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
         type: 2}
-      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 2027}
-    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
-        type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ImageSphereSelected
+      value: ImageSelected
       objectReference: {fileID: 0}
     - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
         type: 2}
@@ -14418,6 +14500,41 @@ Prefab:
     - target: {fileID: 1686319763526636, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 548}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 2027}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: ImageSphereSelected
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_IntArgument
+      value: -2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
@@ -17314,6 +17431,12 @@ Transform:
   m_PrefabParentObject: {fileID: 4000013823248658, guid: 3fa0b101a9bac43fa9da60da65baf719,
     type: 2}
   m_PrefabInternal: {fileID: 1727671783}
+--- !u!114 &1179452500 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
+    type: 2}
+  m_PrefabInternal: {fileID: 1727671783}
+  m_Script: {fileID: 11500000, guid: 2f0190d82f08d41738d620591496232b, type: 3}
 --- !u!1 &1180207625
 GameObject:
   m_ObjectHideFlags: 0
@@ -20735,6 +20858,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 2027}
+        m_MethodName: FollowSelected
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
 --- !u!114 &1454382549
@@ -21423,6 +21557,17 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 856211864}
+        m_MethodName: FollowSelected
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2027}
         m_MethodName: FollowSelected
         m_Mode: 1
         m_Arguments:
@@ -24041,6 +24186,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 2142845340}
     m_Modifications:
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4000013823248658, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
       propertyPath: m_LocalPosition.x
       value: -3.2
@@ -24073,11 +24223,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
-        type: 2}
-      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 2027}
     - target: {fileID: 114609538803917378, guid: 3fa0b101a9bac43fa9da60da65baf719,
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Target
@@ -24157,6 +24302,41 @@ Prefab:
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
       objectReference: {fileID: 2027}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1179452500}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 2027}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: ImageSphereSelected
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_IntArgument
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
   m_IsPrefabParent: 0
@@ -26320,7 +26500,7 @@ Prefab:
     - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 224033499422572898, guid: 231542d4898e941a68adc853bcba143d,
         type: 2}
@@ -26493,6 +26673,31 @@ Prefab:
     - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
         type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[2].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[2].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[2].m_Target
+      value: 
+      objectReference: {fileID: 2027}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
+      value: CommentUploaded
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[2].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -26936,6 +27141,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 1279}
     m_Modifications:
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4000013823248658, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
       propertyPath: m_LocalPosition.x
       value: -5
@@ -27066,13 +27276,8 @@ Prefab:
       objectReference: {fileID: 350}
     - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
         type: 2}
-      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 2027}
-    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
-        type: 2}
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ImageSphereSelected
+      value: ImageSelected
       objectReference: {fileID: 0}
     - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
         type: 2}
@@ -27143,6 +27348,41 @@ Prefab:
       propertyPath: m_imageFlow
       value: 
       objectReference: {fileID: 395}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1637044509}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 2027}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: ImageSphereSelected
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011235539834, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_IntArgument
+      value: -3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
   m_IsPrefabParent: 0
@@ -27959,6 +28199,17 @@ MonoBehaviour:
       - m_Target: {fileID: 2033}
         m_MethodName: FollowSelected
         m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2027}
+        m_MethodName: FollowSelected
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
