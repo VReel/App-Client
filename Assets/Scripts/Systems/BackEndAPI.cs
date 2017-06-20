@@ -142,7 +142,7 @@ public class BackEndAPI
             password = _password,
             password_confirmation = _password_confirmation,
             name = "",
-            profile = _handle + "'s Viewing Reality from a new perspective =)",
+            profile = _handle + " is Viewing Reality from a new perspective =)",
             player_id = _player_id
         });
 
@@ -160,15 +160,15 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
-            UpdateLoginTokens(response);
-
             yield return m_threadJob.WaitFor();
             VReelJSON.Model_User result = null;
             m_threadJob.Start( () => 
                 result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_User>(response.Content)
             );
             yield return m_threadJob.WaitFor();
+
+            UpdateAccessToken(response);
+            UpdateLoginTokens(response);
 
             m_user.m_id = result.data.id;
             m_user.m_handle = result.data.attributes.handle;
@@ -207,16 +207,16 @@ public class BackEndAPI
 
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
-        {
-            UpdateAccessToken(response);
-            UpdateLoginTokens(response);
-
+        {            
             yield return m_threadJob.WaitFor();
             VReelJSON.Model_User result = null;
             m_threadJob.Start( () => 
                 result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_User>(response.Content)
             );
             yield return m_threadJob.WaitFor();
+
+            UpdateAccessToken(response);
+            UpdateLoginTokens(response);
 
             m_user.m_id = result.data.id;
             m_user.m_handle = result.data.attributes.handle;
@@ -503,15 +503,15 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            UpdateAccessToken(response);
-            UpdateLoginTokens(response);
-
             yield return m_threadJob.WaitFor();
             VReelJSON.Model_User result = null;
             m_threadJob.Start( () => 
                 result = RestSharp.SimpleJson.DeserializeObject<VReelJSON.Model_User>(response.Content)
             );
             yield return m_threadJob.WaitFor();
+
+            UpdateAccessToken(response);
+            UpdateLoginTokens(response);
 
             m_user.m_id = result.data.id;
             m_user.m_handle = result.data.attributes.handle;

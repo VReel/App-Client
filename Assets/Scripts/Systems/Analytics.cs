@@ -2,7 +2,6 @@
 using System.Collections;               // IEnumerator
 using mixpanel;                         // Mixpanel
 
-//TODO: Add Mixpanel.Identify() and Mixpanel.Alias()
 public class Analytics : MonoBehaviour 
 {
     // **************************
@@ -14,6 +13,7 @@ public class Analytics : MonoBehaviour
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
 
     private CoroutineQueue m_coroutineQueue;
+    private string kEmptyString = "";
 
     // **************************
     // Public functions
@@ -23,6 +23,8 @@ public class Analytics : MonoBehaviour
     {       
         m_coroutineQueue = new CoroutineQueue( this );
         m_coroutineQueue.StartLoop();
+
+        m_coroutineQueue.EnqueueAction(IdentifyInternal());
     }
 
     public void ProfileSelected()
@@ -57,12 +59,25 @@ public class Analytics : MonoBehaviour
 
     public void LoginSelected()
     {
+        m_coroutineQueue.Clear();
         m_coroutineQueue.EnqueueAction(LoginSelectedInternal());
-    }
+    }        
 
     public void LogoutSelected()
     {
-        Mixpanel.Track("LogoutSelected");
+        m_coroutineQueue.Clear();
+        m_coroutineQueue.EnqueueAction(LogoutSelectedInternal());
+    }
+
+    public void PreSignUpSelected()
+    {
+        Mixpanel.Track("PreSignUpSelected");
+    }
+
+    public void SignUpSelected()
+    {
+        m_coroutineQueue.Clear();
+        m_coroutineQueue.EnqueueAction(SignUpSelectedInternal());
     }
 
     public void PublicTimelineSelected()
@@ -195,17 +210,81 @@ public class Analytics : MonoBehaviour
     // Private/Helper functions
     // **************************
 
-    private IEnumerator LoginSelectedInternal()
+    private IEnumerator IdentifyInternal()
     {
-        while (!m_user.IsLoggedIn())
+        while (!m_user.IsUserDataStored())
         {
             yield return null;
         }
 
-        // If this does not have any properties, then it should not be in a coroutine!
+        Mixpanel.Identify(m_user.m_id);
+
+        Mixpanel.Track("OpenedApp");
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.IdentifyInternal() Identify: " + m_user.m_id);
+    }
+
+    private IEnumerator LoginSelectedInternal()
+    {
+        while (!m_user.IsUserDataStored())
+        {
+            yield return null;
+        }
+
+        Mixpanel.Identify(m_user.m_id);
 
         Mixpanel.Track("LoginSelected");
-    }        
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.LoginSelectedInternal() Identify: " + m_user.m_id);
+    }
+
+    private IEnumerator LogoutSelectedInternal()
+    {
+        Mixpanel.Track("LogoutSelected"); 
+
+        //Mixpanel.FlushQueue();
+
+        yield return new WaitForSeconds(1);
+        while (m_user.IsUserDataStored())
+        {
+            yield return null;
+        }
+
+        //Mixpanel.Reset();
+
+        //Mixpanel.FlushQueue();
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.LogoutSelected(), and Mixpanel.Reset() Called ");
+    }
+
+    private IEnumerator SignUpSelectedInternal()
+    {
+        while (!m_user.IsUserDataStored())
+        {
+            yield return null;
+        }
+            
+        Mixpanel.Alias(m_user.m_id);
+        Mixpanel.Identify(m_user.m_id);
+
+        Mixpanel.people.Name = m_user.m_handle;
+        Mixpanel.people.Email = m_user.m_email;
+
+        Mixpanel.Track("SignUpSelected");
+
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.SignUpSelectedInternal() CurrentDistinctID AFTER: " + mixpanel.platform.MixpanelUnityPlatform.get_distinct_id());
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.SignUpSelectedInternal() Alias and Identify: " + m_user.m_id);
+    }      
+
+    /*
+    private void Identify()
+    {
+        if (m_user.m_id != null && m_user.m_id.CompareTo(kEmptyString) != 0)
+        {
+            Mixpanel.Identify(m_user.m_id);
+        }
+    }
+    */
 
     private void SetAppState(Value properties)
     {

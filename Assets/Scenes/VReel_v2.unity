@@ -113,7 +113,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &65
 GameObject:
   m_ObjectHideFlags: 0
@@ -226,6 +226,7 @@ GameObject:
   m_Component:
   - component: {fileID: 482}
   - component: {fileID: 1796}
+  - component: {fileID: 131}
   m_Layer: 0
   m_Name: Globals
   m_TagString: Untagged
@@ -233,6 +234,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 130}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 882752fe4382f41c593a64591e77ee24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  token: c5fb7a534ca915472ec892c49b43edde
+  debugToken: cd5ef04ffe874b41c118025c5b312113
+  trackInEditor: 0
+  minLogLevel: 3
+  flushInterval: 60
 --- !u!1 &134
 GameObject:
   m_ObjectHideFlags: 0
@@ -4244,9 +4261,9 @@ MonoBehaviour:
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 385}
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 2238}
+        m_MethodName: EndDeleteAccount
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -11439,6 +11456,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 1270248417}
     m_Modifications:
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 224033499422572898, guid: 231542d4898e941a68adc853bcba143d,
         type: 2}
       propertyPath: m_LocalPosition.x
@@ -11571,6 +11593,31 @@ Prefab:
         type: 2}
       propertyPath: m_buttonColourUp.b
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 2027}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: SignUpSelected
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740772709181610, guid: 231542d4898e941a68adc853bcba143d,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 231542d4898e941a68adc853bcba143d, type: 2}
@@ -14432,11 +14479,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400010, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
@@ -22065,6 +22112,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 519907522}
     m_Modifications:
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
         type: 2}
       propertyPath: m_LocalPosition.x
@@ -22203,6 +22255,31 @@ Prefab:
       propertyPath: m_buttonColourUp.b
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 2027}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: PreSignUpSelected
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6d77096d9165e4f12a0b563ced4be6d4, type: 2}
   m_IsPrefabParent: 0
@@ -22218,6 +22295,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 519907522}
     m_Modifications:
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 224931932434479564, guid: 6d77096d9165e4f12a0b563ced4be6d4,
         type: 2}
       propertyPath: m_LocalPosition.x
@@ -22340,6 +22422,31 @@ Prefab:
         type: 2}
       propertyPath: m_buttonColourUp.b
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 2027}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: LoginSelected
+      objectReference: {fileID: 0}
+    - target: {fileID: 114797891934519232, guid: 6d77096d9165e4f12a0b563ced4be6d4,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6d77096d9165e4f12a0b563ced4be6d4, type: 2}
@@ -25135,7 +25242,9 @@ Prefab:
       propertyPath: m_AnchoredPosition.x
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 65947040769964244, guid: 9b910ee209ce647fbb39edc1fd4117c3, type: 2}
+    - {fileID: 65291306234207040, guid: 9b910ee209ce647fbb39edc1fd4117c3, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 9b910ee209ce647fbb39edc1fd4117c3, type: 2}
   m_IsPrefabParent: 0
 --- !u!224 &1786991108 stripped
@@ -25253,6 +25362,30 @@ MonoBehaviour:
     type: 2}
   m_PrefabInternal: {fileID: 1786991107}
   m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+--- !u!65 &1786991121
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1786991113}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 2.8, y: 0.9, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!65 &1786991122
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1786991109}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 2.8, y: 0.9, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1792403951
 GameObject:
   m_ObjectHideFlags: 0

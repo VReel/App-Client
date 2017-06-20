@@ -292,17 +292,31 @@ public class Profile : MonoBehaviour
 
     private void DownloadThumbnailImage(ImageSphereType imageSphereType)
     {        
-        if (imageSphereType == ImageSphereType.kProfile && m_thumbnailUrl != null && m_thumbnailUrl.Length > 0)
+        if (imageSphereType == ImageSphereType.kProfile)
         {
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadThumbnailImage() loading User Thumbnail Image for: " + m_thumbnailUrl);
+            if (m_thumbnailUrl != null && m_thumbnailUrl.Length > 0)
+            {
+                if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadThumbnailImage() loading User Thumbnail Image for: " + m_thumbnailUrl);
 
-            m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kProfilePageSphereIndex, m_thumbnailUrl, m_userId, false);
+                m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kProfilePageSphereIndex, m_thumbnailUrl, m_userId, false);
+            }
+            else
+            {
+                m_imageSphereController.HideSphereAtIndex(Helper.kProfilePageSphereIndex);
+            }
         }
-        else if (imageSphereType == ImageSphereType.kMenuBar && m_loggedUserThumbnailUrl != null && m_loggedUserThumbnailUrl.Length > 0)
+        else if (imageSphereType == ImageSphereType.kMenuBar)
         {
-            if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadThumbnailImage() loading User Thumbnail Image for: " + m_loggedUserThumbnailUrl);
+            if (m_loggedUserThumbnailUrl != null && m_loggedUserThumbnailUrl.Length > 0)
+            {
+                if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadThumbnailImage() loading User Thumbnail Image for: " + m_loggedUserThumbnailUrl);
 
-            m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kMenuBarProfileSphereIndex, m_loggedUserThumbnailUrl, m_user.m_id, false);
+                m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kMenuBarProfileSphereIndex, m_loggedUserThumbnailUrl, m_user.m_id, false);
+            }
+            else
+            {
+                m_imageSphereController.HideSphereAtIndex(Helper.kMenuBarProfileSphereIndex);
+            }
         }
     }
         

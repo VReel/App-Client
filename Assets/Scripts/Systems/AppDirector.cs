@@ -173,7 +173,7 @@ public class AppDirector : MonoBehaviour
     private void SetLoginState()
     {        
         Resources.UnloadUnusedAssets();
-        m_imageSphereController.HideAllImageSpheres();
+        m_imageSphereController.ForceHideAllImageSpheres();
         m_keyboard.CancelText();
 
         m_imageLoader.InvalidateLoading();
