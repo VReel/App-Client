@@ -201,6 +201,7 @@ public class ImageFlow : MonoBehaviour
     {        
         if (!m_user.IsLoggedIn())
         {
+            Close();
             m_loginFlow.OpenCloseSwitch();
             return;
         }
@@ -225,6 +226,7 @@ public class ImageFlow : MonoBehaviour
     {
         if (!m_user.IsLoggedIn())
         {
+            Close();
             m_loginFlow.OpenCloseSwitch();
             return;
         }
@@ -256,6 +258,7 @@ public class ImageFlow : MonoBehaviour
     {
         if (!m_user.IsLoggedIn())
         {
+            Close();
             m_loginFlow.OpenCloseSwitch();
             return;
         }
