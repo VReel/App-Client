@@ -1,6 +1,6 @@
 ﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-Shader "UI/Overlay"
+Shader "UI/UIShader"
 {
 	Properties
 	{
@@ -15,6 +15,9 @@ Shader "UI/Overlay"
 		_StencilReadMask ("Stencil Read Mask", Float) = 255
 
 		_ColorMask ("Color Mask", Float) = 15
+
+		_Alpha ("Alpha", Range (0,1.0)) = 1.0 // 0 is off
+		_MipBias ("Mip Bias", Range (-5.0,5.0)) = 0.0 // 0 is off
 	}
 	
 	SubShader
@@ -73,6 +76,8 @@ Shader "UI/Overlay"
 				float4 _MainTex_ST;
 				fixed4 _Color;
 				fixed4 _TextureSampleAdd;
+				float _Alpha;		// Transparency effect
+				float _MipBias; 	// Quality adjustments
 				
 				v2f vert (appdata_t v)
 				{
@@ -89,7 +94,8 @@ Shader "UI/Overlay"
 				
 				fixed4 frag (v2f i) : SV_Target
 				{
-					fixed4 col = (tex2D(_MainTex, i.texcoord) + _TextureSampleAdd) * i.color;
+					fixed4 col = (tex2Dbias(_MainTex, float4(i.texcoord, 0, _MipBias)) + _TextureSampleAdd) * i.color;
+					col.a = col.a * _Alpha;
 					clip (col.a - 0.01);
 					return col;
 				}

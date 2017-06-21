@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Fiji
+  m_Name: BackSphereImage
   m_Shader: {fileID: 4800000, guid: 1730f10232b7e40519df66191458a04c, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
