@@ -16,6 +16,7 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private ListUsers m_listUsers;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private Profile m_profile;
+    [SerializeField] private LoginFlow m_loginFlow;
     [SerializeField] private ImageFlow m_imageFlow;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
@@ -199,6 +200,12 @@ public class ImageSphere : MonoBehaviour
 
     public void HeartSelected()
     {
+        if (!m_user.IsLoggedIn())
+        {
+            m_loginFlow.OpenCloseSwitch();
+            return;
+        }
+
         m_heartOn = !m_heartOn;
         m_numLikes = m_heartOn ? m_numLikes+1 : m_numLikes-1;
 
@@ -209,6 +216,12 @@ public class ImageSphere : MonoBehaviour
 
     public void HeartSelectedWithObject(GameObject heartObject, GameObject likeCountObject)
     {
+        if (!m_user.IsLoggedIn())
+        {
+            m_loginFlow.OpenCloseSwitch();
+            return;
+        }
+
         m_heartOn = !m_heartOn;
         m_numLikes = m_heartOn ? m_numLikes+1 : m_numLikes-1;
 

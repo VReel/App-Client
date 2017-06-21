@@ -13,6 +13,7 @@ public class ListUsers : MonoBehaviour
     [SerializeField] private User m_user;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private Profile m_profile;
+    [SerializeField] private LoginFlow m_loginFlow;
     [SerializeField] private ListComments m_listComments;
     [SerializeField] private GameObject m_displayItemsTopLevel; //Top-level object for results
     [SerializeField] private GameObject[] m_displayItems;
@@ -145,6 +146,13 @@ public class ListUsers : MonoBehaviour
 
     public void FollowSelected(int userResultItemIndex)
     {        
+        if (!m_user.IsLoggedIn())
+        {
+            CloseListUsers();
+            m_loginFlow.OpenCloseSwitch();
+            return;
+        }
+
         int actualResultIndex = m_currResultIndex + userResultItemIndex;
 
         m_userResults[actualResultIndex].followedByMe = !m_userResults[actualResultIndex].followedByMe;

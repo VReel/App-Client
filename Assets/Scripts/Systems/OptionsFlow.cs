@@ -9,15 +9,17 @@ public class OptionsFlow : MonoBehaviour
     // **************************
 
     [SerializeField] private AppDirector m_appDirector;
+    [SerializeField] private User m_user;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private LoadingIcon m_loadingIcon;
+    [SerializeField] private Profile m_profile;
+    [SerializeField] private LoginFlow m_loginFlow;
+    [SerializeField] private KeyBoard m_keyboard;
     [SerializeField] private Text m_currentPasswordInput;
     [SerializeField] private Text m_newPasswordInput;
     [SerializeField] private Text m_confirmPasswordInput;
     [SerializeField] private GameObject m_setPasswordConfirmedMessage;
     [SerializeField] private GameObject m_deleteConfirmedMessage;
-    [SerializeField] private User m_user;
-    [SerializeField] private KeyBoard m_keyboard;
 
     [SerializeField] private GameObject m_optionsSubMenu;
     [SerializeField] private GameObject m_optionsPage;
@@ -25,7 +27,7 @@ public class OptionsFlow : MonoBehaviour
     [SerializeField] private GameObject m_deleteAccountPage;
     [SerializeField] private GameObject m_aboutPage;
 
-    private bool m_menuOpen = false;
+    private bool m_optionsOpen = false;
     private CoroutineQueue m_coroutineQueue;
     private BackEndAPI m_backEndAPI;
 
@@ -49,18 +51,24 @@ public class OptionsFlow : MonoBehaviour
 
     public void OpenCloseSwitch()
     {
-        if (!m_menuOpen)
+        if (!m_optionsOpen)
         {
-            OpenMenu();
+            if (!m_user.IsLoggedIn())
+            {
+                m_loginFlow.OpenCloseSwitch();
+                return;
+            }
+
+            OpenOptions();
         }
         else
         {
-            CloseMenu();
+            CloseOptions();
         }
     }
          
     public void SetOptionsFlowPage(int pageNumber)
-    {
+    {        
         m_optionsSubMenu.SetActive(true);
 
         if (pageNumber == -1)
@@ -114,7 +122,7 @@ public class OptionsFlow : MonoBehaviour
 
     public void EndDeleteAccount()
     {
-        CloseMenu();
+        CloseOptions();
         m_user.Clear();
     }
 
@@ -122,20 +130,20 @@ public class OptionsFlow : MonoBehaviour
     // Private/Helper functions
     // **************************
 
-    private void OpenMenu()
+    private void OpenOptions()
     {
         SetOptionsFlowPage(0);
-        m_menuOpen = true;
+        m_optionsOpen = true;
 
         m_menuController.UpdateMenuConfig(this);
         m_appDirector.SetOverlayShowing(true);
     }
 
-    private void CloseMenu()
+    private void CloseOptions()
     {
         m_keyboard.CancelText();
         SetOptionsFlowPage(-1);
-        m_menuOpen = false;
+        m_optionsOpen = false;
 
         m_menuController.UpdateMenuConfig(m_appDirector);
         m_appDirector.SetOverlayShowing(false);
@@ -153,7 +161,11 @@ public class OptionsFlow : MonoBehaviour
 
         m_loadingIcon.Hide();
 
-        CloseMenu();
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            CloseOptions();
+            m_profile.SetMenuBarProfileDetails();
+        }
     }   
 
     private IEnumerator SetPasswordInternal()

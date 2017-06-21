@@ -18,6 +18,7 @@ public class Profile : MonoBehaviour
     [SerializeField] private User m_user;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private Posts m_posts;
+    [SerializeField] private LoginFlow m_loginFlow;
     [SerializeField] private ListUsers m_listUsers;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private ImageLoader m_imageLoader;
@@ -94,19 +95,34 @@ public class Profile : MonoBehaviour
     }
 
     public void SetMenuBarProfileDetails()
-    {
-        m_menuBarProfileButtonObject.GetComponentInChildren<Text>().text = m_user.m_handle;
-        m_coroutineQueue.EnqueueAction(SetMenuBarProfileDetailsInternal());
+    {        
+        if (m_user.IsLoggedIn())
+        {
+            m_menuBarProfileButtonObject.GetComponentInChildren<Text>().text = m_user.m_handle;
+            m_coroutineQueue.EnqueueAction(SetMenuBarProfileDetailsInternal());
+        }
+        else
+        {
+            m_menuBarProfileButtonObject.GetComponentInChildren<Text>().text = "Guest";
+            m_imageSphereController.HideSphereAtIndex(Helper.kMenuBarProfileSphereIndex);
+        }
     }
 
     public void OpenUserProfile()
     {
-        m_userId = m_user.m_id;
-        m_handle = m_user.m_handle;
+        if (m_user.IsLoggedIn())
+        {
+            m_userId = m_user.m_id;
+            m_handle = m_user.m_handle;
 
-        m_appDirector.RequestProfileState();
+            m_appDirector.RequestProfileState();
 
-        OpenProfileInternal();
+            OpenProfileInternal();
+        }
+        else
+        {
+            m_loginFlow.OpenCloseSwitch();
+        }
     }
 
     public void OpenProfileWithId(string userId, string handle)
@@ -383,6 +399,12 @@ public class Profile : MonoBehaviour
     //TODO: Should this be somewhere else and as a public function...?
     private void FollowOrUnfollowUser(string userId, bool doFollow)
     {
+        if (!m_user.IsLoggedIn())
+        {
+            m_loginFlow.OpenCloseSwitch();
+            return;
+        }
+
         m_coroutineQueue.EnqueueAction(FollowOrUnfollowUserInternal(userId, doFollow));
     }
         

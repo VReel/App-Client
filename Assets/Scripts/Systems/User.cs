@@ -42,6 +42,7 @@ public class User : MonoBehaviour
     private string m_vreelSaveFile = "";
 
     private string m_dataFilePath;
+    private bool m_loadingLoginData; //This is necessary because we don't want to start the app properly until we've tried to log you in!
     private LoginData m_loginData;
 
     private BackEndAPI m_backEndAPI;
@@ -71,12 +72,18 @@ public class User : MonoBehaviour
 
         m_threadJob = new ThreadJob(this);
 
-        LoadLoginData();
+        m_loadingLoginData = true;
+        m_coroutineQueue.EnqueueAction(LoadLoginData());
     }
 
     public BackEndEnvironment GetBackEndEnvironment()
     {
         return m_backEndEnvironment;
+    }
+
+    public bool IsLoadingLoginData()
+    {
+        return m_loadingLoginData;
     }
 
     public bool IsLoggedIn()
@@ -168,7 +175,7 @@ public class User : MonoBehaviour
         }
     }
 
-    private void LoadLoginData()
+    private IEnumerator LoadLoginData()
     {
         if (File.Exists(m_dataFilePath))
         {
@@ -178,8 +185,10 @@ public class User : MonoBehaviour
                 m_loginData = (LoginData) binaryFormatter.Deserialize(fileStream);
             }
 
-            m_coroutineQueue.EnqueueAction(m_backEndAPI.Register_GetUser());
+            yield return m_backEndAPI.Register_GetUser();
         }
+
+        m_loadingLoginData = false;
     }
 
     private IEnumerator SaveLoginData()

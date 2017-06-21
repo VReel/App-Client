@@ -924,6 +924,7 @@ MonoBehaviour:
   m_user: {fileID: 1796}
   m_posts: {fileID: 2030}
   m_profile: {fileID: 856211864}
+  m_loginFlow: {fileID: 2239}
   m_imageSkybox: {fileID: 350}
   m_menuController: {fileID: 2000}
   m_listComments: {fileID: 1596}
@@ -1294,7 +1295,7 @@ Transform:
   - {fileID: 489}
   - {fileID: 1231}
   m_Father: {fileID: 1462}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &502
 Transform:
@@ -1389,7 +1390,7 @@ Transform:
   - {fileID: 1236}
   - {fileID: 1167}
   m_Father: {fileID: 1462}
-  m_RootOrder: 6
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &539
 MeshFilter:
@@ -2250,7 +2251,7 @@ RectTransform:
   - {fileID: 1270248417}
   - {fileID: 862681440}
   m_Father: {fileID: 1462}
-  m_RootOrder: 4
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -2787,10 +2788,10 @@ RectTransform:
   - {fileID: 515}
   - {fileID: 494}
   - {fileID: 1279}
-  - {fileID: 1172}
-  - {fileID: 1505}
   - {fileID: 521}
+  - {fileID: 1505}
   - {fileID: 498}
+  - {fileID: 1172}
   - {fileID: 1305}
   - {fileID: 340148599}
   - {fileID: 1166}
@@ -3273,6 +3274,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_backEndEnvironment: 0
+  m_profile: {fileID: 856211864}
   m_pushNotifications: {fileID: 1544063735}
   m_errorMessage: {fileID: 1579463189}
 --- !u!114 &1833
@@ -3763,7 +3765,6 @@ MonoBehaviour:
   m_reticle: {fileID: 1865}
   m_input: {fileID: 1864}
   m_menuSubTree: {fileID: 253}
-  m_loginSubMenu: {fileID: 18}
   m_searchSubMenu: {fileID: 389}
   m_profileSubMenu: {fileID: 441}
   m_gallerySubMenu: {fileID: 295}
@@ -3947,9 +3948,9 @@ MonoBehaviour:
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 315}
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 2239}
+        m_MethodName: SetLoginFlowPage
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -4326,15 +4327,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_appDirector: {fileID: 1674}
+  m_user: {fileID: 1796}
   m_menuController: {fileID: 2000}
   m_loadingIcon: {fileID: 2248}
+  m_profile: {fileID: 856211864}
+  m_loginFlow: {fileID: 2239}
+  m_keyboard: {fileID: 2174}
   m_currentPasswordInput: {fileID: 1047605348}
   m_newPasswordInput: {fileID: 1639688262}
   m_confirmPasswordInput: {fileID: 1241065072}
   m_setPasswordConfirmedMessage: {fileID: 65}
   m_deleteConfirmedMessage: {fileID: 385}
-  m_user: {fileID: 1796}
-  m_keyboard: {fileID: 2174}
   m_optionsSubMenu: {fileID: 165}
   m_optionsPage: {fileID: 160}
   m_setPasswordPage: {fileID: 93}
@@ -4352,7 +4355,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_appDirector: {fileID: 1674}
+  m_user: {fileID: 1796}
+  m_menuController: {fileID: 2000}
+  m_profile: {fileID: 856211864}
   m_loadingIcon: {fileID: 2248}
+  m_keyboard: {fileID: 2174}
   m_loginUsernameEmailInput: {fileID: 1225611414}
   m_loginPasswordInput: {fileID: 1661286810}
   m_signUpUsernameInput: {fileID: 887386591}
@@ -4361,7 +4368,7 @@ MonoBehaviour:
   m_signUpPasswordConfirmationInput: {fileID: 1892561252}
   m_resetPasswordEmailInput: {fileID: 2129300156}
   m_resetConfirmedText: {fileID: 315}
-  m_user: {fileID: 1796}
+  m_loginSubMenu: {fileID: 18}
   m_loginPage: {fileID: 519907521}
   m_signUpPage: {fileID: 1270248416}
   m_resetPasswordPage: {fileID: 862681439}
@@ -7448,6 +7455,126 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 1
   m_TargetDisplay: 0
+--- !u!1001 &316293902
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 519907522}
+    m_Modifications:
+    - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 1.6069999
+      objectReference: {fileID: 0}
+    - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: m_AnchoredPosition.y
+      value: -3.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: m_SizeDelta.x
+      value: 56
+      objectReference: {fileID: 0}
+    - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: m_SizeDelta.y
+      value: 56
+      objectReference: {fileID: 0}
+    - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: m_AnchorMin.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: m_AnchorMin.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114767074624028362, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2239}
+    - target: {fileID: 114767074624028362, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OpenCloseSwitch
+      objectReference: {fileID: 0}
+    - target: {fileID: 114767074624028362, guid: e6167b1895f454c2ea70ad98eee7494f,
+        type: 2}
+      propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: e6167b1895f454c2ea70ad98eee7494f, type: 2}
+  m_IsPrefabParent: 0
+--- !u!224 &316293903 stripped
+RectTransform:
+  m_PrefabParentObject: {fileID: 224724055182393166, guid: e6167b1895f454c2ea70ad98eee7494f,
+    type: 2}
+  m_PrefabInternal: {fileID: 316293902}
 --- !u!1001 &330037863
 Prefab:
   m_ObjectHideFlags: 0
@@ -9751,6 +9878,7 @@ RectTransform:
   - {fileID: 1634277702}
   - {fileID: 1632835194}
   - {fileID: 887607290}
+  - {fileID: 316293903}
   m_Father: {fileID: 1172}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -10840,6 +10968,11 @@ Prefab:
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_IntArgument
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: m_loginFlow
+      value: 
+      objectReference: {fileID: 2239}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
   m_IsPrefabParent: 0
@@ -12286,6 +12419,11 @@ Prefab:
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_IntArgument
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: m_loginFlow
+      value: 
+      objectReference: {fileID: 2239}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
   m_IsPrefabParent: 0
@@ -14260,6 +14398,21 @@ Prefab:
       propertyPath: m_profileDescriptionNewText
       value: 
       objectReference: {fileID: 895010030}
+    - target: {fileID: 114570222485566844, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_loginFlow
+      value: 
+      objectReference: {fileID: 2239}
+    - target: {fileID: 114000011095986410, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_loginFlow
+      value: 
+      objectReference: {fileID: 2239}
+    - target: {fileID: 114351951387023894, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_loginFlow
+      value: 
+      objectReference: {fileID: 2239}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5d68de0858483422a933ef12ea7ca889, type: 2}
   m_IsPrefabParent: 0
@@ -14536,6 +14689,11 @@ Prefab:
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_IntArgument
       value: -2
       objectReference: {fileID: 0}
+    - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: m_loginFlow
+      value: 
+      objectReference: {fileID: 2239}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
   m_IsPrefabParent: 0
@@ -14596,11 +14754,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400010, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
@@ -14620,7 +14778,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &882264439
 Transform:
   m_ObjectHideFlags: 0
@@ -24337,6 +24495,11 @@ Prefab:
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_IntArgument
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: m_loginFlow
+      value: 
+      objectReference: {fileID: 2239}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
   m_IsPrefabParent: 0
@@ -27383,6 +27546,11 @@ Prefab:
       propertyPath: OnButtonSelectedFunc.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_IntArgument
       value: -3
       objectReference: {fileID: 0}
+    - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: m_loginFlow
+      value: 
+      objectReference: {fileID: 2239}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
   m_IsPrefabParent: 0

@@ -18,8 +18,8 @@ public class Gallery : MonoBehaviour
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
     [SerializeField] private MenuController m_menuController;
-    [FormerlySerializedAs("m_profileDetails")]
     [SerializeField] private Profile m_profile;
+    [SerializeField] private LoginFlow m_loginFlow;
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
@@ -87,6 +87,12 @@ public class Gallery : MonoBehaviour
     public void PreUpload()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreUpload() called on post: " + m_imageSkybox.GetImageIdentifier());
+
+        if (!m_user.IsLoggedIn())
+        {
+            m_loginFlow.OpenCloseSwitch();
+            return;
+        }
 
         m_uploadConfirmation.SetActive(true);
         m_uploadButton.SetActive(false);

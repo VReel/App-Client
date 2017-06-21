@@ -12,6 +12,7 @@ public class ImageFlow : MonoBehaviour
     [SerializeField] private User m_user;
     [SerializeField] private Posts m_posts;
     [SerializeField] private Profile m_profile;
+    [SerializeField] private LoginFlow m_loginFlow;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private ListComments m_listComments;
@@ -198,6 +199,12 @@ public class ImageFlow : MonoBehaviour
 
     public void OptionsSelected()
     {        
+        if (!m_user.IsLoggedIn())
+        {
+            m_loginFlow.OpenCloseSwitch();
+            return;
+        }
+
         if (m_currImageSphere.IsLoggedUserImage())
         {
             SetImageFlowPage(5);
@@ -216,6 +223,12 @@ public class ImageFlow : MonoBehaviour
 
     public void HeartSelected()
     {
+        if (!m_user.IsLoggedIn())
+        {
+            m_loginFlow.OpenCloseSwitch();
+            return;
+        }
+
         m_currImageSphere.HeartSelectedWithObject(m_heartObject, m_likeCountObject);
     }
 
@@ -241,6 +254,12 @@ public class ImageFlow : MonoBehaviour
 
     public void NewCommentSelected()
     {
+        if (!m_user.IsLoggedIn())
+        {
+            m_loginFlow.OpenCloseSwitch();
+            return;
+        }
+
         SetImageFlowPage(3);
     }
         

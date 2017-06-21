@@ -18,7 +18,6 @@ public class AppDirector : MonoBehaviour
     public enum AppState
     {
         kInit,          // This should only be the state at the very start and never again!
-        kLogin,         // User is not yet logged in, they are going through the login flow
         kExplore,       // User is viewing the public timeline (ie. public or personal timeline)
         kFollowing,     // User is viewing the personal timeline (ie. public or personal timeline)
         kProfile,       // User is viewing the pictures in their own profile
@@ -63,7 +62,7 @@ public class AppDirector : MonoBehaviour
 
         m_menuController.RegisterToUseMenuConfig(this);
         m_menuController.GetMenuConfigForOwner(this).imageSpheresVisible = true;
-        m_menuController.UpdateMenuConfig(this);
+        //m_menuController.UpdateMenuConfig(this); - too early in the execution
     }
 
     public AppState GetState()
@@ -83,17 +82,14 @@ public class AppDirector : MonoBehaviour
 
     public void Update()
     {    
-        if (m_appState != AppDirector.AppState.kLogin && !m_user.IsLoggedIn())
-        {
-            RequestLoginState();
-        }
-        else if ( (m_appState == AppDirector.AppState.kLogin || m_appState == AppDirector.AppState.kInit) && m_user.IsLoggedIn() && m_user.m_handle.Length > 0)
+        if (m_appState == AppDirector.AppState.kInit && !m_user.IsLoadingLoginData())
         {
             RequestExploreState();
             m_profile.SetMenuBarProfileDetails();
         }
     }
-        
+       
+    /*
     public void RequestLoginState()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestLoginState() called");
@@ -102,6 +98,7 @@ public class AppDirector : MonoBehaviour
             SetLoginState();
         }
     }
+    */
 
     public void RequestExploreState()
     {
@@ -114,6 +111,12 @@ public class AppDirector : MonoBehaviour
 
     public void RequestFollowingState()
     {
+        if (!m_user.IsLoggedIn())
+        {
+            m_loginFlow.OpenCloseSwitch();
+            return;
+        }
+
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestFollowingState() called");
         if (m_appState != AppState.kFollowing)
         {
@@ -170,6 +173,7 @@ public class AppDirector : MonoBehaviour
     // Private/Helper functions
     // **************************
 
+    /*
     private void SetLoginState()
     {        
         Resources.UnloadUnusedAssets();
@@ -190,6 +194,7 @@ public class AppDirector : MonoBehaviour
         menuConfig.subMenuVisible = true;
         m_menuController.UpdateMenuConfig(this);
     }
+    */
 
     private void SetExploreState()
     {

@@ -1825,6 +1825,9 @@ public class BackEndAPI
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> " + debugString + " - Error Code: " + response.StatusCode + " - Content:" + response.Content);
 
+        var errorText = m_errorMessage.GetComponentInChildren<Text>();
+        errorText.text = "";
+
         VReelJSON.Model_Error result = null;
         try
         {
@@ -1833,21 +1836,22 @@ public class BackEndAPI
         catch (Exception e)
         {
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - Failed to serialize the Error! Exception = " + e);
-        }
-
-        var errorText = m_errorMessage.GetComponentInChildren<Text>();
-        errorText.text = "";
+            errorText.text = "Woops, seems we have a serialisation error! Please report this to the team so we can patch it up! =)";
+            m_errorMessage.SetActive(true);
+        }                  
 
         if (result != null && result.errors != null)
         {
+            int i = 1;
             foreach(var error in result.errors)
             {
                 if (Debug.isDebugBuild) Debug.Log("------- VREEL: API -> " + debugString + " - Error: " + error.detail.ToString());
 
-                errorText.text += error.detail.ToString();
+                errorText.text += "- " + error.detail.ToString();
                 errorText.text += "\n";
-                m_errorMessage.SetActive(true);
+                i++;
             }
+            m_errorMessage.SetActive(i > 1);
         }
     }   
 

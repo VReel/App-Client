@@ -20,7 +20,7 @@ public class MenuController : MonoBehaviour
     [SerializeField] private VRStandardAssets.Utils.Reticle m_reticle;
     [SerializeField] private VRStandardAssets.Utils.VRInput m_input;
     [SerializeField] private GameObject m_menuSubTree;
-    [SerializeField] private GameObject m_loginSubMenu;
+    //[SerializeField] private GameObject m_loginSubMenu;
     [SerializeField] private GameObject m_searchSubMenu;
     [SerializeField] private GameObject m_profileSubMenu;
     [SerializeField] private GameObject m_gallerySubMenu;
@@ -168,10 +168,12 @@ public class MenuController : MonoBehaviour
         {
             // Empty on purpose
         }
+        /*
         else if (m_appDirector.GetState() == AppDirector.AppState.kLogin)
         {
             SetLoginSubMenuActive(active);
         }
+        */
         else if (m_appDirector.GetState() == AppDirector.AppState.kExplore)
         {
             SetExploreSubMenuActive(active);
@@ -200,16 +202,18 @@ public class MenuController : MonoBehaviour
 
     private void SetAllSubMenusActive(bool active)
     {
-        m_loginSubMenu.SetActive(active);
+        //m_loginSubMenu.SetActive(active);
         m_searchSubMenu.SetActive(active);
         m_profileSubMenu.SetActive(active);
         m_gallerySubMenu.SetActive(active);
     }
 
+    /*
     private void SetLoginSubMenuActive(bool active)
     {
         m_loginSubMenu.SetActive(active);
     }
+    */
 
     private void SetProfileSubMenuActive(bool active)
     {

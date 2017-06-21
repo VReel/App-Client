@@ -8,8 +8,12 @@ public class LoginFlow : MonoBehaviour
     // Member Variables
     // **************************
 
-    [SerializeField] private AppDirector m_appDirector;  
+    [SerializeField] private AppDirector m_appDirector;
+    [SerializeField] private User m_user;
+    [SerializeField] private MenuController m_menuController;
+    [SerializeField] private Profile m_profile;
     [SerializeField] private LoadingIcon m_loadingIcon;
+    [SerializeField] private KeyBoard m_keyboard;
     [SerializeField] private Text m_loginUsernameEmailInput;
     [SerializeField] private Text m_loginPasswordInput;
     [SerializeField] private Text m_signUpUsernameInput;
@@ -18,12 +22,13 @@ public class LoginFlow : MonoBehaviour
     [SerializeField] private Text m_signUpPasswordConfirmationInput;
     [SerializeField] private Text m_resetPasswordEmailInput;
     [SerializeField] private GameObject m_resetConfirmedText;
-    [SerializeField] private User m_user;
 
+    [SerializeField] private GameObject m_loginSubMenu;
     [SerializeField] private GameObject m_loginPage;
     [SerializeField] private GameObject m_signUpPage; 
     [SerializeField] private GameObject m_resetPasswordPage;
 
+    private bool m_loginOpen = false;
     private CoroutineQueue m_coroutineQueue;
     private BackEndAPI m_backEndAPI;
 
@@ -37,23 +42,35 @@ public class LoginFlow : MonoBehaviour
         m_coroutineQueue.StartLoop();
 
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
+
+        m_menuController.RegisterToUseMenuConfig(this);
+        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
+        menuConfig.menuBarVisible = false;
+        menuConfig.imageSpheresVisible = false;
+        menuConfig.subMenuVisible = false;
     }
 
-    /*
-    public void Restart()
+    public void OpenCloseSwitch()
     {
-        if (m_coroutineQueue == null)
+        if (!m_loginOpen)
         {
-            m_coroutineQueue = new CoroutineQueue(this);
+            OpenLogin();
         }
-
-        m_coroutineQueue.StartLoop();
+        else
+        {
+            CloseLogin();
+        }
     }
-    */
         
     public void SetLoginFlowPage(int pageNumber)
     {
-        if (pageNumber == 0) // LoginPage
+        m_loginSubMenu.SetActive(true);
+
+        if (pageNumber == -1)
+        {
+            m_loginSubMenu.SetActive(false);
+        }
+        else if (pageNumber == 0) // LoginPage
         {
             m_loginPage.SetActive(true);
             m_signUpPage.SetActive(false);
@@ -92,6 +109,25 @@ public class LoginFlow : MonoBehaviour
     // Private/Helper functions
     // **************************
 
+    private void OpenLogin()
+    {
+        SetLoginFlowPage(0);
+        m_loginOpen = true;
+
+        m_menuController.UpdateMenuConfig(this);
+        m_appDirector.SetOverlayShowing(true);
+    }
+
+    private void CloseLogin()
+    {
+        m_keyboard.CancelText();
+        SetLoginFlowPage(-1);
+        m_loginOpen = false;
+
+        m_menuController.UpdateMenuConfig(m_appDirector);
+        m_appDirector.SetOverlayShowing(false);
+    }
+
     private IEnumerator LoginInternal()
     {
         yield return m_appDirector.VerifyInternetConnection();
@@ -107,6 +143,12 @@ public class LoginFlow : MonoBehaviour
         );
 
         m_loadingIcon.Hide();
+
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            CloseLogin();
+            m_profile.SetMenuBarProfileDetails();
+        }
     }
 
     private IEnumerator SignUpInternal()
@@ -126,6 +168,12 @@ public class LoginFlow : MonoBehaviour
         );
 
         m_loadingIcon.Hide();
+
+        if (m_backEndAPI.IsLastAPICallSuccessful())
+        {
+            CloseLogin();
+            m_profile.SetMenuBarProfileDetails();
+        }
     } 
 
     private IEnumerator ResetPasswordInternal()

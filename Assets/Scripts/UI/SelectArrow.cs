@@ -59,8 +59,7 @@ public class SelectArrow : MonoBehaviour
             }
         }
 
-        if (m_appDirector.GetState() == AppDirector.AppState.kInit  || 
-            m_appDirector.GetState() == AppDirector.AppState.kLogin ||
+        if (m_appDirector.GetState() == AppDirector.AppState.kInit  ||             
             m_appDirector.GetOverlayShowing())
         {
             return false;
