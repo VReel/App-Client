@@ -241,19 +241,23 @@ public class Analytics : MonoBehaviour
     {
         Mixpanel.Track("Logged Out"); 
 
-        //Mixpanel.FlushQueue();
+        /*
+        Mixpanel.FlushQueue();
 
         yield return new WaitForSeconds(1);
         while (m_user.IsUserDataStored())
         {
             yield return null;
         }
+        */
 
         Mixpanel.Reset();
 
         //Mixpanel.FlushQueue();
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.LogoutSelected(), and Mixpanel.Reset() Called ");
+
+        yield break;
     }
 
     private IEnumerator SignUpSelectedInternal()
