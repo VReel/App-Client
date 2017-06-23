@@ -103,7 +103,7 @@ public class User : MonoBehaviour
 
     public void Clear()
     {
-        m_loginData.m_client = m_loginData.m_uid = "";
+        m_loginData.m_client = m_loginData.m_uid = m_loginData.m_accessToken = "";
         m_id = m_handle = m_email = m_name = m_profileDescription = "";
 
         if (File.Exists(m_dataFilePath))

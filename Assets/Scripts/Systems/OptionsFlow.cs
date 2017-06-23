@@ -112,6 +112,7 @@ public class OptionsFlow : MonoBehaviour
 
     public void SetPassword() 
     {
+        m_keyboard.AcceptText();
         m_coroutineQueue.EnqueueAction(SetPasswordInternal());
     }
 
@@ -123,7 +124,8 @@ public class OptionsFlow : MonoBehaviour
     public void EndDeleteAccount()
     {
         CloseOptions();
-        m_user.Clear();
+        m_profile.SetMenuBarProfileDetails();
+        m_appDirector.RefreshCurrentState();
     }
 
     // **************************
@@ -165,6 +167,7 @@ public class OptionsFlow : MonoBehaviour
         {
             CloseOptions();
             m_profile.SetMenuBarProfileDetails();
+            m_appDirector.RefreshCurrentState();
         }
     }   
 

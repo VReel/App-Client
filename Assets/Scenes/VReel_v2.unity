@@ -929,6 +929,7 @@ MonoBehaviour:
   m_menuController: {fileID: 2000}
   m_listComments: {fileID: 1596}
   m_loadingIcon: {fileID: 2248}
+  m_keyboard: {fileID: 2174}
   m_handleObject: {fileID: 196230557}
   m_captionObject: {fileID: 1239925253}
   m_likeCountObject: {fileID: 4296008}
@@ -3560,7 +3561,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: 15673199f93594d4f853c0f9f4f639ff, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5d6f35122f6cc437889addfbf5c84b81, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -7048,6 +7049,16 @@ Prefab:
       propertyPath: m_buttonColourUp.b
       value: 0.36078432
       objectReference: {fileID: 0}
+    - target: {fileID: 65574708362293304, guid: 8dae737faada54a00ad7520389a304a1,
+        type: 2}
+      propertyPath: m_Size.y
+      value: 450
+      objectReference: {fileID: 0}
+    - target: {fileID: 65574708362293304, guid: 8dae737faada54a00ad7520389a304a1,
+        type: 2}
+      propertyPath: m_Center.y
+      value: -55
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8dae737faada54a00ad7520389a304a1, type: 2}
   m_IsPrefabParent: 0
@@ -8023,7 +8034,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0.9999999}
-  m_SizeDelta: {x: 0.58, y: 0.14}
+  m_SizeDelta: {x: 0.58, y: 0.18}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!65 &341238621
 BoxCollider:
@@ -8056,7 +8067,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: 15faaa4dbd9df4a289afb7ca2a28039a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1453c0a6997f14c82aaa5dd00f14210e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -8881,7 +8892,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -0.02, y: 1.5899999}
-  m_SizeDelta: {x: 0.58, y: 0.14}
+  m_SizeDelta: {x: 0.58, y: 0.18}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &438726624
 MonoBehaviour:
@@ -8958,7 +8969,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: 15faaa4dbd9df4a289afb7ca2a28039a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1453c0a6997f14c82aaa5dd00f14210e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -12013,7 +12024,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_buttonImage: {fileID: 714034375}
   m_buttonText: {fileID: 0}
-  m_buttonColourUp: {r: 1, g: 1, b: 1, a: 1}
+  m_buttonColourUp: {r: 0.48235297, g: 0.48235297, b: 0.48235297, a: 1}
   m_buttonColourOver: {r: 0.7254902, g: 0.7254902, b: 0.7254902, a: 1}
   m_buttonColourDown: {r: 0.85882354, g: 0.85882354, b: 0.85882354, a: 1}
   m_InteractiveItem: {fileID: 714034377}
@@ -14420,6 +14431,16 @@ Prefab:
       propertyPath: m_loginFlow
       value: 
       objectReference: {fileID: 2239}
+    - target: {fileID: 114473982667759278, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_keyboard
+      value: 
+      objectReference: {fileID: 2174}
+    - target: {fileID: 114000011095986410, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_keyboard
+      value: 
+      objectReference: {fileID: 2174}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5d68de0858483422a933ef12ea7ca889, type: 2}
   m_IsPrefabParent: 0
@@ -26656,7 +26677,7 @@ MonoBehaviour:
   m_buttonColourUp: {r: 1, g: 1, b: 1, a: 1}
   m_buttonColourOver: {r: 0.7254902, g: 0.7254902, b: 0.7254902, a: 1}
   m_buttonColourDown: {r: 0.85882354, g: 0.85882354, b: 0.85882354, a: 1}
-  m_InteractiveItem: {fileID: 0}
+  m_InteractiveItem: {fileID: 1844022658}
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
@@ -26711,7 +26732,7 @@ MonoBehaviour:
   m_buttonColourUp: {r: 1, g: 1, b: 1, a: 1}
   m_buttonColourOver: {r: 0.7254902, g: 0.7254902, b: 0.7254902, a: 1}
   m_buttonColourDown: {r: 0.85882354, g: 0.85882354, b: 0.85882354, a: 1}
-  m_InteractiveItem: {fileID: 0}
+  m_InteractiveItem: {fileID: 1844022660}
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
@@ -29192,7 +29213,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: 6d863159166254947af06b57a836d420, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 720b16c98efac4e0fbc2db01fed168b9, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -29303,7 +29324,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_buttonImage: {fileID: 2030770259}
   m_buttonText: {fileID: 0}
-  m_buttonColourUp: {r: 1, g: 1, b: 1, a: 1}
+  m_buttonColourUp: {r: 0.48235297, g: 0.48235297, b: 0.48235297, a: 1}
   m_buttonColourOver: {r: 0.7254902, g: 0.7254902, b: 0.7254902, a: 1}
   m_buttonColourDown: {r: 0.85882354, g: 0.85882354, b: 0.85882354, a: 1}
   m_InteractiveItem: {fileID: 2030770262}

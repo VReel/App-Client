@@ -424,7 +424,7 @@ public class ImageSphere : MonoBehaviour
 
         // Travel to user and partially scale
         const float kPercentageRotationDuration = 0.3f;
-        const float kSecondsToGetToUser = 3.0f;
+        const float kSecondsToGetToUser = 2.0f;
         float progress = 0;
         while (progress <= 1)
         {

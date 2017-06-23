@@ -13,6 +13,7 @@ public class ListComments : MonoBehaviour
     [SerializeField] private User m_user;
     [SerializeField] private Posts m_posts;
     [SerializeField] private LoadingIcon m_loadingIcon;
+    [SerializeField] private KeyBoard m_keyboard;
     [SerializeField] private GameObject m_commentCountInList;
     [SerializeField] private GameObject m_commentCountInSummary;
     [SerializeField] private GameObject[] m_displayItems;
@@ -142,11 +143,13 @@ public class ListComments : MonoBehaviour
 
     public void ConfirmUpdateComment()
     {     
+        m_keyboard.AcceptText();
         m_coroutineQueue.EnqueueAction(ConfirmUpdateCommentInternal());
     }        
 
     public void ConfirmAddComment()
     {
+        m_keyboard.AcceptText();
         m_coroutineQueue.EnqueueAction(ConfirmAddCommentInternal());
     }
         

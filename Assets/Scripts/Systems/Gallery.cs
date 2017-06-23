@@ -24,6 +24,7 @@ public class Gallery : MonoBehaviour
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private LoadingIcon m_loadingIcon;
+    [SerializeField] private KeyBoard m_keyboard;
     [SerializeField] private GameObject m_uploadButton;
     [SerializeField] private GameObject m_noGalleryImagesText;
     [SerializeField] private GameObject m_captionNewText;
@@ -120,11 +121,13 @@ public class Gallery : MonoBehaviour
         
     public void UploadImage()
     {     
+        m_keyboard.AcceptText();
         m_coroutineQueue.EnqueueAction(UploadImageInternal(m_imageSkybox.GetImageIdentifier()));
     }
 
     public void UploadProfileImage()
     {        
+        m_keyboard.AcceptText();
         m_coroutineQueue.EnqueueAction(UploadImageInternal(m_imageSkybox.GetImageIdentifier(), true));
     }
 
@@ -201,18 +204,28 @@ public class Gallery : MonoBehaviour
         // 2) Create Thumbnail from Original image
         string originalImageFilePath = filePath;
         string tempThumbnailPath = m_imagesTopLevelDirectory + "/tempThumbnailImage.png";
+        string tempOriginalPath = m_imagesTopLevelDirectory + "/tempOriginalImage.png";
         bool successfullyCreatedThumbnail = false;
+        bool successfullyCreatedMaxResolutionImage = false;
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
             bool isDebugBuild = Debug.isDebugBuild;
+
             m_threadJob.Start( () => 
-                successfullyCreatedThumbnail = CreateThumbnail(originalImageFilePath, tempThumbnailPath, isDebugBuild)
+                successfullyCreatedThumbnail = 
+                    CreateSmallerImageWithResolution(originalImageFilePath, tempThumbnailPath, Helper.kStandardThumbnailWidth, isDebugBuild)
             );
-            yield return m_threadJob.WaitFor();       
+            yield return m_threadJob.WaitFor();    
+
+            m_threadJob.Start( () => 
+                successfullyCreatedMaxResolutionImage = 
+                    CreateSmallerImageWithResolution(originalImageFilePath, tempOriginalPath, Helper.kMaxImageWidth, isDebugBuild)
+            );
+            yield return m_threadJob.WaitFor(); 
         }
 
         // 3) Upload Original
-        if (m_backEndAPI.IsLastAPICallSuccessful() && successfullyCreatedThumbnail)
+        if (m_backEndAPI.IsLastAPICallSuccessful() && successfullyCreatedThumbnail && successfullyCreatedMaxResolutionImage)
         {
             yield return m_backEndAPI.UploadObject(
                 m_backEndAPI.GetS3PresignedURLResult().data.attributes.original.url.ToString(),
@@ -221,7 +234,7 @@ public class Gallery : MonoBehaviour
         }
 
         // 4) Upload Thumbnail
-        if (m_backEndAPI.IsLastAPICallSuccessful() && successfullyCreatedThumbnail)
+        if (m_backEndAPI.IsLastAPICallSuccessful() && successfullyCreatedThumbnail && successfullyCreatedMaxResolutionImage)
         {
             yield return m_backEndAPI.UploadObject(
                 m_backEndAPI.GetS3PresignedURLResult().data.attributes.thumbnail.url.ToString(),
@@ -230,7 +243,7 @@ public class Gallery : MonoBehaviour
         }
 
         // 5) Register Post as Created
-        if (m_backEndAPI.IsLastAPICallSuccessful() && successfullyCreatedThumbnail)
+        if (m_backEndAPI.IsLastAPICallSuccessful() && successfullyCreatedThumbnail && successfullyCreatedMaxResolutionImage)
         {            
             string captionText = m_captionNewText.GetComponentInChildren<Text>().text;
             Helper.TruncateString(ref captionText, Helper.kMaxCaptionOrDescriptionLength);
@@ -257,6 +270,12 @@ public class Gallery : MonoBehaviour
         {
             File.Delete(tempThumbnailPath);
         }
+
+        if (successfullyCreatedMaxResolutionImage)
+        {
+            File.Delete(tempOriginalPath);
+        }
+
         yield return null;
 
         // 7) If there has been a successful upload -> Inform user that image has been uploaded      
@@ -264,10 +283,6 @@ public class Gallery : MonoBehaviour
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
             //TODO: SHOW A SUCCESS MESSAGE!
-        }
-        else
-        {   
-            //TODO: SHOW A FAILURE MESSAGE! - I Think this will happen naturally...
         }
 
         m_uploadConfirmation.SetActive(false);
@@ -342,7 +357,9 @@ public class Gallery : MonoBehaviour
         {
             if (isDebugBuild) Debug.Log("------- VREEL: Call to GetFiles() failed for: " + baseDirectory);
 
-            // TODO: REPORT FAILURE IN GALLERY
+            var errorText = m_user.GetErrorMessage().GetComponentInChildren<Text>();
+            errorText.text = "We've run into an error looking for your 360-images, check you've given us the correct permissions and try again! =)";
+            m_user.GetErrorMessage().SetActive(true);
         }
 
         try
@@ -360,7 +377,9 @@ public class Gallery : MonoBehaviour
         {
             if (isDebugBuild) Debug.Log("------- VREEL: Call to GetDirectories() failed for: " + baseDirectory);
 
-            // TODO: REPORT FAILURE IN GALLERY
+            var errorText = m_user.GetErrorMessage().GetComponentInChildren<Text>();
+            errorText.text = "We've run into an error looking for your 360-images, check you've given us the correct permissions and try again! =)";
+            m_user.GetErrorMessage().SetActive(true);
         }
 
         return files;
@@ -469,40 +488,27 @@ public class Gallery : MonoBehaviour
     {   
         m_imageLoader.LoadImageFromPathIntoImageSphere(m_imageSphereController, sphereIndex, filePath, showLoading);
         yield break;
-    }
+    }        
 
-    /*
-    private IEnumerator LoadImageInternalUnity(string filePath, int sphereIndex)
+    private bool CreateSmallerImageWithResolution(string originalImagePath, string newImagePath, int newResolutionWidth, bool debugOn)
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadPicturesInternalUnity() from filePath: " + filePath);
-
-        WWW www = new WWW("file://" + filePath);
-        yield return www;
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageIntoTexture()");
-        Texture2D myNewTexture2D = new Texture2D(2,2);
-        www.LoadImageIntoTexture(myNewTexture2D);
-        yield return null;
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadImageIntoTexture()");
-
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAndFilePath()");
-        m_imageSphereController.SetImageAtIndex(sphereIndex, myNewTexture2D, filePath, -1, true);
-        yield return null;
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAndFilePath()");
-
-        Resources.UnloadUnusedAssets();
-    }
-    */
-
-    private bool CreateThumbnail(string originalImagePath, string thumbnailImagePath, bool debugOn)
-    {
-        if (debugOn) Debug.Log("------- VREEL: Called CreateThumbnail() with Thumbnail Path: " + thumbnailImagePath);
+        if (debugOn) Debug.Log("------- VREEL: Called CreateSmallerImageWithResolution() with new Image Path: " + newImagePath);
         AndroidJNI.AttachCurrentThread();
 
-        bool success = m_javaPluginClass.CallStatic<bool>("CreateThumbnail", originalImagePath, thumbnailImagePath, Helper.kStandardThumbnailWidth);
+        bool success = false;
+
+        float currentWidth = m_javaPluginClass.CallStatic<float>("CalcWidth", originalImagePath);
+        if (currentWidth > newResolutionWidth)
+        {
+            success = m_javaPluginClass.CallStatic<bool>("CreateSmallerImageWithResolution", originalImagePath, newImagePath, newResolutionWidth);
+        }
+        else
+        {
+            File.Copy(originalImagePath, newImagePath);
+        }
 
         AndroidJNI.DetachCurrentThread();
-        if (debugOn) Debug.Log("------- VREEL: Call CreateThumbnail() returned with: " + success);
+        if (debugOn) Debug.Log("------- VREEL: Call CreateSmallerImageWithResolution() returned with: " + success);
 
         return success;
     }        
