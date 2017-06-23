@@ -14436,6 +14436,11 @@ Prefab:
       propertyPath: m_keyboard
       value: 
       objectReference: {fileID: 2174}
+    - target: {fileID: 114000011095986410, guid: 5d68de0858483422a933ef12ea7ca889,
+        type: 2}
+      propertyPath: m_keyboard
+      value: 
+      objectReference: {fileID: 2174}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5d68de0858483422a933ef12ea7ca889, type: 2}
   m_IsPrefabParent: 0
@@ -26672,7 +26677,7 @@ MonoBehaviour:
   m_buttonColourUp: {r: 1, g: 1, b: 1, a: 1}
   m_buttonColourOver: {r: 0.7254902, g: 0.7254902, b: 0.7254902, a: 1}
   m_buttonColourDown: {r: 0.85882354, g: 0.85882354, b: 0.85882354, a: 1}
-  m_InteractiveItem: {fileID: 0}
+  m_InteractiveItem: {fileID: 1844022658}
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:
@@ -26727,7 +26732,7 @@ MonoBehaviour:
   m_buttonColourUp: {r: 1, g: 1, b: 1, a: 1}
   m_buttonColourOver: {r: 0.7254902, g: 0.7254902, b: 0.7254902, a: 1}
   m_buttonColourDown: {r: 0.85882354, g: 0.85882354, b: 0.85882354, a: 1}
-  m_InteractiveItem: {fileID: 0}
+  m_InteractiveItem: {fileID: 1844022660}
   OnButtonSelectedFunc:
     m_PersistentCalls:
       m_Calls:

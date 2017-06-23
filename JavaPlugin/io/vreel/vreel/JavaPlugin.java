@@ -50,6 +50,16 @@ public class JavaPlugin extends UnityPlayerActivity
     	return path;
     }
     
+    public static float CalcWidth(String path)
+    {   
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		BitmapFactory.decodeFile(new File(path).getAbsolutePath(), options);
+		int imageWidth = options.outWidth;		
+
+        return imageWidth;
+    }
+    
     public static float CalcAspectRatio(String path)
     {   
 		BitmapFactory.Options options = new BitmapFactory.Options();
@@ -61,15 +71,15 @@ public class JavaPlugin extends UnityPlayerActivity
         return imageWidth/ (float) imageHeight; // casting to float in order to ensure float output
     }
     
-    public static boolean CreateThumbnail(String originalPath, String thumbnailPath, int thumbnailWidth)
+    public static boolean CreateSmallerImageWithResolution(String originalPath, String newImagePath, int newWidth)
     {
     	Bitmap thumbnailBitmap = 
-    			ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(originalPath), thumbnailWidth, thumbnailWidth/2);
+    			ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(originalPath), newWidth, newWidth/2);
 
     	FileOutputStream out = null;
     	try 
     	{
-    		out = new FileOutputStream(thumbnailPath);
+    		out = new FileOutputStream(newImagePath);
     		thumbnailBitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
     	    // PNG is a lossless format, the compression factor (100) is ignored
     	} 
