@@ -89,17 +89,6 @@ public class AppDirector : MonoBehaviour
         }
     }
        
-    /*
-    public void RequestLoginState()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestLoginState() called");
-        if (m_appState != AppState.kLogin)
-        {
-            SetLoginState();
-        }
-    }
-    */
-
     public void RequestExploreState()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestExploreState() called");
@@ -146,6 +135,44 @@ public class AppDirector : MonoBehaviour
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: RequestGalleryState() called");
         if (m_appState != AppState.kGallery)
+        {
+            SetGalleryState();
+        }
+    }
+
+    public void RefreshCurrentState()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: RefreshCurrentState() called");
+
+        if (m_appState == AppDirector.AppState.kExplore)
+        {
+            SetExploreState();
+        }
+        else if (m_appState == AppDirector.AppState.kFollowing)
+        {
+            if (!m_user.IsLoggedIn())
+            {
+                SetExploreState();
+                return;
+            }
+
+            SetFollowingState();
+        }
+        else if (m_appState == AppDirector.AppState.kProfile)
+        {
+            if (!m_user.IsLoggedIn())
+            {
+                SetExploreState();
+                return;
+            }
+
+            SetProfileState();
+        }
+        else if (m_appState == AppDirector.AppState.kSearch)
+        {
+            SetSearchState();
+        }
+        else if (m_appState == AppDirector.AppState.kGallery)
         {
             SetGalleryState();
         }

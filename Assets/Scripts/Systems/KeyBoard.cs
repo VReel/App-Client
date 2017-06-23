@@ -143,10 +143,7 @@ public class KeyBoard : MonoBehaviour
     public void SelectTextInput(Text clickedTextObject)
 	{
         // If keyboard active because of a previous SelectTextInput() call, then AcceptText() on currently active InputForm
-        if (m_mainCanvas.activeInHierarchy)
-        {
-            AcceptText();
-        }
+        AcceptText();
             
         m_objectiveTextObject = clickedTextObject;
         m_previousText = clickedTextObject.text;
@@ -176,6 +173,11 @@ public class KeyBoard : MonoBehaviour
 
 	public void AcceptText()
 	{
+        if (!m_shouldBeShowing)
+        {
+            return;
+        }
+        
         if (m_actualText.Length > 0)
         {
             var passwordText = m_objectiveTextObject.GetComponent<PasswordText>();

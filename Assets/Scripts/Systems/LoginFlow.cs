@@ -92,16 +92,19 @@ public class LoginFlow : MonoBehaviour
 
     public void Login() 
     {
+        m_keyboard.AcceptText();
         m_coroutineQueue.EnqueueAction(LoginInternal());
     }
 
     public void SignUp()
     {
+        m_keyboard.AcceptText();
         m_coroutineQueue.EnqueueAction(SignUpInternal());
     } 
 
     public void ResetPassword()
     {
+        m_keyboard.AcceptText();
         m_coroutineQueue.EnqueueAction(ResetPasswordInternal());
     } 
 
@@ -148,6 +151,7 @@ public class LoginFlow : MonoBehaviour
         {
             CloseLogin();
             m_profile.SetMenuBarProfileDetails();
+            m_appDirector.RefreshCurrentState();
         }
     }
 
@@ -173,6 +177,7 @@ public class LoginFlow : MonoBehaviour
         {
             CloseLogin();
             m_profile.SetMenuBarProfileDetails();
+            m_appDirector.RefreshCurrentState();
         }
     } 
 

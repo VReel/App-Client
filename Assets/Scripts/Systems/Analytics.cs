@@ -303,7 +303,7 @@ public class Analytics : MonoBehaviour
         {
             properties["AppState"] = "Search";
         }
-        else if (m_appDirector.GetState() == AppDirector.AppState.kGallery)
+        else if (m_appDirector.GetState() == AppDirector.AppState.kProfile)
         {
             properties["AppState"] = "Profile";
         }

@@ -421,7 +421,7 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            // Empty
+            m_user.Clear();
         }
         else // Error Handling
         {            
@@ -551,7 +551,7 @@ public class BackEndAPI
         m_lastStatusCode = response.StatusCode;
         if (IsSuccessCode(m_lastStatusCode))
         {
-            // Empty
+            m_user.Clear();
         }
         else // Error Handling
         {            

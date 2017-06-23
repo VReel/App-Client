@@ -17,6 +17,7 @@ public class ImageFlow : MonoBehaviour
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private ListComments m_listComments;
     [SerializeField] private LoadingIcon m_loadingIcon;
+    [SerializeField] private KeyBoard m_keyboard;
     [SerializeField] private GameObject m_handleObject;
     [SerializeField] private GameObject m_captionObject;
     [SerializeField] private GameObject m_likeCountObject;
@@ -199,6 +200,7 @@ public class ImageFlow : MonoBehaviour
 
     public void OptionsSelected()
     {        
+        m_keyboard.AcceptText();
         if (!m_user.IsLoggedIn())
         {
             Close();
