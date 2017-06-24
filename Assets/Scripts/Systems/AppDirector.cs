@@ -200,29 +200,6 @@ public class AppDirector : MonoBehaviour
     // Private/Helper functions
     // **************************
 
-    /*
-    private void SetLoginState()
-    {        
-        Resources.UnloadUnusedAssets();
-        m_imageSphereController.ForceHideAllImageSpheres();
-        m_keyboard.CancelText();
-
-        m_imageLoader.InvalidateLoading();
-        m_posts.InvalidateWork();
-        m_gallery.InvalidateWork();
-        m_profile.InvalidateWork();
-        m_search.InvalidateWork();
-        m_loginFlow.SetLoginFlowPage(0);
-
-        m_appState = AppState.kLogin;
-
-        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
-        menuConfig.menuBarVisible = false;
-        menuConfig.subMenuVisible = true;
-        m_menuController.UpdateMenuConfig(this);
-    }
-    */
-
     private void SetExploreState()
     {
         Resources.UnloadUnusedAssets();

@@ -1800,7 +1800,7 @@ public class BackEndAPI
         {
             if (parameter.Name == "Access-Token")
             {
-                m_user.SetAcceessToken(parameter.Value.ToString());
+                m_user.SetAccessToken(parameter.Value.ToString());
             }               
         }
     }

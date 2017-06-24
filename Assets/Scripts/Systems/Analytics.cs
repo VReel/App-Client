@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
-using System.Collections;               // IEnumerator
-using mixpanel;                         // Mixpanel
+using System;                                           //Serializable
+using System.Runtime.Serialization.Formatters.Binary;   //BinaryFormatter
+using System.IO;                                        //Filestream, File
+using System.Collections;                               //IEnumerator
+using mixpanel;                                         //Mixpanel
 
 public class Analytics : MonoBehaviour 
 {
@@ -12,8 +15,22 @@ public class Analytics : MonoBehaviour
     [SerializeField] private User m_user;
     [SerializeField] private ImageSkybox m_imageSphereSkybox;
 
+    [Serializable]
+    public class AnalyticsData
+    {
+        public string m_uid {get; set;}
+    }
+
+    const string m_vreelDevelopmentAnalyticsFile = "vreelDevelopmentAnalytics.dat";
+    const string m_vreelStagingAnalyticsFile = "vreelStagingAnalytics.dat";
+    const string m_vreelProductionAnalyticsFile = "vreelProductionAnalytics.dat";
+    private string m_vreelAnalyticsFile = "";
+
+    private string m_analyticsFilePath;
+    private AnalyticsData m_analyticsData;
+
     private CoroutineQueue m_coroutineQueue;
-    private string kEmptyString = "";
+    private ThreadJob m_threadJob;
 
     // **************************
     // Public functions
@@ -21,6 +38,15 @@ public class Analytics : MonoBehaviour
 
     public void Start()
     {       
+        // Version dependent code
+        m_vreelAnalyticsFile = GetSaveFile();
+        m_analyticsFilePath = Application.persistentDataPath + m_vreelAnalyticsFile;
+
+        m_analyticsData = new AnalyticsData();
+        m_analyticsData.m_uid = "";
+
+        m_threadJob = new ThreadJob(this);
+
         m_coroutineQueue = new CoroutineQueue( this );
         m_coroutineQueue.StartLoop();
 
@@ -205,90 +231,140 @@ public class Analytics : MonoBehaviour
         Mixpanel.Track("Deleted Post");
     }
 
+    public void AccountDeleted()
+    {
+        m_coroutineQueue.Clear();
+        m_coroutineQueue.EnqueueAction(AccountDeletedInternal());
+    }
+
     // **************************
     // Private/Helper functions
     // **************************
 
+    private string GetSaveFile()
+    {
+        if (m_user.GetBackEndEnvironment() == User.BackEndEnvironment.kProduction)
+        {
+            return m_vreelProductionAnalyticsFile;
+        }
+        else if (m_user.GetBackEndEnvironment() == User.BackEndEnvironment.kStaging)
+        {
+            return m_vreelStagingAnalyticsFile;
+        }
+        else
+        {
+            return m_vreelDevelopmentAnalyticsFile;
+        }
+    }
+        
     private IEnumerator IdentifyInternal()
     {
-        while (!m_user.IsUserDataStored())
+        if (File.Exists(m_analyticsFilePath))
         {
-            yield return null;
-        }
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+            using (FileStream fileStream = File.Open(m_analyticsFilePath, FileMode.Open))
+            {
+                m_analyticsData = (AnalyticsData) binaryFormatter.Deserialize(fileStream);
+            }
 
-        Mixpanel.Identify(m_user.m_id);
+            Mixpanel.Identify(m_analyticsData.m_uid);
+        }
 
         Mixpanel.Track("Opened App");
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.IdentifyInternal() Identify: " + m_user.m_id);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.IdentifyInternal() Identify: " + m_analyticsData.m_uid);
+
+        yield break;
+    }
+
+    private IEnumerator SetUID(string uid)
+    {
+        m_analyticsData.m_uid = uid;       
+        yield return SaveAnalyticsData();
+    }
+
+    private IEnumerator SaveAnalyticsData()
+    {
+        yield return m_threadJob.WaitFor();
+        bool result = false;
+        m_threadJob.Start( () => 
+            result = SaveAnalyticsDataToFile()
+        );
+        yield return m_threadJob.WaitFor(); 
+    }
+
+    private bool SaveAnalyticsDataToFile()
+    {
+        BinaryFormatter binaryFormatter = new BinaryFormatter();
+        using (FileStream fileStream = File.Create(m_analyticsFilePath)) // We call Create() to ensure we always overwrite the file
+        {
+            binaryFormatter.Serialize(fileStream, m_analyticsData);
+        }
+
+        return true;
     }
 
     private IEnumerator LoginSelectedInternal()
     {
-        while (!m_user.IsUserDataStored())
+        while (!m_user.IsLoggedIn())
         {
             yield return null;
         }
 
-        Mixpanel.Identify(m_user.m_id);
+        yield return SetUID(m_user.m_id);
+        Mixpanel.Identify(m_analyticsData.m_uid);
 
         Mixpanel.Track("Logged In");
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.LoginSelectedInternal() Identify: " + m_user.m_id);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.LoginSelectedInternal() Identify: " + m_analyticsData.m_uid);
     }
 
     private IEnumerator LogoutSelectedInternal()
     {
         Mixpanel.Track("Logged Out"); 
 
-        /*
-        Mixpanel.FlushQueue();
+        System.Guid newGUID = System.Guid.NewGuid();
+        yield return SetUID(newGUID.ToString());
+        Mixpanel.Identify(m_analyticsData.m_uid);
 
-        yield return new WaitForSeconds(1);
-        while (m_user.IsUserDataStored())
-        {
-            yield return null;
-        }
-        */
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.LogoutSelected(), and new Anonymous GUID set");
 
-        Mixpanel.Reset();
+        yield break;
+    }
 
-        //Mixpanel.FlushQueue();
+    private IEnumerator AccountDeletedInternal()
+    {
+        Mixpanel.Track("Account Deleted"); 
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.LogoutSelected(), and Mixpanel.Reset() Called ");
+        System.Guid newGUID = System.Guid.NewGuid();
+        yield return SetUID(newGUID.ToString());
+        Mixpanel.Identify(m_analyticsData.m_uid);
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.AccountDeleted(), and new Anonymous GUID set");
 
         yield break;
     }
 
     private IEnumerator SignUpSelectedInternal()
     {
-        while (!m_user.IsUserDataStored())
+        while (!m_user.IsLoggedIn())
         {
             yield return null;
         }
-            
-        Mixpanel.Alias(m_user.m_id);
-        //Mixpanel.Identify(m_user.m_id);
+
+        Mixpanel.Track("New User Signed Up!");
+
+        yield return SetUID(m_user.m_id);
+        Mixpanel.Alias(m_analyticsData.m_uid);
 
         Mixpanel.people.Name = m_user.m_handle;
         Mixpanel.people.Email = m_user.m_email;
 
-        Mixpanel.Track("New User Signed Up!");
+        Mixpanel.Track("Post Alias Mixpanel Error!"); // Mixpanel always errorneously reports the first event after an Alias to be by an Anonymous user...
 
-        //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.SignUpSelectedInternal() CurrentDistinctID AFTER: " + mixpanel.platform.MixpanelUnityPlatform.get_distinct_id());
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.SignUpSelectedInternal() Alias and Identify: " + m_user.m_id);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Analytics.SignUpSelectedInternal() Alias and Identify: " + m_analyticsData.m_uid);
     }      
-
-    /*
-    private void Identify()
-    {
-        if (m_user.m_id != null && m_user.m_id.CompareTo(kEmptyString) != 0)
-        {
-            Mixpanel.Identify(m_user.m_id);
-        }
-    }
-    */
-
+    
     private void SetAppState(Value properties)
     {
         if (m_appDirector.GetState() == AppDirector.AppState.kExplore)

@@ -2,7 +2,7 @@
 using System;                                           //Serializable
 using System.Runtime.Serialization.Formatters.Binary;   //BinaryFormatter
 using System.IO;                                        //Filestream, File
-using System.Collections;                               // IEnumerator
+using System.Collections;                               //IEnumerator
 
 // This class holds a blackboard of user variables that are updated depending on the user logged in
 public class User : MonoBehaviour
@@ -88,12 +88,7 @@ public class User : MonoBehaviour
 
     public bool IsLoggedIn()
     {
-        return (m_loginData.m_client.Length > 0 && m_loginData.m_uid.Length > 0);
-    }
-
-    public bool IsUserDataStored()
-    {
-        return (m_id.Length > 0);
+        return (m_loginData.m_client.Length > 0 && m_loginData.m_uid.Length > 0 && m_id.Length > 0);
     }
 
     public bool IsCurrentUser(string userId)
@@ -149,9 +144,9 @@ public class User : MonoBehaviour
         return m_loginData.m_accessToken;
     }
 
-    public void SetAcceessToken(string acceessToken)
+    public void SetAccessToken(string accessToken)
     {
-        m_loginData.m_accessToken = acceessToken;
+        m_loginData.m_accessToken = accessToken;
         m_coroutineQueue.EnqueueAction(SaveLoginData());
     }
 

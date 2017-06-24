@@ -19,13 +19,13 @@ public class OptionsFlow : MonoBehaviour
     [SerializeField] private Text m_newPasswordInput;
     [SerializeField] private Text m_confirmPasswordInput;
     [SerializeField] private GameObject m_setPasswordConfirmedMessage;
-    [SerializeField] private GameObject m_deleteConfirmedMessage;
 
     [SerializeField] private GameObject m_optionsSubMenu;
     [SerializeField] private GameObject m_optionsPage;
     [SerializeField] private GameObject m_setPasswordPage;
-    [SerializeField] private GameObject m_deleteAccountPage;
     [SerializeField] private GameObject m_aboutPage;
+    [SerializeField] private GameObject m_deleteAccountPage;
+    [SerializeField] private GameObject m_deleteConfirmedPage;
 
     private bool m_optionsOpen = false;
     private CoroutineQueue m_coroutineQueue;
@@ -79,29 +79,41 @@ public class OptionsFlow : MonoBehaviour
         {
             m_optionsPage.SetActive(true);
             m_setPasswordPage.SetActive(false);
-            m_deleteAccountPage.SetActive(false);
             m_aboutPage.SetActive(false);
+            m_deleteAccountPage.SetActive(false);
+            m_deleteConfirmedPage.SetActive(false);
         }
         else if (pageNumber == 1) // Set Password
         {
             m_optionsPage.SetActive(false);
             m_setPasswordPage.SetActive(true);
-            m_deleteAccountPage.SetActive(false);
             m_aboutPage.SetActive(false);
+            m_deleteAccountPage.SetActive(false);
+            m_deleteConfirmedPage.SetActive(false);
         }
-        else if (pageNumber == 2) // Delete Account
+        else if (pageNumber == 2) // About Account
         {
             m_optionsPage.SetActive(false);
             m_setPasswordPage.SetActive(false);
-            m_deleteAccountPage.SetActive(true);
-            m_aboutPage.SetActive(false);
-        }
-        else if (pageNumber == 3) // About Account
-        {
-            m_optionsPage.SetActive(false);
-            m_setPasswordPage.SetActive(false);
-            m_deleteAccountPage.SetActive(false);
             m_aboutPage.SetActive(true);
+            m_deleteAccountPage.SetActive(false);
+            m_deleteConfirmedPage.SetActive(false);
+        }
+        else if (pageNumber == 3) // Delete Account
+        {
+            m_optionsPage.SetActive(false);
+            m_setPasswordPage.SetActive(false);
+            m_aboutPage.SetActive(false);
+            m_deleteAccountPage.SetActive(true);
+            m_deleteConfirmedPage.SetActive(false);
+        }
+        else if (pageNumber == 4) // Delete Confirmed Account
+        {
+            m_optionsPage.SetActive(false);
+            m_setPasswordPage.SetActive(false);
+            m_aboutPage.SetActive(false);
+            m_deleteAccountPage.SetActive(false);
+            m_deleteConfirmedPage.SetActive(true);
         }
     }
 
@@ -126,6 +138,12 @@ public class OptionsFlow : MonoBehaviour
         CloseOptions();
         m_profile.SetMenuBarProfileDetails();
         m_appDirector.RefreshCurrentState();
+    }
+
+    public void PasswordPageBackButton()
+    {
+        SetOptionsFlowPage(0);
+        m_setPasswordConfirmedMessage.SetActive(false);
     }
 
     // **************************
@@ -205,7 +223,7 @@ public class OptionsFlow : MonoBehaviour
 
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
-            m_deleteConfirmedMessage.SetActive(true);
+            SetOptionsFlowPage(4);
         }
 
         m_loadingIcon.Hide();
