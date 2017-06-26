@@ -81,7 +81,7 @@ public class ListComments : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: DisplayCommentResults() called for post ID: " + postId);
 
         m_currImageSphere = imageSphere;
-        string commentCountText = (m_currImageSphere.GetCommentCount() + 1).ToString() + (m_currImageSphere.GetCommentCount() == 1 ? " comment" : " comments");
+        string commentCountText = m_currImageSphere.GetCommentCount().ToString() + (m_currImageSphere.GetCommentCount() == 1 ? " comment" : " comments");
         m_commentCountInList.GetComponentInChildren<Text>().text = commentCountText;
         m_commentCountInSummary.GetComponentInChildren<Text>().text = commentCountText;
         m_coroutineQueue.EnqueueAction(StoreAndDisplayCommentResultsInternal(postId));
@@ -328,7 +328,7 @@ public class ListComments : MonoBehaviour
             DisplayCommentResultsOnItems();
 
             m_currImageSphere.AddToCommentCount(1);
-            string commentCountText = (m_currImageSphere.GetCommentCount() + 1).ToString() + (m_currImageSphere.GetCommentCount() == 1 ? " comment" : " comments");
+            string commentCountText = m_currImageSphere.GetCommentCount().ToString() + (m_currImageSphere.GetCommentCount() == 1 ? " comment" : " comments");
             m_commentCountInList.GetComponentInChildren<Text>().text = commentCountText;
             m_commentCountInSummary.GetComponentInChildren<Text>().text = commentCountText;
         }
@@ -348,7 +348,7 @@ public class ListComments : MonoBehaviour
             DisplayCommentResultsOnItems();
 
             m_currImageSphere.AddToCommentCount(-1);
-            string commentCountText = (m_currImageSphere.GetCommentCount() + 1).ToString() + (m_currImageSphere.GetCommentCount() == 1 ? " comment" : " comments");
+            string commentCountText = m_currImageSphere.GetCommentCount().ToString() + (m_currImageSphere.GetCommentCount() == 1 ? " comment" : " comments");
             m_commentCountInList.GetComponentInChildren<Text>().text = commentCountText;
             m_commentCountInSummary.GetComponentInChildren<Text>().text = commentCountText;
         }

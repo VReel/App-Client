@@ -11,7 +11,6 @@ public class ImageSkybox : MonoBehaviour
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private Posts m_posts;
     [SerializeField] private Profile m_profile;
-    [SerializeField] private GameObject m_uploadButton;
 
     private Material m_myMaterial;
     private int m_currTextureIndex = -1; // ImageSkybox must track the index of the underlying texture it points to in C++ plugin
@@ -58,7 +57,6 @@ public class ImageSkybox : MonoBehaviour
     {        
         if (imageIdentifier.Length <= 0)
         {
-            m_uploadButton.SetActive(false);
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: ERROR - attempting to set skybox to an empty filepath!");
             return;
         }
@@ -72,13 +70,14 @@ public class ImageSkybox : MonoBehaviour
         m_currTextureIndex = textureIndex;
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, true);
 
+        /*
         bool isGalleryState = m_appDirector.GetState() == AppDirector.AppState.kGallery;
         bool isProfileImage = m_profile.IsUser(imageIdentifier); // Identifier is of the User for Profile Pictures
         bool isImageFromDevice = m_imageIdentifier.StartsWith(m_imageSphereController.GetTopLevelDirectory());
-        m_uploadButton.SetActive(isImageFromDevice && isGalleryState && !isProfileImage);  // TODO: Move the UploadButton's activation over to Gallery
+        */
 
         m_myMaterial.mainTexture = m_skyboxTexture;
-        m_myMaterial.SetFloat("_FlipY", 1.0f);
+        m_myMaterial.SetFloat("_FlipY", 1.0f); // This is only ever set to 0 on the default background image - should be 1 every time after...
 
         // TODO: have the skybox be used instead of just a sphere around the user?
         // RenderSettings.skybox = texture; 

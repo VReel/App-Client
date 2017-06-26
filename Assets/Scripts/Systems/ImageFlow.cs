@@ -12,6 +12,7 @@ public class ImageFlow : MonoBehaviour
     [SerializeField] private User m_user;
     [SerializeField] private Posts m_posts;
     [SerializeField] private Profile m_profile;
+    [SerializeField] private Search m_search;
     [SerializeField] private LoginFlow m_loginFlow;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private MenuController m_menuController;
@@ -34,6 +35,9 @@ public class ImageFlow : MonoBehaviour
     [SerializeField] private GameObject m_imageOptionsOthersPage;
     [SerializeField] private GameObject m_deleteImagePage;
     [SerializeField] private GameObject m_reportImagePage;
+    [SerializeField] private GameObject m_profileImagePage;
+    [SerializeField] private GameObject m_galleryImagePage;
+    [SerializeField] private GameObject m_galleryCreatePostPage;
 
     private ImageSphere m_currImageSphere;
     private CoroutineQueue m_coroutineQueue;
@@ -63,10 +67,21 @@ public class ImageFlow : MonoBehaviour
     {
         m_currImageSphere = imageSphere;
 
-        SetImageFlowPage(0);
-        SetImageSummary();
+        if (imageSphere.IsSmallImageSphere())
+        {
+            SetImageFlowPage(9);
+        }
+        else if (m_appDirector.GetState() == AppDirector.AppState.kGallery)
+        {
+            SetImageFlowPage(10);
+        }
+        else
+        {
+            SetImageFlowPage(0);
+            SetImageSummary();
 
-        m_listComments.DisplayCommentResults( m_currImageSphere.GetImageIdentifier(), m_currImageSphere );
+            m_listComments.DisplayCommentResults(m_currImageSphere.GetImageIdentifier(), m_currImageSphere);
+        }
 
         m_menuController.UpdateMenuConfig(this);
         m_appDirector.SetOverlayShowing(true);
@@ -78,6 +93,11 @@ public class ImageFlow : MonoBehaviour
 
         m_menuController.UpdateMenuConfig(m_appDirector);
         m_appDirector.SetOverlayShowing(false);
+
+        if (m_appDirector.GetState() == AppDirector.AppState.kSearch)
+        {
+            m_menuController.UpdateMenuConfig(m_search);
+        }
     }
 
     public void SetImageFlowPage(int pageNumber)
@@ -99,6 +119,9 @@ public class ImageFlow : MonoBehaviour
             m_imageOptionsOthersPage.SetActive(false);
             m_deleteImagePage.SetActive(false);
             m_reportImagePage.SetActive(false);
+            m_profileImagePage.SetActive(false);
+            m_galleryImagePage.SetActive(false);
+            m_galleryCreatePostPage.SetActive(false);
         }
         else if (pageNumber == 1) // Comments
         {
@@ -111,6 +134,9 @@ public class ImageFlow : MonoBehaviour
             m_imageOptionsOthersPage.SetActive(false);
             m_deleteImagePage.SetActive(false);
             m_reportImagePage.SetActive(false);
+            m_profileImagePage.SetActive(false);
+            m_galleryImagePage.SetActive(false);
+            m_galleryCreatePostPage.SetActive(false);
         }
         else if (pageNumber == 2) // Edit Caption
         {
@@ -123,6 +149,9 @@ public class ImageFlow : MonoBehaviour
             m_imageOptionsOthersPage.SetActive(false);
             m_deleteImagePage.SetActive(false);
             m_reportImagePage.SetActive(false);
+            m_profileImagePage.SetActive(false);
+            m_galleryImagePage.SetActive(false);
+            m_galleryCreatePostPage.SetActive(false);
         }
         else if (pageNumber == 3) // New Comment
         {
@@ -135,6 +164,9 @@ public class ImageFlow : MonoBehaviour
             m_imageOptionsOthersPage.SetActive(false);
             m_deleteImagePage.SetActive(false);
             m_reportImagePage.SetActive(false);
+            m_profileImagePage.SetActive(false);
+            m_galleryImagePage.SetActive(false);
+            m_galleryCreatePostPage.SetActive(false);
         }
         else if (pageNumber == 4) // New Comment
         {
@@ -147,6 +179,9 @@ public class ImageFlow : MonoBehaviour
             m_imageOptionsOthersPage.SetActive(false);
             m_deleteImagePage.SetActive(false);
             m_reportImagePage.SetActive(false);
+            m_profileImagePage.SetActive(false);
+            m_galleryImagePage.SetActive(false);
+            m_galleryCreatePostPage.SetActive(false);
         }
         else if (pageNumber == 5) // Options for my own Profile
         {
@@ -159,6 +194,9 @@ public class ImageFlow : MonoBehaviour
             m_imageOptionsOthersPage.SetActive(false);
             m_deleteImagePage.SetActive(false);
             m_reportImagePage.SetActive(false);
+            m_profileImagePage.SetActive(false);
+            m_galleryImagePage.SetActive(false);
+            m_galleryCreatePostPage.SetActive(false);
         }
         else if (pageNumber == 6) // Options for others's Profile
         {
@@ -171,6 +209,9 @@ public class ImageFlow : MonoBehaviour
             m_imageOptionsOthersPage.SetActive(true);
             m_deleteImagePage.SetActive(false);
             m_reportImagePage.SetActive(false);
+            m_profileImagePage.SetActive(false);
+            m_galleryImagePage.SetActive(false);
+            m_galleryCreatePostPage.SetActive(false);
         }
         else if (pageNumber == 7) // Delete Image
         {
@@ -183,6 +224,9 @@ public class ImageFlow : MonoBehaviour
             m_imageOptionsOthersPage.SetActive(false);
             m_deleteImagePage.SetActive(true);
             m_reportImagePage.SetActive(false);
+            m_profileImagePage.SetActive(false);
+            m_galleryImagePage.SetActive(false);
+            m_galleryCreatePostPage.SetActive(false);
         }
         else if (pageNumber == 8) // Report Image
         {
@@ -195,6 +239,54 @@ public class ImageFlow : MonoBehaviour
             m_imageOptionsOthersPage.SetActive(false);
             m_deleteImagePage.SetActive(false);
             m_reportImagePage.SetActive(true);
+            m_profileImagePage.SetActive(false);
+            m_galleryImagePage.SetActive(false);
+            m_galleryCreatePostPage.SetActive(false);
+        }
+        else if (pageNumber == 9) // Profile Image
+        {
+            m_imageSummaryPage.SetActive(false);
+            m_commentsPage.SetActive(false);
+            m_editCaptionPage.SetActive(false);
+            m_newCommentPage.SetActive(false);
+            m_updateCommentPage.SetActive(false);
+            m_imageOptionsPersonalPage.SetActive(false);
+            m_imageOptionsOthersPage.SetActive(false);
+            m_deleteImagePage.SetActive(false);
+            m_reportImagePage.SetActive(false);
+            m_profileImagePage.SetActive(true);
+            m_galleryImagePage.SetActive(false);
+            m_galleryCreatePostPage.SetActive(false);
+        }
+        else if (pageNumber == 10) // Gallery Image
+        {
+            m_imageSummaryPage.SetActive(false);
+            m_commentsPage.SetActive(false);
+            m_editCaptionPage.SetActive(false);
+            m_newCommentPage.SetActive(false);
+            m_updateCommentPage.SetActive(false);
+            m_imageOptionsPersonalPage.SetActive(false);
+            m_imageOptionsOthersPage.SetActive(false);
+            m_deleteImagePage.SetActive(false);
+            m_reportImagePage.SetActive(false);
+            m_profileImagePage.SetActive(false);
+            m_galleryImagePage.SetActive(true);
+            m_galleryCreatePostPage.SetActive(false);
+        }
+        else if (pageNumber == 11) // Gallery Create Post
+        {
+            m_imageSummaryPage.SetActive(false);
+            m_commentsPage.SetActive(false);
+            m_editCaptionPage.SetActive(false);
+            m_newCommentPage.SetActive(false);
+            m_updateCommentPage.SetActive(false);
+            m_imageOptionsPersonalPage.SetActive(false);
+            m_imageOptionsOthersPage.SetActive(false);
+            m_deleteImagePage.SetActive(false);
+            m_reportImagePage.SetActive(false);
+            m_profileImagePage.SetActive(false);
+            m_galleryImagePage.SetActive(false);
+            m_galleryCreatePostPage.SetActive(true);
         }
     }
 
@@ -298,6 +390,18 @@ public class ImageFlow : MonoBehaviour
     public void FlagPost(string flagReason)
     {           
         m_coroutineQueue.EnqueueAction(FlagPostInternal(flagReason));
+    }
+
+    public void PreCreatePost()
+    {           
+        if (!m_user.IsLoggedIn())
+        {
+            Close();
+            m_loginFlow.OpenCloseSwitch();
+            return;
+        }
+
+        SetImageFlowPage(11);
     }
 
     // **************************

@@ -25,7 +25,7 @@ public class ImageSphere : MonoBehaviour
     [SerializeField] private GameObject m_handleObject;
     [SerializeField] private GameObject m_heartObject;
     [SerializeField] private GameObject m_likesObject;
-    [SerializeField] private bool m_isSmallImageSphere;
+    [SerializeField] private bool m_isSmallImageSphere; // TODO: renamed to isProfileImageSphere
 
     private const float kMinShrink = 0.0005f; // Minimum value the sphere will shrink to...
     private const int kLoadingTextureIndex = -1;
@@ -64,6 +64,11 @@ public class ImageSphere : MonoBehaviour
     public string GetImageIdentifier()
     {
         return m_imageIdentifier;
+    }
+
+    public bool IsSmallImageSphere()
+    {
+        return m_isSmallImageSphere;
     }
 
     public void SetImage(Texture2D texture, string imageIdentifier, int textureIndex, bool animateOnSet)
@@ -145,7 +150,7 @@ public class ImageSphere : MonoBehaviour
         if (commentCountObject != null)
         {
             commentCountObject.SetActive(m_caption.Length > 0);
-            commentCountObject.GetComponentInChildren<Text>().text = (m_commentCount + 1).ToString() + (m_commentCount == 1 ? " comment" : " comments"); //Adding 1 for Caption itself
+            commentCountObject.GetComponentInChildren<Text>().text = m_commentCount.ToString() + (m_commentCount == 1 ? " comment" : " comments");
         }
 
         if (heartObject != null)
@@ -382,10 +387,7 @@ public class ImageSphere : MonoBehaviour
         bool willChangeImage = (m_imageIdentifier.Length > 0) && (m_imageSphereSkybox.GetImageIdentifier().CompareTo(m_imageIdentifier) != 0) && (m_currTextureIndex != kLoadingTextureIndex);
         if (!willChangeImage)
         {
-            if (!m_isSmallImageSphere && m_appDirector.GetState() != AppDirector.AppState.kGallery)
-            {
-                m_imageFlow.OpenWithImageSphere(this);
-            }
+            m_imageFlow.OpenWithImageSphere(this);
             
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: OnButtonSelected() will not ChangeImage");
             return;
@@ -481,10 +483,7 @@ public class ImageSphere : MonoBehaviour
 
         m_menuController.SetSkyboxDimOn(true); // switch dim back on gradually...
 
-        if (!m_isSmallImageSphere && m_appDirector.GetState() != AppDirector.AppState.kGallery)
-        {
-            m_imageFlow.OpenWithImageSphere(this);
-        }
+        m_imageFlow.OpenWithImageSphere(this);
     }
 
     private float ExponentialProgress(float progress)

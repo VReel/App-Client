@@ -20,6 +20,7 @@ public class Gallery : MonoBehaviour
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private Profile m_profile;
     [SerializeField] private LoginFlow m_loginFlow;
+    [SerializeField] private ImageFlow m_imageFlow;
     [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private ImageSphereController m_imageSphereController;
     [SerializeField] private ImageSkybox m_imageSkybox;
@@ -57,6 +58,7 @@ public class Gallery : MonoBehaviour
 
         m_uploadConfirmation.SetActive(false);
 
+        // CHECK: Is this even used in Gallery...
         m_menuController.RegisterToUseMenuConfig(this);
         MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
         menuConfig.menuBarVisible = true;
@@ -83,40 +85,6 @@ public class Gallery : MonoBehaviour
         int numImageSpheres = m_imageSphereController.GetNumSpheres();
         int numFiles = m_galleryImageFilePaths.Count;
         return m_currGalleryImageIndex >= (numFiles - numImageSpheres);       
-    }
-
-    public void PreUpload()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreUpload() called on post: " + m_imageSkybox.GetImageIdentifier());
-
-        if (!m_user.IsLoggedIn())
-        {
-            m_loginFlow.OpenCloseSwitch();
-            return;
-        }
-
-        m_uploadConfirmation.SetActive(true);
-        m_uploadButton.SetActive(false);
-        m_appDirector.SetOverlayShowing(true);
-
-        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
-        menuConfig.menuBarVisible = false;
-        menuConfig.imageSpheresVisible = false;
-        m_menuController.UpdateMenuConfig(this);
-    }
-
-    public void CancelUpload()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: CancelUpload() called");
-
-        m_uploadConfirmation.SetActive(false);
-        m_uploadButton.SetActive(true);
-        m_appDirector.SetOverlayShowing(false);
-
-        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
-        menuConfig.menuBarVisible = true;
-        menuConfig.imageSpheresVisible = true;
-        m_menuController.UpdateMenuConfig(this);
     }
         
     public void UploadImage()
@@ -198,13 +166,24 @@ public class Gallery : MonoBehaviour
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Running UploadImageInternal() for image with path: " + filePath);
 
+        //0) Delete temporary file's if they somehow still exist...
+        string originalImageFilePath = filePath;
+        string tempThumbnailPath = m_imagesTopLevelDirectory + "/tempThumbnailImage.png";
+        string tempOriginalPath = m_imagesTopLevelDirectory + "/tempOriginalImage.png";
+        if (File.Exists(tempThumbnailPath))
+        {
+            File.Delete(tempThumbnailPath);
+        }
+
+        if (File.Exists(tempOriginalPath))
+        {
+            File.Delete(tempOriginalPath);
+        }
+
         // 1) Get PresignedURL
         yield return m_backEndAPI.S3_PresignedURL();
 
         // 2) Create Thumbnail from Original image
-        string originalImageFilePath = filePath;
-        string tempThumbnailPath = m_imagesTopLevelDirectory + "/tempThumbnailImage.png";
-        string tempOriginalPath = m_imagesTopLevelDirectory + "/tempOriginalImage.png";
         bool successfullyCreatedThumbnail = false;
         bool successfullyCreatedMaxResolutionImage = false;
         if (m_backEndAPI.IsLastAPICallSuccessful())
@@ -279,19 +258,21 @@ public class Gallery : MonoBehaviour
         yield return null;
 
         // 7) If there has been a successful upload -> Inform user that image has been uploaded      
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploaded image: " + originalImageFilePath + ", with Success: " + (m_backEndAPI.IsLastAPICallSuccessful() && successfullyCreatedThumbnail) );
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Uploaded image: " + originalImageFilePath + ", with Success: " + (m_backEndAPI.IsLastAPICallSuccessful() && successfullyCreatedThumbnail && successfullyCreatedMaxResolutionImage) );
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
             //TODO: SHOW A SUCCESS MESSAGE!
         }
 
-        m_uploadConfirmation.SetActive(false);
+        m_imageFlow.Close();
         m_loadingIcon.Hide();
 
+        /*
         MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
         menuConfig.menuBarVisible = true;
         menuConfig.imageSpheresVisible = true;
         m_menuController.UpdateMenuConfig(this);
+        */
 
         if (profilePic)
         {
@@ -503,8 +484,9 @@ public class Gallery : MonoBehaviour
             success = m_javaPluginClass.CallStatic<bool>("CreateSmallerImageWithResolution", originalImagePath, newImagePath, newResolutionWidth);
         }
         else
-        {
+        {            
             File.Copy(originalImagePath, newImagePath);
+            success = true;
         }
 
         AndroidJNI.DetachCurrentThread();

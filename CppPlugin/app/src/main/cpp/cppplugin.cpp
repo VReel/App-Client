@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <string>
 #include <cstdio>
+#include <vector>
 #include <ctime>
 #include <chrono>
 #include <android/log.h>
@@ -22,9 +23,8 @@ GLuint* m_textureIDs;
 int m_initMaxNumTextures = 0; // Set on Init - sets maximum textures to gen!
 int m_currTextureIndex = 0;
 
-const int kMaxImageWidth = 16 * 1024;
-const int kMaxImageHeight = 8 * 1024;
-stbi_uc* m_pWorkingMemory = NULL;
+const int kMaxImageWidth = 4096; // 2^12 - This is an artifical global limit on width of images viewed and uploaded to the server
+stbi_uc* m_pCurrImage = NULL;
 int m_currImageWidth = 0;
 int m_currImageHeight = 0;
 
@@ -58,6 +58,79 @@ static void CheckGlError(const char* op)
     {
         LOGI("after %s() glError (0x%x)\n", op, error);
     }
+}
+
+stbi_uc* ResampleIntegerRGB(stbi_uc *rgb_in, int w, int h, int stride, int new_w, int new_h, int new_stride)
+{
+    stbi_uc* result = (stbi_uc*) stbi__malloc((size_t) new_h * new_stride);
+    int x_ratio = w / new_w;
+    int y_ratio = h / new_h;
+    int area_ratio = x_ratio * y_ratio;
+
+    for (int y = 0; y != new_h; ++y)
+    {
+        for (int x = 0; x != new_w; ++x)
+        {
+            // take the average of the pixels in the NxM box
+            int r = 0, g = 0, b = 0;
+            for (int j = 0; j != x_ratio; ++j)
+            {
+                for (int i = 0; i != y_ratio; ++i)
+                {
+                    r += rgb_in[0 + (x*x_ratio+i)*3 + (y*y_ratio+j)*stride];
+                    g += rgb_in[1 + (x*x_ratio+i)*3 + (y*y_ratio+j)*stride];
+                    b += rgb_in[2 + (x*x_ratio+i)*3 + (y*y_ratio+j)*stride];
+                }
+            }
+
+            result[0 + x*3 + y*new_stride] = stbi_uc(r / area_ratio);
+            result[1 + x*3 + y*new_stride] = stbi_uc(g / area_ratio);
+            result[2 + x*3 + y*new_stride] = stbi_uc(b / area_ratio);
+        }
+    }
+    return result;
+}
+
+//CURRENTLY UNUSED
+template<int x_ratio, int y_ratio>
+stbi_uc* ResampleConstRGB(stbi_uc *rgb_in, int w, int h, int stride, int new_stride)
+{
+    int new_w = w / x_ratio;
+    int new_h = h / y_ratio;
+    stbi_uc* result = (stbi_uc*) stbi__malloc((size_t) new_h * new_stride);
+    constexpr uint32_t area_ratio = (uint32_t) x_ratio * y_ratio;
+    uint32_t row_len = (uint32_t) new_w * x_ratio * 3;
+    std::vector<uint32_t> row(row_len);
+
+    for (int y = 0; y != new_h; ++y)
+    {
+        for (int k = 0; k != row_len; ++k)
+        {
+            row[k] = rgb_in[k + (y*x_ratio+0)*stride];
+        }
+
+        for (int j = 1; j != y_ratio; ++j)
+        {
+            for (int k = 0; k != row_len; ++k)
+            {
+                row[k] += rgb_in[k + (y*x_ratio+j)*stride];
+            }
+        }
+
+        for (int x = 0; x != new_w; ++x)
+        {
+            for (int comp = 0; comp != 3; ++comp)
+            {
+                uint32_t r = row[x * (x_ratio * 3) + comp];
+                for (int i = 1; i != x_ratio; ++i)
+                {
+                    r += row[x * (x_ratio * 3) + i * 3 + comp];
+                }
+                result[comp + x*3 + y*new_stride] = stbi_uc(r / area_ratio);
+            }
+        }
+    }
+    return result;
 }
 
 
@@ -156,7 +229,7 @@ void LoadScanlinesIntoTextureFromWorkingMemory()
                      : (m_currImageHeight - m_textureLoadingYOffset);
 
     LOGI("glTexSubImage2D(GL_TEXTURE_2D, 0, 0, %d, %d, %d, GL_RGB, GL_UNSIGNED_BYTE, pImage", m_textureLoadingYOffset, m_currImageWidth, height);
-    stbi_uc* pImage = m_pWorkingMemory + (m_textureLoadingYOffset * m_currImageWidth * kNumStbChannels);
+    stbi_uc* pImage = m_pCurrImage + (m_textureLoadingYOffset * m_currImageWidth * kNumStbChannels);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, m_textureLoadingYOffset, m_currImageWidth, height, GL_RGB, GL_UNSIGNED_BYTE, pImage);
     PrintAllGlError();
 
@@ -164,7 +237,7 @@ void LoadScanlinesIntoTextureFromWorkingMemory()
     if (m_textureLoadingYOffset > m_currImageHeight)
     {
         m_isLoadingIntoTexture = false;
-        stbi_image_free(m_pWorkingMemory);
+        stbi_image_free(m_pCurrImage);
 
         LOGI("glGenerateMipmap(GL_TEXTURE_2D)");
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -270,13 +343,37 @@ bool LoadIntoWorkingMemoryFromImagePath(char* pFileName)
     int type = -1;
     m_currImageWidth = m_currImageHeight = 0;
 
-    m_pWorkingMemory = stbi_load(pFileName, &m_currImageWidth, &m_currImageHeight, &type, kNumStbChannels); // Forcing 4-components per pixel RGBA
+    m_pCurrImage = stbi_load(pFileName, &m_currImageWidth, &m_currImageHeight, &type, kNumStbChannels);
+
+    /* //TODO: Get this working!
+    if (m_currImageWidth > kMaxImageWidth) // Currently only necessary for images on phone, those loaded through LoadIntoWorkingMemoryFromImageData() are already on the cloud at max resolution...
+    {
+        auto wcts = std::chrono::high_resolution_clock::now();
+
+        int newWidth = m_currImageWidth;
+        while (newWidth > kMaxImageWidth)
+        {
+            newWidth /= 2;
+        }
+
+        int newHeight = newWidth/2;
+        int newStride = (newWidth * 3 + 3) & ~3; // round up to multiple of four bytes
+        stbi_uc *new_rgb =
+                ResampleIntegerRGB(m_pCurrImage, m_currImageWidth, m_currImageHeight, m_currImageWidth * 3,
+                                   newWidth, newHeight, newStride);
+
+        memcpy(m_pCurrImage, new_rgb, kMaxImageWidth * (kMaxImageWidth/2) * kNumStbChannels);
+        stbi_image_free(new_rgb);
+
+        m_currImageWidth = kMaxImageWidth;
+        m_currImageHeight = kMaxImageWidth/2;
+
+        std::chrono::duration<double> wctduration = (std::chrono::high_resolution_clock::now() - wcts);
+        LOGI("ResampleIntegerRGB() walltime = %f", wctduration.count());
+    }
+     */
 
     LOGI("Image Loaded has Width = %d, Height = %d, Type = %d\n", m_currImageWidth, m_currImageHeight, type);
-    if (m_currImageWidth * m_currImageHeight > kMaxImageWidth * kMaxImageHeight)
-    {
-        LOGI("ERROR - Image Loaded is greater than Working Memory!!!");
-    }
 
     LOGI("Finished LoadIntoWorkingMemoryFromImagePath()!");
 
@@ -290,13 +387,9 @@ bool LoadIntoWorkingMemoryFromImageData(void* pRawData, int dataLength)
     int type = -1;
     m_currImageWidth = m_currImageHeight = 0;
 
-    m_pWorkingMemory = stbi_load_from_memory((stbi_uc*) pRawData, dataLength, &m_currImageWidth, &m_currImageHeight, &type, kNumStbChannels); // Forcing 4-components per pixel RGBA
+    m_pCurrImage = stbi_load_from_memory((stbi_uc*) pRawData, dataLength, &m_currImageWidth, &m_currImageHeight, &type, kNumStbChannels);
 
     LOGI("Image Loaded has Width = %d, Height = %d, Type = %d\n", m_currImageWidth, m_currImageHeight, type);
-    if (m_currImageWidth * m_currImageHeight > kMaxImageWidth * kMaxImageHeight)
-    {
-        LOGI("ERROR - Image Loaded is greater than Working Memory!!!");
-    }
 
     LOGI("Finished LoadIntoWorkingMemoryFromImageData()!");
 
