@@ -11,11 +11,13 @@ public class ImageSphere : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
+    [SerializeField] private Gallery m_gallery;
     [SerializeField] private Search m_search;
     [SerializeField] private Posts m_posts;
     [SerializeField] private ListUsers m_listUsers;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private Profile m_profile;
+    [SerializeField] private ImageLoader m_imageLoader;
     [SerializeField] private LoginFlow m_loginFlow;
     [SerializeField] private ImageFlow m_imageFlow;
     [SerializeField] private ImageSphereController m_imageSphereController;
@@ -448,7 +450,10 @@ public class ImageSphere : MonoBehaviour
         // When Image has reached the user then SetSkybox to Thumbnail and grow the sphere
         m_imageObject.transform.position = userPos;
         m_imageSphereSkybox.SetDim(0); // switch off Dim because no image sphere's have Dim!
-        SetSkybox(imageIdentifier);
+        if (m_imageLoader.IsLoading())
+        {
+            SetSkybox(imageIdentifier); // If its still loading then set the Thumbnail as the background, otherwise no need!
+        }
 
         // Scale to size of SkyBox
         const float kSecondsToGetToGrowFully = 1.0f;
@@ -497,7 +502,11 @@ public class ImageSphere : MonoBehaviour
     private void DownloadAndSetOriginalImageOnSkybox(string imageIdentifier)
     {                
         bool isImageFromDevice = imageIdentifier.StartsWith(m_imageSphereController.GetTopLevelDirectory());
-        if (!isImageFromDevice)
+        if (isImageFromDevice) // Gallery
+        {
+            m_gallery.LoadImageOriginal(imageIdentifier);
+        }
+        else // Online
         {
             if (m_isSmallImageSphere) // Only small image Spheres query ProfileDetails...
             {

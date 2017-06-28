@@ -17,6 +17,7 @@ public class ImageLoader : MonoBehaviour
     private const int kLoadingTextureIndex = -1;
     private int[] m_textureIndexUsage;
 
+    private bool m_isLoading = false;
     private CppPlugin m_cppPlugin;
     private CoroutineQueue m_coroutineQueue;
     private ThreadJob m_threadJob;
@@ -34,6 +35,11 @@ public class ImageLoader : MonoBehaviour
         m_coroutineQueue.StartLoop();
 
         m_threadJob = new ThreadJob(this);
+    }
+
+    public bool IsLoading()
+    {
+        return m_isLoading;
     }
 
     public int GetMaxNumTextures()
@@ -69,9 +75,9 @@ public class ImageLoader : MonoBehaviour
         m_coroutineQueue.Clear();
     }
 
-    public void LoadImageFromPathIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, string filePathAndIdentifier, bool showLoading)
+    public void LoadImageFromPathIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, string filePathAndIdentifier, bool showLoading, int maxImageWidth)
     {
-        m_coroutineQueue.EnqueueAction(LoadImageFromPathIntoImageSphereInternal(imageSphereController, sphereIndex, filePathAndIdentifier, showLoading));
+        m_coroutineQueue.EnqueueAction(LoadImageFromPathIntoImageSphereInternal(imageSphereController, sphereIndex, filePathAndIdentifier, showLoading, maxImageWidth));
     }
 
     public void LoadImageFromURLIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, string url, string filePathAndIdentifier, bool showLoading)
@@ -83,16 +89,18 @@ public class ImageLoader : MonoBehaviour
     // Private/Helper functions
     // **************************
 
-    private IEnumerator LoadImageFromPathIntoImageSphereInternal(ImageSphereController imageSphereController, int sphereIndex, string filePathAndIdentifier, bool showLoading)
+    private IEnumerator LoadImageFromPathIntoImageSphereInternal(ImageSphereController imageSphereController, int sphereIndex, string filePathAndIdentifier, bool showLoading, int maxImageWidth)
     {
+        m_isLoading = true;
         if (showLoading)
         {
             m_loadingIcon.Display();
         }
 
         int textureIndex = GetAvailableTextureIndex();
-        yield return m_cppPlugin.LoadImageFromPathIntoImageSphere(imageSphereController, sphereIndex, filePathAndIdentifier, textureIndex);
+        yield return m_cppPlugin.LoadImageFromPathIntoImageSphere(imageSphereController, sphereIndex, filePathAndIdentifier, textureIndex, maxImageWidth);
 
+        m_isLoading = false;
         if (showLoading)
         {
             m_loadingIcon.Hide();
@@ -103,6 +111,7 @@ public class ImageLoader : MonoBehaviour
     {
         yield return m_appDirector.VerifyInternetConnection();
 
+        m_isLoading = true;
         if (showLoading)
         {
             m_loadingIcon.Display();
@@ -130,6 +139,7 @@ public class ImageLoader : MonoBehaviour
             imageSphereController.SetImageAtIndexToLoading(sphereIndex);
         }
             
+        m_isLoading = false;
         if (showLoading)
         {
             m_loadingIcon.Hide();

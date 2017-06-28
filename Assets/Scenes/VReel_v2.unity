@@ -11162,6 +11162,16 @@ Prefab:
       propertyPath: m_loginFlow
       value: 
       objectReference: {fileID: 2239}
+    - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: m_gallery
+      value: 
+      objectReference: {fileID: 1991}
+    - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: m_imageLoader
+      value: 
+      objectReference: {fileID: 2028}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
   m_IsPrefabParent: 0
@@ -12621,6 +12631,16 @@ Prefab:
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: m_gallery
+      value: 
+      objectReference: {fileID: 1991}
+    - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: m_imageLoader
+      value: 
+      objectReference: {fileID: 2028}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
   m_IsPrefabParent: 0
@@ -14986,6 +15006,16 @@ Prefab:
       propertyPath: m_loginFlow
       value: 
       objectReference: {fileID: 2239}
+    - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: m_gallery
+      value: 
+      objectReference: {fileID: 1991}
+    - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: m_imageLoader
+      value: 
+      objectReference: {fileID: 2028}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
   m_IsPrefabParent: 0
@@ -25328,6 +25358,16 @@ Prefab:
       propertyPath: m_loginFlow
       value: 
       objectReference: {fileID: 2239}
+    - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: m_gallery
+      value: 
+      objectReference: {fileID: 1991}
+    - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: m_imageLoader
+      value: 
+      objectReference: {fileID: 2028}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
   m_IsPrefabParent: 0
@@ -28556,6 +28596,16 @@ Prefab:
       propertyPath: m_loginFlow
       value: 
       objectReference: {fileID: 2239}
+    - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: m_gallery
+      value: 
+      objectReference: {fileID: 1991}
+    - target: {fileID: 114624011454915914, guid: 3fa0b101a9bac43fa9da60da65baf719,
+        type: 2}
+      propertyPath: m_imageLoader
+      value: 
+      objectReference: {fileID: 2028}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3fa0b101a9bac43fa9da60da65baf719, type: 2}
   m_IsPrefabParent: 0
