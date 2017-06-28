@@ -10,7 +10,7 @@ public static class Helper
     // **************************
 
     public const int kMaxImageWidth = 4096; // 2^12
-    public const int kStandardThumbnailWidth = 512; // 2^9
+    public const int kThumbnailWidth = 512; // 2^9
     public const int kMaxCaptionOrDescriptionLength = 200; //NOTE: In API its 500 but in UI its currently 200
     public const int kSkyboxSphereIndex = -1;
     public const int kProfilePageSphereIndex = -2;

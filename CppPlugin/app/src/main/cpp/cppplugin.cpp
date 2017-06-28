@@ -23,8 +23,8 @@ GLuint* m_textureIDs;
 int m_initMaxNumTextures = 0; // Set on Init - sets maximum textures to gen!
 int m_currTextureIndex = 0;
 
-const int kMaxImageWidth = 4096; // 2^12 - This is an artifical global limit on width of images viewed and uploaded to the server
 stbi_uc* m_pCurrImage = NULL;
+int m_maxImageWidth = 4096; // 2^12 to begin with - This is set at runtime in order to limit size of Gallery Images
 int m_currImageWidth = 0;
 int m_currImageHeight = 0;
 
@@ -133,6 +133,38 @@ stbi_uc* ResampleConstRGB(stbi_uc *rgb_in, int w, int h, int stride, int new_str
     return result;
 }
 
+bool DownsampleImageToMaxWidth()
+{
+    if (m_currImageWidth > m_maxImageWidth)
+    {
+        auto wcts = std::chrono::high_resolution_clock::now();
+
+        int newWidth = m_currImageWidth;
+        while (newWidth > m_maxImageWidth)
+        {
+            newWidth /= 2;
+        }
+
+        int newHeight = newWidth / 2;
+        int newStride = (newWidth * 3 + 3) & ~3; // round up to multiple of four bytes
+        stbi_uc *new_rgb =
+                ResampleIntegerRGB(m_pCurrImage, m_currImageWidth, m_currImageHeight, m_currImageWidth * kNumStbChannels,
+                                   newWidth, newHeight, newStride);
+
+        memcpy(m_pCurrImage, new_rgb, newWidth * newHeight * kNumStbChannels);
+        stbi_image_free(new_rgb);
+
+        m_currImageWidth = newWidth;
+        m_currImageHeight = newHeight;
+
+        std::chrono::duration<double> wctduration = (std::chrono::high_resolution_clock::now() - wcts);
+        LOGI("ResampleImageToMaxWidth() walltime = %f", wctduration.count());
+
+        return true;
+    }
+
+    return false;
+}
 
 // **************************
 // Private functions - accessed through OnRenderEvent()
@@ -311,6 +343,11 @@ void SetMaxPixelsUploadedPerFrame(int maxPixelsUploadedPerFrame)
     m_maxPixelsUploadedPerFrame = maxPixelsUploadedPerFrame;
 }
 
+void SetMaxImageWidth(int maxImageWidth)
+{
+    m_maxImageWidth = maxImageWidth;
+}
+
 void SetCurrTextureIndex(int currTextureIndex)
 {
     m_currTextureIndex = currTextureIndex;
@@ -345,33 +382,7 @@ bool LoadIntoWorkingMemoryFromImagePath(char* pFileName)
 
     m_pCurrImage = stbi_load(pFileName, &m_currImageWidth, &m_currImageHeight, &type, kNumStbChannels);
 
-    /* //TODO: Get this working!
-    if (m_currImageWidth > kMaxImageWidth) // Currently only necessary for images on phone, those loaded through LoadIntoWorkingMemoryFromImageData() are already on the cloud at max resolution...
-    {
-        auto wcts = std::chrono::high_resolution_clock::now();
-
-        int newWidth = m_currImageWidth;
-        while (newWidth > kMaxImageWidth)
-        {
-            newWidth /= 2;
-        }
-
-        int newHeight = newWidth/2;
-        int newStride = (newWidth * 3 + 3) & ~3; // round up to multiple of four bytes
-        stbi_uc *new_rgb =
-                ResampleIntegerRGB(m_pCurrImage, m_currImageWidth, m_currImageHeight, m_currImageWidth * 3,
-                                   newWidth, newHeight, newStride);
-
-        memcpy(m_pCurrImage, new_rgb, kMaxImageWidth * (kMaxImageWidth/2) * kNumStbChannels);
-        stbi_image_free(new_rgb);
-
-        m_currImageWidth = kMaxImageWidth;
-        m_currImageHeight = kMaxImageWidth/2;
-
-        std::chrono::duration<double> wctduration = (std::chrono::high_resolution_clock::now() - wcts);
-        LOGI("ResampleIntegerRGB() walltime = %f", wctduration.count());
-    }
-     */
+    DownsampleImageToMaxWidth(); // Only necessary for images on phone, those loaded through LoadIntoWorkingMemoryFromImageData() are already at a max resolution...
 
     LOGI("Image Loaded has Width = %d, Height = %d, Type = %d\n", m_currImageWidth, m_currImageHeight, type);
 
@@ -388,6 +399,8 @@ bool LoadIntoWorkingMemoryFromImageData(void* pRawData, int dataLength)
     m_currImageWidth = m_currImageHeight = 0;
 
     m_pCurrImage = stbi_load_from_memory((stbi_uc*) pRawData, dataLength, &m_currImageWidth, &m_currImageHeight, &type, kNumStbChannels);
+
+    // DownsampleImageToMaxWidth(); Unnecessary here...
 
     LOGI("Image Loaded has Width = %d, Height = %d, Type = %d\n", m_currImageWidth, m_currImageHeight, type);
 

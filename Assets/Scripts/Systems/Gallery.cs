@@ -17,7 +17,6 @@ public class Gallery : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private User m_user;
-    [SerializeField] private MenuController m_menuController;
     [SerializeField] private Profile m_profile;
     [SerializeField] private LoginFlow m_loginFlow;
     [SerializeField] private ImageFlow m_imageFlow;
@@ -57,13 +56,6 @@ public class Gallery : MonoBehaviour
         m_backEndAPI = new BackEndAPI(this, m_user.GetErrorMessage(), m_user);
 
         m_uploadConfirmation.SetActive(false);
-
-        // CHECK: Is this even used in Gallery...
-        m_menuController.RegisterToUseMenuConfig(this);
-        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
-        menuConfig.menuBarVisible = true;
-        menuConfig.imageSpheresVisible = true;
-        menuConfig.subMenuVisible = true;
     }
 
     public void InvalidateWork() // This function is called in order to stop any ongoing work
@@ -104,6 +96,43 @@ public class Gallery : MonoBehaviour
         m_coroutineQueue.EnqueueAction(OpenAndroidGalleryInternal());
     }
 
+    public void LoadImageOriginal(string filePath)
+    {
+        LoadImageInternalPlugin(filePath, Helper.kSkyboxSphereIndex, true, Helper.kMaxImageWidth);
+    }
+
+    public void NextImages()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: NextImages() called");
+
+        int numImagesToLoad = m_imageSphereController.GetNumSpheres();
+        int numFilePaths = m_galleryImageFilePaths.Count;
+
+        m_currGalleryImageIndex = Mathf.Clamp(m_currGalleryImageIndex + numImagesToLoad, 0, numFilePaths);
+
+        m_imageLoader.InvalidateLoading();
+        m_coroutineQueue.Clear(); // Throw away previous operations
+        m_coroutineQueue.EnqueueAction(LoadImageThumbnails(m_currGalleryImageIndex, numImagesToLoad));
+    }
+
+    public void PreviousImages()
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreviousImages() called");
+
+        int numImagesToLoad = m_imageSphereController.GetNumSpheres();
+        int numFilePaths = m_galleryImageFilePaths.Count;
+
+        m_currGalleryImageIndex = Mathf.Clamp(m_currGalleryImageIndex - numImagesToLoad, 0, numFilePaths);
+
+        m_imageLoader.InvalidateLoading();
+        m_coroutineQueue.Clear(); // Throw away previous operations
+        m_coroutineQueue.EnqueueAction(LoadImageThumbnails(m_currGalleryImageIndex, numImagesToLoad));
+    }
+
+    // **************************
+    // Private/Helper functions
+    // **************************
+
     private IEnumerator OpenAndroidGalleryInternal()
     {        
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenAndroidGallery() called");
@@ -123,40 +152,8 @@ public class Gallery : MonoBehaviour
         int numImagesToLoad = m_imageSphereController.GetNumSpheres();
         m_imageSphereController.SetAllImageSpheresToLoading();
 
-        yield return LoadImages(m_currGalleryImageIndex, numImagesToLoad);
+        yield return LoadImageThumbnails(m_currGalleryImageIndex, numImagesToLoad);
     }
-
-    public void NextImages()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: NextImages() called");
-
-        int numImagesToLoad = m_imageSphereController.GetNumSpheres();
-        int numFilePaths = m_galleryImageFilePaths.Count;
-
-        m_currGalleryImageIndex = Mathf.Clamp(m_currGalleryImageIndex + numImagesToLoad, 0, numFilePaths);
-
-        m_imageLoader.InvalidateLoading();
-        m_coroutineQueue.Clear(); // Throw away previous operations
-        m_coroutineQueue.EnqueueAction(LoadImages(m_currGalleryImageIndex, numImagesToLoad));
-    }
-
-    public void PreviousImages()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreviousImages() called");
-
-        int numImagesToLoad = m_imageSphereController.GetNumSpheres();
-        int numFilePaths = m_galleryImageFilePaths.Count;
-
-        m_currGalleryImageIndex = Mathf.Clamp(m_currGalleryImageIndex - numImagesToLoad, 0, numFilePaths);
-
-        m_imageLoader.InvalidateLoading();
-        m_coroutineQueue.Clear(); // Throw away previous operations
-        m_coroutineQueue.EnqueueAction(LoadImages(m_currGalleryImageIndex, numImagesToLoad));
-    }
-
-    // **************************
-    // Private/Helper functions
-    // **************************
 
     private IEnumerator UploadImageInternal(string filePath, bool profilePic = false) //NOTE: Ensured that this function cannot be stopped midway because the LoadingIcon blocks UI
     {
@@ -192,7 +189,7 @@ public class Gallery : MonoBehaviour
 
             m_threadJob.Start( () => 
                 successfullyCreatedThumbnail = 
-                    CreateSmallerImageWithResolution(originalImageFilePath, tempThumbnailPath, Helper.kStandardThumbnailWidth, isDebugBuild)
+                    CreateSmallerImageWithResolution(originalImageFilePath, tempThumbnailPath, Helper.kThumbnailWidth, isDebugBuild)
             );
             yield return m_threadJob.WaitFor();    
 
@@ -266,13 +263,6 @@ public class Gallery : MonoBehaviour
 
         m_imageFlow.Close();
         m_loadingIcon.Hide();
-
-        /*
-        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
-        menuConfig.menuBarVisible = true;
-        menuConfig.imageSpheresVisible = true;
-        m_menuController.UpdateMenuConfig(this);
-        */
 
         if (profilePic)
         {
@@ -420,7 +410,7 @@ public class Gallery : MonoBehaviour
         return true;
     }
 
-    private IEnumerator LoadImages(int startingGalleryImageIndex, int numImagesToLoad)
+    private IEnumerator LoadImageThumbnails(int startingGalleryImageIndex, int numImagesToLoad)
     {
         if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Loading {0} images beginning at index {1}. There are {2} images in the gallery!", 
             numImagesToLoad, startingGalleryImageIndex, m_galleryImageFilePaths.Count));
@@ -453,7 +443,7 @@ public class Gallery : MonoBehaviour
                 if (identifierValid)
                 {
                     bool showLoading = sphereIndex == 0; // The first one in the gallery should do some loading to let the user know things are happening
-                    m_coroutineQueue.EnqueueAction(LoadImageInternalPlugin(filePath, sphereIndex, showLoading));
+                    LoadImageInternalPlugin(filePath, sphereIndex, showLoading, Helper.kThumbnailWidth);
                     m_imageSphereController.SetMetadataToEmptyAtIndex(sphereIndex);
                 }
             }
@@ -465,10 +455,9 @@ public class Gallery : MonoBehaviour
 
     }
 
-    private IEnumerator LoadImageInternalPlugin(string filePath, int sphereIndex,bool showLoading)
+    private void LoadImageInternalPlugin(string filePath, int sphereIndex, bool showLoading, int maxImageWidth)
     {   
-        m_imageLoader.LoadImageFromPathIntoImageSphere(m_imageSphereController, sphereIndex, filePath, showLoading);
-        yield break;
+        m_imageLoader.LoadImageFromPathIntoImageSphere(m_imageSphereController, sphereIndex, filePath, showLoading, maxImageWidth);
     }        
 
     private bool CreateSmallerImageWithResolution(string originalImagePath, string newImagePath, int newResolutionWidth, bool debugOn)

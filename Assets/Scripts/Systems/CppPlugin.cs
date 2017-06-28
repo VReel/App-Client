@@ -31,6 +31,9 @@ public class CppPlugin
     private static extern void SetMaxPixelsUploadedPerFrame(int maxPixelsUploadedPerFrame);
 
     [DllImport ("cppplugin")]
+    private static extern void SetMaxImageWidth(int maxImageWidth);
+
+    [DllImport ("cppplugin")]
     private static extern void SetCurrTextureIndex(int currTextureIndex);
 
     [DllImport ("cppplugin")]
@@ -104,11 +107,13 @@ public class CppPlugin
         GL.IssuePluginEvent(GetRenderEventFunc(), (int)RenderFunctions.kTerminate);
     }
         
-    public IEnumerator LoadImageFromPathIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, string filePathAndIdentifier, int textureIndex)
+    public IEnumerator LoadImageFromPathIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, string filePathAndIdentifier, int textureIndex, int maxImageWidth)
     {
         StringBuilder filePathForCpp = new StringBuilder(filePathAndIdentifier);
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromPathIntoImageSphere() with sphereIndex : "  + sphereIndex + ", from filePath: " + filePathAndIdentifier + ", with TextureIndex: " + textureIndex);
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromPathIntoImageSphere() with sphereIndex : "  + sphereIndex + ", from filePath: " + filePathAndIdentifier + ", with TextureIndex: " + textureIndex + ", with MaxImageWidth: " + maxImageWidth);
         yield return null;
+
+        SetMaxImageWidth(maxImageWidth);
 
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadIntoWorkingMemoryFromImagePath(), on background thread!");
         yield return m_threadJob.WaitFor();
