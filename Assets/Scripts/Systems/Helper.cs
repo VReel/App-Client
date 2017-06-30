@@ -9,6 +9,7 @@ public static class Helper
     // Member Variables
     // **************************
 
+    public const bool kRGB565On = true;
     public const int kMaxImageWidth = 4096; // 2^12
     public const int kThumbnailWidth = 512; // 2^9
     public const int kMaxCaptionOrDescriptionLength = 200; //NOTE: In API its 500 but in UI its currently 200

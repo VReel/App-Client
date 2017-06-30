@@ -70,12 +70,6 @@ public class ImageSkybox : MonoBehaviour
         m_currTextureIndex = textureIndex;
         m_imageSphereController.SetTextureInUse(m_currTextureIndex, true);
 
-        /*
-        bool isGalleryState = m_appDirector.GetState() == AppDirector.AppState.kGallery;
-        bool isProfileImage = m_profile.IsUser(imageIdentifier); // Identifier is of the User for Profile Pictures
-        bool isImageFromDevice = m_imageIdentifier.StartsWith(m_imageSphereController.GetTopLevelDirectory());
-        */
-
         m_myMaterial.mainTexture = m_skyboxTexture;
         m_myMaterial.SetFloat("_FlipY", 1.0f); // This is only ever set to 0 on the default background image - should be 1 every time after...
 

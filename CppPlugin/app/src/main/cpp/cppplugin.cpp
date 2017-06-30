@@ -29,6 +29,8 @@ int m_currImageWidth = 0;
 int m_currImageHeight = 0;
 
 const int kNumStbChannels = 3;
+const int kStrideRGB565 = 2;
+bool m_rgb565On = false;
 int m_maxPixelsUploadedPerFrame = 1 * 1024 * 1024;
 bool m_isLoadingIntoTexture = false;
 GLint m_textureLoadingYOffset = 0;
@@ -60,6 +62,24 @@ static void CheckGlError(const char* op)
     }
 }
 
+// Trying this out to see if it improves performance... SEEMS USELESS FROM "wctduration.count()"
+void RenewTextureHandle()
+{
+    LOGI("Calling RenewTextureHandle()");
+
+    LOGI("glDeleteTextures(1, %d)", m_currTextureIndex);
+    auto wcts = std::chrono::high_resolution_clock::now();
+    glDeleteTextures(1, m_textureIDs + m_currTextureIndex);
+    std::chrono::duration<double> wctduration = (std::chrono::high_resolution_clock::now() - wcts);
+
+    LOGI("glDeleteTextures() walltime = %f", wctduration.count());
+    PrintAllGlError();
+
+    LOGI("glGenTextures(1, %d)", m_currTextureIndex);
+    glGenTextures(1, m_textureIDs + m_currTextureIndex);
+    PrintAllGlError();
+}
+
 stbi_uc* ResampleIntegerRGB(stbi_uc *rgb_in, int w, int h, int stride, int new_w, int new_h, int new_stride)
 {
     stbi_uc* result = (stbi_uc*) stbi__malloc((size_t) new_h * new_stride);
@@ -86,6 +106,41 @@ stbi_uc* ResampleIntegerRGB(stbi_uc *rgb_in, int w, int h, int stride, int new_w
             result[0 + x*3 + y*new_stride] = stbi_uc(r / area_ratio);
             result[1 + x*3 + y*new_stride] = stbi_uc(g / area_ratio);
             result[2 + x*3 + y*new_stride] = stbi_uc(b / area_ratio);
+        }
+    }
+    return result;
+}
+
+stbi_uc* ResampleIntegerRGB565(stbi_uc *rgb_in, int w, int h, int stride, int new_w, int new_h, int new_stride)
+{
+    stbi_uc* result = (stbi_uc*) stbi__malloc((size_t) new_h * new_stride);
+    int x_ratio = w / new_w;
+    int y_ratio = h / new_h;
+    int area_ratio = x_ratio * y_ratio;
+
+    for (int y = 0; y != new_h; ++y)
+    {
+        for (int x = 0; x != new_w; ++x)
+        {
+            // take the average of the pixels in the NxM box
+            int r = 0, g = 0, b = 0;
+            for (int j = 0; j != x_ratio; ++j)
+            {
+                for (int i = 0; i != y_ratio; ++i)
+                {
+                    r += rgb_in[0 + (x * x_ratio + i) * 3 + (y * y_ratio + j) * stride];
+                    g += rgb_in[1 + (x * x_ratio + i) * 3 + (y * y_ratio + j) * stride];
+                    b += rgb_in[2 + (x * x_ratio + i) * 3 + (y * y_ratio + j) * stride];
+                }
+            }
+            stbi_uc r8 = stbi_uc(r / area_ratio);
+            stbi_uc g8 = stbi_uc(g / area_ratio);
+            stbi_uc b8 = stbi_uc(b / area_ratio);
+            (uint16_t &) result[x * 2 + y * new_stride] = (uint16_t) (
+                    ((r8 >> 3) << 11) |
+                    ((g8 >> 2) << 5) |
+                    ((b8 >> 3) << 0)
+            );
         }
     }
     return result;
@@ -133,37 +188,43 @@ stbi_uc* ResampleConstRGB(stbi_uc *rgb_in, int w, int h, int stride, int new_str
     return result;
 }
 
-bool DownsampleImageToMaxWidth()
+bool ReampleImageToMaxWidthAndNewType()
 {
-    if (m_currImageWidth > m_maxImageWidth)
+    auto wcts = std::chrono::high_resolution_clock::now();
+
+    int newWidth = m_currImageWidth;
+    while (newWidth > m_maxImageWidth)
     {
-        auto wcts = std::chrono::high_resolution_clock::now();
-
-        int newWidth = m_currImageWidth;
-        while (newWidth > m_maxImageWidth)
-        {
-            newWidth /= 2;
-        }
-
-        int newHeight = newWidth / 2;
-        int newStride = (newWidth * 3 + 3) & ~3; // round up to multiple of four bytes
-        stbi_uc *new_rgb =
-                ResampleIntegerRGB(m_pCurrImage, m_currImageWidth, m_currImageHeight, m_currImageWidth * kNumStbChannels,
-                                   newWidth, newHeight, newStride);
-
-        memcpy(m_pCurrImage, new_rgb, newWidth * newHeight * kNumStbChannels);
-        stbi_image_free(new_rgb);
-
-        m_currImageWidth = newWidth;
-        m_currImageHeight = newHeight;
-
-        std::chrono::duration<double> wctduration = (std::chrono::high_resolution_clock::now() - wcts);
-        LOGI("ResampleImageToMaxWidth() walltime = %f", wctduration.count());
-
-        return true;
+        newWidth /= 2;
     }
 
-    return false;
+    int newHeight = newWidth / 2; // because of 2:1 ratio for 360-images
+    int newStride = newWidth;
+    stbi_uc* new_rgb = nullptr;
+
+    if (m_rgb565On)
+    {
+        newStride = newWidth * kStrideRGB565;
+        new_rgb = ResampleIntegerRGB565(m_pCurrImage, m_currImageWidth, m_currImageHeight, m_currImageWidth * kNumStbChannels,
+                                        newWidth, newHeight, newStride);
+    }
+    else
+    {
+        newStride = newWidth * kNumStbChannels;
+        new_rgb = ResampleIntegerRGB(m_pCurrImage, m_currImageWidth, m_currImageHeight, m_currImageWidth * kNumStbChannels,
+                                        newWidth, newHeight, newStride);
+    }
+
+    memcpy(m_pCurrImage, new_rgb, (size_t) newHeight * newStride);
+    stbi_image_free(new_rgb);
+
+    m_currImageWidth = newWidth;
+    m_currImageHeight = newHeight;
+
+    std::chrono::duration<double> wctduration = (std::chrono::high_resolution_clock::now() - wcts);
+    LOGI("ReampleImageToMaxWidthAndNewType() walltime = %f", wctduration.count());
+
+    return true;
 }
 
 // **************************
@@ -229,11 +290,20 @@ void CreateEmptyTexture()
     glBindTexture(GL_TEXTURE_2D, textureId);
     PrintAllGlError();
 
-    LOGI("glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, %d, %d, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL)", m_currImageWidth, m_currImageHeight);
     auto wcts = std::chrono::high_resolution_clock::now();
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_currImageWidth, m_currImageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL); //(unsigned char*) m_pWorkingMemory);
-    std::chrono::duration<double> wctduration = (std::chrono::high_resolution_clock::now() - wcts);
 
+    if (m_rgb565On)
+    {
+        LOGI("glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, %d, %d, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL)", m_currImageWidth, m_currImageHeight);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_currImageWidth, m_currImageHeight, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
+    }
+    else
+    {
+        LOGI("glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, %d, %d, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL)", m_currImageWidth, m_currImageHeight);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_currImageWidth, m_currImageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    }
+
+    std::chrono::duration<double> wctduration = (std::chrono::high_resolution_clock::now() - wcts);
     LOGI("glTexImage2D() walltime = %f", wctduration.count());
     PrintAllGlError();
 
@@ -260,9 +330,21 @@ void LoadScanlinesIntoTextureFromWorkingMemory()
                      ? kIdealNumberOfScanlinesToUpload
                      : (m_currImageHeight - m_textureLoadingYOffset);
 
-    LOGI("glTexSubImage2D(GL_TEXTURE_2D, 0, 0, %d, %d, %d, GL_RGB, GL_UNSIGNED_BYTE, pImage", m_textureLoadingYOffset, m_currImageWidth, height);
-    stbi_uc* pImage = m_pCurrImage + (m_textureLoadingYOffset * m_currImageWidth * kNumStbChannels);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, m_textureLoadingYOffset, m_currImageWidth, height, GL_RGB, GL_UNSIGNED_BYTE, pImage);
+    stbi_uc* pImage = m_pCurrImage;
+
+    if (m_rgb565On)
+    {
+        LOGI("glTexSubImage2D(GL_TEXTURE_2D, 0, 0, %d, %d, %d, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, pImage)", m_textureLoadingYOffset, m_currImageWidth, height);
+        pImage = m_pCurrImage + (m_textureLoadingYOffset * m_currImageWidth * kStrideRGB565);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, m_textureLoadingYOffset, m_currImageWidth, height, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, pImage);
+    }
+    else
+    {
+        LOGI("glTexSubImage2D(GL_TEXTURE_2D, 0, 0, %d, %d, %d, GL_RGB, GL_UNSIGNED_BYTE, pImage)", m_textureLoadingYOffset, m_currImageWidth, height);
+        pImage = m_pCurrImage + (m_textureLoadingYOffset * m_currImageWidth * kNumStbChannels);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, m_textureLoadingYOffset, m_currImageWidth, height, GL_RGB, GL_UNSIGNED_BYTE, pImage);
+    }
+
     PrintAllGlError();
 
     m_textureLoadingYOffset += kIdealNumberOfScanlinesToUpload;
@@ -277,24 +359,6 @@ void LoadScanlinesIntoTextureFromWorkingMemory()
     }
 
     LOGI("Finished LoadScanlinesIntoTextureFromWorkingMemory()! Loading in progress = %d", m_isLoadingIntoTexture);
-}
-
-// Trying this out to see if it improves performance...
-void RenewTextureHandle()
-{
-    LOGI("Calling RenewTextureHandle()");
-
-    LOGI("glDeleteTextures(1, %d)", m_currTextureIndex);
-    auto wcts = std::chrono::high_resolution_clock::now();
-    glDeleteTextures(1, m_textureIDs + m_currTextureIndex);
-    std::chrono::duration<double> wctduration = (std::chrono::high_resolution_clock::now() - wcts);
-
-    LOGI("glDeleteTextures() walltime = %f", wctduration.count());
-    PrintAllGlError();
-
-    LOGI("glGenTextures(1, %d)", m_currTextureIndex);
-    glGenTextures(1, m_textureIDs + m_currTextureIndex);
-    PrintAllGlError();
 }
 
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
@@ -348,6 +412,11 @@ void SetMaxImageWidth(int maxImageWidth)
     m_maxImageWidth = maxImageWidth;
 }
 
+void SetRGB565On(int rgb565On)
+{
+    m_rgb565On = rgb565On;
+}
+
 void SetCurrTextureIndex(int currTextureIndex)
 {
     m_currTextureIndex = currTextureIndex;
@@ -377,14 +446,14 @@ bool LoadIntoWorkingMemoryFromImagePath(char* pFileName)
 {
     LOGI("Calling LoadIntoWorkingMemoryFromImagePath()");
 
-    int type = -1;
+    int comp = -1;
     m_currImageWidth = m_currImageHeight = 0;
 
-    m_pCurrImage = stbi_load(pFileName, &m_currImageWidth, &m_currImageHeight, &type, kNumStbChannels);
+    m_pCurrImage = stbi_load(pFileName, &m_currImageWidth, &m_currImageHeight, &comp, kNumStbChannels);
 
-    DownsampleImageToMaxWidth(); // Only necessary for images on phone, those loaded through LoadIntoWorkingMemoryFromImageData() are already at a max resolution...
+    ReampleImageToMaxWidthAndNewType();
 
-    LOGI("Image Loaded has Width = %d, Height = %d, Type = %d\n", m_currImageWidth, m_currImageHeight, type);
+    LOGI("Image Loaded has Width = %d, Height = %d, Comp = %d\n", m_currImageWidth, m_currImageHeight, comp);
 
     LOGI("Finished LoadIntoWorkingMemoryFromImagePath()!");
 
@@ -395,14 +464,17 @@ bool LoadIntoWorkingMemoryFromImageData(void* pRawData, int dataLength)
 {
     LOGI("Calling LoadIntoWorkingMemoryFromImageData()");
 
-    int type = -1;
+    int comp = -1;
     m_currImageWidth = m_currImageHeight = 0;
 
-    m_pCurrImage = stbi_load_from_memory((stbi_uc*) pRawData, dataLength, &m_currImageWidth, &m_currImageHeight, &type, kNumStbChannels);
+    m_pCurrImage = stbi_load_from_memory((stbi_uc*) pRawData, dataLength, &m_currImageWidth, &m_currImageHeight, &comp, kNumStbChannels);
 
-    // DownsampleImageToMaxWidth(); Unnecessary here...
+    if (m_rgb565On) // No need to resample images coming off the cloud if we are not updating them to 565, because they are uploaded at the correct width
+    {
+        ReampleImageToMaxWidthAndNewType();
+    }
 
-    LOGI("Image Loaded has Width = %d, Height = %d, Type = %d\n", m_currImageWidth, m_currImageHeight, type);
+    LOGI("Image Loaded has Width = %d, Height = %d, Comp = %d\n", m_currImageWidth, m_currImageHeight, comp);
 
     LOGI("Finished LoadIntoWorkingMemoryFromImageData()!");
 

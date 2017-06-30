@@ -34,6 +34,9 @@ public class CppPlugin
     private static extern void SetMaxImageWidth(int maxImageWidth);
 
     [DllImport ("cppplugin")]
+    private static extern void SetRGB565On(bool rgb565On);
+
+    [DllImport ("cppplugin")]
     private static extern void SetCurrTextureIndex(int currTextureIndex);
 
     [DllImport ("cppplugin")]
@@ -113,6 +116,7 @@ public class CppPlugin
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromPathIntoImageSphere() with sphereIndex : "  + sphereIndex + ", from filePath: " + filePathAndIdentifier + ", with TextureIndex: " + textureIndex + ", with MaxImageWidth: " + maxImageWidth);
         yield return null;
 
+        SetRGB565On(Helper.kRGB565On);
         SetMaxImageWidth(maxImageWidth);
 
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadIntoWorkingMemoryFromImagePath(), on background thread!");
@@ -154,7 +158,7 @@ public class CppPlugin
             Texture2D.CreateExternalTexture(
                 GetCurrStoredImageWidth(), 
                 GetCurrStoredImageHeight(), 
-                TextureFormat.RGB24, //TextureFormat.RGBA32,           // Default textures have a format of ARGB32
+                Helper.kRGB565On ? TextureFormat.RGB565 : TextureFormat.RGB24, // Default textures have a format of ARGB32
                 true,
                 true,
                 GetCurrStoredTexturePtr()
@@ -175,6 +179,9 @@ public class CppPlugin
     {
         yield return null;
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromStreamIntoImageSphere() with sphereIndex: " + sphereIndex + ", imageIdentifier: " + imageIdentifier + ", with TextureIndex: " + textureIndex);
+
+        SetRGB565On(Helper.kRGB565On);
+        SetMaxImageWidth(Helper.kMaxImageWidth);
 
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling ToByteArray(), on background thread!");
         yield return m_threadJob.WaitFor();
@@ -228,7 +235,7 @@ public class CppPlugin
             Texture2D.CreateExternalTexture(
                 GetCurrStoredImageWidth(), 
                 GetCurrStoredImageHeight(), 
-                TextureFormat.RGB24, //TextureFormat.RGBA32,           // Default textures have a format of ARGB32
+                Helper.kRGB565On ? TextureFormat.RGB565 : TextureFormat.RGB24, // Default textures have a format of ARGB32
                 true,
                 true,
                 GetCurrStoredTexturePtr()
