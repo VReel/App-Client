@@ -330,8 +330,11 @@ public class ImageFlow : MonoBehaviour
 
     public void LikesSelected()
     {
-        SetImageFlowPage(-1);
-        m_currImageSphere.LikesSelected();
+        if (m_currImageSphere.IsLikesGreaterThanZero())
+        {
+            SetImageFlowPage(-1);
+            m_currImageSphere.LikesSelected();
+        }
     }
 
     public void CommentsSelected()

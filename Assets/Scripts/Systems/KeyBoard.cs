@@ -9,11 +9,12 @@ public class KeyBoard : MonoBehaviour
     // **************************
     	
 	public float m_blinkingTime = 1.5f;
-    public Text m_objectiveTextObject;
     public float m_distPos = 0.1f;
+    public Text m_typeTextObject;
     public GameObject m_mainCanvas;
     public bool m_conserveText = false;
 
+    private Text m_objectiveTextObject;
     private string m_previousText = "";      // Text before selecting inputform
     private string m_defaultText = "";       // Default value for inputform text
     private float m_elapsedTime;
@@ -97,10 +98,12 @@ public class KeyBoard : MonoBehaviour
 
                 if(!m_blink)
 				{
+                    m_typeTextObject.text = m_actualText;
                     m_objectiveTextObject.text = m_actualText;
 				}
 				else
 				{
+                    m_typeTextObject.text = m_actualText + " |";
                     m_objectiveTextObject.text = m_actualText + " |";
 				}
 
@@ -112,6 +115,7 @@ public class KeyBoard : MonoBehaviour
 	public void WriteChar(Text txt)
 	{
         m_actualText = m_actualText + txt.text;
+        m_typeTextObject.text = m_actualText;
         m_objectiveTextObject.text = m_actualText;
 	}
 
@@ -120,6 +124,7 @@ public class KeyBoard : MonoBehaviour
         if(m_actualText.Length > 0)
 		{
             m_actualText = m_actualText.Remove(m_actualText.Length-1);
+            m_typeTextObject.text = m_actualText;
             m_objectiveTextObject.text = m_actualText;
 		}
 	}
@@ -206,6 +211,7 @@ public class KeyBoard : MonoBehaviour
         {
             m_objectiveTextObject.text = m_previousText;
         }
+
         m_objectiveTextObject = null;
         m_previousText = "";
 

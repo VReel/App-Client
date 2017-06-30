@@ -244,6 +244,11 @@ public class ImageSphere : MonoBehaviour
             m_listUsers.DisplayLikeResults(m_imageIdentifier);
         }
     }
+
+    public bool IsLikesGreaterThanZero()
+    {
+        return m_numLikes > 0;
+    }
         
     public bool IsLoggedUserImage()
     {
