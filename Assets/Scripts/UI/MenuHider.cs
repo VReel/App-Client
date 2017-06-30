@@ -9,6 +9,7 @@ public class MenuHider : MonoBehaviour
 
     [SerializeField] private VRStandardAssets.Utils.VRInteractiveItem m_InteractiveItem;       // The interactive item used to know how the user is interacting with the button
     [SerializeField] private MenuController m_menuController;
+    [SerializeField] private Image m_vreelLogo;
 
     // **************************
     // Public functions
@@ -39,6 +40,11 @@ public class MenuHider : MonoBehaviour
 
         m_menuController.SetSkyboxDimOn(false);
         gameObject.GetComponent<Collider>().enabled = true; // we switch our box collider back on so that it can still react!
+
+        m_vreelLogo.enabled = true;
+        Color col = m_vreelLogo.color;
+        col.a = 0.4f;
+        m_vreelLogo.color = col;
     }
 
     private void HandleUp()
@@ -50,5 +56,9 @@ public class MenuHider : MonoBehaviour
         menuConfig.menuBarVisible = false;
         menuConfig.imageSpheresVisible = false;
         m_menuController.UpdateMenuConfig(this);
+
+        Color col = m_vreelLogo.color;
+        col.a = 1;
+        m_vreelLogo.color = col;
     }
 }
