@@ -20,9 +20,8 @@ namespace VRStandardAssets.Menu
         [SerializeField] private Color m_buttonColourDown;   // Button's sprite when user presses on it
         [SerializeField] private VRStandardAssets.Utils.VRInteractiveItem m_InteractiveItem;       // The interactive item used to know how the user is interacting with the button
 
-        // TODO: Make this into a single event...
         public UnityEvent OnButtonSelectedFunc;              // This event is triggered when the selection of the button has finished.
-        public event Action<MenuButton> OnButtonSelected;    // This event is triggered when the selection of the button has finished.
+        public UnityEvent OnButtonDownFunc;                  // This event is triggered when the selection of the button has started.
 
         private bool m_gazeOver = false;                     // Whether the user is looking at the VRInteractiveItem currently.
         private bool m_buttonDown = false;                   // Whether the user is pushing the VRInteractiveItem down.
@@ -159,6 +158,11 @@ namespace VRStandardAssets.Menu
             m_buttonDown = true;
 
             RefreshColour();
+
+            if (OnButtonDownFunc != null)
+            {
+                OnButtonDownFunc.Invoke();
+            }
         }
 
         private void HandleUp()
@@ -171,11 +175,6 @@ namespace VRStandardAssets.Menu
 
             if (buttonSelected)
             {
-                if (OnButtonSelected != null)
-                {
-                    OnButtonSelected(this);
-                }
-
                 if (OnButtonSelectedFunc != null)
                 {
                     OnButtonSelectedFunc.Invoke();

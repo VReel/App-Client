@@ -11,7 +11,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: VReel Limited
-  productName: VReel_NoShear
+  productName: VReel_Shear
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13333334, g: 0.17254902, b: 0.21176471, a: 1}
@@ -137,7 +137,7 @@ PlayerSettings:
   protectGraphicsMemory: 0
   useHDRDisplay: 0
   applicationIdentifier:
-    Android: io.vreel.vreel_noshear
+    Android: io.vreel.vreel_shear
     PSP2: com.oculus.UnitySample
     Standalone: unity.VReel Limited.VReel
     Tizen: io.vreel.vreel

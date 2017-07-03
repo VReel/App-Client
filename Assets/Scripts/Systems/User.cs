@@ -176,9 +176,9 @@ public class User : MonoBehaviour
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             using (FileStream fileStream = File.Open(m_dataFilePath, FileMode.Open))
-            {
+            {    
                 if (fileStream.Length > 0) // could have been corrupted
-                {
+                {                   
                     m_loginData = (LoginData) binaryFormatter.Deserialize(fileStream);
 
                     yield return m_backEndAPI.Register_GetUser();
