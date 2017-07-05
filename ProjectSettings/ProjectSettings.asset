@@ -145,7 +145,7 @@ PlayerSettings:
     tvOS: io.vreel.vreel
   buildNumber:
     iOS: 0
-  AndroidBundleVersionCode: 8
+  AndroidBundleVersionCode: 9
   AndroidMinSdkVersion: 21
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 0
