@@ -43,7 +43,7 @@ public class MenuHider : MonoBehaviour
 
         m_vreelLogo.enabled = true;
         Color col = m_vreelLogo.color;
-        col.a = 0.4f;
+        col.a = 0.5f;
         m_vreelLogo.color = col;
     }
 
