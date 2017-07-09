@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: LoadingSphereImage 2
-  m_Shader: {fileID: 4800000, guid: 893f42123f5354cf09bfb1e677f4b8bb, type: 3}
+  m_Shader: {fileID: 4800000, guid: bf2ff709176bf46f7b69d6922d513237, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0
