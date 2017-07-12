@@ -9,7 +9,13 @@ public class DesignVideoController : MonoBehaviour
     // Member Variables
     // **************************
 
-    [SerializeField] private List<TriggerAndTimeEvent> m_events; 
+    [SerializeField] private List<EventList> m_eventGroups; 
+
+    [System.Serializable]
+    public class EventList
+    {
+        public List<TriggerAndTimeEvent> events;
+    }
 
     [System.Serializable]
     public class TriggerAndTimeEvent
@@ -17,6 +23,7 @@ public class DesignVideoController : MonoBehaviour
         public Animator animator;
         public string triggerName;
         public float triggerTime;
+        public bool setToTrue;
         public bool triggered { get; set; }
     }
 
@@ -30,23 +37,27 @@ public class DesignVideoController : MonoBehaviour
 	{
         m_currTime += Time.fixedDeltaTime;
 
-        UpdateAllEventsBasedOnCurrTime();
+        for (int i = 0; i < m_eventGroups.Count; i++) 
+        {
+            UpdateAllEventsBasedOnCurrTime(i);
+        }
 	}
 
     // **************************
     // Private functions
     // **************************
 
-    private void UpdateAllEventsBasedOnCurrTime()
+    private void UpdateAllEventsBasedOnCurrTime(int eventGroupIndex)
 	{
-        for (int i = 0; i < m_events.Count; i++) 
+        for (int i = 0; i < m_eventGroups[eventGroupIndex].events.Count; i++) 
 		{
-            if (m_events[i].triggered != true) 
+            TriggerAndTimeEvent thisEvent = m_eventGroups[eventGroupIndex].events[i];
+            if (thisEvent.triggered != true) 
 			{			
-                if (m_currTime > m_events[i].triggerTime && m_events[i].animator != null)
+                if (m_currTime > thisEvent.triggerTime && thisEvent.animator != null)
                 {
-                    m_events[i].animator.SetBool(m_events[i].triggerName, true);
-                    m_events[i].triggered = true;
+                    thisEvent.animator.SetBool(thisEvent.triggerName, thisEvent.setToTrue);
+                    thisEvent.triggered = true;
                 }
 			}
 		}
