@@ -36405,7 +36405,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 309883018}
-  - component: {fileID: 309883022}
   - component: {fileID: 309883021}
   - component: {fileID: 309883020}
   - component: {fileID: 309883019}
@@ -36481,13 +36480,6 @@ MonoBehaviour:
   m_DebugRayLength: 5
   m_DebugRayDuration: 1
   m_RayLength: 500
---- !u!81 &309883022
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 309883017}
-  m_Enabled: 1
 --- !u!1001 &411677520
 Prefab:
   m_ObjectHideFlags: 0
