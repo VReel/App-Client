@@ -9,6 +9,8 @@ public class DesignVideoController : MonoBehaviour
     // Member Variables
     // **************************
 
+	public float m_currTime = 0;
+
     [SerializeField] private List<EventList> m_eventGroups; 
 
     [System.Serializable]
@@ -25,9 +27,7 @@ public class DesignVideoController : MonoBehaviour
         public float triggerTime;
         public bool setToTrue;
         public bool triggered { get; set; }
-    }
-
-	private float m_currTime = 0;
+    }		
 
     // **************************
     // Public functions
@@ -35,7 +35,7 @@ public class DesignVideoController : MonoBehaviour
 
 	public void Update()
 	{
-        m_currTime += Time.fixedDeltaTime;
+		m_currTime += Time.deltaTime;
 
         for (int i = 0; i < m_eventGroups.Count; i++) 
         {
