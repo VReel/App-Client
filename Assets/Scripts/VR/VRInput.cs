@@ -9,6 +9,10 @@ namespace VRStandardAssets.Utils
     // camera for ease.
     public class VRInput : MonoBehaviour
     {
+        // **************************
+        // Member Variables
+        // **************************
+
         //Swipe directions
         public enum SwipeDirection
         {
@@ -26,16 +30,39 @@ namespace VRStandardAssets.Utils
         public event Action OnDoubleClick;                          // Called when a double click is detected.
         public event Action OnCancel;                               // Called when Cancel is pressed.
 
-        [SerializeField] private float m_DoubleClickTime = 0.3f;    //The max time allowed between double clicks
-        [SerializeField] private float m_SwipeWidth = 0.3f;         //The width of a swipe
+        [SerializeField] private float m_DoubleClickTime = 0.3f;    // The max time allowed between double clicks
+        [SerializeField] private float m_SwipeWidth = 0.3f;         // The width of a swipe
 
+        private Vector2 m_CurrSwipeData;                            // Most recent swipe data
         private Vector2 m_MouseDownPosition;                        // The screen position of the mouse when Fire1 is pressed.
         private Vector2 m_MouseUpPosition;                          // The screen position of the mouse when Fire1 is released.
         private float m_LastMouseUpTime;                            // The time when Fire1 was last released.
         private float m_LastHorizontalValue;                        // The previous value of the horizontal axis used to detect keyboard swipes.
         private float m_LastVerticalValue;                          // The previous value of the vertical axis used to detect keyboard swipes.
 
-        public float DoubleClickTime{ get { return m_DoubleClickTime; } }
+        // **************************
+        // Public functions
+        // **************************
+
+        public float DoubleClickTime
+        { 
+            get 
+            { 
+                return m_DoubleClickTime; 
+            } 
+        }
+
+        public Vector2 SwipeData
+        {
+            get
+            {
+                return m_CurrSwipeData;
+            }
+        }
+
+        // **************************
+        // Public functions
+        // **************************
 
         private void Update()
         {
@@ -124,42 +151,41 @@ namespace VRStandardAssets.Utils
             }
         }
 
-
         private SwipeDirection DetectSwipe ()
         {
             // Get the direction from the mouse position when Fire1 is pressed to when it is released.
-            Vector2 swipeData = (m_MouseUpPosition - m_MouseDownPosition);           
+            m_CurrSwipeData = (m_MouseUpPosition - m_MouseDownPosition);           
 
             // If the X swipe is greater than the required width we register it as horizontal
-            bool swipeIsHorizontal = Mathf.Abs(swipeData.x) > m_SwipeWidth;
+            bool swipeIsHorizontal = Mathf.Abs(m_CurrSwipeData.x) > m_SwipeWidth;
 
             // If the Y swipe is greater than the required width we register it as vertical
-            bool swipeIsVertical = Mathf.Abs(swipeData.y) > m_SwipeWidth;
+            bool swipeIsVertical = Mathf.Abs(m_CurrSwipeData.y) > m_SwipeWidth;
 
             //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Swipe Width: " + m_SwipeWidth);
             //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Swipe Length X: " + Mathf.Abs(swipeData.x));
             //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Swipe Length Y: " + Mathf.Abs(swipeData.y));
 
             // If the swipe has a positive y component and is vertical the swipe is up.
-            if (swipeData.y > 0f && swipeIsVertical)
+            if (m_CurrSwipeData.y > 0f && swipeIsVertical)
             {
                 return SwipeDirection.UP;
             }
 
             // If the swipe has a negative y component and is vertical the swipe is down.
-            if (swipeData.y < 0f && swipeIsVertical)
+            if (m_CurrSwipeData.y < 0f && swipeIsVertical)
             {
                 return SwipeDirection.DOWN;
             }
 
             // If the swipe has a positive x component and is horizontal the swipe is right.
-            if (swipeData.x > 0f && swipeIsHorizontal)
+            if (m_CurrSwipeData.x > 0f && swipeIsHorizontal)
             {
                 return SwipeDirection.RIGHT;
             }
 
             // If the swipe has a negative x component and is vertical the swipe is left.
-            if (swipeData.x < 0f && swipeIsHorizontal)
+            if (m_CurrSwipeData.x < 0f && swipeIsHorizontal)
             {
                 return SwipeDirection.LEFT;
             }
@@ -167,7 +193,6 @@ namespace VRStandardAssets.Utils
             // If the swipe meets none of these requirements there is no swipe.
             return SwipeDirection.NONE;
         }
-
 
         private SwipeDirection DetectKeyboardEmulatedSwipe ()
         {
@@ -210,7 +235,6 @@ namespace VRStandardAssets.Utils
             // If the swipe meets none of these requirements there is no swipe.
             return SwipeDirection.NONE;
         }
-
 
         private void OnDestroy()
         {

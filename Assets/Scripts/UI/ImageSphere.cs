@@ -197,7 +197,10 @@ public class ImageSphere : MonoBehaviour
 
     public void ImageSelected()
     {
-        ImageSelectedInternal();
+        if (!GetComponentInChildren<ImageSphereAnimation>().IsRotating())
+        {
+            ImageSelectedInternal();
+        }
     }
 
     public void HandleSelected()
@@ -506,6 +509,8 @@ public class ImageSphere : MonoBehaviour
 
     private void DownloadAndSetOriginalImageOnSkybox(string imageIdentifier)
     {                
+        //TODO: Set SkyBox rotation based on the rotation from the ImageSphere!
+
         bool isImageFromDevice = imageIdentifier.StartsWith(m_imageSphereController.GetTopLevelDirectory());
         if (isImageFromDevice) // Gallery
         {

@@ -9851,7 +9851,7 @@ LightmapSettings:
     m_TemporalCoherenceThreshold: 1
     m_EnvironmentLightingMode: 0
     m_EnableBakedLightmaps: 1
-    m_EnableRealtimeLightmaps: 1
+    m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
     serializedVersion: 8
     m_Resolution: 2
@@ -9886,7 +9886,7 @@ LightmapSettings:
     m_PVRFilteringAtrousNormalSigma: 1
     m_PVRFilteringAtrousPositionSigma: 1
   m_LightingDataAsset: {fileID: 0}
-  m_ShadowMaskMode: 2
+  m_ShadowMaskMode: 0
 --- !u!212 &816
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -21068,9 +21068,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_active: 0
-  m_timeTakenForFullSineWave: 15
-  m_magnitude: 0.03
-  m_ChanceOfSignFlip: 0.001
+  m_floatingTimeTakenForFullSineWave: 10
+  m_floatingMagnitude: 0.03
+  m_floatingChanceOfSignFlip: 0.001
+  m_eyeRayCaster: {fileID: 0}
+  m_rotationalDamp: 1
 --- !u!114 &1861
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24589,9 +24591,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_active: 1
-  m_timeTakenForFullSineWave: 15
-  m_magnitude: 0.03
-  m_ChanceOfSignFlip: 0.001
+  m_floatingTimeTakenForFullSineWave: 10
+  m_floatingMagnitude: 0.03
+  m_floatingChanceOfSignFlip: 0.001
+  m_eyeRayCaster: {fileID: 309883021}
+  m_rotationalDamp: 1
 --- !u!114 &2029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24651,7 +24655,18 @@ MonoBehaviour:
       PublicKeyToken=null
   OnButtonDownFunc:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2028}
+        m_MethodName: OnSphereSelectedDown
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
 --- !u!114 &2031
@@ -25019,9 +25034,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_active: 0
-  m_timeTakenForFullSineWave: 15
-  m_magnitude: 0.03
-  m_ChanceOfSignFlip: 0.001
+  m_floatingTimeTakenForFullSineWave: 10
+  m_floatingMagnitude: 0.03
+  m_floatingChanceOfSignFlip: 0.001
+  m_eyeRayCaster: {fileID: 0}
+  m_rotationalDamp: 1
 --- !u!114 &2048
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30352,9 +30369,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_active: 1
-  m_timeTakenForFullSineWave: 15
-  m_magnitude: 0.03
-  m_ChanceOfSignFlip: 0.001
+  m_floatingTimeTakenForFullSineWave: 10
+  m_floatingMagnitude: 0.03
+  m_floatingChanceOfSignFlip: 0.001
+  m_eyeRayCaster: {fileID: 309883021}
+  m_rotationalDamp: 1
 --- !u!114 &2341
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30414,7 +30433,18 @@ MonoBehaviour:
       PublicKeyToken=null
   OnButtonDownFunc:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2340}
+        m_MethodName: OnSphereSelectedDown
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
 --- !u!114 &2343
@@ -32468,9 +32498,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_active: 1
-  m_timeTakenForFullSineWave: 15
-  m_magnitude: 0.03
-  m_ChanceOfSignFlip: 0.001
+  m_floatingTimeTakenForFullSineWave: 10
+  m_floatingMagnitude: 0.03
+  m_floatingChanceOfSignFlip: 0.001
+  m_eyeRayCaster: {fileID: 309883021}
+  m_rotationalDamp: 1
 --- !u!114 &2440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32530,7 +32562,18 @@ MonoBehaviour:
       PublicKeyToken=null
   OnButtonDownFunc:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2439}
+        m_MethodName: OnSphereSelectedDown
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
 --- !u!114 &2442
@@ -36521,11 +36564,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400010, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
