@@ -53,6 +53,11 @@ public class ImageSkybox : MonoBehaviour
         m_myMaterial.SetFloat("_Dim", dim);
     }
 
+    public void SetRotation(Quaternion rot)
+    {
+        transform.localRotation = rot;
+    }
+
     public void SetImage(Texture2D texture, string imageIdentifier, int textureIndex)
     {        
         if (imageIdentifier.Length <= 0)

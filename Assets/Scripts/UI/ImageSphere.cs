@@ -354,7 +354,8 @@ public class ImageSphere : MonoBehaviour
             yield return null;
         }
 
-        // Set texture and textureID
+        // Set rotation back to zero and Set texture and textureID
+        m_imageObject.transform.localRotation = Quaternion.Euler(Vector3.zero);
         UpdateTextureAndID();
 
         // Scale up
@@ -429,17 +430,18 @@ public class ImageSphere : MonoBehaviour
 
         Vector3 initialPos = m_imageObject.transform.position;
         Vector3 userPos = Camera.main.gameObject.transform.position;
-        Quaternion initialRot = m_imageObject.transform.rotation;
-        Quaternion skyboxRot = m_imageSphereSkybox.transform.rotation;
+        //Quaternion initialRot = m_imageObject.transform.rotation; TODO: DELETE
+        //Quaternion skyboxRot = m_imageSphereSkybox.transform.rotation; TODO: DELETE
         Vector3 initialScale = new Vector3(kMaxScale, kMaxScale, kMaxScale);
         Vector3 skyboxScale = m_imageSphereSkybox.transform.localScale;
 
         // Travel to user and partially scale
-        const float kPercentageRotationDuration = 0.3f;
+        // const float kPercentageRotationDuration = 0.3f; TODO: DELETE
         const float kSecondsToGetToUser = 2.0f;
         float progress = 0;
         while (progress <= 1)
         {
+            /* TODO: DELETE
             if (progress < kPercentageRotationDuration) // All Rotation needs to have taken place before it reaches your face!
             {
                 m_imageObject.transform.rotation = Quaternion.Slerp(initialRot, skyboxRot, progress/kPercentageRotationDuration); 
@@ -448,6 +450,7 @@ public class ImageSphere : MonoBehaviour
             {
                 m_imageObject.transform.rotation = Quaternion.Slerp(initialRot, skyboxRot, 1.0f); 
             }
+            */
 
             m_imageObject.transform.position = Vector3.Lerp(initialPos, userPos, progress);
             m_imageObject.transform.localScale = Vector3.Lerp(initialScale, skyboxScale/2.0f, ExponentialProgress(progress));
@@ -463,7 +466,10 @@ public class ImageSphere : MonoBehaviour
             SetSkybox(imageIdentifier); // If its still loading then set the Thumbnail as the background, otherwise no need!
         }
 
-        // Scale to size of SkyBox
+        //Set the Skybox Rotation based on image rotation
+        m_imageSphereSkybox.SetRotation(m_imageObject.transform.rotation);
+
+        // Scale to size of Skybox
         const float kSecondsToGetToGrowFully = 1.0f;
         progress = 0;
         while (progress <= 1)
@@ -480,7 +486,7 @@ public class ImageSphere : MonoBehaviour
 
         // When Sphere has grown reset it
         m_imageObject.transform.position = initialPos;
-        m_imageObject.transform.rotation = initialRot;
+        //m_imageObject.transform.rotation = initialRot; TODO: DELETE
         m_imageObject.transform.localScale = new Vector3(kMinShrink, kMinShrink, kMinShrink);
 
         // Scale up the newly appeared ImageSphere
@@ -509,8 +515,6 @@ public class ImageSphere : MonoBehaviour
 
     private void DownloadAndSetOriginalImageOnSkybox(string imageIdentifier)
     {                
-        //TODO: Set SkyBox rotation based on the rotation from the ImageSphere!
-
         bool isImageFromDevice = imageIdentifier.StartsWith(m_imageSphereController.GetTopLevelDirectory());
         if (isImageFromDevice) // Gallery
         {
