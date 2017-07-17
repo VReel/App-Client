@@ -17,3 +17,6 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/DesignPrototyping/DesignPrototyping_04.unity
     guid: e1ad9becb8a3540b99da9979135858fd
+  - enabled: 0
+    path: Assets/Scenes/DesignPrototyping/Animation_03.unity
+    guid: bc648413e80b44b27b589f84d4e2f6d8
