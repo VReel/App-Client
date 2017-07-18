@@ -136,8 +136,8 @@ public class OptionsFlow : MonoBehaviour
     public void EndDeleteAccount()
     {
         CloseOptions();
-        m_profile.SetMenuBarProfileDetails();
         m_appDirector.RefreshCurrentState();
+        m_profile.SetMenuBarProfileDetails();
     }
 
     public void PasswordPageBackButton()
@@ -184,8 +184,8 @@ public class OptionsFlow : MonoBehaviour
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
             CloseOptions();
-            m_profile.SetMenuBarProfileDetails();
             m_appDirector.RefreshCurrentState();
+            m_profile.SetMenuBarProfileDetails();
         }
     }   
 

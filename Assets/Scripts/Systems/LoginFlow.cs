@@ -150,8 +150,8 @@ public class LoginFlow : MonoBehaviour
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
             CloseLogin();
-            m_profile.SetMenuBarProfileDetails();
             m_appDirector.RefreshCurrentState();
+            m_profile.SetMenuBarProfileDetails();
         }
     }
 
@@ -176,8 +176,8 @@ public class LoginFlow : MonoBehaviour
         if (m_backEndAPI.IsLastAPICallSuccessful())
         {
             CloseLogin();
-            m_profile.SetMenuBarProfileDetails();
             m_appDirector.RefreshCurrentState();
+            m_profile.SetMenuBarProfileDetails();
         }
     } 
 

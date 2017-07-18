@@ -10,7 +10,9 @@ public class CoroutineQueue
 
     MonoBehaviour m_owner = null;
     Coroutine m_mainInternalCoroutine = null;
-    Queue<IEnumerator> actions = new Queue<IEnumerator>();
+    Queue<IEnumerator> m_actions = new Queue<IEnumerator>();
+
+    //System.DateTime m_lastProcessTime = System.DateTime.Now;
 
     // **************************
     // Public functions
@@ -23,7 +25,18 @@ public class CoroutineQueue
 
     public bool IsActive()
     {
-        return m_mainInternalCoroutine != null;
+        /*
+        const float kIsActiveThresholdInSeconds = 1.0f;
+        bool processFunctionActive = (System.DateTime.Now - m_lastProcessTime).TotalSeconds < kIsActiveThresholdInSeconds;
+        */
+
+        bool internalCoroutineNotNull = m_mainInternalCoroutine != null;
+        return internalCoroutineNotNull;
+    }
+
+    public int Size()
+    {
+        return m_actions.Count;
     }
 
     public void StartLoop()
@@ -39,26 +52,28 @@ public class CoroutineQueue
 
     public void Clear()
     {
-        actions.Clear();
+        m_actions.Clear();
         m_owner.StopAllCoroutines();
         m_mainInternalCoroutine = m_owner.StartCoroutine(Process());
     }
 
     public void EnqueueAction(IEnumerator aAction)
     {
-        actions.Enqueue(aAction);
+        m_actions.Enqueue(aAction);
     }
 
     public void EnqueueWait(float aWaitTime)
     {
-        actions.Enqueue(Wait(aWaitTime));
+        m_actions.Enqueue(Wait(aWaitTime));
     }
 
     public void DebugPrint()
     {
         if (Debug.isDebugBuild) 
-            Debug.Log("------- VREEL: CoroutineQueue belonging to '" + m_owner + "' has started = " + (m_mainInternalCoroutine!=null) +
-                ", and has " + actions.Count + " Functions in the Queue!");
+        {
+            Debug.Log("------- VREEL: CoroutineQueue belonging to '" + m_owner + "' is active = " + IsActive() +
+                ", and has " + m_actions.Count + " Functions in the Queue!");
+        }
     }
 
     // **************************
@@ -74,9 +89,11 @@ public class CoroutineQueue
     {
         while (true)
         {
-            if (actions.Count > 0)
+            //m_lastProcessTime = System.DateTime.Now;
+            
+            if (m_actions.Count > 0)
             {                                
-                yield return m_owner.StartCoroutine(actions.Dequeue());
+                yield return m_owner.StartCoroutine(m_actions.Dequeue());
             }
             else
             {
