@@ -12,6 +12,7 @@ public class ImageSphereAnimation : MonoBehaviour
     [SerializeField] private float m_floatingMagnitude = 0.03f; // magnitude of variance
     [SerializeField] private float m_floatingChanceOfSignFlip = 0.001f; // chance of flipping float direction
     [SerializeField] private VRStandardAssets.Utils.VREyeRaycaster m_eyeRayCaster;
+    [SerializeField] private float m_rotationalSwipeSenstivity = 1.0f; // sensitivity of rotation effect
     [SerializeField] private float m_rotationalDamp = 5.0f; // damping on rotation effect
 
     // Float effect vars
@@ -26,8 +27,9 @@ public class ImageSphereAnimation : MonoBehaviour
     private VRStandardAssets.Menu.MenuButton m_menuButton;
     private float m_currRotationalSpeed = 0.0f;
     private bool m_isBeingManuallyRotated = false;
-    private Vector3 m_hitPointOnDown;
-    private Vector3 m_newHitPointOnOver;
+
+    private float m_touchXPosOnDown;
+    private float m_touchXPosLastFrame;
     private Quaternion m_rotOnDown;
 
     // **************************
@@ -72,10 +74,8 @@ public class ImageSphereAnimation : MonoBehaviour
     }
 
     public void OnSphereSelectedDown()
-    {
-        Vector3 sphereHitPoint = m_eyeRayCaster.LastRaycastHit.point;
-        Vector3 flattenedSphereHitPoint = (sphereHitPoint - (Vector3.Dot(sphereHitPoint, Vector3.up) * Vector3.up));
-        m_hitPointOnDown = flattenedSphereHitPoint;
+    {       
+        m_touchXPosOnDown = m_touchXPosLastFrame = Input.mousePosition.x;
         m_rotOnDown = transform.localRotation;
     }
 
@@ -112,24 +112,16 @@ public class ImageSphereAnimation : MonoBehaviour
     private void UpdateRotationEffect()
     {
         if (m_menuButton.GetButtonDown() && m_menuButton.GetGazeOver())
-        {
-            Vector3 sphereHitPoint = m_eyeRayCaster.LastRaycastHit.point;
-            Vector3 flattenedSphereHitPoint = (sphereHitPoint - (Vector3.Dot(sphereHitPoint, Vector3.up) * Vector3.up));
-            m_newHitPointOnOver = flattenedSphereHitPoint;                
-
-            Vector3 hitPointOut = Vector3.Cross(Vector3.up, m_hitPointOnDown);
-            float angleSign = Vector3.Dot(hitPointOut, m_newHitPointOnOver) > 0.0f ? 1.0f : -1.0f;
-
-            float newAngle = Vector3.Angle(transform.position - m_hitPointOnDown, transform.position - m_newHitPointOnOver);
-            newAngle *= angleSign;
-
+        {            
+            float newAngle = (Input.mousePosition.x - m_touchXPosOnDown) * m_rotationalSwipeSenstivity;
             Quaternion newRot = m_rotOnDown * Quaternion.Euler(0, newAngle, 0);
+            transform.localRotation = newRot;
 
             const float kSpeedDivisionFactor = 10.0f;
-            m_currRotationalSpeed = (Quaternion.Angle(transform.localRotation, newRot) * angleSign) / kSpeedDivisionFactor;
+            float diffInXFromLastFrame = Input.mousePosition.x - m_touchXPosLastFrame;
+            m_touchXPosLastFrame = Input.mousePosition.x;
+            m_currRotationalSpeed = (diffInXFromLastFrame * Time.fixedDeltaTime) + (m_currRotationalSpeed / kSpeedDivisionFactor); // always taking last speed slightly into account
             m_isBeingManuallyRotated |= Mathf.Abs(m_currRotationalSpeed) > kRotationEpsilon;
-
-            transform.localRotation = newRot;
         }
         else
         {
@@ -140,42 +132,10 @@ public class ImageSphereAnimation : MonoBehaviour
 
             m_isBeingManuallyRotated = false;
         }
-
-        /*
-        if (Debug.isDebugBuild)
-        {
-            if (m_hitPointOnDown.sqrMagnitude > 0.0f)
-            {
-                DrawDebugLine(m_hitPointOnDown, transform.position, Color.red);
-                if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateRotationEffect() - m_hitPointOnDown: " + m_hitPointOnDown + " transform.position: " + transform.position);
-            }
-
-            if (m_newHitPointOnOver.sqrMagnitude > 0.0f)
-            {
-                DrawDebugLine(m_newHitPointOnOver, transform.position, Color.green);
-                if (Debug.isDebugBuild) Debug.Log("------- VREEL: UpdateRotationEffect() - m_newHitPointOnOver: " + m_newHitPointOnOver + " transform.position: " + transform.position);
-            }
-        }
-        */
     }
 
     private int RandomSign() 
     {
         return Random.value < 0.5f? 1 : -1;
-    }
-
-    private void DrawDebugLine(Vector3 start, Vector3 end, Color color, float duration = 0.016f)
-    {
-        GameObject myLine = new GameObject();
-        myLine.transform.position = start;
-        myLine.AddComponent<LineRenderer>();
-        LineRenderer lr = myLine.GetComponent<LineRenderer>();
-        //lr.material = new Material(Shader.Find("Standard"));
-        //lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
-        lr.startColor = lr.endColor = color;
-        lr.startWidth = lr.endWidth = 0.1f;
-        lr.SetPosition(0, start);
-        lr.SetPosition(1, end);
-        GameObject.Destroy(myLine, duration);
     }
 }

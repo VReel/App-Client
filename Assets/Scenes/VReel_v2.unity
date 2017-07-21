@@ -21073,6 +21073,7 @@ MonoBehaviour:
   m_floatingMagnitude: 0.03
   m_floatingChanceOfSignFlip: 0.001
   m_eyeRayCaster: {fileID: 0}
+  m_rotationalSwipeSenstivity: 1
   m_rotationalDamp: 1
 --- !u!114 &1861
 MonoBehaviour:
@@ -24596,7 +24597,8 @@ MonoBehaviour:
   m_floatingMagnitude: 0.03
   m_floatingChanceOfSignFlip: 0.001
   m_eyeRayCaster: {fileID: 309883021}
-  m_rotationalDamp: 1
+  m_rotationalSwipeSenstivity: 1
+  m_rotationalDamp: 3
 --- !u!114 &2029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25039,6 +25041,7 @@ MonoBehaviour:
   m_floatingMagnitude: 0.03
   m_floatingChanceOfSignFlip: 0.001
   m_eyeRayCaster: {fileID: 0}
+  m_rotationalSwipeSenstivity: 1
   m_rotationalDamp: 1
 --- !u!114 &2048
 MonoBehaviour:
@@ -30374,7 +30377,8 @@ MonoBehaviour:
   m_floatingMagnitude: 0.03
   m_floatingChanceOfSignFlip: 0.001
   m_eyeRayCaster: {fileID: 309883021}
-  m_rotationalDamp: 1
+  m_rotationalSwipeSenstivity: 1
+  m_rotationalDamp: 5
 --- !u!114 &2341
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32503,6 +32507,7 @@ MonoBehaviour:
   m_floatingMagnitude: 0.03
   m_floatingChanceOfSignFlip: 0.001
   m_eyeRayCaster: {fileID: 309883021}
+  m_rotationalSwipeSenstivity: 1
   m_rotationalDamp: 1
 --- !u!114 &2440
 MonoBehaviour:
