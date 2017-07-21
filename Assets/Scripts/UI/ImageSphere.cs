@@ -500,7 +500,7 @@ public class ImageSphere : MonoBehaviour
         m_imageObject.GetComponent<ImageSphereAnimation>().SetActive(true);
         m_imageObject.GetComponent<Collider>().enabled = true;
 
-        m_menuController.SetSkyboxDimOn(true); // switch dim back on gradually...
+        //m_menuController.SetSkyboxDimOn(true); // switch dim back on gradually...
 
         m_imageFlow.OpenWithImageSphere(this);
     }

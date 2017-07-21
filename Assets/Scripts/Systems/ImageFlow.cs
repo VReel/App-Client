@@ -16,6 +16,7 @@ public class ImageFlow : MonoBehaviour
     [SerializeField] private LoginFlow m_loginFlow;
     [SerializeField] private ImageSkybox m_imageSkybox;
     [SerializeField] private MenuController m_menuController;
+    [SerializeField] private MenuHider m_menuHider;
     [SerializeField] private ListComments m_listComments;
     [SerializeField] private LoadingIcon m_loadingIcon;
     [SerializeField] private KeyBoard m_keyboard;
@@ -85,6 +86,8 @@ public class ImageFlow : MonoBehaviour
 
         m_menuController.UpdateMenuConfig(this);
         m_appDirector.SetOverlayShowing(true);
+
+        m_menuHider.SetMenuVisibility(false);
     }
 
     public void Close()

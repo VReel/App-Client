@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.VR;       //VRSettings
 
 public class MenuHider : MonoBehaviour 
 {
@@ -20,7 +21,10 @@ public class MenuHider : MonoBehaviour
         m_InteractiveItem.OnOver += HandleOver;
         m_InteractiveItem.OnUp += HandleUp;
 
-        m_menuController.RegisterToUseMenuConfig(this);
+        if (m_menuController.GetMenuConfigForOwner(this) == null)
+        {
+            m_menuController.RegisterToUseMenuConfig(this);
+        }
     }
 
     public void OnDestroy()
@@ -29,12 +33,31 @@ public class MenuHider : MonoBehaviour
         m_InteractiveItem.OnUp -= HandleUp;
     }        
 
+    public void SetMenuVisibility(bool on)
+    {
+        if (m_menuController.GetMenuConfigForOwner(this) == null)
+        {
+            m_menuController.RegisterToUseMenuConfig(this);
+        }
+
+        if (on)
+        {
+            HandleUp();
+        }
+        else
+        {
+            HandleOver();
+        }
+    }
+
     // **************************
     // Private/Helper functions
     // **************************
 
     private void HandleOver()
     {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: HandleOver() called - ie. menu hidden");
+
         m_menuController.GetMenuConfigForOwner(this).menuVisible = false;
         m_menuController.UpdateMenuConfig(this);
 
@@ -49,6 +72,8 @@ public class MenuHider : MonoBehaviour
 
     private void HandleUp()
     {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: HandleUp() called - ie. menu shown");
+
         m_menuController.SetSkyboxDimOn(true);
 
         MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
@@ -60,5 +85,16 @@ public class MenuHider : MonoBehaviour
         Color col = m_vreelLogo.color;
         col.a = 1;
         m_vreelLogo.color = col;
+    }
+
+    // NOTE: The following functions is for making debugging without a headset easier...
+    // ------------------------------------------
+    private void OnMouseDown()
+    {          
+        if (!VRSettings.enabled)
+        {
+            bool visibilityShouldBeOn = !m_menuController.GetMenuConfigForOwner(this).menuVisible;
+            SetMenuVisibility(visibilityShouldBeOn);
+        }
     }
 }

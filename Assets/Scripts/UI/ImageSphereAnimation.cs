@@ -22,8 +22,10 @@ public class ImageSphereAnimation : MonoBehaviour
     private Vector3 m_currTimeVecSign;
 
     // Rotation effect vars
+    const float kRotationEpsilon = 0.1f;
     private VRStandardAssets.Menu.MenuButton m_menuButton;
     private float m_currRotationalSpeed = 0.0f;
+    private bool m_isBeingManuallyRotated = false;
     private Vector3 m_hitPointOnDown;
     private Vector3 m_newHitPointOnOver;
     private Quaternion m_rotOnDown;
@@ -65,9 +67,8 @@ public class ImageSphereAnimation : MonoBehaviour
     }
 
     public bool IsRotating()
-    {
-        const float kEpsilon = 0.1f;
-        return (Mathf.Abs(m_currRotationalSpeed) > kEpsilon);
+    {        
+        return (Mathf.Abs(m_currRotationalSpeed) > kRotationEpsilon) || m_isBeingManuallyRotated;
     }
 
     public void OnSphereSelectedDown()
@@ -123,8 +124,10 @@ public class ImageSphereAnimation : MonoBehaviour
             newAngle *= angleSign;
 
             Quaternion newRot = m_rotOnDown * Quaternion.Euler(0, newAngle, 0);
-            const float kDivisionFactor = 10.0f;
-            m_currRotationalSpeed = (Quaternion.Angle(transform.localRotation, newRot) * angleSign) / kDivisionFactor;
+
+            const float kSpeedDivisionFactor = 10.0f;
+            m_currRotationalSpeed = (Quaternion.Angle(transform.localRotation, newRot) * angleSign) / kSpeedDivisionFactor;
+            m_isBeingManuallyRotated |= Mathf.Abs(m_currRotationalSpeed) > kRotationEpsilon;
 
             transform.localRotation = newRot;
         }
@@ -134,6 +137,8 @@ public class ImageSphereAnimation : MonoBehaviour
             m_currRotationalSpeed = absCurrSpeed * (m_currRotationalSpeed > 0.0f ? 1.0f : -1.0f);
 
             transform.RotateAround(transform.position, Vector3.up, m_currRotationalSpeed);
+
+            m_isBeingManuallyRotated = false;
         }
 
         /*

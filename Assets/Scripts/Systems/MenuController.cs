@@ -97,7 +97,7 @@ public class MenuController : MonoBehaviour
     public MenuConfig GetMenuConfigForOwner(MonoBehaviour owner)
     {
         int index = GetMenuConfigIndexForOwner(owner);
-        return m_menuConfigList[index];
+        return (index >= 0) ? m_menuConfigList[index] : null;
     }
 
     public void UpdateMenuConfig(MonoBehaviour owner)
