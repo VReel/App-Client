@@ -13,7 +13,7 @@ public class ImageSphereAnimation : MonoBehaviour
     [SerializeField] private float m_floatingChanceOfSignFlip = 0.001f; // chance of flipping float direction
     [SerializeField] private VRStandardAssets.Utils.VREyeRaycaster m_eyeRayCaster;
     [SerializeField] private float m_rotationalSwipeSenstivity = 1.0f; // sensitivity of rotation effect
-    [SerializeField] private float m_rotationalDamp = 5.0f; // damping on rotation effect
+    [SerializeField] private float m_rotationalDamp = 1.0f; // damping on rotation effect
 
     // Float effect vars
     private const float kLengthOfSine = 2 * Mathf.PI;
@@ -25,8 +25,8 @@ public class ImageSphereAnimation : MonoBehaviour
     // Rotation effect vars
     const float kRotationEpsilon = 0.1f;
     private VRStandardAssets.Menu.MenuButton m_menuButton;
-    private float m_currRotationalSpeed = 0.0f;
-    private bool m_isBeingManuallyRotated = false;
+    public float m_currRotationalSpeed = 0.0f;
+    public bool m_isBeingManuallyRotated = false;
 
     private float m_touchXPosOnDown;
     private float m_touchXPosLastFrame;
@@ -125,7 +125,7 @@ public class ImageSphereAnimation : MonoBehaviour
         }
         else
         {
-            float absCurrSpeed = Mathf.Abs(m_currRotationalSpeed) - (m_rotationalDamp * Time.fixedDeltaTime);
+            float absCurrSpeed = Mathf.Max(Mathf.Abs(m_currRotationalSpeed) - (m_rotationalDamp * Time.fixedDeltaTime), 0.0f);
             m_currRotationalSpeed = absCurrSpeed * (m_currRotationalSpeed > 0.0f ? 1.0f : -1.0f);
 
             transform.RotateAround(transform.position, Vector3.up, m_currRotationalSpeed);
