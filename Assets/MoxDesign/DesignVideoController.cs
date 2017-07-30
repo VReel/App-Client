@@ -11,6 +11,7 @@ public class DesignVideoController : MonoBehaviour
 
 	public float m_currTime = 0;
 
+    public float m_timeMultiplier = 1.6f; // speed multiplier to make the effect faster
     [SerializeField] private List<EventList> m_eventGroups; 
 
     [System.Serializable]
@@ -35,7 +36,7 @@ public class DesignVideoController : MonoBehaviour
 
 	public void Update()
 	{
-		m_currTime += Time.deltaTime;
+        m_currTime += (Time.deltaTime * m_timeMultiplier);
 
         for (int i = 0; i < m_eventGroups.Count; i++) 
         {

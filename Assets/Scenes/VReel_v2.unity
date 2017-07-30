@@ -23303,7 +23303,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_isFPSTextVisible: 1
-  m_isDebugMessagesOn: 0
+  m_isDebugMessagesOn: 1
   m_fpsTextFontSize: 0.04
 --- !u!114 &1968
 MonoBehaviour:
@@ -36580,11 +36580,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400010, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 126d619cf4daa52469682f85c1378b4a, type: 2}

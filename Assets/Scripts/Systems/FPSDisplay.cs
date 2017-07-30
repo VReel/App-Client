@@ -28,7 +28,7 @@ public class FPSDisplay : MonoBehaviour
         float fps = 1.0f / m_deltaTime;
         if (fps < kFrameOutThreshold)
         {
-            if (m_isDebugMessagesOn && Debug.isDebugBuild) Debug.Log("------- VREEL: We are Framing out at FPS = " + fps);
+            if (m_isDebugMessagesOn && Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: We are Framing out at FPS = " + fps);
         }
         /*
         else if (m_garbageCollectionTimeSinceLast > m_garbageCollectionTimeFreq)

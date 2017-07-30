@@ -121,16 +121,16 @@ public class ImageLoader : MonoBehaviour
         yield return m_threadJob.WaitFor();
         bool debugOn = Debug.isDebugBuild;
         Stream imageStream = null;
-        bool success = false;
+        int contentLength = 0;
         m_threadJob.Start( () => 
-            success = GetImageStreamFromURL(url, ref imageStream, debugOn)
+            contentLength = GetImageStreamFromURL(url, ref imageStream, debugOn)
         );
         yield return m_threadJob.WaitFor();
 
-        if (success)
+        if (contentLength > 0)
         {
             int textureIndex = GetAvailableTextureIndex();
-            yield return m_cppPlugin.LoadImageFromStreamIntoImageSphere(imageSphereController, sphereIndex, imageStream, imageIdentifier, textureIndex);
+            yield return m_cppPlugin.LoadImageFromStreamIntoImageSphere(imageSphereController, sphereIndex, imageStream, imageIdentifier, textureIndex, contentLength);
 
             imageStream.Close();
         }
@@ -146,20 +146,19 @@ public class ImageLoader : MonoBehaviour
         }
     }                   
 
-    private bool GetImageStreamFromURL(string url, ref Stream imageStream, bool debugOn)
+    private int GetImageStreamFromURL(string url, ref Stream imageStream, bool debugOn)
     {        
         try
         {
             HttpWebRequest http = (HttpWebRequest)WebRequest.Create(url);
             imageStream = http.GetResponse().GetResponseStream();
+            return (int) http.GetResponse().ContentLength;
         }
         catch(Exception e)
         {
             if (debugOn) Debug.Log("------- VREEL: ERROR - WebRequest got an exception: " + e);
-            return false;
+            return -1;
         }
-
-        return true;
     }
 
     private int GetAvailableTextureIndex()

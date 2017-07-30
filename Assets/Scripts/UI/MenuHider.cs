@@ -55,9 +55,7 @@ public class MenuHider : MonoBehaviour
     // **************************
 
     private void HandleOver()
-    {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: HandleOver() called - ie. menu hidden");
-
+    {        
         m_menuController.GetMenuConfigForOwner(this).menuVisible = false;
         m_menuController.UpdateMenuConfig(this);
 
@@ -72,8 +70,6 @@ public class MenuHider : MonoBehaviour
 
     private void HandleUp()
     {
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: HandleUp() called - ie. menu shown");
-
         m_menuController.SetSkyboxDimOn(true);
 
         MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);

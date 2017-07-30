@@ -175,7 +175,7 @@ public class CppPlugin
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Completed LoadImageFromPathIntoImageSphere() with sphereIndex : "  + sphereIndex + ", from filePath: " + filePathAndIdentifier + ", with TextureIndex: " + textureIndex);
     }   
            
-    public IEnumerator LoadImageFromStreamIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, Stream imageStream, string imageIdentifier, int textureIndex)
+    public IEnumerator LoadImageFromStreamIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, Stream imageStream, string imageIdentifier, int textureIndex, int contentLength)
     {
         yield return null;
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadImageFromStreamIntoImageSphere() with sphereIndex: " + sphereIndex + ", imageIdentifier: " + imageIdentifier + ", with TextureIndex: " + textureIndex);
@@ -183,15 +183,23 @@ public class CppPlugin
         SetRGB565On(Helper.kRGB565On);
         SetMaxImageWidth(Helper.kMaxImageWidth);
 
+
+
+        var startTime = DateTime.UtcNow;
+
+
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling ToByteArray(), on background thread!");
         yield return m_threadJob.WaitFor();
         bool ranJobSuccessfully = false;
         byte[] myBinary = null;
         m_threadJob.Start( () => 
-            ranJobSuccessfully = ToByteArray(imageStream, ref myBinary)
+            ranJobSuccessfully = ToByteArray(imageStream, contentLength, ref myBinary)
         );
         yield return m_threadJob.WaitFor();
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished ToByteArray(), ran Job Successully = " + ranJobSuccessfully);
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: 1 " + (DateTime.UtcNow-startTime));
+        startTime = DateTime.UtcNow;
 
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadIntoWorkingMemoryFromImagePath(), on background thread!");
         GCHandle rawDataHandle = GCHandle.Alloc(myBinary, GCHandleType.Pinned);
@@ -204,6 +212,10 @@ public class CppPlugin
         yield return m_threadJob.WaitFor();
         rawDataHandle.Free();
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadIntoWorkingMemoryFromImagePath(), ran Job Successully = " + ranJobSuccessfully); 
+
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: 2 " + (DateTime.UtcNow-startTime));
+        startTime = DateTime.UtcNow;
 
 
         //TODO: Make CreateEmptyTexture() more efficient - the problem is simply that a glTexImage2D() call is slow with large textures!
@@ -219,6 +231,9 @@ public class CppPlugin
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateEmptyTexture(), Texture Handle = " + GetCurrStoredTexturePtr() );
 
 
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: 3 " + (DateTime.UtcNow-startTime));
+        startTime = DateTime.UtcNow;
+
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadScanlinesIntoTextureFromWorkingMemory()");
         while (IsLoadingIntoTexture())
         {            
@@ -228,6 +243,9 @@ public class CppPlugin
         }
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadScanlinesIntoTextureFromWorkingMemory()");
 
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: 4 " + (DateTime.UtcNow-startTime));
+        startTime = DateTime.UtcNow;
 
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateExternalTexture(), size of Texture is Width x Height = " + GetCurrStoredImageWidth() + " x " + GetCurrStoredImageHeight());
         yield return m_waitForEndOfFrame;
@@ -244,21 +262,101 @@ public class CppPlugin
         m_lastTextureOperatedOn.filterMode = FilterMode.Trilinear;
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateExternalTexture()!");
 
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: 5 " + (DateTime.UtcNow-startTime));
+        startTime = DateTime.UtcNow;
 
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAtIndex()");
         imageSphereController.SetImageAtIndex(sphereIndex, m_lastTextureOperatedOn, imageIdentifier, textureIndex, true);
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
 
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: 6 " + (DateTime.UtcNow-startTime));
+        startTime = DateTime.UtcNow;
+
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Completed LoadImageFromStreamIntoImageSphere() with sphereIndex: " + sphereIndex + ", imageIdentifier: " + imageIdentifier + ", with TextureIndex: " + textureIndex);
     }  
+
+
+    //WIP
+    public IEnumerator TestLoad(ImageSphereController imageSphereController, int sphereIndex, string url, string imageIdentifier, int textureIndex)
+    {
+        var startTime = DateTime.UtcNow;
+
+        WWW www = new WWW(url);
+        yield return www;
+
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: TestLoad() 1 " + (DateTime.UtcNow-startTime));
+        yield return new WaitForSeconds(2);
+        startTime = DateTime.UtcNow;
+
+
+        byte[] newBytes = new byte[4096 * 2048 * 3];
+
+        for (int i = 0; i < (4096 * 2048); i++)
+        {
+            newBytes[i*3 + 0] = 0;
+            newBytes[i*3 + 1] = 255;
+            newBytes[i*3 + 2] = 0;
+        }
+
+        //DO STUFF
+        /*
+        GCHandle rawDataHandle = GCHandle.Alloc(myBinary, GCHandleType.Pinned);
+        IntPtr rawDataPtr = rawDataHandle.AddrOfPinnedObject();
+        yield return m_threadJob.WaitFor();
+        ranJobSuccessfully = false;
+        m_threadJob.Start( () => 
+            ranJobSuccessfully = LoadIntoWorkingMemoryFromImageData(rawDataPtr, myBinary.Length)
+        );
+        yield return m_threadJob.WaitFor();
+        rawDataHandle.Free();
+        */
+
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: TestLoad() 2 " + (DateTime.UtcNow-startTime));
+        yield return new WaitForSeconds(2);
+        startTime = DateTime.UtcNow;
+
+
+        m_lastTextureOperatedOn = new Texture2D(4096, 2048, TextureFormat.RGB24, false);
+        m_lastTextureOperatedOn.LoadRawTextureData(newBytes);
+
+
+        //www.LoadImageIntoTexture(m_lastTextureOperatedOn);
+
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: TestLoad() 3 " + (DateTime.UtcNow-startTime));
+        yield return new WaitForSeconds(2);
+        startTime = DateTime.UtcNow;
+
+
+        m_lastTextureOperatedOn.Apply();
+
+
+
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: TestLoad() 4 " + (DateTime.UtcNow-startTime));
+        yield return new WaitForSeconds(2);
+        startTime = DateTime.UtcNow;
+
+
+        imageSphereController.SetImageAtIndex(sphereIndex, m_lastTextureOperatedOn, imageIdentifier, textureIndex, true);
+
+
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: TestLoad() 5 " + (DateTime.UtcNow-startTime));
+    }
+
+
 
     // **************************
     // Private/Helper functions
     // **************************
 
-    private bool ToByteArray(Stream stream, ref byte[] outBinary)
-    {                
-        const int kBlockSize = 1024;
+    private bool ToByteArray(Stream stream, int contentLength, ref byte[] outBinary)
+    {       
+        /*
+        const int kBlockSize = 1024*1024;
         byte[] buf = new byte[kBlockSize];
         using( MemoryStream ms = new MemoryStream() ) 
         {            
@@ -272,6 +370,31 @@ public class CppPlugin
 
             outBinary = ms.ToArray();
         }
+
+        return true;
+        */
+
+        // Now read s into a byte buffer with a little padding.
+
+        Debug.Log("------- VREEL-TEST: ToByteArray() - length " + contentLength);
+
+        int numIterations = 0;
+
+        outBinary = new byte[contentLength];
+        int numBytesToRead = contentLength;
+        int numBytesRead = 0;
+        do
+        {
+            // Read may return anything from 0 to 10.
+            int n = stream.Read(outBinary, numBytesRead, numBytesToRead);
+            numBytesRead += n;
+            numBytesToRead -= n;
+
+            numIterations++;
+        } 
+        while (numBytesToRead > 0);
+
+        Debug.Log("------- VREEL-TEST: ToByteArray() iterations " + numIterations);
 
         return true;
     }
