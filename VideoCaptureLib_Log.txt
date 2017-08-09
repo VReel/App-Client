@@ -1,0 +1,112 @@
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-33-58-75KYG.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-33-58-75KYG.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-33-58-G7HPG.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-33-58-G7HPG.wav"
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-34-46-098YN.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-34-46-098YN.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-34-46-2OK0V.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-34-46-2OK0V.wav"
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-35-59-TPCT8.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-35-59-TPCT8.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-35-59-UK3YE.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-35-59-UK3YE.wav"
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-40-00-AXFJX.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-40-00-AXFJX.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-40-00-45K0A.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-40-00-45K0A.wav"
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-40-47-EW63E.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-40-47-EW63E.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-40-47-LY6V4.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-40-47-LY6V4.wav"
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-49-00-0ESJ2.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-49-00-0ESJ2.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-49-00-IR2P2.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-49-00-IR2P2.wav"
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-50-21-LEKFL.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-50-21-LEKFL.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-50-21-P78K1.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-50-21-P78K1.wav"
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-50-31-LX1WF.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-50-31-LX1WF.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-50-31-8OL3X.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-50-31-8OL3X.wav"
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-52-30-RL88G.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-52-30-RL88G.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-52-30-LZC4Q.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-52-30-LZC4Q.wav"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-54-01-EMJBZ.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-54-01-EMJBZ.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-20-54-01-0NI6H.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-20-54-01-0NI6H.wav"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-21-06-55-NUVW3.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-21-06-55-NUVW3.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-21-06-55-YUQNE.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-21-06-55-YUQNE.wav"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-21-07-29-GB31N.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-21-07-29-GB31N.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-21-07-29-AYNLX.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-21-07-29-AYNLX.wav"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-21-08-44-AXRSC.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-21-08-44-AXRSC.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-21-08-54-RMU6Z.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-21-08-54-RMU6Z.wav"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-21-41-47-JIG33.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-21-41-47-JIG33.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-21-41-47-IDAAY.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-21-41-47-IDAAY.wav"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-22-10-05-8CWYR.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 700x422 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-22-10-05-8CWYR.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-22-10-05-J2KGZ.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-22-10-05-J2KGZ.wav"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-22-18-09-L8F1O.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-22-18-09-L8F1O.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-22-18-10-Q69Z8.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-22-18-10-Q69Z8.wav"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-22-27-48-TJA4Y.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 700x422 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-22-27-48-TJA4Y.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-22-27-48-WI739.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-22-27-48-WI739.wav"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-22-34-13-GFOP2.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 700x422 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-22-34-13-GFOP2.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-22-34-13-MIOHS.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-22-34-13-MIOHS.wav"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-22-35-38-TKCFR.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 700x422 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-22-35-38-TKCFR.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-22-35-38-17Y3J.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-22-35-38-17Y3J.wav"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-22-37-31-QW4TU.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1440x710 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-22-37-31-QW4TU.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-22-37-31-7PT3S.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-22-37-31-7PT3S.wav"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-22-45-38-5C3QW.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1440x710 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-22-45-38-5C3QW.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-22-45-38-FI6A1.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-22-45-38-FI6A1.wav"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-22-52-24-TMLHQ.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1440x710 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-22-52-24-TMLHQ.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-22-52-24-WLIG1.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-22-52-24-WLIG1.wav"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-23-11-16-LEXF4.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-23-11-16-LEXF4.wav"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-23-22-25-ZMWE5.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-23-22-25-ZMWE5.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-23-22-25-DBIVN.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-23-22-25-DBIVN.wav"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-23-24-37-5EVSX.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1440x710 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-23-24-37-5EVSX.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/FoxBookAir/RockVR/Video/2017-08-09-23-24-37-QANUA.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/FoxBookAir/Documents/Unity/VReel/VReel-ClientApp/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/FoxBookAir/RockVR/Video/2017-08-09-23-24-37-QANUA.wav"
