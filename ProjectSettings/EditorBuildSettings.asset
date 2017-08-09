@@ -11,12 +11,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/DesignPrototyping/DesignPrototyping_01.unity
     guid: f4c8721758a224021814e316a589deb6
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/VReel_v2.unity
     guid: 07b1fbde4a6b6414e9b95f25d0aeeb48
   - enabled: 0
     path: Assets/Scenes/DesignPrototyping/DesignPrototyping_04.unity
     guid: e1ad9becb8a3540b99da9979135858fd
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/DesignPrototyping/Animation_03.unity
     guid: bc648413e80b44b27b589f84d4e2f6d8
