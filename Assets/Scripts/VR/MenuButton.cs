@@ -182,7 +182,7 @@ namespace VRStandardAssets.Menu
             }   
         }
 
-        // NOTE: The following functions is for making debugging without a headset easier...
+        // NOTE: The following functions is for allowing the app to work outside of VR
         // ------------------------------------------
         private void OnMouseOver()
         {            
