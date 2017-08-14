@@ -28,6 +28,7 @@ public class ImageSphereAnimation : MonoBehaviour
     public float m_currRotationalSpeed = 0.0f;
     public bool m_isBeingManuallyRotated = false;
 
+    private float m_rotationalSpeedOnRelease = 0.0f;
     private float m_touchXPosOnDown;
     private float m_touchXPosLastFrame;
     private Quaternion m_rotOnDown;
@@ -114,7 +115,7 @@ public class ImageSphereAnimation : MonoBehaviour
         if (m_menuButton.GetButtonDown() && m_menuButton.GetGazeOver())
         {            
             float newAngle = (Input.mousePosition.x - m_touchXPosOnDown) * m_rotationalSwipeSenstivity;
-            Quaternion newRot = m_rotOnDown * Quaternion.Euler(0, newAngle, 0);
+            Quaternion newRot =  m_rotOnDown * Quaternion.AngleAxis(newAngle, Vector3.up); 
             transform.localRotation = newRot;
 
             const float kSpeedDivisionFactor = 10.0f;
@@ -122,13 +123,17 @@ public class ImageSphereAnimation : MonoBehaviour
             m_touchXPosLastFrame = Input.mousePosition.x;
             m_currRotationalSpeed = (diffInXFromLastFrame * Time.fixedDeltaTime) + (m_currRotationalSpeed / kSpeedDivisionFactor); // always taking last speed slightly into account
             m_isBeingManuallyRotated |= Mathf.Abs(m_currRotationalSpeed) > kRotationEpsilon;
+
+            m_rotationalSpeedOnRelease = m_currRotationalSpeed;
         }
         else
         {
-            float absCurrSpeed = Mathf.Max(Mathf.Abs(m_currRotationalSpeed) - (m_rotationalDamp * Time.fixedDeltaTime), 0.0f);
-            m_currRotationalSpeed = absCurrSpeed * (m_currRotationalSpeed > 0.0f ? 1.0f : -1.0f);
+            float newAngle = m_currRotationalSpeed;
+            Quaternion newRot = transform.localRotation * Quaternion.AngleAxis(newAngle, Vector3.up); 
+            transform.localRotation = newRot;
 
-            transform.RotateAround(transform.position, Vector3.up, m_currRotationalSpeed);
+            float absCurrSpeed = Mathf.Max(Mathf.Abs(m_currRotationalSpeed) - (Mathf.Abs(m_rotationalSpeedOnRelease) * (m_rotationalDamp * Time.fixedDeltaTime)), 0.0f);
+            m_currRotationalSpeed = absCurrSpeed * (m_currRotationalSpeed > 0.0f ? 1.0f : -1.0f);
 
             m_isBeingManuallyRotated = false;
         }
