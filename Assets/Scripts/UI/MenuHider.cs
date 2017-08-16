@@ -10,7 +10,11 @@ public class MenuHider : MonoBehaviour
 
     [SerializeField] private VRStandardAssets.Utils.VRInteractiveItem m_InteractiveItem;       // The interactive item used to know how the user is interacting with the button
     [SerializeField] private MenuController m_menuController;
+    [SerializeField] private Collider m_vreelCollider;
     [SerializeField] private Image m_vreelLogo;
+
+    private MonoBehaviour m_previousMenuConfigOwner;
+    private bool m_showing = true;
 
     // **************************
     // Public functions
@@ -42,11 +46,27 @@ public class MenuHider : MonoBehaviour
 
         if (on)
         {
-            HandleUp();
+            Show();
         }
         else
         {
-            HandleOver();
+            Hide();
+        }
+    }
+
+    public void SkyboxSelected()
+    {
+        if (!VRSettings.enabled)
+        {
+            Hide();
+        }
+    }
+
+    public void VReelButtonSelected()
+    {
+        if (!VRSettings.enabled)
+        {
+            Show();
         }
     }
 
@@ -56,41 +76,67 @@ public class MenuHider : MonoBehaviour
 
     private void HandleOver()
     {        
+        Hide();
+    }
+
+    private void HandleUp()
+    {
+        Show();
+    }
+
+    private void Hide()
+    {
+        if (!m_showing)
+        {
+            return;
+        }
+        m_showing = false;
+
+        if (m_menuController.GetMenuConfigForOwner(this) == null)
+        {
+            m_menuController.RegisterToUseMenuConfig(this);
+        }            
+
+        m_previousMenuConfigOwner = m_menuController.GetCurrMenuConfig().owner;
         m_menuController.GetMenuConfigForOwner(this).menuVisible = false;
         m_menuController.UpdateMenuConfig(this);
 
         m_menuController.SetSkyboxDimOn(false);
-        gameObject.GetComponent<Collider>().enabled = true; // we switch our box collider back on so that it can still react!
 
         m_vreelLogo.enabled = true;
         Color col = m_vreelLogo.color;
         col.a = 0.5f;
         m_vreelLogo.color = col;
+
+        if (!VRSettings.enabled)
+        {
+            m_vreelCollider.enabled = true;
+        }
+        else
+        {
+            gameObject.GetComponent<Collider>().enabled = true; // we switch the MenuHider's box collider back on so that it can still react!
+        }
     }
 
-    private void HandleUp()
+    private void Show()
     {
+        if (m_showing)
+        {
+            return;
+        }
+        m_showing = true;
+
+        if (m_menuController.GetMenuConfigForOwner(this) == null)
+        {
+            m_menuController.RegisterToUseMenuConfig(this);
+        }
+
         m_menuController.SetSkyboxDimOn(true);
 
-        MenuController.MenuConfig menuConfig = m_menuController.GetMenuConfigForOwner(this);
-        menuConfig.menuVisible = true;
-        menuConfig.menuBarVisible = false;
-        menuConfig.imageSpheresVisible = false;
-        m_menuController.UpdateMenuConfig(this);
+        m_menuController.UpdateMenuConfig(m_previousMenuConfigOwner);
 
         Color col = m_vreelLogo.color;
         col.a = 1;
         m_vreelLogo.color = col;
-    }
-
-    // NOTE: The following functions is for making debugging without a headset easier...
-    // ------------------------------------------
-    private void OnMouseDown()
-    {          
-        if (!VRSettings.enabled)
-        {
-            bool visibilityShouldBeOn = !m_menuController.GetMenuConfigForOwner(this).menuVisible;
-            SetMenuVisibility(visibilityShouldBeOn);
-        }
     }
 }

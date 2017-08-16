@@ -77,6 +77,11 @@ public class MenuController : MonoBehaviour
     {
         return m_menuConfigList[m_currMenuConfigIndex].menuVisible;
     }
+
+    public MenuConfig GetCurrMenuConfig()
+    {
+        return m_menuConfigList[m_currMenuConfigIndex];
+    }
         
     public void RegisterToUseMenuConfig(MonoBehaviour owner)
     {

@@ -24,7 +24,7 @@ public class AppDirector : MonoBehaviour
         kSearch,        // User is searching profiles or tags
         kGallery        // User is viewing their 360 photo gallery, they can scroll through all the 360 photos on their phone
     }
-
+        
     [SerializeField] private User m_user;
     [SerializeField] private GameObject m_menuBar;
     [SerializeField] private MenuController m_menuController;
@@ -86,6 +86,18 @@ public class AppDirector : MonoBehaviour
         {
             RequestExploreState();
             m_profile.SetMenuBarProfileDetails();
+        }
+
+        //AppDirector changes certain settings based on whether in VR or not!
+        if (!VRSettings.enabled)
+        {
+            Camera.current.fieldOfView = 78;
+            m_keyboard.SetInVRMode(false);
+        }
+        else
+        {
+            Camera.current.fieldOfView = 90;
+            m_keyboard.SetInVRMode(true);
         }
     }
        

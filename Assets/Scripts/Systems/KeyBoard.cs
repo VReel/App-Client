@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.VR;       //VRSettings
 
 public class KeyBoard : MonoBehaviour 
 {
@@ -273,4 +274,16 @@ public class KeyBoard : MonoBehaviour
             m_symbolMode = false;
 		}		
 	}
+
+    public void SetInVRMode(bool inVR)
+    {
+        if (inVR)
+        {
+            transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+        }
+        else
+        {
+            transform.localScale = new Vector3(0.0175f, 0.0175f, 0.01f);
+        }
+    }
 }
