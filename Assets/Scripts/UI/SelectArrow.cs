@@ -20,7 +20,8 @@ public class SelectArrow : MonoBehaviour
     public enum ArrowType
     {
         kPrev,
-        kNext
+        kNext,
+        kScroll
     };
 
     // **************************
@@ -75,7 +76,13 @@ public class SelectArrow : MonoBehaviour
             else if (m_arrowType == ArrowType.kPrev)
             {
                 return !m_posts.IsPostIndexAtStart();
-            }      
+            }
+            else if (m_arrowType == ArrowType.kScroll)
+            {
+                if (Debug.isDebugBuild) Debug.Log("------- VREEL: Scroll visible: " + (!m_posts.IsPostIndexAtEnd() || !m_posts.IsPostIndexAtStart()) );
+
+                return !m_posts.IsPostIndexAtEnd() || !m_posts.IsPostIndexAtStart();
+            }
         }
 
         if (m_appDirector.GetState() == AppDirector.AppState.kGallery)
@@ -87,6 +94,10 @@ public class SelectArrow : MonoBehaviour
             else if (m_arrowType == ArrowType.kPrev)
             {
                 return !m_gallery.IsGalleryIndexAtStart();
+            }
+            else if (m_arrowType == ArrowType.kScroll)
+            {
+                return !m_gallery.IsGalleryIndexAtEnd() || !m_gallery.IsGalleryIndexAtStart();
             }
         }
             
