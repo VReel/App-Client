@@ -9,8 +9,9 @@ public class CarouselElement : MonoBehaviour
 
     [SerializeField] private Battlehub.SplineEditor.Spline m_spline;
     [SerializeField] private float m_startingDistAlongSpline = 0.5f;
-
+       
     private float m_distAlongSpline = 0.0f;
+    private ImageSphere m_imageSphere = null;
 
     // **************************
     // Public functions
@@ -19,6 +20,8 @@ public class CarouselElement : MonoBehaviour
     public void Start()
     {
         m_distAlongSpline = m_startingDistAlongSpline;
+
+        m_imageSphere = gameObject.GetComponent<ImageSphere>();
     }  
 
     public float GetDistAlongSpline()
@@ -27,8 +30,33 @@ public class CarouselElement : MonoBehaviour
     }
 
     public void SetDistAlongSpline(float newDistAlongSpline)
-    {       
-        m_distAlongSpline = (newDistAlongSpline < 0) ? (newDistAlongSpline + 1.0f) : (newDistAlongSpline % 1.0f);
+    {               
+        if (newDistAlongSpline < 0.0f)
+        {
+            newDistAlongSpline += 1.0f;
+
+            if (m_imageSphere != null)
+            {
+                m_imageSphere.NextImage();
+            }
+        }
+
+        if (newDistAlongSpline > 1.0f)
+        {
+            newDistAlongSpline -= 1.0f;
+
+            if (m_imageSphere != null)
+            {
+                m_imageSphere.PrevImage();
+            }
+        }
+
+        m_distAlongSpline = newDistAlongSpline;
+    }
+
+    public void ResetToStartingDistAlongSpline()
+    {
+        m_distAlongSpline = m_startingDistAlongSpline;
     }
         
     public void Update()

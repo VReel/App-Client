@@ -102,6 +102,20 @@ public class Posts : MonoBehaviour
         return m_currPostIndex >= (numPosts - numImageSpheres);       
     }        
 
+    public bool IsValidRequest(int postImageIndex)
+    {
+        int numImageSpheres = m_imageSphereController.GetNumSpheres();
+        bool imageRequestStillValid = 
+            (m_currPostIndex != -1) && 
+            (m_currPostIndex <= postImageIndex) &&  
+            (postImageIndex < m_currPostIndex + numImageSpheres); // Request no longer valid as user has moved on from this page
+
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Checking PostIndex validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", 
+            imageRequestStillValid, m_currPostIndex, postImageIndex, numImageSpheres));
+
+        return imageRequestStillValid;
+    }
+
     public void OpenPublicTimeline()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: OpenPublicTimeline() called");
@@ -151,6 +165,7 @@ public class Posts : MonoBehaviour
         OpenPosts();
     } 
 
+    /*
     public void NextPosts()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: NextPosts() called");
@@ -171,7 +186,34 @@ public class Posts : MonoBehaviour
         m_coroutineQueue.EnqueueAction(RefreshPostsAtCurrIndex());
         m_coroutineQueue.EnqueueAction(DownloadThumbnailsAndSetSpheres());
     }
+    */
 
+    public void NextPost(int imageSphereIndex)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: NextPost() called with index: " + imageSphereIndex);
+
+        int numImagesToLoad = 1;
+        int numSpheres = m_imageSphereController.GetNumSpheres();
+        int numPosts = m_posts.Count;
+
+        m_currPostIndex = Mathf.Clamp(m_currPostIndex + numImagesToLoad, 0, numPosts);
+
+        //m_imageLoader.InvalidateLoading(); // Stop anything we may have already been loading
+        //m_coroutineQueue.Clear(); // Ensures we don't repeat operations
+
+        if (m_nextPageOfPosts != null)
+        { // By calling this every time a user presses the next button, we ensure he can never miss out on posts and don't overload the API            
+            m_coroutineQueue.EnqueueAction(StorePostsFromNextPage());
+        }
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: CurrPostIndex: " + m_currPostIndex);
+
+        int postIndex = m_currPostIndex + (numSpheres-1);
+        m_coroutineQueue.EnqueueAction(RefreshPostsAtIndex(postIndex));
+        m_coroutineQueue.EnqueueAction(DownloadThumbnailAndSetSphere(imageSphereIndex, postIndex));
+    }
+
+    /*
     public void PreviousPosts()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreviousPosts() called");
@@ -186,6 +228,26 @@ public class Posts : MonoBehaviour
 
         m_coroutineQueue.EnqueueAction(RefreshPostsAtCurrIndex());
         m_coroutineQueue.EnqueueAction(DownloadThumbnailsAndSetSpheres());
+    }
+    */
+
+    public void PreviousPost(int imageSphereIndex)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreviousPost() called with index: " + imageSphereIndex);
+
+        int numImagesToLoad = 1;
+        int numPosts = m_posts.Count;
+
+        m_currPostIndex = Mathf.Clamp(m_currPostIndex - numImagesToLoad, 0, numPosts);
+
+        //m_imageLoader.InvalidateLoading(); // Stop anything we may have already been loading
+        //m_coroutineQueue.Clear(); // Ensures we don't repeat operations
+
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: CurrPostIndex: " + m_currPostIndex);
+
+        int postIndex = m_currPostIndex;
+        m_coroutineQueue.EnqueueAction(RefreshPostsAtIndex(postIndex));
+        m_coroutineQueue.EnqueueAction(DownloadThumbnailAndSetSphere(imageSphereIndex, postIndex));
     }
 
     public void LikeOrUnlikePost(string postId, bool doLike)
@@ -353,7 +415,8 @@ public class Posts : MonoBehaviour
 
                 LoadImageInternalPlugin(
                     m_posts[postIndex].thumbnailUrl, 
-                    sphereIndex, 
+                    sphereIndex,
+                    postIndex,
                     m_posts[postIndex].postId, 
                     showLoading
                 );
@@ -376,6 +439,41 @@ public class Posts : MonoBehaviour
         }
     }
 
+    private IEnumerator DownloadThumbnailAndSetSphere(int sphereIndex, int postIndex)
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Downloading 1 image beginning at index {0}. We've found {1} posts!", postIndex, m_posts.Count));
+
+        if (postIndex < m_posts.Count)
+        {                   
+            bool showLoading = false;
+
+            LoadImageInternalPlugin(
+                m_posts[postIndex].thumbnailUrl, 
+                sphereIndex,
+                postIndex,
+                m_posts[postIndex].postId, 
+                showLoading
+            );
+
+            m_imageSphereController.SetMetadataAtIndex(
+                sphereIndex, 
+                m_posts[postIndex].userId, 
+                m_posts[postIndex].userHandle, 
+                m_posts[postIndex].caption, 
+                m_posts[postIndex].commentCount, 
+                m_posts[postIndex].likeCount,
+                m_posts[postIndex].likedByMe,
+                false
+            );
+        }
+        else
+        {
+            m_imageSphereController.HideSphereAtIndex(sphereIndex);
+        }
+    }
+
     public IEnumerator DownloadOriginalImageInternal(string postId)
     {
         yield return m_appDirector.VerifyInternetConnection();
@@ -393,6 +491,7 @@ public class Posts : MonoBehaviour
             LoadImageInternalPlugin(
                 m_posts[index].originalUrl, 
                 sphereIndex, 
+                Helper.kIgnoreImageIndex,
                 postId, 
                 showLoading
             );
@@ -401,6 +500,7 @@ public class Posts : MonoBehaviour
         m_loadingIcon.Hide();
     }
 
+    /*
     private IEnumerator RefreshPostsAtCurrIndex()
     {
         yield return m_appDirector.VerifyInternetConnection();
@@ -417,6 +517,19 @@ public class Posts : MonoBehaviour
                 yield return RefreshPostDataInternal(m_posts[postIndex].postId);
             }
         }
+    }
+    */
+
+    private IEnumerator RefreshPostsAtIndex(int postIndex)
+    {
+        yield return m_appDirector.VerifyInternetConnection();
+
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Refreshing post at index {0}!", postIndex));
+
+        if (postIndex < m_posts.Count)
+        {                   
+            yield return RefreshPostDataInternal(m_posts[postIndex].postId);
+        }           
     }
 
     private IEnumerator RefreshPostDataInternal(string postId, bool updateMetadata = false) // NOTE: Since URL's have a lifetime, we need to refresh the data at certain points...
@@ -454,11 +567,11 @@ public class Posts : MonoBehaviour
         }
     }        
 
-    private void LoadImageInternalPlugin(string url, int sphereIndex, string imageIdentifier, bool showLoading)
+    private void LoadImageInternalPlugin(string url, int sphereIndex, int postIndex, string imageIdentifier, bool showLoading)
     {        
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: LoadImageInternal for " + imageIdentifier);
 
-        m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, sphereIndex, url, imageIdentifier, showLoading);
+        m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, sphereIndex, postIndex, url, imageIdentifier, showLoading);
     }           
 
     //TODO: To remove this all I need to do is turn m_posts into a Map<ID, PostAttributes>...

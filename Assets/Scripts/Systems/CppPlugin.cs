@@ -198,7 +198,8 @@ public class CppPlugin
         yield return m_threadJob.WaitFor();
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished ToByteArray(), ran Job Successully = " + ranJobSuccessfully);
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: 1 " + (DateTime.UtcNow-startTime));
+
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: 1 " + (DateTime.UtcNow-startTime));
         startTime = DateTime.UtcNow;
 
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadIntoWorkingMemoryFromImagePath(), on background thread!");
@@ -214,7 +215,7 @@ public class CppPlugin
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadIntoWorkingMemoryFromImagePath(), ran Job Successully = " + ranJobSuccessfully); 
 
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: 2 " + (DateTime.UtcNow-startTime));
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: 2 " + (DateTime.UtcNow-startTime));
         startTime = DateTime.UtcNow;
 
 
@@ -231,7 +232,7 @@ public class CppPlugin
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateEmptyTexture(), Texture Handle = " + GetCurrStoredTexturePtr() );
 
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: 3 " + (DateTime.UtcNow-startTime));
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: 3 " + (DateTime.UtcNow-startTime));
         startTime = DateTime.UtcNow;
 
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadScanlinesIntoTextureFromWorkingMemory()");
@@ -244,7 +245,7 @@ public class CppPlugin
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished LoadScanlinesIntoTextureFromWorkingMemory()");
 
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: 4 " + (DateTime.UtcNow-startTime));
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: 4 " + (DateTime.UtcNow-startTime));
         startTime = DateTime.UtcNow;
 
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling CreateExternalTexture(), size of Texture is Width x Height = " + GetCurrStoredImageWidth() + " x " + GetCurrStoredImageHeight());
@@ -262,14 +263,14 @@ public class CppPlugin
         m_lastTextureOperatedOn.filterMode = FilterMode.Trilinear;
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished CreateExternalTexture()!");
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: 5 " + (DateTime.UtcNow-startTime));
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: 5 " + (DateTime.UtcNow-startTime));
         startTime = DateTime.UtcNow;
 
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling SetImageAtIndex()");
         imageSphereController.SetImageAtIndex(sphereIndex, m_lastTextureOperatedOn, imageIdentifier, textureIndex, true);
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Finished SetImageAtIndex()");
 
-        if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: 6 " + (DateTime.UtcNow-startTime));
+        //if (Debug.isDebugBuild) Debug.Log("------- VREEL-TEST: 6 " + (DateTime.UtcNow-startTime));
         startTime = DateTime.UtcNow;
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: Completed LoadImageFromStreamIntoImageSphere() with sphereIndex: " + sphereIndex + ", imageIdentifier: " + imageIdentifier + ", with TextureIndex: " + textureIndex);

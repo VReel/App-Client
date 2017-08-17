@@ -10,8 +10,10 @@ public class Carousel : MonoBehaviour
     [SerializeField] private bool m_active = true;
     [SerializeField] private float m_rotationalSwipeSenstivity = 0.1f; // sensitivity of rotation effect
     [SerializeField] private float m_rotationalDamp = 1.0f; // damping on rotation effect
-    [SerializeField] private VRStandardAssets.Menu.MenuButton m_menuButton;
     [SerializeField] private CarouselElement[] m_carouselItems;
+
+    private VRStandardAssets.Menu.MenuButton m_currMenuButton;
+    private SelectArrow m_currSelectArrow;
 
     // Rotation effect vars
     const float kRotationEpsilon = 0.1f;
@@ -46,13 +48,39 @@ public class Carousel : MonoBehaviour
         m_active = active;
     }
 
+    public bool IsAtMiddle() // NOTE: This function currently assumes an odd number of spheres...
+    {
+        const float kCentreItemGap = 0.02f;
+        for (int i = 0; i < m_carouselItems.Length; i++)
+        {            
+            if (Mathf.Abs(m_carouselItems[i].GetDistAlongSpline() - 0.5f) < kCentreItemGap) // 0.5 - e < d < 0.5 + e
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void ResetPositions()
+    {
+        for (int i = 0; i < m_carouselItems.Length; i++)
+        {
+            m_carouselItems[i].ResetToStartingDistAlongSpline();
+        }
+    }
+
+    /*
     public bool IsRotating()
     {        
         return (Mathf.Abs(m_currRotationalSpeed) > kRotationEpsilon) || m_isBeingManuallyRotated;
     }
+    */
 
-    public void OnScrollSelectedDown()
+    public void OnArrowSelectedDown(GameObject button)
     {       
+        m_currMenuButton = button.GetComponent<VRStandardAssets.Menu.MenuButton>();
+        m_currSelectArrow = button.GetComponent<SelectArrow>();
         m_touchXPosLastFrame = Input.mousePosition.x;
     }
 
@@ -61,15 +89,30 @@ public class Carousel : MonoBehaviour
     // **************************
                    
     private void UpdateRotationEffect()
-    {
-        if (m_menuButton.GetButtonDown() && m_menuButton.GetGazeOver())
-        {            
-            float movementInFrame = (Input.mousePosition.x - m_touchXPosLastFrame) * m_rotationalSwipeSenstivity;
+    {        
+        if (m_currMenuButton != null && m_currMenuButton.GetButtonDown() && m_currMenuButton.GetGazeOver())
+        {      
+            float movementInFrame = 0.0f;
+            if (m_currSelectArrow.GetArrowType() == SelectArrow.ArrowType.kNext)
+            {
+                movementInFrame = -m_rotationalSwipeSenstivity;
+            }
+            else if (m_currSelectArrow.GetArrowType() == SelectArrow.ArrowType.kPrev)
+            {
+                movementInFrame = m_rotationalSwipeSenstivity;
+            }
+
+            /*
+            if (m_currSelectArrow.GetArrowType() == SelectArrow.ArrowType.kScroll)
+            {
+                movementInFrame = (Input.mousePosition.x - m_touchXPosLastFrame) * m_rotationalSwipeSenstivity;
+            }
+            */
+
             for (int i = 0; i < m_carouselItems.Length; i++)
             {
                 m_carouselItems[i].SetDistAlongSpline(m_carouselItems[i].GetDistAlongSpline() + movementInFrame);
             }
-
 
             const float kSpeedDivisionFactor = 10.0f;
             float diffInXFromLastFrame = Input.mousePosition.x - m_touchXPosLastFrame;
@@ -79,6 +122,7 @@ public class Carousel : MonoBehaviour
 
             m_rotationalSpeedOnRelease = m_currRotationalSpeed;
         }
+        /*
         else
         {
             float newAngle = m_currRotationalSpeed;
@@ -89,5 +133,6 @@ public class Carousel : MonoBehaviour
 
             m_isBeingManuallyRotated = false;
         }
+        */
     }
 }

@@ -29,6 +29,7 @@ public class AppDirector : MonoBehaviour
     [SerializeField] private GameObject m_menuBar;
     [SerializeField] private MenuController m_menuController;
     [SerializeField] private ImageSphereController m_imageSphereController;
+    [SerializeField] private Carousel m_carousel;
     [SerializeField] private Posts m_posts;
     [SerializeField] private Search m_search;
     [SerializeField] private Profile m_profile;
@@ -216,6 +217,7 @@ public class AppDirector : MonoBehaviour
     {
         Resources.UnloadUnusedAssets();
         m_imageSphereController.HideAllImageSpheres();
+        m_carousel.ResetPositions();
         m_keyboard.CancelText();
 
         m_imageLoader.InvalidateLoading();
@@ -237,6 +239,7 @@ public class AppDirector : MonoBehaviour
     {
         Resources.UnloadUnusedAssets();
         m_imageSphereController.HideAllImageSpheres();
+        m_carousel.ResetPositions();
         m_keyboard.CancelText();
 
         m_imageLoader.InvalidateLoading();
@@ -258,6 +261,7 @@ public class AppDirector : MonoBehaviour
     {
         Resources.UnloadUnusedAssets();
         m_imageSphereController.HideAllImageSpheres();
+        m_carousel.ResetPositions();
         m_keyboard.CancelText();
 
         m_imageLoader.InvalidateLoading();
@@ -279,6 +283,7 @@ public class AppDirector : MonoBehaviour
     {
         Resources.UnloadUnusedAssets();
         m_imageSphereController.HideAllImageSpheres();
+        m_carousel.ResetPositions();
         m_keyboard.CancelText();
 
         m_imageLoader.InvalidateLoading();
@@ -300,6 +305,7 @@ public class AppDirector : MonoBehaviour
     {
         Resources.UnloadUnusedAssets();
         m_imageSphereController.HideAllImageSpheres();
+        m_carousel.ResetPositions();
         m_keyboard.CancelText();
 
         m_imageLoader.InvalidateLoading();

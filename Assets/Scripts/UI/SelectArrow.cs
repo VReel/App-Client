@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.VR;               //VRSettings
 
+// NOTE: This class is being used for scroll too, it should probably be renamed...
 public class SelectArrow : MonoBehaviour 
 {
     // **************************
@@ -9,6 +11,7 @@ public class SelectArrow : MonoBehaviour
 
     [SerializeField] private AppDirector m_appDirector;
     [SerializeField] private MenuController m_menuController;
+    [SerializeField] private Carousel m_carousel;
     [SerializeField] private Posts m_posts;
     [SerializeField] private Gallery m_gallery;
     [SerializeField] private Search m_search;
@@ -17,16 +20,23 @@ public class SelectArrow : MonoBehaviour
     [SerializeField] private Image m_transparentBackgroundImage;
     [SerializeField] private ArrowType m_arrowType = ArrowType.kNext;
 
+    private VRStandardAssets.Menu.MenuButton m_menuButton;
+
     public enum ArrowType
     {
         kPrev,
-        kNext,
-        kScroll
+        kNext
+        //kScroll
     };
 
     // **************************
     // Public functions
     // **************************
+
+    public void Start()
+    {
+        m_menuButton = gameObject.GetComponent<VRStandardAssets.Menu.MenuButton>();
+    }
 
     public void Update() //TODO: Remove this Update and make this a simpler event based class!
     {
@@ -35,7 +45,12 @@ public class SelectArrow : MonoBehaviour
 
     public void OnButtonSelected()
     {
-        OnButtonSelectedInternal();
+        //OnButtonSelectedInternal();
+    }
+
+    public ArrowType GetArrowType()
+    {
+        return m_arrowType;
     }
 
     // **************************
@@ -71,17 +86,11 @@ public class SelectArrow : MonoBehaviour
         {
             if (m_arrowType == ArrowType.kNext)
             {
-                return !m_posts.IsPostIndexAtEnd();
+                return !(m_posts.IsPostIndexAtEnd() && m_carousel.IsAtMiddle());
             }
             else if (m_arrowType == ArrowType.kPrev)
             {
-                return !m_posts.IsPostIndexAtStart();
-            }
-            else if (m_arrowType == ArrowType.kScroll)
-            {
-                if (Debug.isDebugBuild) Debug.Log("------- VREEL: Scroll visible: " + (!m_posts.IsPostIndexAtEnd() || !m_posts.IsPostIndexAtStart()) );
-
-                return !m_posts.IsPostIndexAtEnd() || !m_posts.IsPostIndexAtStart();
+                return !(m_posts.IsPostIndexAtStart() && m_carousel.IsAtMiddle());
             }
         }
 
@@ -89,23 +98,20 @@ public class SelectArrow : MonoBehaviour
         {
             if (m_arrowType == ArrowType.kNext)
             {
-                return !m_gallery.IsGalleryIndexAtEnd();
+                return !(m_gallery.IsGalleryIndexAtEnd() && m_carousel.IsAtMiddle());
             }
             else if (m_arrowType == ArrowType.kPrev)
             {
-                return !m_gallery.IsGalleryIndexAtStart();
-            }
-            else if (m_arrowType == ArrowType.kScroll)
-            {
-                return !m_gallery.IsGalleryIndexAtEnd() || !m_gallery.IsGalleryIndexAtStart();
+                return !(m_gallery.IsGalleryIndexAtStart() && m_carousel.IsAtMiddle());
             }
         }
             
         return false;
     }
 
+    /*
     private void OnButtonSelectedInternal()
-    {
+    {        
         if (IsPostsActive())
         {
             if (m_arrowType == ArrowType.kNext)
@@ -130,6 +136,7 @@ public class SelectArrow : MonoBehaviour
             }
         }  
     }
+    */
 
     private bool IsPostsActive()
     {

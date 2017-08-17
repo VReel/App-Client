@@ -314,7 +314,7 @@ public class Profile : MonoBehaviour
             {
                 if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadThumbnailImage() loading User Thumbnail Image for: " + m_thumbnailUrl);
 
-                m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kProfilePageSphereIndex, m_thumbnailUrl, m_userId, false);
+                m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kProfilePageSphereIndex, Helper.kIgnoreImageIndex, m_thumbnailUrl, m_userId, false);
             }
             else
             {
@@ -327,7 +327,7 @@ public class Profile : MonoBehaviour
             {
                 if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadThumbnailImage() loading User Thumbnail Image for: " + m_loggedUserThumbnailUrl);
 
-                m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kMenuBarProfileSphereIndex, m_loggedUserThumbnailUrl, m_user.m_id, false);
+                m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kMenuBarProfileSphereIndex, Helper.kIgnoreImageIndex, m_loggedUserThumbnailUrl, m_user.m_id, false);
             }
             else
             {
@@ -350,13 +350,13 @@ public class Profile : MonoBehaviour
             {
                 if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadOriginalImageInternal() loading User Original Image for: " + m_originalUrl);
 
-                m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kSkyboxSphereIndex, m_originalUrl, m_userId, true);
+                m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kSkyboxSphereIndex, Helper.kIgnoreImageIndex, m_originalUrl, m_userId, true);
             }
             else if (imageSphereType == ImageSphereType.kMenuBar)
             {
                 if (Debug.isDebugBuild) Debug.Log("------- VREEL: DownloadOriginalImageInternal() loading User Original Image for: " + m_loggedUserOriginalUrl);
 
-                m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kSkyboxSphereIndex, m_loggedUserOriginalUrl, m_user.m_id, true);
+                m_imageLoader.LoadImageFromURLIntoImageSphere(m_imageSphereController, Helper.kSkyboxSphereIndex, Helper.kIgnoreImageIndex, m_loggedUserOriginalUrl, m_user.m_id, true);
             }
         }
 

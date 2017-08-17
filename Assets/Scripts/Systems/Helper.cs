@@ -16,6 +16,7 @@ public static class Helper
     public const int kSkyboxSphereIndex = -1;
     public const int kProfilePageSphereIndex = -2;
     public const int kMenuBarProfileSphereIndex = -3;
+    public const int kIgnoreImageIndex = -1; // This is for the ImageLoader to ignore the index passed in when deciding whether request is old
 
     // **************************
     // Public functions

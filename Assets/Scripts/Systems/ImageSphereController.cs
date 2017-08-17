@@ -104,9 +104,9 @@ public class ImageSphereController : MonoBehaviour
         m_imageSphereCanvas.SetActive(enable);
     }
 
-    public void SetImageAtIndexToLoading(int sphereIndex)
+    public void SetImageAtIndexToLoading(int sphereIndex, bool animateOnSet)
     {
-        SetImageAtIndex(sphereIndex, m_sphereLoadingTexture, kLoadingTextureFilePath, m_imageLoader.GetLoadingTextureIndex(), true);
+        SetImageAtIndex(sphereIndex, m_sphereLoadingTexture, kLoadingTextureFilePath, m_imageLoader.GetLoadingTextureIndex(), animateOnSet);
     }
 
     public void SetAllImageSpheresToLoading()
@@ -172,7 +172,7 @@ public class ImageSphereController : MonoBehaviour
     {
         if (0 <= sphereIndex && sphereIndex < GetNumSpheres())
         {
-            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetMetadataToEmpty();
+            m_imageSpheres[sphereIndex].GetComponent<ImageSphere>().SetMetadataToEmpty(false);
         }
         else
         {

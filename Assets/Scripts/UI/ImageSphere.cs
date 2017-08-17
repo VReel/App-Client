@@ -42,7 +42,7 @@ public class ImageSphere : MonoBehaviour
     private int m_numLikes;
     private bool m_heartOn;
 
-    private int m_imageSphereIndex = -1; // ImageSphere's know their index into the ImageSphereController - this is currently only for Debug!
+    private int m_imageSphereIndex = -1; // ImageSphere's know their index into the ImageSphereController!
     private int m_currTextureIndex = -1; // ImageSphere's track the index of the texture they are pointing to
     private int m_nextTextureIndex = -1; // ImageSphere's also track the index of the next texture they will point to - necessary because we don't swap textures immediately
     private CoroutineQueue m_coroutineQueue;   
@@ -115,7 +115,7 @@ public class ImageSphere : MonoBehaviour
         }
     }
 
-    public void SetMetadataToEmpty(bool updateMetadata = false)
+    public void SetMetadataToEmpty(bool updateMetadata)
     {        
         m_handle = "";
         m_caption = "";
@@ -174,7 +174,7 @@ public class ImageSphere : MonoBehaviour
 
     public void Hide()
     {        
-        SetMetadataToEmpty();
+        SetMetadataToEmpty(false);
 
         if (m_coroutineQueue != null)
         {
@@ -185,8 +185,7 @@ public class ImageSphere : MonoBehaviour
 
     public void ForceHide()
     {        
-        SetMetadataToEmpty();
-        UpdateMetadata();
+        SetMetadataToEmpty(true);
 
         if (m_coroutineQueue != null)
         {
@@ -256,6 +255,36 @@ public class ImageSphere : MonoBehaviour
     public bool IsLoggedUserImage()
     {
         return m_user.IsCurrentUser(m_userId);
+    }
+
+    public void NextImage()
+    {        
+        SetMetadataToEmpty(true);
+        m_imageSphereController.SetImageAtIndexToLoading(m_imageSphereIndex, false);
+
+        if (m_appDirector.GetState() == AppDirector.AppState.kGallery)
+        {
+            m_gallery.NextImage(m_imageSphereIndex);
+        }
+        else
+        {
+            m_posts.NextPost(m_imageSphereIndex);
+        }
+    }
+
+    public void PrevImage()
+    {        
+        SetMetadataToEmpty(true);
+        m_imageSphereController.SetImageAtIndexToLoading(m_imageSphereIndex, false);
+
+        if (m_appDirector.GetState() == AppDirector.AppState.kGallery)
+        {
+            m_gallery.PreviousImage(m_imageSphereIndex);
+        }
+        else
+        {
+            m_posts.PreviousPost(m_imageSphereIndex);
+        }
     }
 
     // **************************

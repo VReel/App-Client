@@ -11,6 +11,8 @@ public class ImageLoader : MonoBehaviour
     // **************************
 
     [SerializeField] private AppDirector m_appDirector;
+    [SerializeField] private Posts m_posts;
+    [SerializeField] private Gallery m_gallery;
     [SerializeField] private LoadingIcon m_loadingIcon;
 
     private const int kMaxNumTextures = 12; // 5 ImageSpheres + 1 Skybox + 1 ProfileImage + 5 spare textures
@@ -75,22 +77,27 @@ public class ImageLoader : MonoBehaviour
         m_coroutineQueue.Clear();
     }
 
-    public void LoadImageFromPathIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, string filePathAndIdentifier, bool showLoading, int maxImageWidth)
+    public void LoadImageFromPathIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, int galleryImageIndex, string filePathAndIdentifier, bool showLoading, int maxImageWidth)
     {
-        m_coroutineQueue.EnqueueAction(LoadImageFromPathIntoImageSphereInternal(imageSphereController, sphereIndex, filePathAndIdentifier, showLoading, maxImageWidth));
+        m_coroutineQueue.EnqueueAction(LoadImageFromPathIntoImageSphereInternal(imageSphereController, sphereIndex, galleryImageIndex, filePathAndIdentifier, showLoading, maxImageWidth));
     }
 
-    public void LoadImageFromURLIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, string url, string filePathAndIdentifier, bool showLoading)
+    public void LoadImageFromURLIntoImageSphere(ImageSphereController imageSphereController, int sphereIndex, int postImageIndex, string url, string filePathAndIdentifier, bool showLoading)
     {
-        m_coroutineQueue.EnqueueAction(LoadImageFromURLIntoImageSphereInternal(imageSphereController, sphereIndex, url, filePathAndIdentifier, showLoading));
+        m_coroutineQueue.EnqueueAction(LoadImageFromURLIntoImageSphereInternal(imageSphereController, sphereIndex, postImageIndex, url, filePathAndIdentifier, showLoading));
     }        
 
     // **************************
     // Private/Helper functions
     // **************************
 
-    private IEnumerator LoadImageFromPathIntoImageSphereInternal(ImageSphereController imageSphereController, int sphereIndex, string filePathAndIdentifier, bool showLoading, int maxImageWidth)
-    {
+    private IEnumerator LoadImageFromPathIntoImageSphereInternal(ImageSphereController imageSphereController, int sphereIndex, int galleryImageIndex, string filePathAndIdentifier, bool showLoading, int maxImageWidth)
+    {        
+        if (galleryImageIndex != Helper.kIgnoreImageIndex && !m_gallery.IsValidRequest(galleryImageIndex))
+        {            
+            yield break;
+        }
+
         m_isLoading = true;
         if (showLoading)
         {
@@ -107,8 +114,13 @@ public class ImageLoader : MonoBehaviour
         }
     }
 
-    private IEnumerator LoadImageFromURLIntoImageSphereInternal(ImageSphereController imageSphereController, int sphereIndex, string url, string imageIdentifier, bool showLoading)
+    private IEnumerator LoadImageFromURLIntoImageSphereInternal(ImageSphereController imageSphereController, int sphereIndex, int postImageIndex, string url, string imageIdentifier, bool showLoading)
     {
+        if (postImageIndex != Helper.kIgnoreImageIndex && !m_posts.IsValidRequest(postImageIndex))
+        {
+            yield break;
+        }
+
         yield return m_appDirector.VerifyInternetConnection();
 
         m_isLoading = true;
@@ -136,7 +148,7 @@ public class ImageLoader : MonoBehaviour
         }
         else
         {
-            imageSphereController.SetImageAtIndexToLoading(sphereIndex);
+            imageSphereController.SetImageAtIndexToLoading(sphereIndex, true);
         }
             
         m_isLoading = false;

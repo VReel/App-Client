@@ -78,6 +78,20 @@ public class Gallery : MonoBehaviour
         int numFiles = m_galleryImageFilePaths.Count;
         return m_currGalleryImageIndex >= (numFiles - numImageSpheres);       
     }
+
+    public bool IsValidRequest(int galleryImageIndex)
+    {
+        int numImageSpheres = m_imageSphereController.GetNumSpheres();
+        bool imageRequestStillValid = 
+            (m_currGalleryImageIndex != -1) && 
+            (m_currGalleryImageIndex <= galleryImageIndex) &&  
+            (galleryImageIndex < m_currGalleryImageIndex + numImageSpheres); // Request no longer valid as user has moved on from this page
+
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Checking GalleryIndex validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", 
+            imageRequestStillValid, m_currGalleryImageIndex, galleryImageIndex, numImageSpheres));
+
+        return imageRequestStillValid;
+    }
         
     public void UploadImage()
     {     
@@ -97,10 +111,11 @@ public class Gallery : MonoBehaviour
     }
 
     public void LoadImageOriginal(string filePath)
-    {
-        LoadImageInternalPlugin(filePath, Helper.kSkyboxSphereIndex, true, Helper.kMaxImageWidth);
+    {        
+        LoadImageInternalPlugin(filePath, Helper.kSkyboxSphereIndex, Helper.kIgnoreImageIndex, true, Helper.kMaxImageWidth);
     }
 
+    /*
     public void NextImages()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: NextImages() called");
@@ -114,7 +129,25 @@ public class Gallery : MonoBehaviour
         m_coroutineQueue.Clear(); // Throw away previous operations
         m_coroutineQueue.EnqueueAction(LoadImageThumbnails(m_currGalleryImageIndex, numImagesToLoad));
     }
+    */
 
+    public void NextImage(int imageSphereIndex)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: NextImage() called with index: " + imageSphereIndex);
+
+        int numImagesToLoad = 1;
+        int numFilePaths = m_galleryImageFilePaths.Count;
+
+        m_currGalleryImageIndex = Mathf.Clamp(m_currGalleryImageIndex + numImagesToLoad, 0, numFilePaths);
+
+        //m_imageLoader.InvalidateLoading();
+        //m_coroutineQueue.Clear(); // Throw away previous operations
+
+        int galleryImageIndex = m_currGalleryImageIndex + (m_imageSphereController.GetNumSpheres()-1);
+        m_coroutineQueue.EnqueueAction(LoadImageThumbnail(imageSphereIndex, galleryImageIndex));
+    }
+
+    /*
     public void PreviousImages()
     {
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreviousImages() called");
@@ -127,6 +160,23 @@ public class Gallery : MonoBehaviour
         m_imageLoader.InvalidateLoading();
         m_coroutineQueue.Clear(); // Throw away previous operations
         m_coroutineQueue.EnqueueAction(LoadImageThumbnails(m_currGalleryImageIndex, numImagesToLoad));
+    }
+    */
+
+    public void PreviousImage(int imageSphereIndex)
+    {
+        if (Debug.isDebugBuild) Debug.Log("------- VREEL: PreviousImage() called with index: " + imageSphereIndex);
+
+        int numImagesToLoad = 1;
+        int numFilePaths = m_galleryImageFilePaths.Count;
+
+        m_currGalleryImageIndex = Mathf.Clamp(m_currGalleryImageIndex - numImagesToLoad, 0, numFilePaths);
+
+        //m_imageLoader.InvalidateLoading();
+        //m_coroutineQueue.Clear(); // Throw away previous operations
+
+        int galleryImageIndex = m_currGalleryImageIndex;
+        m_coroutineQueue.EnqueueAction(LoadImageThumbnail(imageSphereIndex, galleryImageIndex));
     }
 
     // **************************
@@ -415,14 +465,7 @@ public class Gallery : MonoBehaviour
         if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Loading {0} images beginning at index {1}. There are {2} images in the gallery!", 
             numImagesToLoad, startingGalleryImageIndex, m_galleryImageFilePaths.Count));
 
-        Resources.UnloadUnusedAssets();
-
-        bool imageRequestStillValid = 
-            (m_currGalleryImageIndex != -1) && 
-            (m_currGalleryImageIndex <= startingGalleryImageIndex) &&  
-            (startingGalleryImageIndex < m_currGalleryImageIndex + numImagesToLoad); // Request no longer valid as user has moved on from this page
-
-        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Checking validity returned '{0}' when checking that {1} <= {2} < {1}+{3}", imageRequestStillValid, startingGalleryImageIndex, m_currGalleryImageIndex, numImagesToLoad));
+        bool imageRequestStillValid = IsValidRequest(startingGalleryImageIndex);
         if (!imageRequestStillValid)
         {
             if (Debug.isDebugBuild) Debug.Log("------- VREEL: LoadImages() with index = " + startingGalleryImageIndex + " has failed");
@@ -443,7 +486,7 @@ public class Gallery : MonoBehaviour
                 if (identifierValid)
                 {
                     bool showLoading = sphereIndex == 0; // The first one in the gallery should do some loading to let the user know things are happening
-                    LoadImageInternalPlugin(filePath, sphereIndex, showLoading, Helper.kThumbnailWidth);
+                    LoadImageInternalPlugin(filePath, sphereIndex, currGalleryImageIndex, showLoading, Helper.kThumbnailWidth);
                     m_imageSphereController.SetMetadataToEmptyAtIndex(sphereIndex);
                 }
             }
@@ -455,9 +498,39 @@ public class Gallery : MonoBehaviour
 
     }
 
-    private void LoadImageInternalPlugin(string filePath, int sphereIndex, bool showLoading, int maxImageWidth)
+    private IEnumerator LoadImageThumbnail(int imageSphereIndex, int galleryImageIndex)
+    {
+        if (Debug.isDebugBuild) Debug.Log(string.Format("------- VREEL: Loading 1 image beginning at index {0}. There are {1} images in the gallery!", 
+            galleryImageIndex, m_galleryImageFilePaths.Count));
+
+        bool imageRequestStillValid = IsValidRequest(galleryImageIndex);
+        if (!imageRequestStillValid)
+        {
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: LoadImages() with index = " + galleryImageIndex + " is no longer valid");
+            yield break;
+        }
+
+        if (galleryImageIndex < m_galleryImageFilePaths.Count)
+        {                      
+            string filePath = m_galleryImageFilePaths[galleryImageIndex];
+
+            bool identifierValid = filePath.CompareTo(m_imageSphereController.GetIdentifierAtIndex(imageSphereIndex)) != 0; // If file-path is the same then ignore request
+            if (Debug.isDebugBuild) Debug.Log("------- VREEL: Checking that filePath has changed has returned = " + identifierValid);
+            if (identifierValid)
+            {                
+                LoadImageInternalPlugin(filePath, imageSphereIndex, galleryImageIndex, false, Helper.kThumbnailWidth);
+                m_imageSphereController.SetMetadataToEmptyAtIndex(imageSphereIndex);
+            }
+        }
+        else
+        {
+            m_imageSphereController.HideSphereAtIndex(imageSphereIndex);
+        }
+    }
+
+    private void LoadImageInternalPlugin(string filePath, int sphereIndex, int galleryImageIndex, bool showLoading, int maxImageWidth)
     {   
-        m_imageLoader.LoadImageFromPathIntoImageSphere(m_imageSphereController, sphereIndex, filePath, showLoading, maxImageWidth);
+        m_imageLoader.LoadImageFromPathIntoImageSphere(m_imageSphereController, sphereIndex, galleryImageIndex, filePath, showLoading, maxImageWidth);
     }        
 
     private bool CreateSmallerImageWithResolution(string originalImagePath, string newImagePath, int newResolutionWidth, bool debugOn)
