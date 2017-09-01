@@ -313,13 +313,17 @@ public class Posts : MonoBehaviour
         m_loadingIcon.Hide();
     }
 
+
+    /*
+    if (tag == 0x0100) m_currImageWidth = off;
+    if (tag == 0x0101) m_currImageHeight = off;
+    */
+
     private IEnumerator StorePostsFromNextPage()
     {
         yield return m_appDirector.VerifyInternetConnection();
 
         if (Debug.isDebugBuild) Debug.Log("------- VREEL: StorePostsFromNextPage() for page: " + m_nextPageOfPosts + ", for PostType: " + m_postsType.ToString());       
-
-        m_loadingIcon.Display(); //NOTE: This should stop the following operation from ever being cut half-way through
 
         yield return GetPosts(m_nextPageOfPosts);
 
@@ -327,8 +331,6 @@ public class Posts : MonoBehaviour
         {
             StoreNewPosts();
         }
-
-        m_loadingIcon.Hide();
     }
 
     private IEnumerator GetPosts(string nextPageOfPosts = "")

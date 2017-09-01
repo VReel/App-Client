@@ -4,6 +4,7 @@
 #include <vector>
 #include <ctime>
 #include <chrono>
+#include <fstream>
 #include <android/log.h>
 #include <GLES3/gl3.h>
 #include "Unity/IUnityGraphics.h"
@@ -24,6 +25,7 @@ int m_initMaxNumTextures = 0; // Set on Init - sets maximum textures to gen!
 int m_currTextureIndex = 0;
 
 stbi_uc* m_pCurrImage = NULL;
+bool m_useExif = false; // Only relates to files that live on the phone, not to files in the cloud
 int m_maxImageWidth = 4096; // 2^12 to begin with - This is set at runtime in order to limit size of Gallery Images
 int m_currImageWidth = 0;
 int m_currImageHeight = 0;
@@ -227,6 +229,124 @@ bool ReampleImageToMaxWidthAndNewType()
     return true;
 }
 
+// return a vector containing JPEG thummnail for an EXif file.
+std::vector<char> FindExifJpeg(const char* pFileName)
+{
+    std::ifstream f(pFileName, std::ios::binary);
+
+    // Loop over JPEG markers
+    while (!f.eof())
+    {
+        int t = (uint8_t)f.get();
+        //printf("%08x %02x\n", (int)f.tellg()-1, t);
+        if (t != 0xff)
+        {
+            break;
+        }
+        int marker = (uint8_t)f.get();
+
+        if (marker == 0xd8 || marker == 0xd9)
+        {
+            // Start/end of image
+            //printf("%08x %02x %02x size = %04x\n", (int)f.tellg(), t, marker, 0);
+        }
+        else if (marker == 0xda)
+        {
+            // start of JPEG data
+            //printf("%08x %02x %02x size = %04x\n", (int)f.tellg(), t, marker, 0);
+            break;
+        }
+        else
+        {
+            // General tag: size is encoded in two bytes.
+            int hibyte = (uint8_t)f.get();
+            int lobyte = (uint8_t)f.get();
+            int size = hibyte * 0x100 + lobyte;
+            //LOGI("%08x %02x %02x size = %04d\n", (int)f.tellg(), t, marker, size);
+
+            // ff e1 tag is APP1
+            if (marker == 0xe1)
+            {
+                std::vector<char> exif(size-2);
+                f.read(exif.data(), size-2);
+                char *d = exif.data();
+                char *base = d + 6;
+                // APP1 tags with "Exif\0\0" are Exif data encoded as TIFF data.
+                static const char exifHdrLe[] = { 0x45, 0x78, 0x69, 0x66, 0x00, 0x00, 0x49, 0x49, 0x2A, 0x00, 0x08, 0x00, 0x00, 0x00 };
+                static const char exifHdrBe[] = { 0x45, 0x78, 0x69, 0x66, 0x00, 0x00, 0x4D, 0x4D, 0x00, 0x2A, 0x00, 0x00, 0x00, 0x08 };
+                auto sz = sizeof(exifHdrLe);
+                bool isLe = exif.size() > sz + 2 && std::mismatch(d, d+sz, exifHdrLe).first == d+sz;
+                bool isBe = exif.size() > sz + 2 && std::mismatch(d, d+sz, exifHdrBe).first == d+sz;
+                char *dmax = d + exif.size();
+
+                // Two byte orders are possible (madness!)
+                if (isLe || isBe)
+                {
+                    //printf("EXIF!\n");
+                    d += sz;
+                    auto b2 = [&]()
+                    {
+                        int b0 = (uint8_t)*d++;
+                        int b1 = (uint8_t)*d++;
+                        return isBe ? b0 * 0x100 + b1 : b1 * 0x100 + b0;
+                    };
+                    auto b4 = [&]()
+                    {
+                        int w0 = b2();
+                        int w1 = b2();
+                        return isBe ? w0 * 0x10000 + w1 : w1 * 0x10000 + w0;
+                    };
+
+                    // Loop over TIFF tags finding the JPEG image data
+                    int jpegOffset  = 0;
+                    int jpegSize = 0;
+                    while (d+2 <= dmax)
+                    {
+                        int numEntries = b2();
+                        //printf("ne=%d\n", numEntries);
+                        if (d + numEntries * 12 + 4 > dmax)
+                        {
+                            break;
+                        }
+                        for (int i = 0; i != numEntries; ++i)
+                        {
+                            int tag = b2();
+                            int fmt = b2();
+                            int nc = b4();
+                            int off = b4();
+                            //printf("%04x %04x %08x %08x\n", tag, fmt, nc, off);
+                            if (tag == 0x0201) jpegOffset = off;
+                            if (tag == 0x0202) jpegSize = off;
+                        }
+                        int next = b4();
+                        //printf("%08x\n", next);
+                        if (next)
+                        {
+                            d = base + next;
+                        }
+                        else
+                            break;
+                    }
+                    //printf("%08x..%08x\n", jpegOffset, jpegSize);
+                    if (jpegOffset && jpegSize && jpegOffset > 0 && base + jpegOffset <= dmax)
+                    {
+                        //printf("jpeg found\n");
+                        char *b = base + jpegOffset;
+                        char *e = b + jpegSize;
+                        return std::vector<char>(b, e);
+                    }
+                }
+            }
+            else
+            {
+                f.seekg(size-2, std::ios::cur);
+            }
+        }
+    }
+
+    return std::vector<char>{};
+}
+
 // **************************
 // Private functions - accessed through OnRenderEvent()
 // **************************
@@ -407,6 +527,11 @@ void SetMaxPixelsUploadedPerFrame(int maxPixelsUploadedPerFrame)
     m_maxPixelsUploadedPerFrame = maxPixelsUploadedPerFrame;
 }
 
+void SetUseExif(bool useExif)
+{
+    m_useExif = useExif;
+}
+
 void SetMaxImageWidth(int maxImageWidth)
 {
     m_maxImageWidth = maxImageWidth;
@@ -449,9 +574,19 @@ bool LoadIntoWorkingMemoryFromImagePath(char* pFileName)
     int comp = -1;
     m_currImageWidth = m_currImageHeight = 0;
 
-    m_pCurrImage = stbi_load(pFileName, &m_currImageWidth, &m_currImageHeight, &comp, kNumStbChannels);
+    if (m_useExif)
+    {
+        auto jpeg = FindExifJpeg(pFileName);
+        std::ofstream("tempExif.jpg", std::ios::binary).write(jpeg.data(), jpeg.size());
+        pFileName = (char*) "tempExif.jpg";
+        //m_pCurrImage = reinterpret_cast<stbi_uc*>(jpeg.data());
+    }
 
-    ReampleImageToMaxWidthAndNewType();
+    m_pCurrImage = stbi_load(pFileName, &m_currImageWidth, &m_currImageHeight, &comp, kNumStbChannels);
+    if (!m_useExif)
+    {
+        ReampleImageToMaxWidthAndNewType();
+    }
 
     LOGI("Image Loaded has Width = %d, Height = %d, Comp = %d\n", m_currImageWidth, m_currImageHeight, comp);
 

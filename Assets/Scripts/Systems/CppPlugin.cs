@@ -31,6 +31,9 @@ public class CppPlugin
     private static extern void SetMaxPixelsUploadedPerFrame(int maxPixelsUploadedPerFrame);
 
     [DllImport ("cppplugin")]
+    private static extern void SetUseExif(bool useExif);
+
+    [DllImport ("cppplugin")]
     private static extern void SetMaxImageWidth(int maxImageWidth);
 
     [DllImport ("cppplugin")]
@@ -118,6 +121,7 @@ public class CppPlugin
 
         SetRGB565On(Helper.kRGB565On);
         SetMaxImageWidth(maxImageWidth);
+        SetUseExif(false); //SetUseExif(maxImageWidth == Helper.kThumbnailWidth);
 
         //if (Debug.isDebugBuild) Debug.Log("------- VREEL: Calling LoadIntoWorkingMemoryFromImagePath(), on background thread!");
         yield return m_threadJob.WaitFor();
@@ -182,7 +186,6 @@ public class CppPlugin
 
         SetRGB565On(Helper.kRGB565On);
         SetMaxImageWidth(Helper.kMaxImageWidth);
-
 
 
         var startTime = DateTime.UtcNow;
